@@ -1,0 +1,14 @@
+2026-06-11 18:15:15 - app.services.upload_service - INFO - UploadService initialized
+2026-06-11 18:15:15 - app.core.database - INFO - SQLite database initialized at C:\Users\tanis\OneDrive\Documents\freda-backend\backend\data\freda.db
+2026-06-11 18:15:19 - app.core.database - INFO - SQLite database initialized at C:\Users\tanis\OneDrive\Documents\freda-backend\backend\data\freda.db
+2026-06-11 18:15:20 - app.services.parser_service - INFO - ParserService initialized with CSV, XLSX/XLS, JSON, PDF, DOCX, TXT parsers
+2026-06-11 18:15:24 - backend.app.main - INFO - Starting F.R.E.D.A v0.1.0
+2026-06-11 18:15:24 - backend.app.main - INFO - Server configured: 0.0.0.0:8000
+2026-06-11 18:15:24 - app.core.database - INFO - SQLite database initialized at C:\Users\tanis\OneDrive\Documents\freda-backend\backend\data\freda.db
+2026-06-11 18:15:24 - backend.app.main - INFO - Application initialization complete
+2026-06-11 18:15:24 - backend.app.main - INFO - Scheduler: refresh_scheduler_loop started.
+2026-06-11 18:15:24 - backend.app.main - INFO - Shutting down F.R.E.D.A
+2026-06-11 18:15:25 - app.services.upload_service - INFO - UploadService initialized
+2026-06-11 18:15:25 - app.core.database - INFO - SQLite database initialized at C:\Users\tanis\OneDrive\Documents\freda-backend\backend\data\freda.db
+2026-06-11 18:15:27 - app.core.database - INFO - SQLite database initialized at C:\Users\tanis\OneDrive\Documents\freda-backend\backend\data\freda.db
+2026-06-11 18:15:27 - app.services.parser_service - INFO - ParserService initialized with CSV, XLSX/XLS, JSON, PDF, DOCX, TXT parsers

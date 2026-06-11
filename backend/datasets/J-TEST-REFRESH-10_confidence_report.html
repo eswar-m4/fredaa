@@ -1,0 +1,44 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Confidence Report - Keysight</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; color: #111827; }
+    .meta { border: 1px solid #d1d5db; border-radius: 10px; padding: 12px; margin-bottom: 14px; background-color: #f9fafb; }
+    .meta div { margin: 3px 0; }
+    .confidence-old { color: #b91c1c; font-weight: 700; text-decoration: line-through; }
+    .confidence-new { color: #047857; font-weight: 700; }
+    .confidence-arrow { color: #6b7280; }
+    .source-wrap { border: 1px solid #e5e7eb; border-radius: 10px; padding: 14px; }
+    table { border-collapse: collapse; width: 100%; margin-bottom: 14px; }
+    th, td { border: 1px solid #e5e7eb; padding: 8px; text-align: left; vertical-align: top; }
+    th { background: #f8fafc; }
+  </style>
+</head>
+<body>
+  <h1>Confidence Report</h1>
+  <div class="meta">
+    <div><strong>Company/Source Name:</strong> Keysight</div>
+    <div><strong>Workflow Name:</strong> Partial Dump Scraper Run</div>
+    <div><strong>Timestamp:</strong> 2026-06-11T07:01:13.002342Z</div>
+    <div><strong>Confidence Score:</strong> 95%</div>
+    <div><strong>Source URL:</strong> <a href="Demo Source" target="_blank">Demo Source</a></div>
+    <div><strong>Source Type:</strong> Site-Specific</div>
+    <div style="margin-top: 8px; padding-top: 8px; border-t: 1px solid #e5e7eb;">
+      <strong>Refresh Statistics:</strong>
+      <span style="margin-left: 10px;">Total Changes: <strong>3</strong></span>
+      <span style="margin-left: 10px;">Added: <strong>0</strong></span>
+      <span style="margin-left: 10px;">Removed: <strong>0</strong></span>
+      <span style="margin-left: 10px;">Modified: <strong>3</strong></span>
+    </div>
+  </div>
+  <h2>Changed Values</h2>
+  <table>
+    <thead><tr><th>Field / Record ID</th><th>Original (Red / Strikethrough)</th><th>Updated (Green / Bold)</th></tr></thead>
+    <tbody><tr><td>DSOX1204A -> Discontinued</td><td><span class='confidence-old'>False</span></td><td><span class='confidence-new'>True</span></td></tr><tr><td>DSOX1204A -> price</td><td><span class='confidence-old'>None</span></td><td><span class='confidence-new'>$5,200.00</span></td></tr><tr><td>10070C -> is_in_stock</td><td><span class='confidence-old'>1</span></td><td><span class='confidence-new'>0</span></td></tr></tbody>
+  </table>
+  <h2>Source Content With Highlights</h2>
+  <div class="source-wrap"><div>Source web page preview is not applicable or could not be loaded. Detailed records diff can be viewed in the table above.</div></div>
+</body>
+</html>
