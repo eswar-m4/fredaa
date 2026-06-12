@@ -645,38 +645,38 @@ def simulate_demo_mutations(source: str, records: list) -> list:
     return mutated
 
 async def run_scraper_background(job_id: str):
-    # 1. Update status to 'Running'
-    with get_connection() as conn:
-        conn.execute(
-            "UPDATE scraper_jobs SET status = 'Running' WHERE id = ?",
-            (job_id,)
-        )
-        conn.commit()
-    
-    # 2. Get job info from DB
-    with get_connection() as conn:
-        row = conn.execute(
-            "SELECT source, scope, filters, custom_criteria FROM scraper_jobs WHERE id = ?",
-            (job_id,)
-        ).fetchone()
-    
-    if not row:
-        return
-        
-    source, scope, filters_str, custom_criteria = row
-    
-    # Fetch refresh count and frequency to determine run state
+    # 1. Fetch info from DB first to check if custom source onboarding and avoid multiple database queries
     with get_connection() as conn:
         job_info_db = conn.execute(
-            "SELECT refresh_count, frequency, mode, is_custom_source, complexity, estimated_onboarding_time FROM scraper_jobs WHERE id = ?",
+            """SELECT refresh_count, frequency, mode, is_custom_source, complexity, estimated_onboarding_time,
+                      source, scope, filters, custom_criteria 
+               FROM scraper_jobs WHERE id = ?""",
             (job_id,)
         ).fetchone()
-    refresh_count_curr = job_info_db[0] if job_info_db else 0
-    frequency = job_info_db[1] if job_info_db else "Weekly"
-    job_mode = job_info_db[2] if job_info_db else "Site-Specific"
-    is_custom = job_info_db[3] if job_info_db else 0
-    complexity = job_info_db[4] if job_info_db else None
-    estimated_onboarding_time = job_info_db[5] if job_info_db else None
+        
+    if not job_info_db:
+        return
+        
+    refresh_count_curr = job_info_db[0]
+    frequency = job_info_db[1]
+    job_mode = job_info_db[2]
+    is_custom = job_info_db[3]
+    complexity = job_info_db[4]
+    estimated_onboarding_time = job_info_db[5]
+    source = job_info_db[6]
+    scope = job_info_db[7]
+    filters_str = job_info_db[8]
+    custom_criteria = job_info_db[9]
+    
+    status_val = "Pending Onboarding" if (bool(is_custom) and refresh_count_curr == 0) else "Running"
+    
+    # Update status to determined value
+    with get_connection() as conn:
+        conn.execute(
+            "UPDATE scraper_jobs SET status = ? WHERE id = ?",
+            (status_val, job_id)
+        )
+        conn.commit()
     
     # Translate Custom prompt using Qwen LLM
     if scope == "Custom" and custom_criteria and custom_criteria not in ("—", "- -"):
@@ -984,17 +984,19 @@ async def launch_jobs(request: LaunchJobsRequest, background_tasks: BackgroundTa
             except Exception:
                 pass
 
+        status_val = "Pending Onboarding" if item.isCustomSource else "Running"
+
         if exists:
             with get_connection() as conn:
                 conn.execute(
                     """UPDATE scraper_jobs 
                        SET source = ?, scope = ?, filters = ?, frequency = ?, delivery = ?, 
-                           output_format = ?, dataset_path = ?, status = 'Running', 
+                           output_format = ?, dataset_path = ?, status = ?, 
                            created_at = ?, next_refresh = ?, is_custom_source = ?, mode = ?,
                            complexity = ?, estimated_onboarding_time = ?
                        WHERE id = ?""",
                     (item.source, item.scope, item.filters, item.frequency, item.delivery,
-                     item.output_format, dataset_path, now_str, next_refresh_str,
+                     item.output_format, dataset_path, status_val, now_str, next_refresh_str,
                      1 if item.isCustomSource else 0, item.mode, complexity_val, sla_val, item.id)
                 )
                 conn.commit()
@@ -1004,9 +1006,9 @@ async def launch_jobs(request: LaunchJobsRequest, background_tasks: BackgroundTa
                     """INSERT INTO scraper_jobs (id, source, scope, filters, custom_criteria, frequency, delivery, 
                                                 output_format, dataset_path, status, created_at, next_refresh, 
                                                 is_custom_source, mode, complexity, estimated_onboarding_time)
-                       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'Running', ?, ?, ?, ?, ?, ?)""",
+                       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
                     (item.id, item.source, item.scope, item.filters, item.filters, item.frequency, item.delivery,
-                     item.output_format, dataset_path, now_str, next_refresh_str,
+                     item.output_format, dataset_path, status_val, now_str, next_refresh_str,
                      1 if item.isCustomSource else 0, item.mode, complexity_val, sla_val)
                 )
                 conn.commit()
