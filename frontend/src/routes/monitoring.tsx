@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { Badge, Card, PageHeader, Button } from "@/components/ui-bits";
-import { X, ShieldAlert, Download, ChevronDown, Eye } from "lucide-react";
+import { Download, ChevronDown } from "lucide-react";
 import bots from "@/data/bots.json";
 
 
@@ -161,7 +161,6 @@ function getSourceDisplayName(source: string) {
 function Monitoring() {
   const [customJobs, setCustomJobs] = useState<any[]>([]);
   const [openExportId, setOpenExportId] = useState<string | null>(null);
-  const [previewJobId, setPreviewJobId] = useState<string | null>(null);
 
   const baseApiUrl = (() => {
     if (
@@ -290,14 +289,13 @@ function Monitoring() {
                 <th className="text-left px-4 py-2.5 border-b border-border/40">Status</th>
                 <th className="text-right px-4 py-2.5 border-b border-border/40">Records</th>
                 <th className="text-right px-4 py-2.5 border-b border-border/40">Fresh %</th>
-                <th className="text-left px-4 py-2.5 border-b border-border/40">Confidence Report</th>
                 <th className="text-right px-4 py-2.5 pr-6 border-b border-border/40">Download</th>
               </tr>
             </thead>
             <tbody className="">
               {finalJobs.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="text-center py-12 text-muted-foreground font-medium">
+                  <td colSpan={8} className="text-center py-12 text-muted-foreground font-medium">
                     No active or historical scraper jobs found.
                   </td>
                 </tr>
@@ -358,26 +356,6 @@ function Monitoring() {
                       <td className="px-4 py-3.5 text-right font-mono border-b border-border/40 text-[13px] text-foreground font-semibold">
                         {j.status === "Completed" ? "100%" : (j.status === "Failed" ? "0%" : (j.fresh !== null && j.fresh !== undefined ? `${j.fresh}%` : "—"))}
                       </td>
-                      <td className="px-4 py-3.5 border-b border-border/40 text-left">
-                        {j.status === "Completed" ? (
-                          <div className="flex items-center gap-2">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => setPreviewJobId(j.id)}
-                              className="h-8 w-8 p-0 rounded-md hover:bg-secondary flex items-center justify-center"
-                              title="Preview Confidence Report"
-                            >
-                              <Eye className="h-4 w-4 text-muted-foreground" />
-                            </Button>
-                            <span className="text-[12px] text-muted-foreground font-medium">
-                              {j.changes_detected > 0 ? `${j.changes_detected} changes` : "No changes"}
-                            </span>
-                          </div>
-                        ) : (
-                          <span className="text-muted-foreground">—</span>
-                        )}
-                      </td>
                       <td className="px-4 py-3.5 text-right border-b border-border/40 pr-6 relative">
                         <div className="inline-block text-left">
                           <Button
@@ -435,32 +413,6 @@ function Monitoring() {
           </table>
         </Card>
       </div>
-
-      {previewJobId && (
-        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-card border border-border rounded-lg shadow-lg w-full max-w-4xl h-[80vh] flex flex-col overflow-hidden relative">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-border">
-              <h3 className="font-semibold text-base">Confidence Report Preview</h3>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setPreviewJobId(null)}
-                className="h-8 w-8 p-0"
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-            <div className="flex-1 bg-secondary/10 relative">
-              <iframe
-                src={`${baseApiUrl}/api/v1/demo/jobs/${previewJobId}/confidence-report/preview`}
-                className="w-full h-full border-0"
-                title="Confidence Report Preview"
-                sandbox="allow-same-origin allow-scripts"
-              />
-            </div>
-          </div>
-        </div>
-      )}
     </AppLayout>
   );
 }

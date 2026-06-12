@@ -35,7 +35,7 @@ from app.services.normalization_service import normalization_service
 from app.services.relationship_inference_service import relationship_inference_service
 from app.services.confidence_service import confidence_service
 from app.services.website_complexity_classifier import website_complexity_classifier_service
-from app.services.confidence_report_html_service import confidence_report_html_service
+# confidence_report_html_service import removed
 from app.models.unified_schemas import (
     MultiFileNormalizeResponse,
     NormalizedFileEntry,
@@ -457,56 +457,7 @@ async def export_processed_dataset(
     )
 
 
-@router.post(
-    "/workflows/confidence-report-html/download",
-    summary="Download confidence report HTML bundle (raw, enriched, highlighted)",
-    description=(
-        "Builds 3 HTML files from the selected source URL: "
-        "raw source HTML, enriched HTML, and a confidence report HTML with red/green change highlights."
-    ),
-)
-async def download_confidence_report_html(payload: Dict[str, Any]) -> StreamingResponse:
-    try:
-        filename, zip_bytes = confidence_report_html_service.build_zip_bytes(payload)
-        return StreamingResponse(
-            io.BytesIO(zip_bytes),
-            media_type="application/zip",
-            headers={"Content-Disposition": f'attachment; filename="{filename}"'},
-        )
-    except ValueError as ve:
-        raise HTTPException(status_code=400, detail=str(ve))
-    except requests.RequestException as rexc:
-        logger.error("Confidence report source fetch failed: %s", rexc, exc_info=True)
-        raise HTTPException(status_code=502, detail="Failed to fetch source content for confidence report")
-    except Exception as e:
-        logger.error("Confidence report generation failed: %s", e, exc_info=True)
-        raise HTTPException(status_code=500, detail="Confidence report generation failed")
-
-
-@router.post(
-    "/workflows/confidence-report-html/source-highlighted/download",
-    summary="Download highlighted source HTML",
-    description=(
-        "Fetches the selected source page, removes non-essential content, and returns "
-        "a highlighted source HTML where old values are red and updated values are green."
-    ),
-)
-async def download_highlighted_source_html(payload: Dict[str, Any]) -> StreamingResponse:
-    try:
-        filename, html_bytes = confidence_report_html_service.build_highlighted_source_html_bytes(payload)
-        return StreamingResponse(
-            io.BytesIO(html_bytes),
-            media_type="text/html; charset=utf-8",
-            headers={"Content-Disposition": f'attachment; filename="{filename}"'},
-        )
-    except ValueError as ve:
-        raise HTTPException(status_code=400, detail=str(ve))
-    except requests.RequestException as rexc:
-        logger.error("Highlighted source HTML fetch failed: %s", rexc, exc_info=True)
-        raise HTTPException(status_code=502, detail="Failed to fetch source content")
-    except Exception as e:
-        logger.error("Highlighted source HTML generation failed: %s", e, exc_info=True)
-        raise HTTPException(status_code=500, detail="Highlighted source HTML generation failed")
+# Confidence report HTML endpoints have been removed.
 
 
 @router.post(
