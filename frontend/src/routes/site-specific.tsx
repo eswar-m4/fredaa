@@ -91,6 +91,7 @@ function SiteSpecific() {
 
   const [previewBot, setPreviewBot] = useState<Bot | null>(null);
   const [showAdd, setShowAdd] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
   const countries = useMemo(() => {
     const s = new Set<string>();
@@ -159,6 +160,61 @@ function SiteSpecific() {
       <PageHeader
         title="Sources & Agents"
         subtitle={`Browse ${all.length} onboarded scraping agents. Pick one or many to schedule a refresh, or add a brand-new site.`}
+        actions={step === 0 ? (
+          <div className="relative flex items-center gap-3">
+            <div className="relative flex items-center w-80">
+              <Search className="h-4 w-4 absolute left-3 text-muted-foreground" />
+              <input
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                placeholder="Search sources by name, URL..."
+                className="w-full h-10 pl-9 pr-28 rounded-md border border-input bg-card text-[13px] outline-none focus:ring-2 focus:ring-ring/40"
+              />
+              <button
+                type="button"
+                onClick={() => setShowAdvanced(!showAdvanced)}
+                className="absolute right-3 text-[11px] font-semibold text-info hover:text-info/80 hover:underline cursor-pointer select-none"
+              >
+                advanced search
+              </button>
+            </div>
+            
+            <Button variant="outline" onClick={() => setShowAdd(true)} className="h-10 shrink-0">
+              <PlusCircle className="h-4 w-4" /> Add new source
+            </Button>
+
+            {showAdvanced && (
+              <>
+                <div className="fixed inset-0 z-40" onClick={() => setShowAdvanced(false)} />
+                <div className="absolute right-0 top-12 z-50 w-72 p-4 bg-card border border-border rounded-lg shadow-xl space-y-3">
+                  <div>
+                    <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Category</label>
+                    <Select value={category} onChange={(e) => setCategory(e.target.value)} className="mt-1">
+                      <option value="All">All categories</option>
+                      {cats.map((c) => <option key={c} value={c}>{c}</option>)}
+                    </Select>
+                  </div>
+                  <div>
+                    <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Country</label>
+                    <Select value={country} onChange={(e) => setCountry(e.target.value)} className="mt-1">
+                      <option value="All">Any country</option>
+                      {countries.map((c) => <option key={c} value={c}>{c}</option>)}
+                    </Select>
+                  </div>
+                  <div>
+                    <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Complexity</label>
+                    <Select value={complexity} onChange={(e) => setComplexity(e.target.value)} className="mt-1">
+                      <option value="All">Any complexity</option>
+                      <option>Simple</option>
+                      <option>Medium</option>
+                      <option>Complex</option>
+                    </Select>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        ) : undefined}
       />
 
       <div className="px-7 pb-8 space-y-6">
@@ -168,36 +224,6 @@ function SiteSpecific() {
 
         {step === 0 && (
           <>
-            <Card className="p-4">
-              <div className="flex flex-col lg:flex-row gap-3">
-                <div className="relative flex-1">
-                  <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                  <input
-                    value={q}
-                    onChange={(e) => setQ(e.target.value)}
-                    placeholder={`Search ${all.length} sources by name, URL, industry, country, data type…`}
-                    className="w-full h-10 pl-9 pr-3 rounded-md border border-input bg-card text-[13px] outline-none focus:ring-2 focus:ring-ring/40"
-                  />
-                </div>
-                <Button variant="outline" onClick={() => setShowAdd(true)} className="h-10 shrink-0">
-                  <PlusCircle className="h-4 w-4" /> Add new source
-                </Button>
-                <Select value={category} onChange={(e) => setCategory(e.target.value)} className="lg:w-52">
-                  <option value="All">All categories</option>
-                  {cats.map((c) => <option key={c} value={c}>{c}</option>)}
-                </Select>
-                <Select value={country} onChange={(e) => setCountry(e.target.value)} className="lg:w-40">
-                  <option value="All">Any country</option>
-                  {countries.map((c) => <option key={c} value={c}>{c}</option>)}
-                </Select>
-                <Select value={complexity} onChange={(e) => setComplexity(e.target.value)} className="lg:w-40">
-                  <option value="All">Any complexity</option>
-                  <option>Simple</option>
-                  <option>Medium</option>
-                  <option>Complex</option>
-                </Select>
-              </div>
-            </Card>
 
             {hasSelection && (
               <Card className="p-4 border-primary/40 bg-info-bg/30">
