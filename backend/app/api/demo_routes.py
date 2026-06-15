@@ -668,13 +668,11 @@ async def run_scraper_background(job_id: str):
     filters_str = job_info_db[8]
     custom_criteria = job_info_db[9]
     
-    status_val = "Pending Onboarding" if (bool(is_custom) and refresh_count_curr == 0) else "Running"
-    
-    # Update status to determined value
+    # Update status to 'Running'
     with get_connection() as conn:
         conn.execute(
-            "UPDATE scraper_jobs SET status = ? WHERE id = ?",
-            (status_val, job_id)
+            "UPDATE scraper_jobs SET status = 'Running' WHERE id = ?",
+            (job_id,)
         )
         conn.commit()
     
@@ -984,7 +982,7 @@ async def launch_jobs(request: LaunchJobsRequest, background_tasks: BackgroundTa
             except Exception:
                 pass
 
-        status_val = "Pending Onboarding" if item.isCustomSource else "Running"
+        status_val = "Running"
 
         if exists:
             with get_connection() as conn:
@@ -1017,8 +1015,8 @@ async def launch_jobs(request: LaunchJobsRequest, background_tasks: BackgroundTa
         try:
             with get_connection() as conn:
                 conn.execute(
-                    "DELETE FROM scraper_jobs WHERE source = ? AND (status = 'Analysis Complete' OR status = 'Pending Onboarding')",
-                    (item.source,)
+                    "DELETE FROM scraper_jobs WHERE source = ? AND id != ? AND (status = 'Analysis Complete' OR status = 'Pending Onboarding')",
+                    (item.source, item.id)
                 )
                 conn.commit()
         except Exception:

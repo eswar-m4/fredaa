@@ -204,7 +204,7 @@ function Monitoring() {
       source: sourceName,
       mode: j.mode || "Site-Specific",
       run: formatRelativeTime(j.created_at),
-      status: j.status === "Analysis Complete" ? "Pending Onboarding" : j.status,
+      status: (j.status === "Analysis Complete" || (j.status === "Running" && (j.isCustomSource ?? true) && (j.refresh_count === 0 || !j.refresh_count))) ? "Pending Onboarding" : j.status,
       records: j.records !== undefined ? j.records : null,
       fresh: j.fresh !== undefined ? j.fresh : null,
       frequency: j.frequency || "Weekly",

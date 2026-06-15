@@ -278,8 +278,6 @@ function SiteSpecific() {
                 </table>
               </div>
             </Card>
-
-            <JobsPanel />
           </>
         )}
 
