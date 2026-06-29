@@ -87,36 +87,79 @@ function getEstimatedRecords(bot: Bot): string {
 }
 
 function FrequencyWidget({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [showSubmenu, setShowSubmenu] = useState(value !== "One-time");
+
   const isRecurring = value !== "One-time";
-  const recurringValue = isRecurring ? value : "Weekly";
+  const displayLabel = value;
 
   return (
-    <div className="flex flex-col gap-1.5 w-full">
-      <Select
-        value={isRecurring ? "recurring" : "one-time"}
-        onChange={(e) => {
-          if (e.target.value === "one-time") {
-            onChange("One-time");
-          } else {
-            onChange(recurringValue);
-          }
+    <div className="relative inline-block text-left w-36">
+      <button
+        type="button"
+        onClick={() => {
+          setIsOpen(!isOpen);
         }}
-        className="h-8 text-[12px] w-full"
+        className="inline-flex items-center justify-between h-8 w-full px-3 text-[12px] bg-secondary hover:bg-secondary/80 rounded-md font-semibold text-foreground transition-colors border border-border"
       >
-        <option value="one-time">One-time</option>
-        <option value="recurring">Recurring</option>
-      </Select>
-      {isRecurring && (
-        <Select
-          value={value === "recurring" ? "Weekly" : value}
-          onChange={(e) => onChange(e.target.value)}
-          className="h-8 text-[12px] w-full animate-in fade-in slide-in-from-top-1 duration-200"
-        >
-          <option>Weekly</option>
-          <option>Monthly</option>
-          <option>Quarterly</option>
-          <option>Yearly</option>
-        </Select>
+        <span>{displayLabel}</span>
+        <span className="text-[10px] text-muted-foreground/60">▼</span>
+      </button>
+
+      {isOpen && (
+        <>
+          <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
+          <div className="absolute left-0 mt-1 w-36 rounded-md shadow-lg bg-card border border-border z-50 py-1 flex flex-col">
+            <button
+              type="button"
+              onClick={() => {
+                onChange("One-time");
+                setIsOpen(false);
+                setShowSubmenu(false);
+              }}
+              className={[
+                "flex items-center w-full px-3 py-1.5 hover:bg-secondary/60 text-[12px] text-left text-foreground font-medium",
+                value === "One-time" ? "text-primary font-semibold" : ""
+              ].join(" ")}
+            >
+              One-time
+            </button>
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setShowSubmenu(!showSubmenu)}
+                className={[
+                  "flex items-center justify-between w-full px-3 py-1.5 hover:bg-secondary/60 text-[12px] text-left text-foreground font-medium",
+                  isRecurring ? "bg-secondary/30 text-primary font-semibold" : ""
+                ].join(" ")}
+              >
+                <span>Recurring</span>
+                <span className="text-[10px] text-muted-foreground/60">&gt;</span>
+              </button>
+
+              {showSubmenu && (
+                <div className="absolute left-full top-0 ml-1 w-32 rounded-md shadow-lg bg-card border border-border z-50 py-1 flex flex-col">
+                  {["Weekly", "Monthly", "Quarterly", "Yearly"].map((freq) => (
+                    <button
+                      key={freq}
+                      type="button"
+                      onClick={() => {
+                        onChange(freq);
+                        setIsOpen(false);
+                      }}
+                      className={[
+                        "flex items-center w-full px-3 py-1.5 hover:bg-secondary/60 text-[12px] text-left text-foreground font-medium",
+                        value === freq ? "text-primary font-semibold" : ""
+                      ].join(" ")}
+                    >
+                      {freq}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </>
       )}
     </div>
   );
@@ -970,7 +1013,6 @@ function ScopeScheduleStep({
               <th className="text-left px-3 py-2.5 font-semibold">Source</th>
               <th className="text-left px-3 py-2.5 font-semibold w-44">Scope</th>
               <th className="text-left px-3 py-2.5 font-semibold">Pattern / criteria</th>
-              <th className="text-left px-3 py-2.5 font-semibold w-36">Estimated Records</th>
               <th className="text-left px-3 py-2.5 font-semibold w-36">Frequency</th>
               <th className="w-10 px-3 py-2.5"></th>
             </tr>
@@ -1006,9 +1048,6 @@ function ScopeScheduleStep({
                         className="w-full h-16 p-1.5 border border-border rounded text-[12px] bg-background text-foreground focus:outline-none resize-y font-sans font-medium"
                       />
                     )}
-                  </td>
-                  <td className="px-3 py-2 align-top font-mono text-[12px] font-semibold text-muted-foreground">
-                    {getEstimatedRecords(i.bot)}
                   </td>
                   <td className="px-3 py-2 align-top">
                     <FrequencyWidget
@@ -1055,9 +1094,6 @@ function ScopeScheduleStep({
                       className="w-full h-16 p-1.5 border border-border rounded text-[12px] bg-background text-foreground focus:outline-none resize-y font-sans font-medium"
                     />
                   )}
-                </td>
-                <td className="px-3 py-2 align-top font-mono text-[12px] font-semibold text-muted-foreground">
-                  Pending onboarding
                 </td>
                 <td className="px-3 py-2 align-top">
                   <FrequencyWidget
