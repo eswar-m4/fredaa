@@ -100,7 +100,7 @@ function FrequencyWidget({ value, onChange }: { value: string; onChange: (v: str
         onClick={() => {
           setIsOpen(!isOpen);
         }}
-        className="inline-flex items-center justify-between h-8 w-full px-3 text-[12px] bg-secondary hover:bg-secondary/80 rounded-md font-semibold text-foreground transition-colors border border-border"
+        className="inline-flex items-center justify-between h-8 w-full px-3 text-[12px] bg-card hover:bg-secondary/20 rounded-md font-semibold text-foreground transition-colors border border-border"
       >
         <span>{displayLabel}</span>
         <span className="text-[10px] text-muted-foreground/60">▼</span>
@@ -1041,11 +1041,12 @@ function ScopeScheduleStep({
                   </td>
                   <td className="px-3 py-2 align-top">
                     {i.scope === "partial" && (
-                      <textarea
+                      <input
+                        type="text"
                         value={i.partialCriteria}
                         onChange={(e) => updateItem(i.id, { partialCriteria: e.target.value })}
-                        placeholder="Provide conditions or criteria to scrape..."
-                        className="w-full h-16 p-1.5 border border-border rounded text-[12px] bg-background text-foreground focus:outline-none resize-y font-sans font-medium"
+                        placeholder="Provide conditions or criteria to scrape."
+                        className="h-8 text-[12px] w-full border border-border rounded bg-card text-foreground px-2 font-medium focus:outline-none focus:ring-1 focus:ring-ring"
                       />
                     )}
                   </td>
@@ -1085,13 +1086,14 @@ function ScopeScheduleStep({
                 </td>
                 <td className="px-3 py-2 align-top">
                   {sel.newSite.scope === "partial" && (
-                    <textarea
+                    <input
+                      type="text"
                       value={sel.newSite.partialCriteria}
                       onChange={(e) =>
                         setSel((s) => ({ ...s, newSite: { ...s.newSite!, partialCriteria: e.target.value } }))
                       }
-                      placeholder="Provide conditions or criteria to scrape..."
-                      className="w-full h-16 p-1.5 border border-border rounded text-[12px] bg-background text-foreground focus:outline-none resize-y font-sans font-medium"
+                      placeholder="Provide conditions or criteria to scrape."
+                      className="h-8 text-[12px] w-full border border-border rounded bg-card text-foreground px-2 font-medium focus:outline-none focus:ring-1 focus:ring-ring"
                     />
                   )}
                 </td>
@@ -1121,7 +1123,7 @@ function ScopeScheduleStep({
         <div>
           <label className="text-[12px] text-muted-foreground">Delivery (applies to all)</label>
           <Select value={sel.delivery} onChange={(e) => setSel((s) => ({ ...s, delivery: e.target.value }))}>
-            <option>S3 bucket</option><option>Snowflake</option><option>Webhook</option><option>API pull</option>
+            <option>S3 bucket</option><option>Snowflake</option><option>Webhook</option><option>API pull</option><option>Export</option>
           </Select>
         </div>
         <div>
