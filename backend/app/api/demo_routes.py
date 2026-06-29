@@ -919,6 +919,7 @@ async def run_scraper_background(job_id: str):
             run_sec = any("sec" in str(s).lower() or "edgar" in str(s).lower() for s in picked_sources)
             run_linkedin = any("linkedin" in str(s).lower() for s in picked_sources)
             run_mca = any("mca" in str(s).lower() for s in picked_sources)
+            run_crunchbase = any("crunchbase" in str(s).lower() for s in picked_sources)
             
             # Default to running website if picked_sources is empty
             if not picked_sources:
@@ -1035,6 +1036,16 @@ async def run_scraper_background(job_id: str):
                         except Exception as e:
                             logger.warning("[By Dataset] LinkedIn lookup failed/timed out for %s: %s", company_val, e)
 
+                    cb_fields = {}
+                    if should_scrape and run_crunchbase:
+                        try:
+                            # Crunchbase real service integration point:
+                            # from app.services.crunchbase_service import crunchbase_service
+                            # cb_fields = await crunchbase_service.lookup_company(company_val)
+                            pass
+                        except Exception as e:
+                            logger.warning("[By Dataset] Crunchbase lookup failed for %s: %s", company_val, e)
+
                     enriched_row = {}
                     
                     sec_addr = sec_fields.get("profile", {}).get("business_address") or {}
@@ -1113,10 +1124,14 @@ async def run_scraper_background(job_id: str):
                             enriched_row[key] = val if val else None
                         elif key in ("employees", "employee_count"):
                             li_emp = parse_employee_count(linkedin_metadata.get("company_size") or linkedin_metadata.get("linkedin_company_size"))
-                            enriched_row[key] = li_emp if li_emp else None
+                            enriched_row[key] = li_emp if li_emp else cb_fields.get("employee_count") or cb_fields.get("employee_range") or None
                         elif key == "employee_range":
-                            val = linkedin_metadata.get("linkedin_employee_range") or linkedin_metadata.get("company_size")
+                            val = linkedin_metadata.get("linkedin_employee_range") or linkedin_metadata.get("company_size") or cb_fields.get("employee_range")
                             enriched_row[key] = val if val else None
+                        elif key in ("funding_total", "latest_round", "latest_round_amount", "valuation", "investors"):
+                            enriched_row[key] = cb_fields.get(key) or None
+                        elif key in ("annual_revenue", "revenue_range"):
+                            enriched_row[key] = cb_fields.get(key) or None
                         else:
                             matched_val = record.get(mapping.get(key) or key)
                             enriched_row[key] = matched_val if matched_val is not None else None

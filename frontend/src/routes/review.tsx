@@ -1317,7 +1317,7 @@ function Review() {
                     onClick={() => setPageOffset((prev) => Math.max(0, prev - stepSize))}
                     className="h-8 text-[11px] px-2.5"
                   >
-                    ← Previous {stepSize}
+                    ← Previous
                   </Button>
                   <Button
                     variant="outline"
@@ -1326,7 +1326,7 @@ function Review() {
                     onClick={() => setPageOffset((prev) => prev + stepSize)}
                     className="h-8 text-[11px] px-2.5"
                   >
-                    Next {stepSize} →
+                    Next →
                   </Button>
                 </div>
               </div>

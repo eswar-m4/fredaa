@@ -270,6 +270,7 @@ def get_review_rows(job_id: str, sample_rate: float) -> dict:
 
     refresh_count, source, scope, mode, filters_str = row
     is_dataset = mode in ("By Dataset", "Any-Site")
+    baseline_records = []
 
     selected_outputs: List[str] = []
     attr_mapping: Dict[str, str] = {}

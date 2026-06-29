@@ -73,6 +73,55 @@ type Selection = {
   format: string;
 };
 
+function getEstimatedRecords(bot: Bot): string {
+  if (bot.name.toLowerCase() === "keysight") return "25,000";
+  if (bot.name.toLowerCase() === "webmd") return "1,500";
+  if (bot.name.toLowerCase() === "investegate") return "1,200";
+  if (bot.name.toLowerCase() === "turkeybrokers") return "350";
+
+  const raw = (bot as any).estimated_records;
+  if (raw && typeof raw === "number") {
+    return raw.toLocaleString();
+  }
+  return "500";
+}
+
+function FrequencyWidget({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const isRecurring = value !== "One-time";
+  const recurringValue = isRecurring ? value : "Weekly";
+
+  return (
+    <div className="flex flex-col gap-1.5 w-full">
+      <Select
+        value={isRecurring ? "recurring" : "one-time"}
+        onChange={(e) => {
+          if (e.target.value === "one-time") {
+            onChange("One-time");
+          } else {
+            onChange(recurringValue);
+          }
+        }}
+        className="h-8 text-[12px] w-full"
+      >
+        <option value="one-time">One-time</option>
+        <option value="recurring">Recurring</option>
+      </Select>
+      {isRecurring && (
+        <Select
+          value={value === "recurring" ? "Weekly" : value}
+          onChange={(e) => onChange(e.target.value)}
+          className="h-8 text-[12px] w-full animate-in fade-in slide-in-from-top-1 duration-200"
+        >
+          <option>Weekly</option>
+          <option>Monthly</option>
+          <option>Quarterly</option>
+          <option>Yearly</option>
+        </Select>
+      )}
+    </div>
+  );
+}
+
 function SiteSpecific() {
   const all = (bots as any).bots as Bot[];
   const cats = Object.keys((bots as any).categoryCounts).sort();
@@ -900,13 +949,16 @@ function ScopeScheduleStep({
           <span className="text-[11px] text-muted-foreground">Apply to all:</span>
           <Select onChange={(e) => e.target.value && applyAll({ frequency: e.target.value })} value="" className="h-8 w-32 text-[12px]">
             <option value="">Frequency…</option>
-            <option value="2 Minutes">2 Minutes</option>
-            <option>Daily</option><option>Weekly</option><option>Monthly</option><option>Quarterly</option>
+            <option value="One-time">One-time</option>
+            <option value="Weekly">Recurring: Weekly</option>
+            <option value="Monthly">Recurring: Monthly</option>
+            <option value="Quarterly">Recurring: Quarterly</option>
+            <option value="Yearly">Recurring: Yearly</option>
           </Select>
           <Select onChange={(e) => e.target.value && applyAll({ scope: e.target.value as "full" | "partial" })} value="" className="h-8 w-32 text-[12px]">
             <option value="">Scope…</option>
-            <option value="full">Full dump</option>
-            <option value="partial">Custom dump</option>
+            <option value="full">Full Scrape</option>
+            <option value="partial">Partial Scrape</option>
           </Select>
         </div>
       </div>
@@ -918,6 +970,7 @@ function ScopeScheduleStep({
               <th className="text-left px-3 py-2.5 font-semibold">Source</th>
               <th className="text-left px-3 py-2.5 font-semibold w-44">Scope</th>
               <th className="text-left px-3 py-2.5 font-semibold">Pattern / criteria</th>
+              <th className="text-left px-3 py-2.5 font-semibold w-36">Estimated Records</th>
               <th className="text-left px-3 py-2.5 font-semibold w-36">Frequency</th>
               <th className="w-10 px-3 py-2.5"></th>
             </tr>
@@ -940,51 +993,28 @@ function ScopeScheduleStep({
                     <Select value={i.scope} onChange={(e) => {
                       updateItem(i.id, { scope: e.target.value as "full" | "partial", partialCriteria: "" });
                     }} className="h-8 text-[12px]">
-                      <option value="full">Full dump</option>
-                      <option value="partial">Custom dump</option>
+                      <option value="full">Full Scrape</option>
+                      <option value="partial">Partial Scrape</option>
                     </Select>
                   </td>
                   <td className="px-3 py-2 align-top">
-                    {i.scope === "full" && (
-                      <Input disabled value="—" className="h-8 text-[12px]" />
-                    )}
-
                     {i.scope === "partial" && (
-                      i.bot.name === "Keysight" ? (
-                        <KeysightFilterSelector
-                          filters={filters}
-                          onChange={(key, val) => updateFilters(i.id, i.bot.name, key, val)}
-                        />
-                      ) : i.bot.name === "Webmd" ? (
-                        <WebmdFilterSelector
-                          filters={filters}
-                          onChange={(key, val) => updateFilters(i.id, i.bot.name, key, val)}
-                        />
-                      ) : i.bot.name === "Investegate" ? (
-                        <InvestegateFilterSelector
-                          filters={filters}
-                          onChange={(key, val) => updateFilters(i.id, i.bot.name, key, val)}
-                        />
-                      ) : i.bot.name === "TurkeyBrokers" ? (
-                        <TurkeyBrokersFilterSelector
-                          filters={filters}
-                          onChange={(key, val) => updateFilters(i.id, i.bot.name, key, val)}
-                        />
-                      ) : (
-                        <Input
-                          value={i.partialCriteria}
-                          onChange={(e) => updateItem(i.id, { partialCriteria: e.target.value })}
-                          placeholder="/products/* or specific criteria"
-                          className="h-8 text-[12px]"
-                        />
-                      )
+                      <textarea
+                        value={i.partialCriteria}
+                        onChange={(e) => updateItem(i.id, { partialCriteria: e.target.value })}
+                        placeholder="Provide conditions or criteria to scrape..."
+                        className="w-full h-16 p-1.5 border border-border rounded text-[12px] bg-background text-foreground focus:outline-none resize-y font-sans font-medium"
+                      />
                     )}
                   </td>
+                  <td className="px-3 py-2 align-top font-mono text-[12px] font-semibold text-muted-foreground">
+                    {getEstimatedRecords(i.bot)}
+                  </td>
                   <td className="px-3 py-2 align-top">
-                    <Select value={i.frequency} onChange={(e) => updateItem(i.id, { frequency: e.target.value })} className="h-8 text-[12px]">
-                      <option value="2 Minutes">2 Minutes</option>
-                      <option>Daily</option><option>Weekly</option><option>Monthly</option><option>Quarterly</option>
-                    </Select>
+                    <FrequencyWidget
+                      value={i.frequency}
+                      onChange={(val) => updateItem(i.id, { frequency: val })}
+                    />
                   </td>
                   <td className="px-3 py-2 align-top text-right">
                     <button onClick={() => removeItem(i.id)} className="text-muted-foreground hover:text-destructive">
@@ -1010,37 +1040,32 @@ function ScopeScheduleStep({
                     }}
                     className="h-8 text-[12px]"
                   >
-                    <option value="full">Full dump</option>
-                    <option value="partial">Custom dump</option>
+                    <option value="full">Full Scrape</option>
+                    <option value="partial">Partial Scrape</option>
                   </Select>
                 </td>
                 <td className="px-3 py-2 align-top">
-                  {sel.newSite.scope === "full" && (
-                    <Input disabled value="—" className="h-8 text-[12px]" />
-                  )}
-
                   {sel.newSite.scope === "partial" && (
-                    <Input
+                    <textarea
                       value={sel.newSite.partialCriteria}
                       onChange={(e) =>
                         setSel((s) => ({ ...s, newSite: { ...s.newSite!, partialCriteria: e.target.value } }))
                       }
-                      placeholder="/path/*"
-                      className="h-8 text-[12px]"
+                      placeholder="Provide conditions or criteria to scrape..."
+                      className="w-full h-16 p-1.5 border border-border rounded text-[12px] bg-background text-foreground focus:outline-none resize-y font-sans font-medium"
                     />
                   )}
                 </td>
+                <td className="px-3 py-2 align-top font-mono text-[12px] font-semibold text-muted-foreground">
+                  Pending onboarding
+                </td>
                 <td className="px-3 py-2 align-top">
-                  <Select
+                  <FrequencyWidget
                     value={sel.newSite.frequency}
-                    onChange={(e) =>
-                      setSel((s) => ({ ...s, newSite: { ...s.newSite!, frequency: e.target.value } }))
+                    onChange={(val) =>
+                      setSel((s) => ({ ...s, newSite: { ...s.newSite!, frequency: val } }))
                     }
-                    className="h-8 text-[12px]"
-                  >
-                    <option value="2 Minutes">2 Minutes</option>
-                    <option>Daily</option><option>Weekly</option><option>Monthly</option><option>Quarterly</option>
-                  </Select>
+                  />
                 </td>
                 <td className="px-3 py-2 align-top text-right">
                   <button
@@ -1162,7 +1187,7 @@ function ReviewStep({ sel, onBack }: { sel: Selection; onBack: () => void }) {
         return {
           id: `J-${Date.now() + index}`,
           source: i.bot.name,
-          scope: i.scope === "full" ? "Full Dump" : "Custom Dump",
+          scope: i.scope === "full" ? "Full Scrape" : "Partial Scrape",
           filters: formatFilters(i.partialCriteria),
           frequency: i.frequency,
           delivery: sel.delivery,
@@ -1176,7 +1201,7 @@ function ReviewStep({ sel, onBack }: { sel: Selection; onBack: () => void }) {
         newJobs.push({
           id: `J-${Date.now() + 99}`,
           source: sel.newSite.url,
-          scope: sel.newSite.scope === "full" ? "Full Dump" : "Custom Dump",
+          scope: sel.newSite.scope === "full" ? "Full Scrape" : "Partial Scrape",
           filters: sel.newSite.partialCriteria || "—",
           frequency: sel.newSite.frequency,
           delivery: sel.delivery,
@@ -1224,6 +1249,7 @@ function ReviewStep({ sel, onBack }: { sel: Selection; onBack: () => void }) {
             <tr>
               <th className="text-left px-3 py-2 font-semibold">Source</th>
               <th className="text-left px-3 py-2 font-semibold">Scope</th>
+              <th className="text-left px-3 py-2 font-semibold">Estimated Records</th>
               <th className="text-left px-3 py-2 font-semibold">Frequency</th>
               <th className="text-left px-3 py-2 font-semibold">First run</th>
             </tr>
@@ -1234,14 +1260,17 @@ function ReviewStep({ sel, onBack }: { sel: Selection; onBack: () => void }) {
                 <td className="px-3 py-2 truncate max-w-[260px]">{i.bot.name}</td>
                 <td className="px-3 py-2 text-muted-foreground">
                   {i.scope === "full" && (
-                    <div className="font-semibold text-foreground">Full Dump</div>
+                    <div className="font-semibold text-foreground">Full Scrape</div>
                   )}
                   {i.scope === "partial" && (
                     <div>
-                      <div className="font-semibold text-foreground">Custom Dump</div>
-                      <div className="text-[11px] text-muted-foreground">Criteria: {formatReviewCriteria(i.partialCriteria, i.bot.name)}</div>
+                      <div className="font-semibold text-foreground">Partial Scrape</div>
+                      <div className="text-[11px] text-muted-foreground">Criteria: {i.partialCriteria || "All Pages"}</div>
                     </div>
                   )}
+                </td>
+                <td className="px-3 py-2 font-mono text-[12px] font-semibold text-muted-foreground">
+                  {getEstimatedRecords(i.bot)}
                 </td>
                 <td className="px-3 py-2">{i.frequency}</td>
                 <td className="px-3 py-2 text-muted-foreground">
@@ -1256,14 +1285,17 @@ function ReviewStep({ sel, onBack }: { sel: Selection; onBack: () => void }) {
                 </td>
                 <td className="px-3 py-2 text-muted-foreground">
                   {sel.newSite.scope === "full" && (
-                    <div className="font-semibold text-foreground">Full Dump</div>
+                    <div className="font-semibold text-foreground">Full Scrape</div>
                   )}
                   {sel.newSite.scope === "partial" && (
                     <div>
-                      <div className="font-semibold text-foreground">Custom Dump</div>
-                      <div className="text-[11px] text-muted-foreground">Criteria: {(!sel.newSite.partialCriteria || sel.newSite.partialCriteria === "—" || sel.newSite.partialCriteria === "- -") ? "All Pages" : sel.newSite.partialCriteria}</div>
+                      <div className="font-semibold text-foreground">Partial Scrape</div>
+                      <div className="text-[11px] text-muted-foreground">Criteria: {sel.newSite.partialCriteria || "All Pages"}</div>
                     </div>
                   )}
+                </td>
+                <td className="px-3 py-2 font-mono text-[12px] font-semibold text-muted-foreground">
+                  Pending onboarding
                 </td>
                 <td className="px-3 py-2">{sel.newSite.frequency}</td>
                 <td className="px-3 py-2 text-muted-foreground">
