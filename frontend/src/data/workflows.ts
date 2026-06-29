@@ -7,12 +7,18 @@ export type Workflow = {
   name: string;
   category: "Firmographic" | "Contacts" | "Financials" | "Funding" | "Compliance" | "Web Discovery" | "Enrichment";
   description: string;
+  datapointsSummary: string;
+  runtime: string;
+  // Legacy properties
   inputs: string[];
   outputs: string[];
   attributes: string[];
-  datapointsSummary: string;
-  runtime: string;
   qcPercent: number;
+  // Extended properties for By Dataset
+  inputAttributes: string[];
+  outputAttributes: string[];
+  coveragePercent: number;
+  accuracyPercent: number;
   steps: string[];
   sources: string[];
   screenshot?: string;
@@ -30,6 +36,10 @@ export const WORKFLOWS: Workflow[] = [
     datapointsSummary: "7 core firmographic fields per company",
     runtime: "~45 sec / company",
     qcPercent: 94,
+    inputAttributes: ["Company URL", "Company Name (optional)"],
+    outputAttributes: ["Company Name", "Legal Name", "Description", "Industry", "HQ Address", "Founded Year", "Employee Count"],
+    coveragePercent: 96,
+    accuracyPercent: 94,
     steps: ["Input", "HTML Page Downloader", "Filter Columns", "GPT HTML Reader", "GPT Text Reader", "Union", "Key-Value Response", "SMLE Python", "GPT PP – Column Join", "MOJO Integration", "Production", "Output"],
     sources: ["Company Website", "LinkedIn", "Crunchbase"],
     screenshot: companyShot,
@@ -45,6 +55,10 @@ export const WORKFLOWS: Workflow[] = [
     datapointsSummary: "7 financial KPIs × N fiscal years",
     runtime: "~3 min / report",
     qcPercent: 91,
+    inputAttributes: ["Annual Report URL or S3 Key", "Ticker (optional)"],
+    outputAttributes: ["Revenue", "Net Income", "EBITDA", "Total Assets", "Total Liabilities", "Cash Flow", "Fiscal Year"],
+    coveragePercent: 89,
+    accuracyPercent: 96,
     steps: ["Input", "S3 SignedURL Generator", "Page Classification", "Sequence Filter", "PDF Merge", "Financial Statements Filter", "PDF Merge 2", "RAG", "LLM", "HITL", "Output"],
     sources: ["SEC EDGAR", "Annual Reports", "Investor Relations"],
     screenshot: annualReportShot,
@@ -60,6 +74,10 @@ export const WORKFLOWS: Workflow[] = [
     datapointsSummary: "6 registry fields + directors + filings",
     runtime: "~25 sec / lookup",
     qcPercent: 97,
+    inputAttributes: ["Company Name", "Jurisdiction / Country"],
+    outputAttributes: ["Registry Number", "Incorporation Date", "Status", "Directors", "Registered Address", "Filings"],
+    coveragePercent: 98,
+    accuracyPercent: 97,
     steps: ["Input", "Companies House Filter", "MCA Filter", "California Filter", "Delaware Filter", "New York Filter", "Per-registry Bot", "Output"],
     sources: ["Companies House (UK)", "MCA (India)", "California SOS", "Delaware Division of Corporations", "New York DOS"],
     screenshot: registryShot,
@@ -75,6 +93,10 @@ export const WORKFLOWS: Workflow[] = [
     datapointsSummary: "8 NAP fields per company",
     runtime: "~20 sec / company",
     qcPercent: 92,
+    inputAttributes: ["Company Name", "Domain (optional)"],
+    outputAttributes: ["Company Name", "Street Address", "City", "State", "Postal Code", "Country", "Phone", "Website"],
+    coveragePercent: 93,
+    accuracyPercent: 92,
     steps: ["Input", "Search Engine", "Website Resolver", "Contact Page Scraper", "GPT Extractor", "Normalizer", "Confidence Scorer", "Output"],
     sources: ["Google Search", "Bing", "Company Website", "Yellow Pages"],
   },
@@ -89,6 +111,10 @@ export const WORKFLOWS: Workflow[] = [
     datapointsSummary: "7 fields × up to 50 contacts / company",
     runtime: "~1 min / company",
     qcPercent: 88,
+    inputAttributes: ["Company Domain", "Role / Seniority (optional)"],
+    outputAttributes: ["Full Name", "Title", "Email", "Phone", "LinkedIn URL", "Department", "Seniority"],
+    coveragePercent: 85,
+    accuracyPercent: 88,
     steps: ["Input", "Domain Resolver", "Email Pattern Detector", "LinkedIn Scraper", "Verifier", "Output"],
     sources: ["LinkedIn", "Company Website", "Hunter.io patterns"],
   },
@@ -103,6 +129,10 @@ export const WORKFLOWS: Workflow[] = [
     datapointsSummary: "6 fields × N rounds per company",
     runtime: "~40 sec / company",
     qcPercent: 90,
+    inputAttributes: ["Company Name or Domain"],
+    outputAttributes: ["Round", "Amount Raised", "Date", "Investors", "Lead Investor", "Post-money Valuation"],
+    coveragePercent: 78,
+    accuracyPercent: 90,
     steps: ["Input", "News Search", "Article Filter", "GPT Extractor", "Dedupe & Reconcile", "Output"],
     sources: ["Crunchbase", "TechCrunch", "PR Newswire", "Bloomberg"],
   },
@@ -117,6 +147,10 @@ export const WORKFLOWS: Workflow[] = [
     datapointsSummary: "4 classification codes",
     runtime: "~10 sec / company",
     qcPercent: 96,
+    inputAttributes: ["Company Description or URL"],
+    outputAttributes: ["SIC Code", "SIC Description", "NAICS Code", "NAICS Description"],
+    coveragePercent: 99,
+    accuracyPercent: 96,
     steps: ["Input", "Description Builder", "LLM Classifier", "Validator", "Output"],
     sources: ["Company Website", "SEC Filings"],
   },
@@ -131,6 +165,10 @@ export const WORKFLOWS: Workflow[] = [
     datapointsSummary: "6 technographic dimensions",
     runtime: "~15 sec / domain",
     qcPercent: 93,
+    inputAttributes: ["Company Domain"],
+    outputAttributes: ["CMS", "Analytics", "Ad Tech", "CDN", "JS Frameworks", "Hosting Provider"],
+    coveragePercent: 94,
+    accuracyPercent: 93,
     steps: ["Input", "Page Fetcher", "Tech Fingerprint", "DNS Probe", "Output"],
     sources: ["Company Website", "BuiltWith-style fingerprints"],
   },
@@ -145,6 +183,10 @@ export const WORKFLOWS: Workflow[] = [
     datapointsSummary: "5 fields × N signals / week",
     runtime: "Streaming – ~5 min batches",
     qcPercent: 89,
+    inputAttributes: ["Company Name", "Signal Types of Interest"],
+    outputAttributes: ["Headline", "Signal Type", "Date", "Source URL", "Sentiment"],
+    coveragePercent: 91,
+    accuracyPercent: 89,
     steps: ["Input", "News Search", "Classifier", "Sentiment", "Output"],
     sources: ["Google News", "PR Newswire", "BusinessWire"],
   },

@@ -14,7 +14,7 @@ import {
   HelpCircle,
   GitBranch,
   RefreshCw,
-  Menu,
+  PanelLeft,
   Sun,
   Moon,
 } from "lucide-react";
@@ -24,12 +24,12 @@ type NavItem = { to: string; label: string; icon: typeof Target; hash?: string }
 type NavGroup = { group: string; items: NavItem[] };
 
 const BASE: NavGroup = {
-  group: "Overview",
+  group: "OVERVIEW",
   items: [{ to: "/", label: "Use Cases", icon: LayoutDashboard }],
 };
 
 const TARGETED: NavGroup = {
-  group: "Site Specific",
+  group: "BY SOURCE",
   items: [
     { to: "/site-specific", label: "Sources & Agents", icon: Library },
   ],
@@ -38,17 +38,17 @@ const TARGETED: NavGroup = {
 
 
 const OPENWEB: NavGroup = {
-  group: "Any Site",
+  group: "BY DATASET",
   items: [
     { to: "/any-site", label: "Field Mapping", icon: GitBranch },
     { to: "/workflows", label: "Workflows", icon: WorkflowIcon },
-    { to: "/review", label: "Review", icon: CheckSquare },
   ],
 };
 
 const OPERATE: NavGroup = {
-  group: "Operate",
+  group: "OPERATE",
   items: [
+    { to: "/review", label: "Review", icon: CheckSquare },
     { to: "/monitoring", label: "Monitoring", icon: Activity },
     { to: "/export", label: "Export & Sync", icon: Upload },
   ],
@@ -159,10 +159,10 @@ export function AppLayout({ children }: { children: ReactNode }) {
                         to={n.to}
                         hash={n.hash}
                         className={[
-                          "flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px] transition",
+                          "flex items-center gap-2.5 px-3 py-2 text-[13px] transition border-l-2",
                           active
-                            ? "bg-primary text-primary-foreground"
-                            : "text-white/80 hover:bg-white/8 hover:text-white",
+                            ? "bg-primary text-primary-foreground border-transparent rounded-md dark:bg-card dark:text-foreground dark:border-primary dark:rounded-l-none"
+                            : "text-white/80 hover:bg-white/8 hover:text-white border-transparent rounded-md dark:text-muted-foreground dark:hover:bg-card/40 dark:hover:text-foreground",
                         ].join(" ")}
                       >
                         <Icon className="h-4 w-4" />
@@ -186,7 +186,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
             title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             className="h-9 w-9 inline-flex items-center justify-center rounded-md hover:bg-secondary text-muted-foreground transition"
           >
-            <Menu className="h-4 w-4" />
+            <PanelLeft className="h-4.5 w-4.5" />
           </button>
           <div className="relative flex-1 max-w-md">
             <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />

@@ -142,7 +142,12 @@ function ExportPage() {
         records: j.records !== undefined ? j.records : null,
       };
     })
-    .filter((j) => j.status === "Completed");
+    .filter((j) => 
+      j.status === "Completed" || 
+      j.status === "Review Pending" || 
+      j.status === "Review" || 
+      j.status === "Execution Completed"
+    );
 
   const handleExport = (format: string) => {
     if (!selectedJobId) return;

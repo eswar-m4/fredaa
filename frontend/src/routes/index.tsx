@@ -126,50 +126,52 @@ function UseCaseCard({
   onPick: () => void;
 }) {
   return (
-    <Card className={["p-6 flex flex-col", active ? "ring-2 ring-primary" : ""].join(" ")}>
-      <div className="flex items-center gap-2 mb-3">
-        <Badge tone={tone}>{badge}</Badge>
-        {active && <Badge tone="success">Active</Badge>}
-      </div>
-      <div className="flex items-start gap-4">
-        <div
-          className={
-            tone === "info"
-              ? "h-12 w-12 rounded-lg bg-info-bg text-info inline-flex items-center justify-center"
-              : "h-12 w-12 rounded-lg bg-purple-bg text-purple-token inline-flex items-center justify-center"
-          }
-        >
-          <Icon className="h-6 w-6" />
+    <div onClick={onPick} className="cursor-pointer group flex flex-col h-full">
+      <Card className={["p-6 flex flex-col h-full group-hover:border-primary/50 group-hover:shadow-md transition-all duration-200", active ? "ring-2 ring-primary" : ""].join(" ")}>
+        <div className="flex items-center gap-2 mb-3">
+          <Badge tone={tone}>{badge}</Badge>
+          {active && <Badge tone="success">Active</Badge>}
         </div>
-        <div className="min-w-0 flex-1">
-          <h2 className="text-[18px] font-semibold">{title}</h2>
-          <div className="text-[11px] text-muted-foreground">{aka}</div>
-          <p className="text-[13px] text-muted-foreground mt-1">{description}</p>
+        <div className="flex items-start gap-4">
+          <div
+            className={
+              tone === "info"
+                ? "h-12 w-12 rounded-lg bg-info-bg text-info inline-flex items-center justify-center"
+                : "h-12 w-12 rounded-lg bg-purple-bg text-purple-token inline-flex items-center justify-center"
+            }
+          >
+            <Icon className="h-6 w-6" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <h2 className="text-[18px] font-semibold">{title}</h2>
+            <div className="text-[11px] text-muted-foreground">{aka}</div>
+            <p className="text-[13px] text-muted-foreground mt-1">{description}</p>
+          </div>
         </div>
-      </div>
-      <ul className="mt-4 space-y-1.5 text-[13px]">
-        {bullets.map((b) => (
-          <li key={b} className="flex items-start gap-2">
-            <span className="text-success mt-0.5">✓</span>
-            <span>{b}</span>
-          </li>
-        ))}
-      </ul>
-      <div className="mt-4 pt-4 border-t border-border">
-        <div className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5">
-          Unlocks these screens
-        </div>
-        <div className="flex flex-wrap gap-1.5">
-          {shows.map((s) => (
-            <Badge key={s} tone="neutral">{s}</Badge>
+        <ul className="mt-4 space-y-1.5 text-[13px] flex-1">
+          {bullets.map((b) => (
+            <li key={b} className="flex items-start gap-2">
+              <span className="text-success mt-0.5">✓</span>
+              <span>{b}</span>
+            </li>
           ))}
+        </ul>
+        <div className="mt-4 pt-4 border-t border-border">
+          <div className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5">
+            Unlocks these screens
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {shows.map((s) => (
+              <Badge key={s} tone="neutral">{s}</Badge>
+            ))}
+          </div>
         </div>
-      </div>
-      <div className="mt-5">
-        <Button onClick={onPick}>
-          {cta} <ArrowRight className="h-4 w-4" />
-        </Button>
-      </div>
-    </Card>
+        <div className="mt-5">
+          <div className="inline-flex items-center justify-center gap-1.5 rounded-md font-medium transition h-9 px-4 text-[13px] bg-primary text-primary-foreground group-hover:bg-primary/90">
+            {cta} <ArrowRight className="h-4 w-4" />
+          </div>
+        </div>
+      </Card>
+    </div>
   );
 }

@@ -134,6 +134,13 @@ class CustomDumpLLMService:
         return None
 
     def _ollama_chat(self, messages: List[Dict[str, str]]) -> Dict[str, Any]:
+        # Preflight check: verify if local Ollama port is open and responsive (1.5s timeout)
+        try:
+            requests.get(settings.OLLAMA_BASE_URL, timeout=1.5)
+        except Exception as conn_err:
+            logger.warning("Ollama pre-flight check failed (offline or unresponsive): %s", conn_err)
+            raise ConnectionError(f"Ollama is offline or unresponsive: {conn_err}")
+
         url = f"{settings.OLLAMA_BASE_URL.rstrip('/')}/api/chat"
         request_payload = {
             "model": settings.OLLAMA_MODEL,

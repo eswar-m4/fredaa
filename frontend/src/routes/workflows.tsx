@@ -3,7 +3,18 @@ import { useMemo, useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { Badge, Card, PageHeader } from "@/components/ui-bits";
 import { WORKFLOWS } from "@/data/workflows";
-import { ChevronDown, Clock, Database, ArrowRight, ShieldCheck, ArrowDownToLine, ArrowUpFromLine } from "lucide-react";
+import {
+  ChevronDown,
+  Clock,
+  Database,
+  ArrowRight,
+  Target as TargetIcon,
+  CheckCircle2,
+  ArrowDownToLine,
+  ArrowUpFromLine,
+  Maximize2,
+  X,
+} from "lucide-react";
 
 export const Route = createFileRoute("/workflows")({
   head: () => ({ meta: [{ title: "Workflows – FreshData AI" }] }),
@@ -13,6 +24,7 @@ export const Route = createFileRoute("/workflows")({
 function Workflows() {
   const [openId, setOpenId] = useState<string | null>(null);
   const [cat, setCat] = useState<string>("All");
+  const [zoomSrc, setZoomSrc] = useState<{ src: string; title: string } | null>(null);
 
   const cats = useMemo(() => ["All", ...Array.from(new Set(WORKFLOWS.map((w) => w.category)))], []);
   const list = WORKFLOWS.filter((w) => cat === "All" || w.category === cat);
@@ -61,15 +73,24 @@ function Workflows() {
                     <ChevronDown className={`h-4 w-4 text-muted-foreground transition ${open ? "rotate-180" : ""}`} />
                   </div>
 
-                  <div className="mt-4 grid grid-cols-3 gap-2 text-[12px]">
+                  <div className="mt-4 grid grid-cols-4 gap-2 text-[12px]">
                     <Stat icon={Database} label="Datapoints" value={wf.datapointsSummary} />
                     <Stat icon={Clock} label="Runtime" value={wf.runtime} />
                     <Stat
-                      icon={ShieldCheck}
-                      label="QC pass rate"
+                      icon={TargetIcon}
+                      label="Data coverage"
                       value={
-                        <span className={wf.qcPercent >= 93 ? "text-success" : wf.qcPercent >= 88 ? "text-warning" : "text-destructive"}>
-                          {wf.qcPercent}%
+                        <span className={(wf.coveragePercent ?? wf.qcPercent) >= 93 ? "text-success" : (wf.coveragePercent ?? wf.qcPercent) >= 85 ? "text-warning" : "text-destructive"}>
+                          {wf.coveragePercent ?? wf.qcPercent}%
+                        </span>
+                      }
+                    />
+                    <Stat
+                      icon={CheckCircle2}
+                      label="Accuracy rate"
+                      value={
+                        <span className={(wf.accuracyPercent ?? wf.qcPercent) >= 93 ? "text-success" : (wf.accuracyPercent ?? wf.qcPercent) >= 88 ? "text-warning" : "text-destructive"}>
+                          {wf.accuracyPercent ?? wf.qcPercent}%
                         </span>
                       }
                     />
@@ -79,8 +100,8 @@ function Workflows() {
                 {open && (
                   <div className="border-t border-border p-5 space-y-4 bg-secondary/30">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <IOBlock icon={ArrowDownToLine} title="Inputs" items={wf.inputs} tone="info" />
-                      <IOBlock icon={ArrowUpFromLine} title="Outputs" items={wf.outputs} tone="success" />
+                      <IOBlock icon={ArrowDownToLine} title="Input Attributes" items={wf.inputAttributes ?? wf.inputs} tone="info" />
+                      <IOBlock icon={ArrowUpFromLine} title="Output Attributes" items={wf.outputAttributes ?? wf.outputs ?? wf.attributes} tone="success" />
                     </div>
 
                     <div>
@@ -104,10 +125,10 @@ function Workflows() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-[12px]">
                       <div>
                         <div className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5">
-                          Attributes ({wf.attributes.length})
+                          Attributes ({wf.attributes ? wf.attributes.length : 0})
                         </div>
                         <div className="flex flex-wrap gap-1">
-                          {wf.attributes.map((a) => (
+                          {(wf.attributes ?? []).map((a) => (
                             <Badge key={a} tone="neutral">{a}</Badge>
                           ))}
                         </div>
@@ -126,14 +147,28 @@ function Workflows() {
 
                     {wf.screenshot ? (
                       <div className="rounded-md border border-border bg-card overflow-hidden">
-                        <div className="px-3 py-1.5 border-b border-border text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">
-                          Workflow Studio preview
+                        <div className="px-3 py-1.5 border-b border-border flex items-center justify-between">
+                          <span className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">
+                            Workflow Studio preview
+                          </span>
+                          <button
+                            onClick={() => setZoomSrc({ src: wf.screenshot!, title: wf.name })}
+                            className="inline-flex items-center gap-1 text-[11px] text-info hover:underline"
+                          >
+                            <Maximize2 className="h-3 w-3" /> Expand
+                          </button>
                         </div>
-                        <img src={wf.screenshot} alt={`${wf.name} pipeline`} className="w-full h-auto block" />
+                        <button
+                          onClick={() => setZoomSrc({ src: wf.screenshot!, title: wf.name })}
+                          className="block w-full text-left"
+                          aria-label="Expand workflow preview"
+                        >
+                          <img src={wf.screenshot} alt={`${wf.name} pipeline`} className="w-full h-auto block cursor-zoom-in" />
+                        </button>
                       </div>
                     ) : (
                       <div className="rounded-md border border-dashed border-border bg-card p-3 text-[11px] text-muted-foreground text-center">
-                        [ pipeline screenshot placeholder — wire up workflow studio render here ]
+                        [ pipeline screenshot placeholder ]
                       </div>
                     )}
                   </div>
@@ -143,6 +178,31 @@ function Workflows() {
           })}
         </div>
       </div>
+
+      {zoomSrc && (
+        <div
+          className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
+          onClick={() => setZoomSrc(null)}
+        >
+          <div className="absolute top-4 right-4 flex items-center gap-2">
+            <button
+              onClick={() => setZoomSrc(null)}
+              className="h-9 px-3 inline-flex items-center gap-1.5 rounded-md bg-card text-foreground text-[12px] font-medium"
+            >
+              <X className="h-4 w-4" /> Close
+            </button>
+          </div>
+          <div className="absolute top-4 left-4 text-white/90 text-[13px] font-semibold">
+            {zoomSrc.title} — Workflow Studio preview
+          </div>
+          <img
+            src={zoomSrc.src}
+            alt={zoomSrc.title}
+            className="max-w-[95vw] max-h-[88vh] object-contain rounded shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
     </AppLayout>
   );
 }

@@ -90,50 +90,127 @@
   --info-bg: oklch(0.95 0.03 250);               /* #EBF3FC */
   --purple-token: oklch(0.42 0.16 290);          /* #5D3FA8 */
   --purple-bg: oklch(0.95 0.04 290);             /* #EEEAFC */
+
+  /* Prototype Aliases */
+  --bg: var(--background);
+  --surface: var(--card);
+  --border2: var(--border);
+  --text: var(--foreground);
+  --text2: var(--muted-foreground);
+  --text3: var(--muted-foreground);
+  --blue: var(--primary);
+  --blue-mid: var(--info);
+  --blue-bg: var(--info-bg);
+  --green-mid: var(--success);
+  --green: var(--success);
+  --green-bg: var(--success-bg);
+  --amber: var(--warning);
+  --amber-bg: var(--warning-bg);
+  --purple: var(--purple-token);
 }
 
 .dark {
-  /* Slate/Navy Dark Palette (Enterprise SaaS Style) */
-  --background: oklch(0.14 0.015 255);          /* #0A111E */
-  --foreground: oklch(0.92 0.01 255);            /* #E2E8F0 */
-  --card: oklch(0.18 0.02 255);                 /* #121E31 */
-  --card-foreground: oklch(0.92 0.01 255);
-  --popover: oklch(0.18 0.02 255);
-  --popover-foreground: oklch(0.92 0.01 255);
+  /* Slate/Navy Dark Palette (Refined Enterprise SaaS Style) */
+  --background: #0A0F1F;
+  --foreground: #F8FAFC;
+  
+  --card: #111827;
+  --card-foreground: #F8FAFC;
+  
+  --popover: #172033;
+  --popover-foreground: #F8FAFC;
 
-  --primary: oklch(0.60 0.14 250);               /* #3882F6 */
-  --primary-foreground: oklch(0.99 0.005 250);   /* #F8FAFC */
+  --primary: #38BDF8;                /* Neon Blue */
+  --primary-foreground: #0A0F1F;     /* Dark Canvas text color on Neon Blue CTAs */
 
-  --secondary: oklch(0.22 0.02 255);            /* #1C2D47 */
-  --secondary-foreground: oklch(0.85 0.02 255);  /* #CBD5E1 */
+  --secondary: #111827;              /* Slate background */
+  --secondary-foreground: #CBD5E1;   /* Slate/Secondary text */
 
-  --muted: oklch(0.22 0.02 255);
-  --muted-foreground: oklch(0.65 0.02 255);      /* #94A3B8 */
+  --muted: #111827;
+  --muted-foreground: #94A3B8;       /* Muted Slate text */
 
-  --accent: oklch(0.24 0.03 255);               /* #233A5C */
-  --accent-foreground: oklch(0.95 0.01 255);     /* #F1F5F9 */
+  --accent: #172033;
+  --accent-foreground: #F8FAFC;
 
-  --destructive: oklch(0.55 0.18 20);
-  --destructive-foreground: oklch(0.99 0.005 250);
+  --destructive: #EF4444;            /* Neon Red */
+  --destructive-foreground: #F8FAFC;
 
-  --border: oklch(0.25 0.02 255);                /* #20334E */
-  --input: oklch(0.20 0.02 255);                 /* #17263C */
-  --ring: oklch(0.60 0.14 250);
+  --border: #1E293B;                 /* Border color */
+  --input: #111827;
+  --ring: #38BDF8;                   /* Neon Blue ring outline */
 
-  --navy: oklch(0.16 0.02 255);                  /* #101928 */
-  --navy-foreground: oklch(0.92 0.01 255);
+  --navy: #080D1E;                   /* Deep Navy Sidebar background */
+  --navy-foreground: #CBD5E1;        /* Muted slate sidebar text */
 
-  --surface2: oklch(0.22 0.02 255);
-  --surface3: oklch(0.24 0.03 255);
+  --surface2: #111827;
+  --surface3: #172033;
 
-  --success: oklch(0.65 0.15 160);               /* #10B981 */
-  --success-bg: oklch(0.20 0.04 160);            /* #0A2E20 */
-  --warning: oklch(0.70 0.15 65);                /* #F59E0B */
-  --warning-bg: oklch(0.20 0.04 65);             /* #2D1F08 */
-  --info: oklch(0.60 0.14 250);
-  --info-bg: oklch(0.18 0.03 250);               /* #0E1F38 */
-  --purple-token: oklch(0.65 0.16 295);          /* #8B5CF6 */
-  --purple-bg: oklch(0.20 0.04 295);             /* #23153F */
+  --success: #22C55E;                /* Neon Green */
+  --success-bg: rgba(34, 197, 94, 0.15); /* Dark Green fill */
+  
+  --warning: #F59E0B;                /* Neon Amber */
+  --warning-bg: rgba(245, 158, 11, 0.15); /* Dark Amber fill */
+  
+  --info: #22D3EE;                   /* Neon Cyan */
+  --info-bg: rgba(34, 211, 238, 0.15); /* Dark Cyan fill */
+  
+  --purple-token: #A855F7;           /* Neon Purple */
+  --purple-bg: rgba(168, 85, 247, 0.15); /* Dark Purple fill */
+
+  /* Prototype Aliases */
+  --bg: var(--background);
+  --surface: var(--card);
+  --border2: var(--border);
+  --text: var(--foreground);
+  --text2: var(--muted-foreground);
+  --text3: var(--muted-foreground);
+  --blue: var(--primary);
+  --blue-mid: var(--info);
+  --blue-bg: var(--info-bg);
+  --green-mid: var(--success);
+  --green: var(--success);
+  --green-bg: var(--success-bg);
+  --amber: var(--warning);
+  --amber-bg: var(--warning-bg);
+  --purple: var(--purple-token);
+}
+
+/* Elevated element background overrides for popovers, dropdown absolute panels, and modals in dark mode */
+.dark .absolute.bg-card,
+.dark .absolute.bg-background,
+.dark .fixed .bg-card,
+.dark [role="dialog"],
+.dark [role="dialog"] .bg-card {
+  background-color: var(--popover) !important;
+}
+
+/* Dropdowns background and text color styling in dark mode */
+.dark select,
+.dark option {
+  background-color: var(--popover) !important;
+  color: var(--foreground) !important;
+  border-color: var(--border) !important;
+}
+
+/* Active outlines & focused inputs styling in dark mode */
+.dark input:focus,
+.dark select:focus,
+.dark textarea:focus {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 1px var(--primary) !important;
+  outline: none;
+}
+
+/* Secondary & Outline Buttons: Slate background, Neon Blue border/outline only on hover in dark mode */
+.dark button.bg-secondary:hover,
+.dark button.bg-secondary:focus-visible {
+  box-shadow: 0 0 0 1px var(--primary) !important;
+  border-color: var(--primary) !important;
+}
+.dark button.border-border:hover,
+.dark button.border-border:focus-visible {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 1px var(--primary) !important;
 }
 
 @layer base {

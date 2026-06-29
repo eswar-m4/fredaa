@@ -62,9 +62,6 @@ class WebsiteComplexityClassifierService:
         content = text.strip()
         if not content:
             return {}
-
-    def _normalize_token(self, value: str) -> str:
-        return re.sub(r"[^a-z0-9]+", "_", str(value or "").strip().lower()).strip("_")
         try:
             return json.loads(content)
         except Exception:
@@ -77,7 +74,17 @@ class WebsiteComplexityClassifierService:
         except Exception:
             return {}
 
+    def _normalize_token(self, value: str) -> str:
+        return re.sub(r"[^a-z0-9]+", "_", str(value or "").strip().lower()).strip("_")
+
     def _ollama_chat(self, messages: List[Dict[str, str]]) -> Dict[str, Any]:
+        # Preflight check: verify if local Ollama port is open and responsive (1.5s timeout)
+        try:
+            requests.get(settings.OLLAMA_BASE_URL, timeout=1.5)
+        except Exception as conn_err:
+            logger.warning("Ollama pre-flight check failed (offline or unresponsive): %s", conn_err)
+            raise ConnectionError(f"Ollama is offline or unresponsive: {conn_err}")
+
         url = f"{settings.OLLAMA_BASE_URL.rstrip('/')}/api/chat"
         request_payload = {
             "model": settings.OLLAMA_MODEL,
@@ -296,27 +303,23 @@ class WebsiteComplexityClassifierService:
         key = self._normalize_token(header)
         supported = set(superset_fields)
         rules = {
-            "company_name": {"company_name", "company", "name", "organization"},
-            "legal_name": {"legal_name", "registered_name"},
-            "hq_address": {"hq_address", "address", "headquarters_address"},
-            "website_url": {"website", "website_url", "company_website", "domain", "url"},
-            "email": {"email", "email_address", "work_email", "business_email"},
-            "phone_number": {"phone", "phone_number", "telephone", "mobile"},
-            "linkedin_url": {"linkedin", "linkedin_url", "linkedin_profile"},
-            "employee_count": {"employee_count", "employees", "emp_count"},
-            "industry_vertical": {"industry", "industry_vertical"},
-            "country": {"country"},
-            "city": {"city"},
-            "state": {"state", "province"},
-            "postal_code": {"postal_code", "zip", "zip_code", "pincode"},
-            "cik_number": {"cik", "cik_number"},
+            "legal_name": {"legal_name", "registered_name", "company_name", "company", "name", "organization", "firm_name", "business_name"},
+            "dba": {"dba", "trading_name", "doing_business_as"},
+            "description": {"description", "desc", "about", "summary"},
+            "tagline": {"tagline", "slogan"},
+            "hq_address": {"hq_address", "address", "headquarters_address", "add", "registered_address", "street_address", "hq_addr", "addr"},
+            "hq_city": {"hq_city", "city", "hq_town", "town", "location_city"},
+            "hq_state": {"hq_state", "state", "province", "hq_province", "region", "location_state"},
+            "hq_country": {"hq_country", "country", "hq_nation", "nation", "location_country"},
+            "website": {"website", "website_url", "company_website", "domain", "url", "corp_site", "homepage", "web_address"},
+            "email": {"email", "email_address", "work_email", "business_email", "contact_email", "gen_email"},
+            "phone": {"phone", "phone_number", "telephone", "mobile", "ph", "tel", "contact_number"},
+            "linkedin_url": {"linkedin", "linkedin_url", "linkedin_profile", "linkedin_link"},
+            "employee_count": {"employee_count", "employees", "emp_count", "headcount", "staff_count", "no_of_employees"},
+            "industry": {"industry", "industry_vertical", "sector", "business_type"},
+            "registry_number": {"registry_number", "cik", "cik_number", "registration_number", "company_number", "company_no", "reg_no"},
             "sic_code": {"sic", "sic_code"},
-            "sic_description": {"sic_description"},
-            "state_of_incorporation": {"state_of_incorporation"},
-            "fiscal_year_end": {"fiscal_year_end"},
-            "funding_stage": {"funding_stage"},
-            "stock_ticker": {"stock_ticker", "ticker"},
-            "public_private": {"public_private"},
+            "tax_id": {"tax_id", "ein", "tax_number", "tax_no"},
         }
         for target, aliases in rules.items():
             if target in supported and key in aliases:
@@ -329,16 +332,21 @@ class WebsiteComplexityClassifierService:
         superset_set = set(superset)
         exact_matches: Dict[str, str] = {}
         unresolved: List[str] = []
+        inferred: Dict[str, str] = {}
+
         for header in headers:
             normalized_header = self._normalize_token(header)
             if normalized_header in superset_set:
                 exact_matches[header] = normalized_header
             else:
-                unresolved.append(header)
+                guess = self._heuristic_field_map(header, superset)
+                if guess:
+                    inferred[header] = guess
+                else:
+                    unresolved.append(header)
 
         llm_trace: Dict[str, Any] = {}
         used_fallback = False
-        inferred: Dict[str, str] = {}
 
         if unresolved:
             messages = [
@@ -371,15 +379,43 @@ class WebsiteComplexityClassifierService:
                     if header in unresolved and mapped in superset_set:
                         inferred[header] = mapped
             except Exception as exc:
+                logger.warning("Ollama field mapping suggestions failed, falling back to central AIProvider: %s", exc)
                 used_fallback = True
-                llm_trace = {"error": str(exc)}
-
-            for header in unresolved:
-                if header in inferred:
-                    continue
-                guess = self._heuristic_field_map(header, superset)
-                if guess:
-                    inferred[header] = guess
+                try:
+                    from app.services.ai_provider import AIProvider
+                    provider = AIProvider(api_key=settings.GEMINI_API_KEY, model=settings.GEMINI_MODEL)
+                    prompt = (
+                        "You are an AI assistant. Map each input header to exactly one field from allowed superset fields, "
+                        "or empty string if no reliable mapping. Return strict JSON with key 'mappings' only.\n\n"
+                        f"Input headers: {unresolved}\n"
+                        f"Allowed superset fields: {superset}\n"
+                        "Return format:\n"
+                        '{"mappings":[{"input_header":"...","mapped_field":"allowed_or_empty"}]}'
+                    )
+                    raw_response = provider.generate(prompt, timeout=settings.AI_REQUEST_TIMEOUT_SEC, temperature=0.1)
+                    
+                    cleaned = raw_response.strip()
+                    if cleaned.startswith("```json"):
+                        cleaned = cleaned[7:]
+                    if cleaned.startswith("```"):
+                        cleaned = cleaned[3:]
+                    if cleaned.endswith("```"):
+                        cleaned = cleaned[:-3]
+                    
+                    parsed = json.loads(cleaned.strip())
+                    llm_trace = {"provider": "central_ai_provider", "raw_response": raw_response, "parsed": parsed}
+                    
+                    rows = parsed.get("mappings") if isinstance(parsed.get("mappings"), list) else []
+                    for row in rows:
+                        if not isinstance(row, dict):
+                            continue
+                        header = str(row.get("input_header") or "").strip()
+                        mapped = self._normalize_token(str(row.get("mapped_field") or ""))
+                        if header in unresolved and mapped in superset_set:
+                            inferred[header] = mapped
+                except Exception as fallback_exc:
+                    logger.error("Fallback AIProvider mapping failed: %s", fallback_exc, exc_info=True)
+                    llm_trace = {"error": str(exc), "fallback_error": str(fallback_exc)}
 
         mappings = []
         for header in headers:

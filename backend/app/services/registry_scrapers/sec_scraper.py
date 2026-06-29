@@ -105,14 +105,36 @@ class SECScraper:
                 SEC_SUBMISSIONS_URL.format(cik=lookup["cik"])
             )
         except Exception as exc:
-            logger.warning("[Registry:SEC] lookup failed for %s: %s", company_name, exc)
-            return _empty_result(
-                company_name=company_name,
-                confidence=0.0,
-                status="unavailable",
-                error=str(exc),
-                raw_metadata={"cik": normalized_cik, "ticker": ticker},
-            )
+            # Fallback to company-name-based SEC lookup if primary search with CIK fails
+            if normalized_cik:
+                logger.info("[Registry:SEC] Lookup by CIK %s failed for %s. Retrying by company name...", normalized_cik, company_name)
+                try:
+                    lookup_fallback = await self._resolve_company(company_name, cik=None, ticker=None)
+                    if lookup_fallback:
+                        submission = await self._request_json(
+                            SEC_SUBMISSIONS_URL.format(cik=lookup_fallback["cik"])
+                        )
+                        lookup = lookup_fallback
+                    else:
+                        raise exc
+                except Exception as fallback_exc:
+                    logger.warning("[Registry:SEC] Fallback lookup by name failed for %s: %s", company_name, fallback_exc)
+                    return _empty_result(
+                        company_name=company_name,
+                        confidence=0.0,
+                        status="unavailable",
+                        error=str(exc),
+                        raw_metadata={"cik": normalized_cik, "ticker": ticker},
+                    )
+            else:
+                logger.warning("[Registry:SEC] lookup failed for %s: %s", company_name, exc)
+                return _empty_result(
+                    company_name=company_name,
+                    confidence=0.0,
+                    status="unavailable",
+                    error=str(exc),
+                    raw_metadata={"cik": normalized_cik, "ticker": ticker},
+                )
 
         fields = self._extract_fields(submission, lookup)
         confidence = self._confidence(fields, matched_by=lookup.get("matched_by"))

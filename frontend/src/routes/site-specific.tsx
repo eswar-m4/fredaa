@@ -49,7 +49,7 @@ const STEPS = ["Pick or Add Sources", "Scope & Schedule", "Review & Launch"];
 type SourceItem = {
   id: number;
   bot: Bot;
-  scope: "full" | "partial" | "custom";
+  scope: "full" | "partial";
   partialCriteria: string;
   frequency: string;
 };
@@ -61,7 +61,7 @@ type NewSite = {
   description: string;
   authRequired: boolean;
   analysis: { complexity: string; sla: string; pages: string; reason: string };
-  scope: "full" | "partial" | "custom";
+  scope: "full" | "partial";
   partialCriteria: string;
   frequency: string;
 };
@@ -168,18 +168,34 @@ function SiteSpecific() {
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
                 placeholder="Search sources by name, URL..."
-                className="w-full h-10 pl-9 pr-28 rounded-md border border-input bg-card text-[13px] outline-none focus:ring-2 focus:ring-ring/40"
+                className="w-full h-10 pl-9 pr-12 rounded-md border border-input bg-card text-[13px] outline-none focus:ring-2 focus:ring-ring/40"
               />
               <button
                 type="button"
                 onClick={() => setShowAdvanced(!showAdvanced)}
-                className="absolute right-3 text-[11px] font-semibold text-info hover:text-info/80 hover:underline cursor-pointer select-none"
+                title="Advanced Search"
+                className="absolute right-1 w-[38px] h-[38px] rounded-md flex items-center justify-center text-muted-foreground/60 hover:text-blue-600 hover:bg-blue-50 dark:text-slate-500 dark:hover:text-cyan-400 dark:hover:bg-cyan-950/30 transition-colors cursor-pointer select-none"
               >
-                advanced search
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="h-[26px] w-[26px]"
+                >
+                  <circle cx="10.5" cy="11.5" r="5.5" />
+                  <line x1="14.5" y1="15.5" x2="20" y2="21" />
+                  <circle cx="17" cy="6" r="3.5" fill="var(--card)" stroke="currentColor" strokeWidth="1.5" />
+                  <line x1="15.5" y1="6" x2="18.5" y2="6" stroke="currentColor" strokeWidth="1.5" />
+                  <line x1="17" y1="4.5" x2="17" y2="7.5" stroke="currentColor" strokeWidth="1.5" />
+                </svg>
               </button>
             </div>
             
-            <Button variant="outline" onClick={() => setShowAdd(true)} className="h-10 shrink-0">
+            <Button onClick={() => setShowAdd(true)} className="h-10 shrink-0">
               <PlusCircle className="h-4 w-4" /> Add new source
             </Button>
 
@@ -293,7 +309,7 @@ function SiteSpecific() {
                           </td>
                           <td className="px-3 py-2 text-right font-mono">{b.datapoints}</td>
                           <td className="px-3 py-2 text-right">
-                            <button onClick={(e) => { e.stopPropagation(); setPreviewBot(b); }} className="text-[11px] text-info hover:underline inline-flex items-center gap-1">
+                            <button onClick={(e) => { e.stopPropagation(); setPreviewBot(b); }} className="text-[11px] text-info hover:underline inline-flex items-center gap-1 dark:text-muted-foreground dark:hover:text-[#22D3EE]">
                               <Eye className="h-3 w-3" /> Sample
                             </button>
                           </td>
@@ -887,11 +903,10 @@ function ScopeScheduleStep({
             <option value="2 Minutes">2 Minutes</option>
             <option>Daily</option><option>Weekly</option><option>Monthly</option><option>Quarterly</option>
           </Select>
-          <Select onChange={(e) => e.target.value && applyAll({ scope: e.target.value as "full" | "partial" | "custom" })} value="" className="h-8 w-32 text-[12px]">
+          <Select onChange={(e) => e.target.value && applyAll({ scope: e.target.value as "full" | "partial" })} value="" className="h-8 w-32 text-[12px]">
             <option value="">Scope…</option>
             <option value="full">Full dump</option>
-            <option value="partial">Partial dump</option>
-            <option value="custom">Custom</option>
+            <option value="partial">Custom dump</option>
           </Select>
         </div>
       </div>
@@ -923,11 +938,10 @@ function ScopeScheduleStep({
                   </td>
                   <td className="px-3 py-2 align-top">
                     <Select value={i.scope} onChange={(e) => {
-                      updateItem(i.id, { scope: e.target.value as "full" | "partial" | "custom", partialCriteria: "" });
+                      updateItem(i.id, { scope: e.target.value as "full" | "partial", partialCriteria: "" });
                     }} className="h-8 text-[12px]">
                       <option value="full">Full dump</option>
-                      <option value="partial">Partial dump</option>
-                      <option value="custom">Custom</option>
+                      <option value="partial">Custom dump</option>
                     </Select>
                   </td>
                   <td className="px-3 py-2 align-top">
@@ -965,15 +979,6 @@ function ScopeScheduleStep({
                         />
                       )
                     )}
-
-                    {i.scope === "custom" && (
-                      <Input
-                        value={i.partialCriteria}
-                        onChange={(e) => updateItem(i.id, { partialCriteria: e.target.value })}
-                        placeholder="e.g. Only pull California state records"
-                        className="h-8 text-[12px]"
-                      />
-                    )}
                   </td>
                   <td className="px-3 py-2 align-top">
                     <Select value={i.frequency} onChange={(e) => updateItem(i.id, { frequency: e.target.value })} className="h-8 text-[12px]">
@@ -1001,13 +1006,12 @@ function ScopeScheduleStep({
                   <Select
                     value={sel.newSite.scope}
                     onChange={(e) => {
-                      setSel((s) => ({ ...s, newSite: { ...s.newSite!, scope: e.target.value as "full" | "partial" | "custom", partialCriteria: "" } }));
+                      setSel((s) => ({ ...s, newSite: { ...s.newSite!, scope: e.target.value as "full" | "partial", partialCriteria: "" } }));
                     }}
                     className="h-8 text-[12px]"
                   >
                     <option value="full">Full dump</option>
-                    <option value="partial">Partial dump</option>
-                    <option value="custom">Custom</option>
+                    <option value="partial">Custom dump</option>
                   </Select>
                 </td>
                 <td className="px-3 py-2 align-top">
@@ -1022,17 +1026,6 @@ function ScopeScheduleStep({
                         setSel((s) => ({ ...s, newSite: { ...s.newSite!, partialCriteria: e.target.value } }))
                       }
                       placeholder="/path/*"
-                      className="h-8 text-[12px]"
-                    />
-                  )}
-
-                  {sel.newSite.scope === "custom" && (
-                    <Input
-                      value={sel.newSite.partialCriteria}
-                      onChange={(e) =>
-                        setSel((s) => ({ ...s, newSite: { ...s.newSite!, partialCriteria: e.target.value } }))
-                      }
-                      placeholder="e.g. Only pull pages matching certain keywords"
                       className="h-8 text-[12px]"
                     />
                   )}
@@ -1130,7 +1123,7 @@ function ReviewStep({ sel, onBack }: { sel: Selection; onBack: () => void }) {
     }
   };
 
-  const handleLaunch = async () => {
+  const handleLaunch = async (): Promise<boolean> => {
     try {
       const baseApiUrl = (() => {
         if (
@@ -1169,7 +1162,7 @@ function ReviewStep({ sel, onBack }: { sel: Selection; onBack: () => void }) {
         return {
           id: `J-${Date.now() + index}`,
           source: i.bot.name,
-          scope: i.scope === "full" ? "Full Dump" : i.scope === "partial" ? "Partial Dump" : "Custom",
+          scope: i.scope === "full" ? "Full Dump" : "Custom Dump",
           filters: formatFilters(i.partialCriteria),
           frequency: i.frequency,
           delivery: sel.delivery,
@@ -1183,7 +1176,7 @@ function ReviewStep({ sel, onBack }: { sel: Selection; onBack: () => void }) {
         newJobs.push({
           id: `J-${Date.now() + 99}`,
           source: sel.newSite.url,
-          scope: sel.newSite.scope === "full" ? "Full Dump" : sel.newSite.scope === "partial" ? "Partial Dump" : "Custom",
+          scope: sel.newSite.scope === "full" ? "Full Dump" : "Custom Dump",
           filters: sel.newSite.partialCriteria || "—",
           frequency: sel.newSite.frequency,
           delivery: sel.delivery,
@@ -1195,13 +1188,21 @@ function ReviewStep({ sel, onBack }: { sel: Selection; onBack: () => void }) {
         });
       }
 
-      await fetch(`${baseApiUrl}/api/v1/demo/jobs/launch`, {
+      const response = await fetch(`${baseApiUrl}/api/v1/demo/jobs/launch`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ jobs: newJobs })
       });
+
+      if (!response.ok) {
+        console.error("Failed to launch jobs: backend returned", response.status);
+        return false;
+      }
+
+      return true;
     } catch (err) {
       console.error("Failed to launch jobs:", err);
+      return false;
     }
   };
 
@@ -1237,14 +1238,8 @@ function ReviewStep({ sel, onBack }: { sel: Selection; onBack: () => void }) {
                   )}
                   {i.scope === "partial" && (
                     <div>
-                      <div className="font-semibold text-foreground">Partial Dump</div>
+                      <div className="font-semibold text-foreground">Custom Dump</div>
                       <div className="text-[11px] text-muted-foreground">Criteria: {formatReviewCriteria(i.partialCriteria, i.bot.name)}</div>
-                    </div>
-                  )}
-                  {i.scope === "custom" && (
-                    <div>
-                      <div className="font-semibold text-foreground">Custom</div>
-                      <div className="text-[11px] text-muted-foreground">Criteria: "{(!i.partialCriteria || i.partialCriteria === "—" || i.partialCriteria === "- -") ? "Only products updated in last 30 days" : i.partialCriteria}"</div>
                     </div>
                   )}
                 </td>
@@ -1265,14 +1260,8 @@ function ReviewStep({ sel, onBack }: { sel: Selection; onBack: () => void }) {
                   )}
                   {sel.newSite.scope === "partial" && (
                     <div>
-                      <div className="font-semibold text-foreground">Partial Dump</div>
+                      <div className="font-semibold text-foreground">Custom Dump</div>
                       <div className="text-[11px] text-muted-foreground">Criteria: {(!sel.newSite.partialCriteria || sel.newSite.partialCriteria === "—" || sel.newSite.partialCriteria === "- -") ? "All Pages" : sel.newSite.partialCriteria}</div>
-                    </div>
-                  )}
-                  {sel.newSite.scope === "custom" && (
-                    <div>
-                      <div className="font-semibold text-foreground">Custom</div>
-                      <div className="text-[11px] text-muted-foreground">Criteria: "{(!sel.newSite.partialCriteria || sel.newSite.partialCriteria === "—" || sel.newSite.partialCriteria === "- -") ? "Only products updated in last 30 days" : sel.newSite.partialCriteria}"</div>
                     </div>
                   )}
                 </td>
@@ -1288,8 +1277,8 @@ function ReviewStep({ sel, onBack }: { sel: Selection; onBack: () => void }) {
       <div className="flex justify-between pt-2">
         <Button variant="outline" onClick={onBack}>Back</Button>
         <Button
-          onClick={async () => {
-            await handleLaunch();
+          onClick={() => {
+            handleLaunch();
             navigate({ to: "/monitoring" });
           }}
         >
@@ -1336,7 +1325,7 @@ function SampleModal({ bot, onClose }: { bot: Bot; onClose: () => void }) {
           baseApiUrl = `http://${window.location.hostname}:8131`;
         }
 
-        const endpoint = isKeysight ? "keysight" : isWebMD ? "webmd" : "sec";
+        const endpoint = isKeysight ? "keysight" : isWebMD ? "webmd" : (isTurkeyBrokers ? "turkeybrokers" : "sec");
         const response = await fetch(`${baseApiUrl}/api/v1/demo/${endpoint}/sample`);
         if (!response.ok) {
           throw new Error(`Server returned status ${response.status}`);
@@ -1375,7 +1364,7 @@ function SampleModal({ bot, onClose }: { bot: Bot; onClose: () => void }) {
   ];
   
   const investegateCols = [
-    "company_name", "ticker", "submission_time", "announcement_type", "category"
+    "Company_Name", "Company_Link", "Article_Link", "Disposition", "Comments", "Disposition_Details", "Article_Subject", "Market", "Listing_Category", "FTSE_index", "FTSE_Sector", "Published_Date", "KeywordsMapped", "Total_MatchKeyword", "Event_Name", "RNS", "Source"
   ];
 
   const turkeyBrokersCols = [
@@ -1386,26 +1375,30 @@ function SampleModal({ bot, onClose }: { bot: Bot; onClose: () => void }) {
     return rows.map((r) => {
       if (isInvestegate) {
         return {
-          company_name: r.entity_name,
-          ticker: r.ticker,
-          submission_time: r.filing_date,
-          announcement_type: r.filing_type,
-          category: r.sic_description,
+          Company_Name: r.Company_Name,
+          Company_Link: r.Company_Link,
+          Article_Link: r.Article_Link,
+          Disposition: r.Disposition,
+          Comments: r.Comments,
+          Disposition_Details: r.Disposition_Details,
+          Article_Subject: r.Article_Subject,
+          Market: r.Market,
+          Listing_Category: r.Listing_Category,
+          FTSE_index: r.FTSE_index,
+          FTSE_Sector: r.FTSE_Sector,
+          Published_Date: r.Published_Date,
+          KeywordsMapped: r.KeywordsMapped,
+          Total_MatchKeyword: r.Total_MatchKeyword,
+          Event_Name: r.Event_Name,
+          RNS: r.RNS,
+          Source: r.Source
         };
       }
       if (isTurkeyBrokers) {
-        const extractCity = (addr?: string) => {
-          if (!addr) return "";
-          const parts = addr.split(",").map(p => p.trim());
-          if (parts.length >= 3) {
-            return parts[parts.length - 3];
-          }
-          return parts[0] || "";
-        };
         return {
-          PrimaryKey: r.entity_name || null,
-          Address: r.business_address || null,
-          City: extractCity(r.business_address) || null,
+          PrimaryKey: r.PrimaryKey,
+          Address: r.Address,
+          City: r.City,
         };
       }
       return r;
@@ -1763,8 +1756,20 @@ function AddSourceModal({
             <div>
               <label className="text-[12px] text-muted-foreground">Category</label>
               <Select value={category} onChange={(e) => setCategory(e.target.value)}>
-                <option>Registry & SEC</option><option>Stock Exchange</option><option>Government / Regulatory</option>
-                <option>Retail & E-Commerce</option><option>Financial Services</option><option>News & Media</option><option>Other</option>
+                <option>Business Directory</option>
+                <option>Construction</option>
+                <option>Energy & Utilities</option>
+                <option>Government & Regulatory</option>
+                <option>Healthcare</option>
+                <option>Job Boards</option>
+                <option>Other</option>
+                <option>RFP & Tenders</option>
+                <option>Real Estate</option>
+                <option>Registry & SEC</option>
+                <option>Retail & E-Commerce</option>
+                <option>Social Media</option>
+                <option>Store Locator</option>
+                <option>Travel</option>
               </Select>
             </div>
             <label className="flex items-center gap-2 mt-6 text-[13px]">

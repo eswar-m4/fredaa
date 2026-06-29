@@ -124,24 +124,34 @@ export function Select(props: React.SelectHTMLAttributes<HTMLSelectElement>) {
 
 export function Steps({ steps, current }: { steps: string[]; current: number }) {
   return (
-    <ol className="flex items-center gap-2 flex-wrap">
+    <ol className="w-full flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-4">
       {steps.map((s, i) => {
         const done = i < current;
         const active = i === current;
+        const isLast = i === steps.length - 1;
         return (
-          <li key={s} className="flex items-center gap-2">
-            <div
-              className={cn(
-                "h-6 w-6 rounded-full flex items-center justify-center text-[11px] font-semibold",
-                done && "bg-success text-white",
-                active && "bg-primary text-primary-foreground",
-                !done && !active && "bg-secondary text-muted-foreground",
-              )}
-            >
-              {done ? "✓" : i + 1}
+          <li key={s} className={cn("flex flex-col md:flex-row md:items-center gap-3", !isLast && "md:flex-1")}>
+            <div className="flex items-center gap-2 shrink-0">
+              <div
+                className={cn(
+                  "h-6 w-6 rounded-full flex items-center justify-center text-[11px] font-semibold shrink-0",
+                  done && "bg-success text-white",
+                  active && "bg-primary text-primary-foreground",
+                  !done && !active && "bg-secondary text-muted-foreground",
+                )}
+              >
+                {done ? "✓" : i + 1}
+              </div>
+              <span className={cn("text-[12px] whitespace-nowrap", active ? "font-semibold text-foreground" : "text-muted-foreground")}>
+                {s}
+              </span>
             </div>
-            <span className={cn("text-[12px]", active ? "font-semibold text-foreground" : "text-muted-foreground")}>{s}</span>
-            {i < steps.length - 1 && <span className="text-muted-foreground">→</span>}
+            {!isLast && (
+              <div className="flex md:flex-1 items-center min-w-[16px] h-4 md:h-auto pl-[11px] md:pl-0">
+                <div className="w-[1.5px] h-full md:w-auto md:h-[1.5px] md:flex-1 bg-border" />
+                <span className="hidden md:inline text-muted-foreground text-[10px] ml-1 select-none">→</span>
+              </div>
+            )}
           </li>
         );
       })}

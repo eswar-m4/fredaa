@@ -66,6 +66,22 @@ ERROR_PAGE_TITLE = re.compile(
 )
 
 
+def clean_wayback(url: str) -> str:
+    if not url:
+        return url
+    cleaned = re.sub(r'^(?:https?://(?:www\.)?web\.archive\.org)?/web/\d+[a-z_]*/', '', url, flags=re.IGNORECASE)
+    return cleaned
+
+
+def _strip_wayback_noise(soup: BeautifulSoup) -> None:
+    for tag in soup.find_all(id=re.compile(r'^wm-ipp', re.I)):
+        tag.decompose()
+    for tag in soup.find_all(class_=re.compile(r'^wm-ipp', re.I)):
+        tag.decompose()
+    for tag in soup.find_all(id=re.compile(r'^donato', re.I)):
+        tag.decompose()
+
+
 def _extract_domain(url: str) -> str:
     parsed = urlparse(url)
     domain = parsed.netloc or parsed.path
@@ -485,6 +501,7 @@ async def _fetch_html_aio(url: str) -> str:
 def _fetch_html_requests(url: str) -> str:
     headers = {'User-Agent': USER_AGENT}
     response = requests.get(url, headers=headers, timeout=REQUEST_TIMEOUT, allow_redirects=True)
+    response.raise_for_status()
     content_type = response.headers.get('Content-Type', '')
     if 'text/html' not in content_type.lower():
         raise ValueError('Unsupported content type')
@@ -494,29 +511,159 @@ def _fetch_html_requests(url: str) -> str:
     return content
 
 
+def _is_empty_or_blocked_metadata(metadata: Dict[str, Any]) -> bool:
+    title = (metadata.get('title') or '').lower()
+    if any(blocked in title for blocked in ['access denied', 'forbidden', 'attention required', 'blocked', 'security challenge', 'cloudflare']):
+        return True
+    has_title = bool(metadata.get('title'))
+    has_desc = bool(metadata.get('meta_description'))
+    has_company = bool(metadata.get('detected_company_name'))
+    if not has_title and not has_desc and not has_company:
+        return True
+    return False
+
+
+def _fetch_wayback_html_sync(url: str, headers: Dict[str, str]) -> Optional[str]:
+    response = requests.get(url, headers=headers, timeout=REQUEST_TIMEOUT, allow_redirects=True)
+    if response.status_code == 200:
+        return response.text
+    return None
+
+
+async def fetch_wayback_html(url: str) -> Optional[str]:
+    wayback_url = f"https://web.archive.org/web/20240601000000/{url}"
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+    }
+    try:
+        loop = asyncio.get_event_loop()
+        html = await loop.run_in_executor(
+            None,
+            lambda: _fetch_wayback_html_sync(wayback_url, headers)
+        )
+        return html
+    except Exception as e:
+        logger.warning('[Scraper] failed to fetch from wayback: %s', e)
+        return None
+
+
+def _extract_metadata_wayback(html: str, url: str) -> Dict[str, Any]:
+    soup = BeautifulSoup(html, 'html.parser')
+    _strip_wayback_noise(soup)
+    
+    title = ''
+    description = ''
+    keywords: List[str] = []
+    social_links: List[str] = []
+
+    if soup.title and soup.title.string:
+        title = soup.title.string.strip()
+
+    description = (
+        _meta_content(soup, name='description')
+        or _meta_content(soup, prop='og:description')
+    )
+
+    keyword_tag = soup.find('meta', attrs={'name': 'keywords'})
+    if keyword_tag and keyword_tag.get('content'):
+        keywords = [kw.strip().lower() for kw in keyword_tag['content'].split(',') if kw.strip()]
+
+    visible_text = _meaningful_visible_text(soup)
+    is_error_page = bool(ERROR_PAGE_TITLE.search(title))
+    detected_company_name = '' if is_error_page else _extract_company_name(soup, title, url)
+    page_text = '' if is_error_page else _extract_meaningful_page_text(soup, html, description)
+
+    if not keywords and page_text:
+        tokens = re.findall(r'\b[a-zA-Z]{4,}\b', page_text.lower())
+        freq: Dict[str, int] = {}
+        for token in tokens:
+            freq[token] = freq.get(token, 0) + 1
+        keywords = [k for k, _ in sorted(freq.items(), key=lambda item: item[1], reverse=True)[:10]]
+
+    emails = [] if is_error_page else list({m.lower() for m in EMAIL_REGEX.findall(visible_text)})
+    phone_numbers = [] if is_error_page else _extract_phone_numbers(soup, visible_text)
+
+    for anchor in soup.find_all('a', href=True):
+        href = anchor['href'].strip()
+        cleaned_href = clean_wayback(href)
+        if any(domain in cleaned_href.lower() for domain in SOCIAL_DOMAINS):
+            social_links.append(cleaned_href)
+
+    seen_social = set()
+    dedup_social = []
+    for link in social_links:
+        if link not in seen_social:
+            seen_social.add(link)
+            dedup_social.append(link)
+
+    return {
+        'url': url,
+        'title': title,
+        'meta_description': description,
+        'emails': emails,
+        'phone_numbers': phone_numbers,
+        'social_links': dedup_social,
+        'detected_company_name': detected_company_name,
+        'detected_keywords': keywords,
+        'page_text': page_text,
+        'page_text_length': len(page_text),
+    }
+
+
 async def fetch_website_metadata(raw_url: str) -> Dict[str, Any]:
     url = _safe_url(raw_url)
     if not url:
         raise ValueError('Could not verify domain')
 
+    html = None
+    fallback_to_wayback = False
+    error_reason = None
+
     try:
-        # enforce per-scrape timeout to avoid hanging on slow sites
         logger.info('[Scraper] fetching %s', url)
         html = await asyncio.wait_for(_fetch_html_aio(url), timeout=REQUEST_TIMEOUT)
     except Exception as exc:
-        # classify timeout separately for clearer logging
         if isinstance(exc, asyncio.TimeoutError):
             logger.warning('[Scraper][Timeout] fetch timed out for %s', url)
-            raise ValueError('Request timed out')
-        logger.warning('[Scraper] aiohttp fetch failed for %s: %s', url, exc)
+            error_reason = 'Request timed out'
+        else:
+            logger.warning('[Scraper] aiohttp fetch failed for %s: %s', url, exc)
+            error_reason = str(exc)
+            
         try:
             html = _fetch_html_requests(url)
         except Exception as inner:
             logger.warning('[Scraper] requests fallback failed for %s: %s', url, inner)
-            raise ValueError(_sanitize_error(str(inner)))
+            error_reason = str(inner)
+            fallback_to_wayback = True
 
-    metadata = _extract_metadata(html, url)
-    return metadata
+    if not fallback_to_wayback and html:
+        try:
+            metadata = _extract_metadata(html, url)
+            if _is_empty_or_blocked_metadata(metadata):
+                logger.info('[Scraper] Live metadata for %s is empty or blocked. Triggering Wayback fallback.', url)
+                fallback_to_wayback = True
+            else:
+                return metadata
+        except Exception as parse_err:
+            logger.warning('[Scraper] Error parsing live HTML for %s: %s. Triggering Wayback fallback.', url, parse_err)
+            fallback_to_wayback = True
+
+    if fallback_to_wayback:
+        logger.info('[Scraper] Attempting Wayback fallback for %s', url)
+        try:
+            wayback_html = await fetch_wayback_html(url)
+            if wayback_html:
+                metadata = _extract_metadata_wayback(wayback_html, url)
+                if metadata and not _is_empty_or_blocked_metadata(metadata):
+                    logger.info('[Scraper] Successfully retrieved archived metadata for %s', url)
+                    return metadata
+        except Exception as wayback_exc:
+            logger.warning('[Scraper] Wayback fallback failed for %s: %s', url, wayback_exc)
+
+    if error_reason:
+        raise ValueError(_sanitize_error(error_reason))
+    raise ValueError('Could not verify domain')
 
 
 async def verify_company_website(record: Dict[str, Any]) -> Dict[str, Any]:

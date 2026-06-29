@@ -7,6 +7,7 @@ falls back to Groq for quota, rate-limit, or service interruptions.
 from typing import Optional
 import time
 import logging
+from concurrent.futures import ThreadPoolExecutor, TimeoutError as FutureTimeoutError
 from app.config import settings
 from app.services.groq_provider import GroqProvider
 
@@ -69,14 +70,27 @@ class GeminiProvider:
             logger.info(f"Gemini model fallback selected: {chosen}")
 
         model_obj = self.client.GenerativeModel(model_name=chosen)
-        response = model_obj.generate_content(
-            prompt,
-            generation_config={
-                "temperature": float(temperature),
-                "top_p": 0.8,
-            },
-            request_options={"timeout": int(timeout)},
-        )
+        timeout_seconds = max(1, int(timeout))
+        executor = ThreadPoolExecutor(max_workers=1)
+        try:
+            future = executor.submit(
+                model_obj.generate_content,
+                prompt,
+                generation_config={
+                    "temperature": float(temperature),
+                    "top_p": 0.8,
+                },
+            )
+            response = future.result(timeout=timeout_seconds)
+        except FutureTimeoutError as exc:
+            logger.warning(
+                "Gemini request timed out after %ss for model=%s",
+                timeout_seconds,
+                self.model,
+            )
+            raise TimeoutError(f"Gemini request timed out after {timeout_seconds}s") from exc
+        finally:
+            executor.shutdown(wait=False, cancel_futures=True)
 
         text = getattr(response, "text", None)
         if text is None:

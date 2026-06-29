@@ -76,15 +76,15 @@ function formatRelativeTime(isoStr: string) {
 
 function tone(s: string) {
   if (s === "Running") return "info" as const;
-  if (s === "Completed") return "success" as const;
-  if (s === "Review") return "warning" as const;
+  if (s === "Completed" || s === "Execution Completed") return "success" as const;
+  if (s === "Review" || s === "Review Pending") return "warning" as const;
   if (s === "Analysis Complete" || s === "Pending Onboarding") return "warning" as const;
   return "destructive" as const;
 }
 
 function cleanSourceName(name: string) {
   if (!name) return "";
-  let clean = name.trim();
+  let clean = String(name).trim();
   
   const dashIdxs = [" – ", " - "];
   for (const dash of dashIdxs) {
@@ -157,6 +157,26 @@ function getSourceDisplayName(source: string) {
   return baseName.charAt(0).toUpperCase() + baseName.slice(1);
 }
 
+function getNewSourceDisplayName(source: string) {
+  if (!source) return "";
+  const clean = cleanSourceName(source);
+  const baseName = clean.split(".")[0].trim();
+  if (!baseName) return "";
+  return baseName.charAt(0).toUpperCase() + baseName.slice(1);
+}
+
+function getAnySiteUploadedFilename(filters: string) {
+  if (!filters || filters === "—") return "";
+  try {
+    const parsed = JSON.parse(filters);
+    return typeof parsed.seedFile === "string"
+      ? parsed.seedFile.trim().replace(/\.(csv|xlsx|xls)$/i, "")
+      : "";
+  } catch {
+    return "";
+  }
+}
+
 
 function Monitoring() {
   const [customJobs, setCustomJobs] = useState<any[]>([]);
@@ -198,7 +218,7 @@ function Monitoring() {
   }, [baseApiUrl]);
 
   const combinedJobs = [...customJobs].reverse().map((j) => {
-    const sourceName = j.source || j.source_name || j.website_url || "Unknown Source";
+    const sourceName = String(j.source || j.source_name || j.website_url || "Unknown Source");
     return {
       id: j.id || `J-${Date.now()}`,
       source: sourceName,
@@ -233,8 +253,8 @@ function Monitoring() {
   const sortedJobs = [...combinedJobs].sort((a, b) => {
     const score = (status: string) => {
       if (status === "Running") return 3;
-      if (status === "Completed") return 2;
-      if (status === "Review") return 2;
+      if (status === "Completed" || status === "Execution Completed") return 2;
+      if (status === "Review" || status === "Review Pending") return 2;
       return 1;
     };
     return score(b.status) - score(a.status);
@@ -244,7 +264,7 @@ function Monitoring() {
     if (seenIds.has(j.id)) continue;
     seenIds.add(j.id);
 
-    const nameKey = cleanSourceName(j.source).toLowerCase();
+    const nameKey = cleanSourceName(String(j.source || "")).toLowerCase();
     if (seenSources.has(nameKey)) {
       continue;
     }
@@ -256,8 +276,8 @@ function Monitoring() {
   const finalJobs = combinedJobs.filter((j) => deduplicatedJobs.some((dj) => dj.id === j.id));
 
   const runningCount = finalJobs.filter((j) => j.status === "Running").length;
-  const completedCount = finalJobs.filter((j) => j.status === "Completed").length;
-  const reviewCount = finalJobs.filter((j) => j.status === "Review").length;
+  const completedCount = finalJobs.filter((j) => j.status === "Completed" || j.status === "Execution Completed").length;
+  const reviewCount = finalJobs.filter((j) => j.status === "Review" || j.status === "Review Pending").length;
   const failedCount = finalJobs.filter((j) => j.status === "Failed").length;
   return (
     <AppLayout>
@@ -302,11 +322,15 @@ function Monitoring() {
               ) : (
                 finalJobs.map((j) => {
                   const isCatalog = bots.bots.some((b) => 
-                    j.source.toLowerCase().includes(b.name.toLowerCase()) || 
-                    b.name.toLowerCase().includes(j.source.toLowerCase())
+                    String(j.source || "").toLowerCase().includes(b.name.toLowerCase()) || 
+                    b.name.toLowerCase().includes(String(j.source || "").toLowerCase())
                   );
                   const showNewBadge = j.isCustomSource && !isCatalog;
-                  const sourceDisplayName = getSourceDisplayName(j.source);
+                  const isNewSourceOnboarding = j.isCustomSource && j.status === "Pending Onboarding";
+                  const uploadedFilename = j.mode === "Any-Site" ? getAnySiteUploadedFilename(j.filters) : "";
+                  const sourceDisplayName = isNewSourceOnboarding
+                    ? getNewSourceDisplayName(j.source)
+                    : (uploadedFilename || getSourceDisplayName(j.source));
 
                   return (
                     <tr key={j.id} className="hover:bg-secondary/60 group">
@@ -354,7 +378,9 @@ function Monitoring() {
                         {j.records !== null && j.records !== undefined ? j.records.toLocaleString() : "—"}
                       </td>
                       <td className="px-4 py-3.5 text-right font-mono border-b border-border/40 text-[13px] text-foreground font-semibold">
-                        {j.status === "Completed" ? "100%" : (j.status === "Failed" ? "0%" : (j.fresh !== null && j.fresh !== undefined ? `${j.fresh}%` : "—"))}
+                        {isNewSourceOnboarding
+                          ? "—"
+                          : (j.status === "Completed" ? "100%" : (j.status === "Failed" ? "0%" : (j.fresh !== null && j.fresh !== undefined ? `${j.fresh}%` : "—")))}
                       </td>
                       <td className="px-4 py-3.5 text-right border-b border-border/40 pr-6 relative">
                         <div className="inline-block text-left">

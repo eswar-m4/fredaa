@@ -4,7 +4,10 @@ Temporary demo router for Keysight and WebMD Scraper integrations.
 
 import os
 import json
-from typing import Optional
+import re
+import random
+import logging
+from typing import Any, Dict, Optional
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel, Field
@@ -16,6 +19,7 @@ from app.services.scrapers.keysight_scraper import (
 from app.services.scrapers.webmd_scraper import main as run_webmd_scraper
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
 
 # Resolve workspace root directory relative to this file
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
@@ -31,6 +35,11 @@ WEBMD_XLSX_PATH = os.path.join(BASE_DIR, "sample_webmd.xlsx")
 # Investegate paths
 INVESTEGATE_CSV_PATH = os.path.join(BASE_DIR, "sample_investegate.csv")
 INVESTEGATE_XLSX_PATH = os.path.join(BASE_DIR, "sample_investegate.xlsx")
+
+# TurkeyBrokers paths
+TURKEYBROKERS_CSV_PATH = os.path.join(BASE_DIR, "sample_turkeybrokers.csv")
+TURKEYBROKERS_XLSX_PATH = os.path.join(BASE_DIR, "sample_turkeybrokers.xlsx")
+
 
 
 # Pydantic schemas for request validation
@@ -474,6 +483,114 @@ async def download_investegate_xlsx():
     )
 
 
+# --- TurkeyBrokers Endpoints ---
+
+@router.get(
+    "/turkeybrokers/sample",
+    summary="Get TurkeyBrokers sample data",
+    description="Loads TurkeyBrokers records from the stored CSV dataset, selects 15 records with the highest field completeness, and returns the results."
+)
+async def get_turkeybrokers_sample():
+    """
+    Loads TurkeyBrokers records from the stored CSV dataset, selects 15 records
+    with the highest field completeness, and returns the results.
+    """
+    try:
+        import pandas as pd
+        import numpy as np
+        import math
+        
+        ensure_turkeybrokers_data()
+        
+        if not os.path.exists(TURKEYBROKERS_CSV_PATH):
+            raise FileNotFoundError(f"TurkeyBrokers sample CSV file not found at: {TURKEYBROKERS_CSV_PATH}")
+            
+        df = pd.read_csv(TURKEYBROKERS_CSV_PATH)
+        records = df.to_dict(orient="records")
+        
+        # Clean any float nan or infinite values
+        for rec in records:
+            for k, v in rec.items():
+                if isinstance(v, float) and (math.isnan(v) or math.isinf(v)):
+                    rec[k] = None
+                elif pd.isna(v):
+                    rec[k] = None
+        
+        # Helper to check completeness score
+        def get_completeness_score(rec):
+            if not rec:
+                return 0.0
+            non_empty = sum(
+                1 for v in rec.values()
+                if v is not None and v != "" and str(v).lower() != "nan" and str(v).lower() != "null"
+            )
+            return float(non_empty) / float(len(rec))
+            
+        # Sort in descending order of completeness score
+        sorted_records = sorted(records, key=get_completeness_score, reverse=True)
+        
+        # Select top 15 records
+        selected_records = sorted_records[:15]
+        
+        result = {
+            "source": "TurkeyBrokers",
+            "records_scraped": 500,
+            "sample_csv": TURKEYBROKERS_CSV_PATH,
+            "sample_xlsx": TURKEYBROKERS_XLSX_PATH,
+            "records": selected_records
+        }
+        return JSONResponse(content=result)
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"An error occurred while loading TurkeyBrokers sample: {str(e)}"
+        )
+
+
+@router.get(
+    "/turkeybrokers/download/csv",
+    summary="Download scraped TurkeyBrokers sample CSV file",
+    description="Returns the generated sample_turkeybrokers.csv file."
+)
+async def download_turkeybrokers_csv():
+    """
+    Downloads the sample_turkeybrokers.csv file.
+    """
+    ensure_turkeybrokers_data()
+    if not os.path.exists(TURKEYBROKERS_CSV_PATH):
+        raise HTTPException(
+            status_code=404,
+            detail="Sample CSV file not found. Please ensure the dataset is generated."
+        )
+    return FileResponse(
+        path=TURKEYBROKERS_CSV_PATH,
+        media_type="text/csv",
+        filename="sample_turkeybrokers.csv"
+    )
+
+
+@router.get(
+    "/turkeybrokers/download/xlsx",
+    summary="Download scraped TurkeyBrokers sample Excel file",
+    description="Returns the generated sample_turkeybrokers.xlsx file."
+)
+async def download_turkeybrokers_xlsx():
+    """
+    Downloads the sample_turkeybrokers.xlsx file.
+    """
+    ensure_turkeybrokers_data()
+    if not os.path.exists(TURKEYBROKERS_XLSX_PATH):
+        raise HTTPException(
+            status_code=404,
+            detail="Sample XLSX file not found. Please ensure the dataset is generated."
+        )
+    return FileResponse(
+        path=TURKEYBROKERS_XLSX_PATH,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        filename="sample_turkeybrokers.xlsx"
+    )
+
+
 # --- Scraper Job Infrastructure ---
 
 from typing import List, Dict, Any
@@ -493,6 +610,8 @@ class LaunchJobItem(BaseModel):
     mode: str
     complexity: Optional[str] = None
     estimated_onboarding_time: Optional[str] = None
+    records: Optional[int] = None
+    input_data: Optional[List[Dict[str, str]]] = None
 
 class LaunchJobsRequest(BaseModel):
     jobs: List[LaunchJobItem]
@@ -567,22 +686,37 @@ def ensure_turkeybrokers_data():
     import pandas as pd
     path = os.path.join(BASE_DIR, "sample_turkeybrokers.csv")
     xlsx_path = os.path.join(BASE_DIR, "sample_turkeybrokers.xlsx")
-    if not os.path.exists(path):
-        data = [
-            {"PrimaryKey": "TB-001", "Address": "Ataturk Bulvari No: 12, Ankara", "City": "Ankara"},
-            {"PrimaryKey": "TB-002", "Address": "Istiklal Caddesi No: 45, Istanbul", "City": "Istanbul"},
-            {"PrimaryKey": "TB-003", "Address": "Cumhuriyet Meydani No: 8, Izmir", "City": "Izmir"},
-            {"PrimaryKey": "TB-004", "Address": "Mevlana Caddesi No: 99, Konya", "City": "Konya"},
-            {"PrimaryKey": "TB-005", "Address": "Talatpasa Bulvari No: 3, Izmir", "City": "Izmir"},
-            {"PrimaryKey": "TB-006", "Address": "Bagdat Caddesi No: 202, Istanbul", "City": "Istanbul"},
-            {"PrimaryKey": "TB-007", "Address": "Barbaros Bulvari No: 88, Istanbul", "City": "Istanbul"},
-            {"PrimaryKey": "TB-008", "Address": "Kenan Evren Bulvari No: 15, Adana", "City": "Adana"},
-            {"PrimaryKey": "TB-009", "Address": "Gazi Mustafa Kemal Bulvari No: 54, Ankara", "City": "Ankara"},
-            {"PrimaryKey": "TB-010", "Address": "Ataturk Caddesi No: 77, Bursa", "City": "Bursa"},
-            {"PrimaryKey": "TB-011", "Address": "Inonu Caddesi No: 120, Izmir", "City": "Izmir"},
-            {"PrimaryKey": "TB-012", "Address": "Halaskargazi Caddesi No: 34, Istanbul", "City": "Istanbul"},
-            {"PrimaryKey": "TB-015", "Address": "Mithatpasa Caddesi No: 21, Ankara", "City": "Ankara"},
-        ]
+    
+    data = [
+        {"PrimaryKey": "TB-001", "Address": "Ataturk Bulvari No: 12, Ankara", "City": "Ankara"},
+        {"PrimaryKey": "TB-002", "Address": "Istiklal Caddesi No: 45, Istanbul", "City": "Istanbul"},
+        {"PrimaryKey": "TB-003", "Address": "Cumhuriyet Meydani No: 8, Izmir", "City": "Izmir"},
+        {"PrimaryKey": "TB-004", "Address": "Mevlana Caddesi No: 99, Konya", "City": "Konya"},
+        {"PrimaryKey": "TB-005", "Address": "Talatpasa Bulvari No: 3, Izmir", "City": "Izmir"},
+        {"PrimaryKey": "TB-006", "Address": "Bagdat Caddesi No: 202, Istanbul", "City": "Istanbul"},
+        {"PrimaryKey": "TB-007", "Address": "Barbaros Bulvari No: 88, Istanbul", "City": "Istanbul"},
+        {"PrimaryKey": "TB-008", "Address": "Kenan Evren Bulvari No: 15, Adana", "City": "Adana"},
+        {"PrimaryKey": "TB-009", "Address": "Gazi Mustafa Kemal Bulvari No: 54, Ankara", "City": "Ankara"},
+        {"PrimaryKey": "TB-010", "Address": "Ataturk Caddesi No: 77, Bursa", "City": "Bursa"},
+        {"PrimaryKey": "TB-011", "Address": "Inonu Caddesi No: 120, Izmir", "City": "Izmir"},
+        {"PrimaryKey": "TB-012", "Address": "Halaskargazi Caddesi No: 34, Istanbul", "City": "Istanbul"},
+        {"PrimaryKey": "TB-013", "Address": "Ziya Gokalp Caddesi No: 9, Ankara", "City": "Ankara"},
+        {"PrimaryKey": "TB-014", "Address": "Fevzi Pasa Caddesi No: 150, Istanbul", "City": "Istanbul"},
+        {"PrimaryKey": "TB-015", "Address": "Mithatpasa Caddesi No: 21, Ankara", "City": "Ankara"},
+    ]
+    
+    needs_generation = False
+    if not os.path.exists(path) or not os.path.exists(xlsx_path):
+        needs_generation = True
+    else:
+        try:
+            df_temp = pd.read_csv(path)
+            if len(df_temp) < 15:
+                needs_generation = True
+        except Exception:
+            needs_generation = True
+            
+    if needs_generation:
         df = pd.DataFrame(data)
         df.to_csv(path, index=False)
         df.to_excel(xlsx_path, index=False)
@@ -594,11 +728,27 @@ def get_record_key(source: str, r: dict) -> str:
     if "keysight" in src:
         return str(r.get("sku") or r.get("_model_Num") or "")
     if "webmd" in src:
-        return str(r.get("Business_Name") or r.get("Primary_Phone") or "")
+        return str(r.get("Detail_Url") or r.get("detail_url") or r.get("Business_Name") or r.get("Primary_Phone") or "")
+    if "cars.com" in src or "cars" in src:
+        return str(r.get("vin") or r.get("VIN") or r.get("listing_url") or r.get("Listing_Url") or "")
+    if "amazon" in src:
+        return str(r.get("asin") or r.get("ASIN") or r.get("sku") or r.get("SKU") or "")
+    if "mca" in src:
+        return str(r.get("registry_number") or r.get("cin") or r.get("CIN") or "")
+    if "companies house" in src or "companieshouse" in src:
+        return str(r.get("registry_number") or r.get("company_number") or "")
+    if "crunchbase" in src:
+        return str(r.get("company_domain") or r.get("domain") or r.get("source_url") or "")
     if "turkeybrokers" in src:
-        return str(r.get("PrimaryKey") or r.get("Address") or "")
+        return str(r.get("PrimaryKey") or r.get("primary_key") or r.get("listing_url") or "")
     if "investegate" in src:
-        return str(r.get("entity_name") or r.get("ticker") or "") + "_" + str(r.get("filing_date") or "")
+        if r.get("filing_document_link"):
+            return str(r.get("filing_document_link"))
+        ticker = str(r.get("ticker") or r.get("Ticker") or "")
+        fdate = str(r.get("filing_date") or r.get("Filing_Date") or "")
+        if ticker or fdate:
+            return f"{ticker}_{fdate}"
+        return ""
     return str(r.get("url") or r.get("id") or "")
 
 def simulate_demo_mutations(source: str, records: list) -> list:
@@ -649,7 +799,7 @@ async def run_scraper_background(job_id: str):
     with get_connection() as conn:
         job_info_db = conn.execute(
             """SELECT refresh_count, frequency, mode, is_custom_source, complexity, estimated_onboarding_time,
-                      source, scope, filters, custom_criteria 
+                      source, scope, filters, custom_criteria, records, status
                FROM scraper_jobs WHERE id = ?""",
             (job_id,)
         ).fetchone()
@@ -667,6 +817,12 @@ async def run_scraper_background(job_id: str):
     scope = job_info_db[7]
     filters_str = job_info_db[8]
     custom_criteria = job_info_db[9]
+    uploaded_records = job_info_db[10]
+    current_status = job_info_db[11]
+
+    # Keep new source onboarding jobs pending until a dedicated onboarding flow updates them.
+    if bool(is_custom) and str(current_status) == "Pending Onboarding":
+        return
     
     # Update status to 'Running'
     with get_connection() as conn:
@@ -676,29 +832,7 @@ async def run_scraper_background(job_id: str):
         )
         conn.commit()
     
-    # Translate Custom prompt using Qwen LLM
-    if scope == "Custom" and custom_criteria and custom_criteria not in ("—", "- -"):
-        try:
-            import logging
-            logging.basicConfig(level=logging.INFO)
-            logger = logging.getLogger("app.api.demo_routes")
-            from app.services.custom_dump_llm_service import custom_dump_llm_service
-            logger.info(f"Custom Dump translation triggered for job {job_id} on source {source} with prompt: {custom_criteria}")
-            validated_filters = custom_dump_llm_service.translate_prompt(source, custom_criteria)
-            filters_str = custom_dump_llm_service.format_to_query_string(validated_filters)
-            
-            # Save the updated filters in the database for UI consistency and export lookup
-            with get_connection() as conn:
-                conn.execute(
-                    "UPDATE scraper_jobs SET filters = ? WHERE id = ?",
-                    (filters_str, job_id)
-                )
-                conn.commit()
-            logger.info(f"Custom Dump translated query string saved to DB: {filters_str}")
-        except Exception as e:
-            import logging
-            logger = logging.getLogger("app.api.demo_routes")
-            logger.error(f"Error in Custom Dump LLM translation for job {job_id}: {e}")
+
     
     # Simulate scraper run time (onboarding duration for first run of custom source, or 5s standard)
     if bool(is_custom) and refresh_count_curr == 0:
@@ -735,6 +869,329 @@ async def run_scraper_background(job_id: str):
     source_lower = source.lower()
     
     try:
+        if job_mode in ("By Dataset", "Any-Site"):
+            # 1. Parse filters configuration
+            config_data = {}
+            if filters_str:
+                try:
+                    config_data = json.loads(filters_str)
+                except Exception:
+                    pass
+            selected_outputs = config_data.get("selectedOutputs") or []
+            mapping = config_data.get("mapping") or {}
+            picked_sources = config_data.get("pickedSources") or []
+
+            # 2. Load input rows
+            input_file_path = os.path.join(BASE_DIR, "datasets", f"{job_id}_input.json")
+            input_rows = []
+            if os.path.exists(input_file_path):
+                try:
+                    with open(input_file_path, "r", encoding="utf-8") as f_in:
+                        input_rows = json.load(f_in)
+                except Exception:
+                    pass
+
+            if not input_rows:
+                # Default mock input records if none uploaded
+                input_rows = [
+                    {"company_name": "Acme Corp", "corp_site": "https://acme.com", "phone": "+1 555-0199", "email": "info@acme.com", "linkedin": "https://www.linkedin.com/company/acme"},
+                    {"company_name": "Bolt.new", "corp_site": "https://bolt.new", "phone": "+1 555-0200", "email": "contact@bolt.new", "linkedin": "https://www.linkedin.com/company/boltdotnew"},
+                    {"company_name": "Vercel", "corp_site": "https://vercel.com", "phone": "+1 555-0201", "email": "support@vercel.com", "linkedin": "https://www.linkedin.com/company/vercel"},
+                    {"company_name": "Supabase", "corp_site": "https://supabase.com", "phone": "+1 555-0202", "email": "sales@supabase.io", "linkedin": "https://www.linkedin.com/company/supabase"},
+                    {"company_name": "OpenAI", "corp_site": "https://openai.com", "phone": "+1 555-0203", "email": "press@openai.com", "linkedin": "https://www.linkedin.com/company/openai"}
+                ]
+                if not mapping:
+                    mapping = {
+                        "legal_name": "company_name",
+                        "website": "corp_site",
+                        "phone": "phone",
+                        "email": "email",
+                        "linkedin_url": "linkedin"
+                    }
+
+            # 3. Execute enrichment
+            from app.services.company_verification_service import company_verification_service
+            from app.services.registry_scrapers.sec_scraper import sec_scraper
+            from app.services.registry_scrapers.mca_scraper import mca_scraper
+            from app.services.workflow_service import workflow_service, parse_employee_count, parse_headquarters
+            
+            run_website = any("website" in str(s).lower() and "linkedin" not in str(s).lower() for s in picked_sources)
+            run_sec = any("sec" in str(s).lower() or "edgar" in str(s).lower() for s in picked_sources)
+            run_linkedin = any("linkedin" in str(s).lower() for s in picked_sources)
+            run_mca = any("mca" in str(s).lower() for s in picked_sources)
+            
+            # Default to running website if picked_sources is empty
+            if not picked_sources:
+                run_website = True
+
+            # Concurrency limit and task definition
+            sem = asyncio.Semaphore(5)
+
+            def _normalize_uploaded_key(value: Any) -> str:
+                return re.sub(r"[^a-z0-9]+", "", str(value or "").strip().lower())
+
+            def _resolve_uploaded_value(record: Dict[str, Any], *field_names: str) -> Any:
+                if not isinstance(record, dict):
+                    return None
+
+                normalized_record = {
+                    _normalize_uploaded_key(key): value
+                    for key, value in record.items()
+                }
+
+                for field_name in field_names:
+                    if not field_name:
+                        continue
+                    mapped_header = mapping.get(field_name)
+                    candidates = [mapped_header, field_name]
+                    for candidate in candidates:
+                        if not candidate:
+                            continue
+                        value = normalized_record.get(_normalize_uploaded_key(candidate))
+                        if value not in (None, "", [], {}):
+                            return value
+                return None
+
+            async def process_record_safe(idx, record):
+                async with sem:
+                    record = dict(record or {})
+                    company_val = _resolve_uploaded_value(record, "legal_name", "company_name")
+                    if not company_val:
+                        return {key: None for key in selected_outputs}
+
+                    website_val = _resolve_uploaded_value(record, "website")
+                    email_val = _resolve_uploaded_value(record, "email")
+                    phone_val = _resolve_uploaded_value(record, "phone")
+                    linkedin_val = _resolve_uploaded_value(record, "linkedin_url")
+                    registry_val = _resolve_uploaded_value(record, "registry_number")
+                    ticker_val = _resolve_uploaded_value(record, "ticker")
+                    
+                    scraped_metadata = {}
+                    website_resolved = None
+                    sec_fields = {}
+                    mca_fields = {}
+                    linkedin_metadata = {}
+                    
+                    # For demo performance, only do real scraping for the first 5 records
+                    should_scrape = (idx < 5)
+                    
+                    if should_scrape and run_website:
+                        verification_input = {
+                            "company": company_val,
+                            "website": website_val,
+                            "email": email_val,
+                            "phone": phone_val,
+                            "linkedin": linkedin_val
+                        }
+                        try:
+                            res = await asyncio.wait_for(
+                                company_verification_service.verify_record(verification_input, {}),
+                                timeout=4.0
+                            )
+                            scraped_metadata = res.get("scraped_metadata") or {}
+                            website_resolved = res.get("website")
+                        except Exception as e:
+                            logger.warning("[By Dataset] Scraper failed/timed out for %s: %s", company_val, e)
+                            
+                    if should_scrape and run_sec:
+                        try:
+                            res_sec = await asyncio.wait_for(
+                                sec_scraper.lookup_company(
+                                    company_val,
+                                    cik=registry_val,
+                                    ticker=ticker_val
+                                ),
+                                timeout=3.0
+                            )
+                            if res_sec.get("raw_metadata", {}).get("status") == "success":
+                                sec_fields = res_sec.get("extracted_fields") or {}
+                        except Exception as e:
+                            logger.warning("[By Dataset] SEC EDGAR lookup failed/timed out for %s: %s", company_val, e)
+
+                    if should_scrape and run_mca:
+                        try:
+                            res_mca = await asyncio.wait_for(
+                                mca_scraper.lookup_company(company_val),
+                                timeout=3.0
+                            )
+                            if res_mca.get("raw_metadata", {}).get("status") == "success":
+                                mca_fields = res_mca.get("extracted_fields") or {}
+                        except Exception as e:
+                            logger.warning("[By Dataset] MCA lookup failed/timed out for %s: %s", company_val, e)
+
+                    if should_scrape and run_linkedin:
+                        try:
+                            discovery = await asyncio.wait_for(
+                                asyncio.to_thread(
+                                    workflow_service._discover_linkedin_search_evidence,
+                                    company_val
+                                ),
+                                timeout=3.0
+                            )
+                            if discovery and "metadata" in discovery:
+                                linkedin_metadata = discovery.get("metadata") or {}
+                                if "linkedin_url" in discovery:
+                                    linkedin_metadata["linkedin_url"] = discovery["linkedin_url"]
+                        except Exception as e:
+                            logger.warning("[By Dataset] LinkedIn lookup failed/timed out for %s: %s", company_val, e)
+
+                    enriched_row = {}
+                    
+                    sec_addr = sec_fields.get("profile", {}).get("business_address") or {}
+                    sec_street = " ".join(p for p in [sec_addr.get("street1"), sec_addr.get("street2")] if p) or None
+                    sec_city = sec_addr.get("city") or None
+                    sec_state = sec_addr.get("stateOrCountry") or None
+                    sec_country = sec_addr.get("country") or ("USA" if sec_state else None)
+
+                    mca_addr_str = mca_fields.get("registered_office_address") or ""
+                    mca_hq = parse_headquarters(mca_addr_str) if mca_addr_str else {"city": None, "state": None, "country": None}
+
+                    li_hq_str = linkedin_metadata.get("headquarters") or linkedin_metadata.get("linkedin_headquarters") or ""
+                    li_hq = parse_headquarters(li_hq_str) if li_hq_str else {"city": None, "state": None, "country": None}
+                    
+                    for key in selected_outputs:
+                        if key in ("company_name", "legal_name"):
+                            val = sec_fields.get("entity_name") or mca_fields.get("company_name") or linkedin_metadata.get("company_name") or linkedin_metadata.get("linkedin_company_name") or scraped_metadata.get("detected_company_name") or company_val
+                            enriched_row[key] = val if val else None
+                        elif key == "website":
+                            val = sec_fields.get("website") or linkedin_metadata.get("website") or linkedin_metadata.get("linkedin_website") or scraped_metadata.get("url") or website_resolved or website_val
+                            enriched_row[key] = val if val else None
+                        elif key == "description":
+                            val = linkedin_metadata.get("description") or linkedin_metadata.get("linkedin_description") or scraped_metadata.get("meta_description") or sec_fields.get("sic_description")
+                            enriched_row[key] = val if val else None
+                        elif key in ("phone", "contact_phone"):
+                            phones = scraped_metadata.get("phone_numbers") or []
+                            val = sec_fields.get("profile", {}).get("phone") or (phones[0] if phones else None) or phone_val
+                            enriched_row[key] = val if val else None
+                        elif key in ("email", "contact_email"):
+                            emails = scraped_metadata.get("emails") or []
+                            val = (emails[0] if emails else None) or email_val
+                            enriched_row[key] = val if val else None
+                        elif key in ("linkedin_url", "contact_linkedin"):
+                            val = linkedin_metadata.get("linkedin_url") or linkedin_val
+                            if not val:
+                                links = [l for l in scraped_metadata.get("social_links", []) if "linkedin.com" in l]
+                                val = links[0] if links else None
+                            enriched_row[key] = val if val else None
+                        elif key in ("twitter_handle", "twitter_url"):
+                            links = [l for l in scraped_metadata.get("social_links", []) if "twitter.com" in l or "x.com" in l]
+                            enriched_row[key] = links[0] if links else None
+                        elif key == "facebook_url":
+                            links = [l for l in scraped_metadata.get("social_links", []) if "facebook.com" in l]
+                            enriched_row["facebook_url"] = links[0] if links else None
+                        elif key == "hq_address":
+                            val = sec_street or mca_fields.get("registered_office_address") or li_hq_str or scraped_metadata.get("hq_address") or scraped_metadata.get("address")
+                            enriched_row[key] = val if val else None
+                        elif key == "hq_city":
+                            val = sec_city or mca_hq.get("city") or li_hq.get("city") or scraped_metadata.get("hq_city") or scraped_metadata.get("city")
+                            enriched_row[key] = val if val else None
+                        elif key == "hq_state":
+                            val = sec_state or mca_hq.get("state") or li_hq.get("state") or scraped_metadata.get("hq_state") or scraped_metadata.get("state")
+                            enriched_row[key] = val if val else None
+                        elif key == "hq_country":
+                            val = sec_country or ("India" if mca_fields.get("registered_office_address") else None) or li_hq.get("country") or scraped_metadata.get("hq_country") or scraped_metadata.get("country")
+                            enriched_row[key] = val if val else None
+                        elif key == "country":
+                            val = sec_country or ("India" if mca_fields.get("registered_office_address") else None) or li_hq.get("country") or scraped_metadata.get("hq_country") or scraped_metadata.get("country")
+                            enriched_row[key] = val if val else None
+                        elif key == "registry_number":
+                            val = sec_fields.get("cik") or mca_fields.get("cin") or registry_val
+                            enriched_row[key] = val if val else None
+                        elif key == "ticker":
+                            enriched_row["ticker"] = sec_fields.get("ticker") or None
+                        elif key == "sic_code":
+                            enriched_row["sic_code"] = sec_fields.get("sic") or None
+                        elif key == "incorporation_state":
+                            enriched_row["incorporation_state"] = sec_fields.get("state_of_incorporation") or None
+                        elif key == "fiscal_year":
+                            enriched_row["fiscal_year"] = sec_fields.get("fiscal_year_end") or None
+                        elif key == "industry":
+                            val = sec_fields.get("sic_description") or linkedin_metadata.get("industry") or linkedin_metadata.get("linkedin_industry") or scraped_metadata.get("detected_industry") or scraped_metadata.get("industry")
+                            enriched_row[key] = val if val else None
+                        elif key == "sub_industry":
+                            val = sec_fields.get("sic_description") or linkedin_metadata.get("industry") or linkedin_metadata.get("linkedin_industry") or scraped_metadata.get("detected_industry") or scraped_metadata.get("industry")
+                            enriched_row[key] = val if val else None
+                        elif key in ("employees", "employee_count"):
+                            li_emp = parse_employee_count(linkedin_metadata.get("company_size") or linkedin_metadata.get("linkedin_company_size"))
+                            enriched_row[key] = li_emp if li_emp else None
+                        elif key == "employee_range":
+                            val = linkedin_metadata.get("linkedin_employee_range") or linkedin_metadata.get("company_size")
+                            enriched_row[key] = val if val else None
+                        else:
+                            matched_val = record.get(mapping.get(key) or key)
+                            enriched_row[key] = matched_val if matched_val is not None else None
+                    return enriched_row
+
+            tasks = [process_record_safe(idx, rec) for idx, rec in enumerate(input_rows)]
+            enriched_records = await asyncio.gather(*tasks)
+
+            # Wait 5 seconds simulating output file generation & review preparation
+            await asyncio.sleep(5)
+            
+            records_count = len(input_rows)
+            freshness_val = random.randint(95, 100)
+            now_str = datetime.utcnow().isoformat() + "Z"
+            
+            from datetime import timedelta
+            now = datetime.utcnow()
+            if frequency == "Daily":
+                next_date = now + timedelta(days=1)
+            elif frequency == "Monthly":
+                next_date = now + timedelta(days=30)
+            elif frequency == "Quarterly":
+                next_date = now + timedelta(days=90)
+            else:
+                next_date = now + timedelta(days=7)
+            next_refresh_str = next_date.isoformat() + "Z"
+
+            history_entry = {
+                "timestamp": now_str,
+                "records_scraped": records_count,
+                "accuracy_rate": freshness_val,
+                "status": "Success",
+                "execution_time_seconds": random.randint(15, 30)
+            }
+            
+            with get_connection() as conn:
+                existing_history_json = conn.execute(
+                    "SELECT refresh_history_json FROM scraper_jobs WHERE id = ?",
+                    (job_id,)
+                ).fetchone()[0]
+            
+            history = json.loads(existing_history_json or "[]")
+            history.append(history_entry)
+
+            with get_connection() as conn:
+                conn.execute(
+                    """UPDATE scraper_jobs 
+                       SET status = 'Review Pending', 
+                           records = ?, 
+                           fresh = ?, 
+                           last_refresh = ?, 
+                           next_refresh = ?,
+                           refresh_count = refresh_count + 1,
+                           refresh_history_json = ?,
+                           changes_detected = 0
+                       WHERE id = ?""",
+                    (records_count, freshness_val, now_str, next_refresh_str, json.dumps(history), job_id)
+                )
+                conn.commit()
+                
+            # Write run file
+            run_file_dir = os.path.join(BASE_DIR, "datasets")
+            run_file_path = os.path.join(run_file_dir, f"{job_id}_run_{refresh_count_curr + 1}.json")
+            with open(run_file_path, "w", encoding="utf-8") as f_run:
+                json.dump(enriched_records, f_run, ensure_ascii=False, indent=2)
+
+            from app.services.workflow_service import workflow_service
+            workflow_service.runs[job_id] = {
+                "run_id": job_id,
+                "dataset_id": job_id,
+                "dataset_name": source,
+                "processed_dataset": enriched_records
+            }
+            return
+
         if "keysight" in source_lower:
             from app.services.scrapers.keysight_scraper import scrape_keysight_products
             filters = parse_criteria(filters_str)
@@ -750,7 +1207,7 @@ async def run_scraper_background(job_id: str):
                     for k, v in r.items():
                         if pd.isna(v):
                             r[k] = None
-                if scope in ("Partial Dump", "Custom"):
+                if scope in ("Partial Dump", "Custom Dump", "Custom"):
                     filters = parse_criteria(filters_str)
                     records = filter_records(records, filters)
                     
@@ -764,9 +1221,8 @@ async def run_scraper_background(job_id: str):
                     for k, v in r.items():
                         if pd.isna(v):
                             r[k] = None
-                if scope in ("Partial Dump", "Custom"):
-                    criteria_to_use = filters_str if scope == "Partial Dump" else custom_criteria
-                    filters = parse_criteria(criteria_to_use)
+                if scope in ("Partial Dump", "Custom Dump", "Custom"):
+                    filters = parse_criteria(filters_str)
                     records = filter_records(records, filters)
                     
         elif "turkeybrokers" in source_lower:
@@ -780,7 +1236,7 @@ async def run_scraper_background(job_id: str):
                     for k, v in r.items():
                         if pd.isna(v):
                             r[k] = None
-                if scope in ("Partial Dump", "Custom"):
+                if scope in ("Partial Dump", "Custom Dump", "Custom"):
                     filters = parse_criteria(filters_str)
                     records = filter_records(records, filters)
                     
@@ -819,62 +1275,128 @@ async def run_scraper_background(job_id: str):
             json.dump(records, f_run, ensure_ascii=False, indent=2)
             
         # Compute comparisons diff
-        comparisons = []
-        added_count = 0
-        removed_count = 0
-        modified_count = 0
         total_changes = 0
+        comparison_log = {}
         
-        if refresh_count_curr >= 1:
-            # Load previous clean run records
-            prev_file_path = os.path.join(run_file_dir, f"{job_id}_run_{refresh_count_curr}.json")
-            prev_records = []
-            if os.path.exists(prev_file_path):
+        if refresh_count_curr == 0:
+            # First run: WCM not run, everything treated as A (Added)
+            total_changes = len(records)
+            comparison_log = {
+                "baseline_file": "",
+                "current_file": f"{job_id}_run_1.json",
+                "records_compared": len(records),
+                "added": len(records),
+                "modified": 0,
+                "deleted": 0,
+                "verified": 0,
+                "change_percentage": 100.0,
+                "modified_details": []
+            }
+        else:
+            # Load baseline approved dataset
+            baseline_records = []
+            baseline_path = os.path.join(run_file_dir, f"{job_id}_final.json")
+            if os.path.exists(baseline_path):
                 try:
-                    with open(prev_file_path, "r", encoding="utf-8") as f_prev:
-                        prev_records = json.load(f_prev)
+                    with open(baseline_path, "r", encoding="utf-8") as f_base:
+                        baseline_records = json.load(f_base)
                 except Exception:
                     pass
             
-            # Apply in-memory mutations to simulate changes only for comparison layer
-            mutated_records = simulate_demo_mutations(source, records)
+            # Compare using wcm_comparison_service
+            from app.services.wcm_comparison_service import compare_records
+            flattened_rows, record_change_count = compare_records(
+                source,
+                baseline_records,
+                records,
+                allowed_attrs=selected_outputs if selected_outputs else None,
+                attr_mapping=mapping if mapping else None,
+            )
+            total_changes = record_change_count
             
-            prev_map = {get_record_key(source, r): r for r in prev_records if get_record_key(source, r)}
-            curr_map = {get_record_key(source, r): r for r in mutated_records if get_record_key(source, r)}
+            # Calculate comparison metrics
+            from app.api.demo_routes import get_record_key
             
-            # Check removed and modified
-            for key, prev_r in prev_map.items():
-                if key not in curr_map:
-                    removed_count += 1
-                    comparisons.append({
-                        "field": f"Record {key}",
-                        "existing_value": "Present",
-                        "suggested_value": "REMOVED"
-                    })
-                else:
-                    curr_r = curr_map[key]
-                    for field in prev_r.keys():
-                        if field in curr_r and prev_r[field] != curr_r[field]:
-                            modified_count += 1
-                            comparisons.append({
-                                "field": f"{key} -> {field}",
-                                "existing_value": str(prev_r[field]),
-                                "suggested_value": str(curr_r[field])
-                            })
-                            
-            # Check added
-            for key in curr_map.keys():
-                if key not in prev_map:
+            baseline_keys = set()
+            for idx, r in enumerate(baseline_records):
+                key = get_record_key(source, r) or f"idx_{idx}"
+                orig_key = key
+                counter = 1
+                while key in baseline_keys:
+                    key = f"{orig_key}_{counter}"
+                    counter += 1
+                baseline_keys.add(key)
+                
+            current_keys = set()
+            for idx, r in enumerate(records):
+                key = get_record_key(source, r) or f"idx_{idx}"
+                orig_key = key
+                counter = 1
+                while key in current_keys:
+                    key = f"{orig_key}_{counter}"
+                    counter += 1
+                current_keys.add(key)
+                
+            all_keys = baseline_keys.union(current_keys)
+            
+            added_count = 0
+            deleted_count = 0
+            modified_count = 0
+            verified_count = 0
+            modified_details = []
+            
+            # Group flattened comparison rows by recordKey and check for M rows
+            key_changes = {}
+            for row in flattened_rows:
+                k = row["recordKey"]
+                change_type = row["changeType"]
+                if change_type in ("A", "M", "D"):
+                    if k not in key_changes:
+                        key_changes[k] = []
+                    key_changes[k].append(row)
+                    
+            for k in all_keys:
+                if k in current_keys and k not in baseline_keys:
                     added_count += 1
-                    comparisons.append({
-                        "field": f"Record {key}",
-                        "existing_value": "ABSENT",
-                        "suggested_value": "ADDED"
-                    })
-            total_changes = added_count + removed_count + modified_count
+                elif k in baseline_keys and k not in current_keys:
+                    deleted_count += 1
+                else:
+                    if k in key_changes:
+                        modified_count += 1
+                        for change in key_changes[k]:
+                            if change["changeType"] == "M":
+                                modified_details.append({
+                                    "record_key": k,
+                                    "attribute": change["attributeKey"],
+                                    "old_value": change["previous"],
+                                    "new_value": change["value"]
+                                })
+                    else:
+                        verified_count += 1
+                        
+            records_compared = len(all_keys)
+            change_percentage = round((added_count + modified_count + deleted_count) / records_compared * 100, 2) if records_compared > 0 else 0.0
             
-        # HTML snapshot generation for confidence report is removed as per requirements.
+            comparison_log = {
+                "baseline_file": f"{job_id}_final.json",
+                "current_file": f"{job_id}_run_{refresh_count_curr + 1}.json",
+                "records_compared": records_compared,
+                "added": added_count,
+                "modified": modified_count,
+                "deleted": deleted_count,
+                "verified": verified_count,
+                "change_percentage": change_percentage,
+                "modified_details": modified_details
+            }
             
+        # Write comparison audit log
+        comparison_log_path = os.path.join(run_file_dir, f"{job_id}_comparison.json")
+        try:
+            with open(comparison_log_path, "w", encoding="utf-8") as f_comp:
+                json.dump(comparison_log, f_comp, ensure_ascii=False, indent=2)
+        except Exception as e:
+            logger.error("Failed to write comparison log file: %s", e)
+
         # Recalculate next refresh date
         from datetime import datetime as dt, timedelta
         now = dt.utcnow()
@@ -890,7 +1412,6 @@ async def run_scraper_background(job_id: str):
             next_date = now + timedelta(days=7)
         next_refresh_str = next_date.isoformat() + "Z"
         
-        import random
         history_entry = {
             "timestamp": now_str,
             "records_scraped": len(records),
@@ -911,12 +1432,11 @@ async def run_scraper_background(job_id: str):
         with get_connection() as conn:
             conn.execute(
                 """UPDATE scraper_jobs 
-                   SET status = 'Completed', 
+                   SET status = 'Review Pending', 
                        records = ?, 
                        fresh = 100, 
                        last_refresh = ?, 
                        next_refresh = ?,
-                       refresh_count = refresh_count + 1,
                        refresh_history_json = ?,
                        changes_detected = ?
                    WHERE id = ?""",
@@ -931,6 +1451,7 @@ async def run_scraper_background(job_id: str):
             "dataset_name": source,
             "processed_dataset": records
         }
+        return
     except Exception as e:
         import traceback
         traceback.print_exc()
@@ -947,6 +1468,13 @@ async def launch_jobs(request: LaunchJobsRequest, background_tasks: BackgroundTa
     for item in request.jobs:
         with get_connection() as conn:
             exists = conn.execute("SELECT 1 FROM scraper_jobs WHERE id = ?", (item.id,)).fetchone()
+        
+        if item.input_data is not None:
+            input_file_dir = os.path.join(BASE_DIR, "datasets")
+            os.makedirs(input_file_dir, exist_ok=True)
+            input_file_path = os.path.join(input_file_dir, f"{item.id}_input.json")
+            with open(input_file_path, "w", encoding="utf-8") as f_in:
+                json.dump(item.input_data, f_in, ensure_ascii=False, indent=2)
         
         clean_src = "".join(ch if ch.isalnum() else "_" for ch in item.source.lower())
         dataset_path = f"datasets/{clean_src}_sample.csv"
@@ -991,23 +1519,23 @@ async def launch_jobs(request: LaunchJobsRequest, background_tasks: BackgroundTa
                        SET source = ?, scope = ?, filters = ?, frequency = ?, delivery = ?, 
                            output_format = ?, dataset_path = ?, status = ?, 
                            created_at = ?, next_refresh = ?, is_custom_source = ?, mode = ?,
-                           complexity = ?, estimated_onboarding_time = ?
+                           complexity = ?, estimated_onboarding_time = ?, records = ?
                        WHERE id = ?""",
                     (item.source, item.scope, item.filters, item.frequency, item.delivery,
                      item.output_format, dataset_path, status_val, now_str, next_refresh_str,
-                     1 if item.isCustomSource else 0, item.mode, complexity_val, sla_val, item.id)
+                     1 if item.isCustomSource else 0, item.mode, complexity_val, sla_val, item.records, item.id)
                 )
                 conn.commit()
         else:
             with get_connection() as conn:
                 conn.execute(
                     """INSERT INTO scraper_jobs (id, source, scope, filters, custom_criteria, frequency, delivery, 
-                                                output_format, dataset_path, status, created_at, next_refresh, 
-                                                is_custom_source, mode, complexity, estimated_onboarding_time)
-                       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                                                 output_format, dataset_path, status, created_at, next_refresh, 
+                                                 is_custom_source, mode, complexity, estimated_onboarding_time, records)
+                       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
                     (item.id, item.source, item.scope, item.filters, item.filters, item.frequency, item.delivery,
                      item.output_format, dataset_path, status_val, now_str, next_refresh_str,
-                     1 if item.isCustomSource else 0, item.mode, complexity_val, sla_val)
+                     1 if item.isCustomSource else 0, item.mode, complexity_val, sla_val, item.records)
                 )
                 conn.commit()
         
@@ -1032,13 +1560,14 @@ async def create_pending_job(item: PendingJobItem):
     import random
     job_id = f"J-{random.randint(1000, 9999)}"
     now_str = datetime.utcnow().isoformat() + "Z"
+    status = "Pending Onboarding"
     
     with get_connection() as conn:
         conn.execute(
             """INSERT INTO scraper_jobs (id, source, scope, filters, custom_criteria, frequency, delivery, 
                                         output_format, dataset_path, status, created_at, is_custom_source, mode, complexity, estimated_onboarding_time)
                VALUES (?, ?, 'Full Dump', '—', '—', 'Weekly', 'S3 bucket', 'JSON', ?, ?, ?, 1, 'Site-Specific', ?, ?)""",
-            (job_id, item.website_url, f"datasets/{item.source_name.lower()}_sample.csv", item.status, now_str, item.complexity, item.estimated_development_effort)
+            (job_id, item.website_url, f"datasets/{item.source_name.lower()}_sample.csv", status, now_str, item.complexity, item.estimated_development_effort)
         )
         conn.commit()
     return {"status": "success", "job_id": job_id}
@@ -1057,39 +1586,454 @@ async def get_jobs():
     
     jobs = []
     for r in rows:
-        history = []
-        if r["refresh_history_json"]:
-            try:
-                history = json.loads(r["refresh_history_json"])
-            except Exception:
-                pass
-                
-        jobs.append({
-            "id": r["id"],
-            "source": r["source"],
-            "scope": r["scope"],
-            "filters": r["filters"],
-            "custom_criteria": r["custom_criteria"],
-            "frequency": r["frequency"],
-            "delivery": r["delivery"],
-            "output_format": r["output_format"],
-            "dataset_path": r["dataset_path"],
-            "status": r["status"],
-            "records": r["records"],
-            "fresh": r["fresh"],
-            "created_at": r["created_at"],
-            "last_refresh": r["last_refresh"],
-            "next_refresh": r["next_refresh"],
-            "refresh_count": r["refresh_count"],
-            "isCustomSource": bool(r["is_custom_source"]),
-            "mode": r["mode"],
-            "changes_detected": r["changes_detected"] if "changes_detected" in r.keys() else 0,
-            "refresh_history": history,
-            "complexity": r["complexity"] if "complexity" in r.keys() else None,
-            "estimated_onboarding_time": r["estimated_onboarding_time"] if "estimated_onboarding_time" in r.keys() else None,
-        })
+        try:
+            history = []
+            if r["refresh_history_json"]:
+                try:
+                    history = json.loads(r["refresh_history_json"])
+                except Exception:
+                    history = []
+
+            def as_text(value, default=""):
+                if value is None:
+                    return default
+                if isinstance(value, str):
+                    return value
+                return str(value)
+
+            # Dynamically load the records count from input/run JSON file if it exists for By Dataset
+            job_id = as_text(r["id"])
+            records_count = r["records"]
+            job_mode = as_text(r["mode"])
+            if job_mode in ("By Dataset", "Any-Site"):
+                from app.services.workflow_service import workflow_service
+                in_mem_run = workflow_service.runs.get(job_id)
+                if in_mem_run and in_mem_run.get("processed_dataset"):
+                    records_count = len(in_mem_run["processed_dataset"])
+                else:
+                    ref_count = r["refresh_count"] or 1
+                    run_file = os.path.join(BASE_DIR, "datasets", f"{job_id}_run_{ref_count}.json")
+                    if not os.path.exists(run_file):
+                        run_file = os.path.join(BASE_DIR, "datasets", f"{job_id}_run_1.json")
+                    input_file = os.path.join(BASE_DIR, "datasets", f"{job_id}_input.json")
+                    if os.path.exists(run_file):
+                        try:
+                            with open(run_file, "r", encoding="utf-8") as f:
+                                records_count = len(json.load(f))
+                        except Exception:
+                            pass
+                    elif os.path.exists(input_file):
+                        try:
+                            with open(input_file, "r", encoding="utf-8") as f:
+                                records_count = len(json.load(f))
+                        except Exception:
+                            pass
+
+            jobs.append({
+                "id": job_id,
+                "source": as_text(r["source"]),
+                "scope": as_text(r["scope"]),
+                "filters": as_text(r["filters"], "â€”"),
+                "custom_criteria": as_text(r["custom_criteria"], "â€”"),
+                "frequency": as_text(r["frequency"], "Weekly"),
+                "delivery": as_text(r["delivery"], "S3 bucket"),
+                "output_format": as_text(r["output_format"], "JSON"),
+                "dataset_path": as_text(r["dataset_path"]),
+                "status": as_text(r["status"], "Failed"),
+                "records": records_count,
+                "fresh": r["fresh"],
+                "created_at": r["created_at"],
+                "last_refresh": r["last_refresh"],
+                "next_refresh": r["next_refresh"],
+                "refresh_count": r["refresh_count"],
+                "isCustomSource": bool(r["is_custom_source"]),
+                "mode": job_mode or "Site-Specific",
+                "changes_detected": r["changes_detected"] if "changes_detected" in r.keys() else 0,
+                "refresh_history": history,
+                "complexity": r["complexity"] if "complexity" in r.keys() else None,
+                "estimated_onboarding_time": r["estimated_onboarding_time"] if "estimated_onboarding_time" in r.keys() else None,
+            })
+        except Exception as e:
+            logger.warning("Skipping malformed scraper job row %s: %s", r["id"] if "id" in r.keys() else "unknown", e)
     return jobs
+
+
+class EditValueRequest(BaseModel):
+    job_id: str
+    record_index: int
+    attribute: str
+    value: str
+
+@router.post("/jobs/edit_value")
+async def edit_value(req: EditValueRequest):
+    import logging
+    logger = logging.getLogger(__name__)
+    job_id = req.job_id
+    record_index = req.record_index
+    attribute = req.attribute
+    value = req.value
+    
+    # 1. Update in-memory workspace runs if present
+    from app.services.workflow_service import workflow_service
+    in_mem_run = workflow_service.runs.get(job_id)
+    if in_mem_run and in_mem_run.get("processed_dataset"):
+        dataset = in_mem_run["processed_dataset"]
+        if 0 <= record_index < len(dataset):
+            dataset[record_index][attribute] = value if value != "—" else None
+            
+    # 2. Update DB/file state to persist it
+    with get_connection() as conn:
+        row = conn.execute("SELECT mode, refresh_count FROM scraper_jobs WHERE id = ?", (job_id,)).fetchone()
+    
+    mode = row[0] if row else "By Dataset"
+    refresh_count = row[1] if row else 1
+    if refresh_count == 0:
+        refresh_count = 1
+        
+    run_file_dir = os.path.join(BASE_DIR, "datasets")
+    if mode in ("By Dataset", "Any-Site"):
+        run_file_path = os.path.join(run_file_dir, f"{job_id}_run_{refresh_count}.json")
+        if not os.path.exists(run_file_path):
+            run_file_path = os.path.join(run_file_dir, f"{job_id}_run_1.json")
+    else:
+        run_file_path = os.path.join(run_file_dir, f"{job_id}_run_{refresh_count}.json")
+    
+    if os.path.exists(run_file_path):
+        try:
+            with open(run_file_path, "r", encoding="utf-8") as f:
+                records = json.load(f)
+            if 0 <= record_index < len(records):
+                records[record_index][attribute] = value if value != "—" else None
+            with open(run_file_path, "w", encoding="utf-8") as f:
+                json.dump(records, f, ensure_ascii=False, indent=2)
+        except Exception as e:
+            logger.error("Failed to edit persisted JSON file: %s", e)
+            raise HTTPException(status_code=500, detail=f"Failed to update dataset file: {str(e)}")
+            
+    return {"status": "success"}
 
 
 # Confidence report preview route has been removed.
 
+
+@router.get("/jobs/review_data")
+async def get_jobs_review_data(job_id: str, sample_rate: float = 2.0):
+    from app.services.wcm_comparison_service import get_review_rows
+    try:
+        data = get_review_rows(job_id, sample_rate)
+        return data
+    except Exception as e:
+        logger.error("Failed to get review data: %s", e)
+        raise HTTPException(status_code=500, detail=f"Failed to fetch review data: {str(e)}")
+
+
+class ReviewDecisionItem(BaseModel):
+    record_index: int
+    attribute: str
+    previous_value: Optional[str] = None
+    enriched_value: Optional[str] = None
+    admv_status: str
+    reviewer_action: str
+
+class SubmitReviewRequest(BaseModel):
+    job_id: str
+    decisions: List[ReviewDecisionItem]
+
+@router.post("/jobs/submit_review")
+async def submit_review(req: SubmitReviewRequest):
+    import logging
+    logger = logging.getLogger(__name__)
+    job_id = req.job_id
+    
+    # 1. Save the reviewer decisions to datasets/{job_id}_review_decisions.json
+    decisions_dir = os.path.join(BASE_DIR, "datasets")
+    os.makedirs(decisions_dir, exist_ok=True)
+    decisions_path = os.path.join(decisions_dir, f"{job_id}_review_decisions.json")
+    
+    decisions_list = [d.dict() for d in req.decisions]
+    try:
+        with open(decisions_path, "w", encoding="utf-8") as f_dec:
+            json.dump(decisions_list, f_dec, ensure_ascii=False, indent=2)
+    except Exception as e:
+        logger.error("Failed to write review decisions file: %s", e)
+        raise HTTPException(status_code=500, detail=f"Failed to save decisions: {str(e)}")
+
+    # 2. Retrieve scraper_job metadata
+    try:
+        with get_connection() as conn:
+            row = conn.execute("SELECT filters, mode, refresh_count, source FROM scraper_jobs WHERE id = ?", (job_id,)).fetchone()
+        if not row:
+            raise HTTPException(status_code=404, detail="Job not found")
+        filters_str, mode, refresh_count, source = row
+        config = json.loads(filters_str) if filters_str and filters_str != "—" else {}
+    except Exception as e:
+        logger.error("Failed to query DB: %s", e)
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+
+    if mode in ("By Dataset", "Any-Site"):
+        mapping = config.get("mapping") or {}
+        selected_outputs = config.get("selectedOutputs") or []
+        # Load input rows and scraped records
+        input_file_path = os.path.join(decisions_dir, f"{job_id}_input.json")
+        final_file_path = os.path.join(decisions_dir, f"{job_id}_final.json")
+        if refresh_count > 1 and os.path.exists(final_file_path):
+            input_file_path = final_file_path
+
+        run_file_path = os.path.join(decisions_dir, f"{job_id}_run_{refresh_count}.json")
+        if not os.path.exists(run_file_path):
+            run_file_path = os.path.join(decisions_dir, f"{job_id}_run_1.json")
+
+        input_records = []
+        scraped_records = []
+
+        if os.path.exists(input_file_path):
+            try:
+                with open(input_file_path, "r", encoding="utf-8") as f:
+                    input_records = json.load(f)
+            except Exception:
+                pass
+
+        if os.path.exists(run_file_path):
+            try:
+                with open(run_file_path, "r", encoding="utf-8") as f:
+                    scraped_records = json.load(f)
+            except Exception:
+                pass
+
+        if not scraped_records:
+            raise HTTPException(status_code=400, detail="No enriched run data found to finalize")
+
+        def is_empty(v):
+            if v is None:
+                return True
+            s = str(v).strip()
+            return s in ("", "-", "—")
+
+        def get_final_value(prev_val, enriched_val, admv_status, action):
+            if admv_status == "A":
+                if action == "rejected":
+                    return None
+                else:
+                    return enriched_val if not is_empty(enriched_val) else None
+            elif admv_status == "D":
+                if action == "rejected":
+                    return prev_val if not is_empty(prev_val) else None
+                else:
+                    return None
+            elif admv_status == "M":
+                if action == "rejected":
+                    return prev_val if not is_empty(prev_val) else None
+                else:
+                    return enriched_val if not is_empty(enriched_val) else None
+            else:
+                return enriched_val if not is_empty(enriched_val) else None
+
+        def determine_admv_fallback(prev, newVal):
+            def clean_value(v):
+                if v is None:
+                    return ""
+                s = str(v).strip()
+                if s in ("", "-", "—"):
+                    return ""
+                return s
+            p = clean_value(prev)
+            n = clean_value(newVal)
+            if p == "" and n == "":
+                return "V"
+            if p == "" and n != "":
+                return "A"
+            if p != "" and n == "":
+                return "D"
+            if p.lower() == n.lower():
+                return "V"
+            return "M"
+
+        final_records = []
+        for i in range(len(scraped_records)):
+            original_rec = input_records[i] if i < len(input_records) else {}
+            scraped_rec = scraped_records[i]
+            
+            final_rec = {}
+            for attr in selected_outputs:
+                decision = next((d for d in req.decisions if d.record_index == i and d.attribute == attr), None)
+                
+                mapped_header = mapping.get(attr)
+                raw_prev = original_rec.get(mapped_header) if mapped_header else original_rec.get(attr)
+                raw_new = scraped_rec.get(attr)
+                
+                if decision:
+                    admv = decision.admv_status
+                    action = decision.reviewer_action.lower()
+                else:
+                    admv = determine_admv_fallback(raw_prev, raw_new)
+                    action = "accepted"
+                    
+                final_val = get_final_value(raw_prev, raw_new, admv, action)
+                final_rec[attr] = final_val
+                
+            final_records.append(final_rec)
+
+    else:
+        # By Source (Site-Specific) Review Submission
+        # Load latest run
+        run_file_path = os.path.join(decisions_dir, f"{job_id}_run_{refresh_count + 1}.json")
+        new_records = []
+        if os.path.exists(run_file_path):
+            try:
+                with open(run_file_path, "r", encoding="utf-8") as f:
+                    new_records = json.load(f)
+            except Exception:
+                pass
+
+        # Load baseline
+        baseline_records = []
+        if refresh_count > 0:
+            baseline_path = os.path.join(decisions_dir, f"{job_id}_final.json")
+            if os.path.exists(baseline_path):
+                try:
+                    with open(baseline_path, "r", encoding="utf-8") as f:
+                        baseline_records = json.load(f)
+                except Exception:
+                    pass
+
+        # Align records
+        from app.api.demo_routes import get_record_key
+        baseline_map = {}
+        for idx, r in enumerate(baseline_records):
+            key = get_record_key(source, r)
+            if not key or key.strip() == "":
+                key = f"idx_{idx}"
+            orig_key = key
+            counter = 1
+            while key in baseline_map:
+                key = f"{orig_key}_{counter}"
+                counter += 1
+            baseline_map[key] = r
+
+        new_map = {}
+        for idx, r in enumerate(new_records):
+            key = get_record_key(source, r)
+            if not key or key.strip() == "":
+                key = f"idx_{idx}"
+            orig_key = key
+            counter = 1
+            while key in new_map:
+                key = f"{orig_key}_{counter}"
+                counter += 1
+            new_map[key] = r
+
+        ordered_keys = []
+        for k in new_map.keys():
+            ordered_keys.append(k)
+        for k in baseline_map.keys():
+            if k not in new_map:
+                ordered_keys.append(k)
+
+        all_attrs = set()
+        for r in new_map.values():
+            all_attrs.update(r.keys())
+        for r in baseline_map.values():
+            all_attrs.update(r.keys())
+        exclude_keys = {"id", "run_id", "timestamp", "scraped_at", "created_at"}
+        attrs = sorted([a for a in all_attrs if a not in exclude_keys])
+
+        decisions_dict = {}
+        for d in req.decisions:
+            decisions_dict[(d.record_index, d.attribute)] = d.reviewer_action.lower()
+
+        final_records = []
+        for idx, k in enumerate(ordered_keys):
+            new_val_exists = k in new_map
+            baseline_val_exists = k in baseline_map
+
+            # Handle deleted record
+            if baseline_val_exists and not new_val_exists:
+                keep_record = False
+                for attr in attrs:
+                    action = decisions_dict.get((idx, attr), "accepted")
+                    if action == "rejected":
+                        keep_record = True
+                        break
+                if keep_record:
+                    final_records.append(baseline_map[k])
+                continue
+
+            final_rec = {}
+            base_rec = new_map[k] if new_val_exists else baseline_map[k]
+            for sys_key in exclude_keys:
+                if sys_key in base_rec:
+                    final_rec[sys_key] = base_rec[sys_key]
+
+            def clean_value(v):
+                if v is None:
+                    return ""
+                s = str(v).strip()
+                if s in ("", "-", "—"):
+                    return ""
+                return s
+
+            for attr in attrs:
+                prev_val = baseline_map[k].get(attr) if baseline_val_exists else None
+                new_val = new_map[k].get(attr) if new_val_exists else None
+                
+                action = decisions_dict.get((idx, attr), "accepted")
+                
+                p_str = clean_value(prev_val)
+                n_str = clean_value(new_val)
+                
+                if p_str == "" and n_str == "":
+                    admv = "V"
+                elif p_str == "" and n_str != "":
+                    admv = "A"
+                elif p_str != "" and n_str == "":
+                    admv = "D"
+                elif p_str.lower() == n_str.lower():
+                    admv = "V"
+                else:
+                    admv = "M"
+
+                if admv == "A":
+                    final_val = new_val if action == "accepted" else None
+                elif admv == "D":
+                    final_val = None if action == "accepted" else prev_val
+                elif admv == "M":
+                    final_val = new_val if action == "accepted" else prev_val
+                else:
+                    final_val = new_val if new_val is not None else prev_val
+                
+                final_rec[attr] = final_val if final_val is not None else ""
+                
+            if not baseline_val_exists:
+                has_any_val = False
+                for attr in attrs:
+                    val = final_rec.get(attr)
+                    if val is not None and str(val).strip() not in ("", "-", "—"):
+                        has_any_val = True
+                        break
+                if not has_any_val:
+                    continue
+
+            final_records.append(final_rec)
+
+    # Save final dataset
+    final_path = os.path.join(decisions_dir, f"{job_id}_final.json")
+    try:
+        with open(final_path, "w", encoding="utf-8") as f_fin:
+            json.dump(final_records, f_fin, ensure_ascii=False, indent=2)
+    except Exception as e:
+        logger.error("Failed to write final reviewed dataset file: %s", e)
+        raise HTTPException(status_code=500, detail=f"Failed to save final export file: {str(e)}")
+
+    # Update SQLite status to 'Completed' and increment refresh_count if not By Dataset
+    try:
+        with get_connection() as conn:
+            if mode in ("By Dataset", "Any-Site"):
+                conn.execute("UPDATE scraper_jobs SET status = 'Completed' WHERE id = ?", (job_id,))
+            else:
+                conn.execute("UPDATE scraper_jobs SET status = 'Completed', refresh_count = refresh_count + 1 WHERE id = ?", (job_id,))
+            conn.commit()
+    except Exception as e:
+        logger.error("Failed to update database status: %s", e)
+        raise HTTPException(status_code=500, detail=f"Database update failed: {str(e)}")
+
+    return {"status": "success"}
