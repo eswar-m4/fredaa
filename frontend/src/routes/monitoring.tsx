@@ -222,7 +222,7 @@ function Monitoring() {
     return {
       id: j.id || `J-${Date.now()}`,
       source: sourceName,
-      mode: j.mode || "Site-Specific",
+      mode: j.mode || "By Source",
       run: formatRelativeTime(j.created_at),
       status: (j.status === "Analysis Complete" || (j.status === "Running" && (j.isCustomSource ?? true) && (j.refresh_count === 0 || !j.refresh_count))) ? "Pending Onboarding" : j.status,
       records: j.records !== undefined ? j.records : null,
@@ -327,7 +327,7 @@ function Monitoring() {
                   );
                   const showNewBadge = j.isCustomSource && !isCatalog;
                   const isNewSourceOnboarding = j.isCustomSource && j.status === "Pending Onboarding";
-                  const uploadedFilename = j.mode === "Any-Site" ? getAnySiteUploadedFilename(j.filters) : "";
+                  const uploadedFilename = (j.mode === "Any-Site" || j.mode === "By Dataset") ? getAnySiteUploadedFilename(j.filters) : "";
                   const sourceDisplayName = isNewSourceOnboarding
                     ? getNewSourceDisplayName(j.source)
                     : (uploadedFilename || getSourceDisplayName(j.source));
@@ -349,8 +349,8 @@ function Monitoring() {
                         </div>
                       </td>
                       <td className="px-4 py-3.5 border-b border-border/40 text-left">
-                        <Badge tone={j.mode === "Site-Specific" ? "info" : "purple"}>
-                          {j.mode === "Site-Specific" ? "Site-Specific" : "Any-Site"}
+                        <Badge tone={(j.mode === "Site-Specific" || j.mode === "By Source") ? "info" : "purple"}>
+                          {(j.mode === "Site-Specific" || j.mode === "By Source") ? "By Source" : "By Dataset"}
                         </Badge>
                       </td>
                       <td className="px-4 py-3.5 text-muted-foreground border-b border-border/40 text-left">
