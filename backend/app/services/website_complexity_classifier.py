@@ -333,6 +333,8 @@ class WebsiteComplexityClassifierService:
         exact_matches: Dict[str, str] = {}
         unresolved: List[str] = []
         inferred: Dict[str, str] = {}
+        inferred_conf: Dict[str, float] = {}
+        inferred_reason: Dict[str, str] = {}
 
         for header in headers:
             normalized_header = self._normalize_token(header)
@@ -349,22 +351,82 @@ class WebsiteComplexityClassifierService:
         used_fallback = False
 
         if unresolved:
+            field_descriptions = {
+                "legal_name": "Official registered company or organization name.",
+                "dba": "Doing Business As, trading name, or brand name used by the company.",
+                "description": "A short summary, bio, or description of the company business or operations.",
+                "tagline": "Slogan or brief marketing tagline of the company.",
+                "hq_address": "Primary headquarters physical street address.",
+                "hq_city": "The city where the headquarters is located.",
+                "hq_state": "The state, province, or region where the headquarters is located.",
+                "hq_country": "The country where the headquarters is located.",
+                "website": "Official company corporate homepage website URL.",
+                "email": "General, contact, or business support email address of the company.",
+                "phone": "Main corporate phone number or telephone number of the company.",
+                "linkedin_url": "The company's official LinkedIn page or profile URL.",
+                "employee_count": "Number of employees, headcount, or staff size of the company.",
+                "industry": "Primary industry sector or vertical the business operates in.",
+                "registry_number": "Official corporate registration number, CIK number, or business registration ID.",
+                "sic_code": "Standard Industrial Classification (SIC) code.",
+                "naics_code": "North American Industry Classification System (NAICS) code.",
+                "tax_id": "Employer Identification Number (EIN) or corporate tax ID.",
+                "revenue": "Annual revenue or revenue range of the company.",
+                "valuation": "Estimated financial company valuation.",
+                "year_founded": "The year when the company was founded."
+            }
+
+            semantic_list = []
+            for field in superset:
+                desc = field_descriptions.get(field)
+                if not desc:
+                    clean_field = field.replace("_", " ").strip()
+                    desc = f"Company field representing {clean_field}."
+                semantic_list.append(f"{field}\n{desc}")
+            superset_semantics = "\n\n".join(semantic_list)
+
+            examples = (
+                "Representative Examples of Mappings:\n"
+                "Company Name, Business Name, Organization Name, Legal Entity Name -> legal_name\n"
+                "Address, Address Line 1, Street Address, Headquarters -> hq_address\n"
+                "City, HQ City -> hq_city\n"
+                "State, Region, Province -> hq_state\n"
+                "Zip, Postal Code, PIN Code -> zip_code\n"
+                "Website, Homepage, URL, Web Address -> website\n"
+                "Industry, Sector, Category -> industry\n"
+                "Phone, Telephone, Mobile -> phone\n"
+                "Email, Contact Email -> email"
+            )
+
+            system_content = (
+                "You are an expert data classification AI. Your task is to map input headers from an uploaded dataset "
+                "to allowed fields from the target schema (superset fields) based on semantic understanding. "
+                "Map each input header to exactly one field from allowed superset fields, or an empty string if no reliable mapping exists. "
+                "You must return a strict JSON object with a single key 'mappings'. No other text outside the JSON block."
+            )
+
+            user_content = (
+                f"Complete Dataset Headers for Context:\n{headers}\n\n"
+                f"Allowed Superset Fields and Descriptions:\n{superset_semantics}\n\n"
+                f"{examples}\n\n"
+                f"Input Headers to Map:\n{unresolved}\n\n"
+                "For each unresolved header, perform a semantic mapping to one of the allowed fields. "
+                "Return strict JSON with mapping objects containing the following keys:\n"
+                "- 'input_header': the exact string from unresolved list.\n"
+                "- 'mapped_field': the matched target field name or empty string.\n"
+                "- 'confidence': a float confidence score between 0.00 and 1.00.\n"
+                "- 'reason': a brief explanation of why this mapping was selected.\n\n"
+                "Return Format Example:\n"
+                '{"mappings": [{"input_header": "Company Name", "mapped_field": "legal_name", "confidence": 0.99, "reason": "Represents the official company name."}]}'
+            )
+
             messages = [
                 {
                     "role": "system",
-                    "content": (
-                        "Map each input header to exactly one field from allowed superset fields, "
-                        "or empty string if no reliable mapping. Return strict JSON with key 'mappings' only."
-                    ),
+                    "content": system_content,
                 },
                 {
                     "role": "user",
-                    "content": (
-                        f"Input headers: {unresolved}\n"
-                        f"Allowed superset fields: {superset}\n"
-                        "Return format: "
-                        '{"mappings":[{"input_header":"...","mapped_field":"allowed_or_empty"}]}'
-                    ),
+                    "content": user_content,
                 },
             ]
             try:
@@ -378,6 +440,11 @@ class WebsiteComplexityClassifierService:
                     mapped = self._normalize_token(str(row.get("mapped_field") or ""))
                     if header in unresolved and mapped in superset_set:
                         inferred[header] = mapped
+                        try:
+                            inferred_conf[header] = float(row.get("confidence") or 0.0)
+                        except Exception:
+                            inferred_conf[header] = 0.0
+                        inferred_reason[header] = str(row.get("reason") or "").strip()
             except Exception as exc:
                 logger.warning("Ollama field mapping suggestions failed, falling back to central AIProvider: %s", exc)
                 used_fallback = True
@@ -385,12 +452,22 @@ class WebsiteComplexityClassifierService:
                     from app.services.ai_provider import AIProvider
                     provider = AIProvider(api_key=settings.GEMINI_API_KEY, model=settings.GEMINI_MODEL)
                     prompt = (
-                        "You are an AI assistant. Map each input header to exactly one field from allowed superset fields, "
-                        "or empty string if no reliable mapping. Return strict JSON with key 'mappings' only.\n\n"
-                        f"Input headers: {unresolved}\n"
-                        f"Allowed superset fields: {superset}\n"
-                        "Return format:\n"
-                        '{"mappings":[{"input_header":"...","mapped_field":"allowed_or_empty"}]}'
+                        "You are an AI assistant. Your task is to map input headers from an uploaded dataset "
+                        "to allowed fields from the target schema (superset fields) based on semantic understanding. "
+                        "Map each input header to exactly one field from allowed superset fields, or an empty string if no reliable mapping exists. "
+                        "You must return a strict JSON object with a single key 'mappings' only.\n\n"
+                        f"Complete Dataset Headers for Context:\n{headers}\n\n"
+                        f"Allowed Superset Fields and Descriptions:\n{superset_semantics}\n\n"
+                        f"{examples}\n\n"
+                        f"Input Headers to Map:\n{unresolved}\n\n"
+                        "For each unresolved header, perform a semantic mapping to one of the allowed fields. "
+                        "Return strict JSON with mapping objects containing the following keys:\n"
+                        "- 'input_header': the exact string from unresolved list.\n"
+                        "- 'mapped_field': the matched target field name or empty string.\n"
+                        "- 'confidence': a float confidence score between 0.00 and 1.00.\n"
+                        "- 'reason': a brief explanation of why this mapping was selected.\n\n"
+                        "Return Format Example:\n"
+                        '{"mappings": [{"input_header": "Company Name", "mapped_field": "legal_name", "confidence": 0.99, "reason": "Represents the official company name."}]}'
                     )
                     raw_response = provider.generate(prompt, timeout=settings.AI_REQUEST_TIMEOUT_SEC, temperature=0.1)
                     
@@ -413,6 +490,11 @@ class WebsiteComplexityClassifierService:
                         mapped = self._normalize_token(str(row.get("mapped_field") or ""))
                         if header in unresolved and mapped in superset_set:
                             inferred[header] = mapped
+                            try:
+                                inferred_conf[header] = float(row.get("confidence") or 0.0)
+                            except Exception:
+                                inferred_conf[header] = 0.0
+                            inferred_reason[header] = str(row.get("reason") or "").strip()
                 except Exception as fallback_exc:
                     logger.error("Fallback AIProvider mapping failed: %s", fallback_exc, exc_info=True)
                     llm_trace = {"error": str(exc), "fallback_error": str(fallback_exc)}
@@ -420,10 +502,15 @@ class WebsiteComplexityClassifierService:
         mappings = []
         for header in headers:
             mapped = exact_matches.get(header) or inferred.get(header) or ""
+            confidence = 1.0 if exact_matches.get(header) else inferred_conf.get(header, 0.0)
+            reason = "Exact match" if exact_matches.get(header) else inferred_reason.get(header, "")
+            
             mappings.append({
                 "input_header": header,
                 "mapped_field": mapped,
                 "match_type": "exact" if exact_matches.get(header) else ("qwen" if mapped else "none"),
+                "confidence": confidence,
+                "reason": reason
             })
 
         return {
