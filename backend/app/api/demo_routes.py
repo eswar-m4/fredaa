@@ -17,6 +17,7 @@ from app.services.scrapers.keysight_scraper import (
     scrape_keysight_products
 )
 from app.services.scrapers.webmd_scraper import main as run_webmd_scraper
+from app.services.partial_scrape_runtime import execute_partial_scrape
 from app.services.partial_scrape_planner_service import partial_scrape_planner_service
 from app.services.partial_scrape_capabilities import get_partial_scrape_capability
 
@@ -913,6 +914,7 @@ async def run_scraper_background(job_id: str):
     records = []
     source_lower = source.lower()
     resolved_filters = _extract_partial_scrape_filters(planner_json, filters_str)
+    partial_scrape_metadata: Dict[str, Any] = {}
     
     try:
         if job_mode in ("By Dataset", "Any-Site"):
@@ -1253,7 +1255,15 @@ async def run_scraper_background(job_id: str):
             }
             return
 
-        if "keysight" in source_lower:
+        if _is_partial_scope(scope) and planner_json:
+            partial_result = execute_partial_scrape(
+                source_name=source,
+                planner_json=planner_json,
+            )
+            records = partial_result.records
+            partial_scrape_metadata = partial_result.execution_metadata
+
+        elif "keysight" in source_lower:
             from app.services.scrapers.keysight_scraper import scrape_keysight_products
             filters = resolved_filters
             records = scrape_keysight_products(filters)
@@ -1510,7 +1520,8 @@ async def run_scraper_background(job_id: str):
             "run_id": job_id,
             "dataset_id": job_id,
             "dataset_name": source,
-            "processed_dataset": records
+            "processed_dataset": records,
+            "partial_scrape_metadata": partial_scrape_metadata or None,
         }
         return
     except Exception as e:
@@ -1620,7 +1631,7 @@ async def launch_jobs(request: LaunchJobsRequest, background_tasks: BackgroundTa
                            created_at = ?, next_refresh = ?, is_custom_source = ?, mode = ?,
                            complexity = ?, estimated_onboarding_time = ?, records = ?
                        WHERE id = ?""",
-                    (item.source, item.scope, effective_filters, raw_partial_request or item.custom_criteria or "—", item.frequency, item.delivery,
+                    (item.source, item.scope, effective_filters, raw_partial_request or item.custom_criteria or "—", planner_json_value, item.frequency, item.delivery,
                      item.output_format, dataset_path, status_val, now_str, next_refresh_str,
                      1 if item.isCustomSource else 0, item.mode, complexity_val, sla_val, item.records, item.id)
                 )
