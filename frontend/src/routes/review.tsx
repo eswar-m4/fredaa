@@ -987,7 +987,7 @@ function Review() {
             </div>
             <div className="overflow-auto max-h-[500px] pb-32">
               <table className="w-full text-[12.5px]">
-              <thead className="bg-secondary text-[11px] uppercase tracking-wider text-muted-foreground sticky top-0 dark:bg-secondary/80">
+              <thead className="bg-secondary text-[11px] uppercase tracking-wider text-muted-foreground sticky top-0 z-10 dark:bg-secondary/80">
                 <tr>
                   <th className="text-left px-3 py-2">Job</th>
                   <th className="text-left px-3 py-2">Source</th>
@@ -1130,7 +1130,7 @@ function Review() {
             </div>
             <div className="overflow-auto max-h-[500px] pb-32">
               <table className="w-full text-[12.5px]">
-              <thead className="bg-secondary text-[11px] uppercase tracking-wider text-muted-foreground sticky top-0 dark:bg-secondary/80">
+              <thead className="bg-secondary text-[11px] uppercase tracking-wider text-muted-foreground sticky top-0 z-10 dark:bg-secondary/80">
                 <tr>
                   <th className="text-left px-3 py-2">Job</th>
                   <th className="text-left px-3 py-2">Source</th>
@@ -1396,7 +1396,7 @@ function Review() {
 
               <div className="rounded-md border border-border overflow-hidden max-h-[60vh] overflow-y-auto">
                 <table className="w-full text-[12px] table-fixed">
-                  <thead className="bg-secondary text-[10px] uppercase tracking-wider text-muted-foreground sticky top-0 dark:bg-secondary/80">
+                  <thead className="bg-secondary text-[10px] uppercase tracking-wider text-muted-foreground sticky top-0 z-10 dark:bg-secondary/80">
                     <tr>
                       <th className="text-left px-2.5 py-2 w-[7%]">ADMV</th>
                       <th className="text-left px-2.5 py-2 w-[10%]">Record</th>
