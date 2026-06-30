@@ -224,7 +224,7 @@ function Monitoring() {
       source: sourceName,
       mode: j.mode || "By Source",
       run: formatRelativeTime(j.created_at),
-      status: (j.status === "Analysis Complete" || (j.status === "Running" && (j.isCustomSource ?? true) && (j.refresh_count === 0 || !j.refresh_count))) ? "Pending Onboarding" : j.status,
+      status: j.isCustomSource ? "Pending Onboarding" : j.status,
       records: j.records !== undefined ? j.records : null,
       fresh: j.fresh !== undefined ? j.fresh : null,
       frequency: j.frequency || "Weekly",
@@ -321,12 +321,8 @@ function Monitoring() {
                 </tr>
               ) : (
                 finalJobs.map((j) => {
-                  const isCatalog = bots.bots.some((b) => 
-                    String(j.source || "").toLowerCase().includes(b.name.toLowerCase()) || 
-                    b.name.toLowerCase().includes(String(j.source || "").toLowerCase())
-                  );
-                  const showNewBadge = j.isCustomSource && !isCatalog;
-                  const isNewSourceOnboarding = j.isCustomSource && j.status === "Pending Onboarding";
+                  const showNewBadge = j.isCustomSource;
+                  const isNewSourceOnboarding = j.isCustomSource;
                   const uploadedFilename = (j.mode === "Any-Site" || j.mode === "By Dataset") ? getAnySiteUploadedFilename(j.filters) : "";
                   const sourceDisplayName = isNewSourceOnboarding
                     ? getNewSourceDisplayName(j.source)
