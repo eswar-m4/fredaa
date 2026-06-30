@@ -278,16 +278,18 @@ function Monitoring() {
   const runningCount = finalJobs.filter((j) => j.status === "Running").length;
   const completedCount = finalJobs.filter((j) => j.status === "Completed" || j.status === "Execution Completed").length;
   const reviewCount = finalJobs.filter((j) => j.status === "Review" || j.status === "Review Pending").length;
+  const pendingOnboardingCount = finalJobs.filter((j) => j.status === "Pending Onboarding").length;
   const failedCount = finalJobs.filter((j) => j.status === "Failed").length;
   return (
     <AppLayout>
       <PageHeader title="Monitoring" subtitle="Live state of refreshes across both approaches." />
       <div className="px-7 pb-8 space-y-5">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
           {[
             { l: "Running", v: runningCount, t: "info" as const },
             { l: "Completed today", v: completedCount, t: "success" as const },
             { l: "Needs review", v: reviewCount, t: "warning" as const },
+            { l: "Pending onboarding", v: pendingOnboardingCount, t: "warning" as const },
             { l: "Failed", v: failedCount, t: "destructive" as const },
           ].map((s) => (
             <Card key={s.l} className="p-4">
