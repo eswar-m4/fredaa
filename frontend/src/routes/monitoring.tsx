@@ -264,11 +264,13 @@ function Monitoring() {
     if (seenIds.has(j.id)) continue;
     seenIds.add(j.id);
 
-    const nameKey = cleanSourceName(String(j.source || "")).toLowerCase();
-    if (seenSources.has(nameKey)) {
-      continue;
+    if (j.mode === "By Source" || j.mode === "Site-Specific") {
+      const nameKey = cleanSourceName(String(j.source || "")).toLowerCase();
+      if (seenSources.has(nameKey)) {
+        continue;
+      }
+      seenSources.add(nameKey);
     }
-    seenSources.add(nameKey);
     deduplicatedJobs.push(j);
   }
 

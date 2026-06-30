@@ -898,9 +898,11 @@ function LaunchStep(p: {
       <div className="flex justify-between pt-2">
         <Button variant="outline" onClick={p.onBack}>Back</Button>
         <Button
-          onClick={() => {
-            p.onLaunch();
-            p.navigateToMonitoring();
+          onClick={async () => {
+            const success = await p.onLaunch();
+            if (success) {
+              p.navigateToMonitoring();
+            }
           }}
         >
           <Upload className="h-4 w-4" /> Launch & open Jobs
