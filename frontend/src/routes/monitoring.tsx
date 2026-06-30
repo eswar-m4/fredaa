@@ -373,7 +373,7 @@ function Monitoring() {
                         </div>
                       </td>
                       <td className="px-4 py-3.5 text-right font-mono border-b border-border/40 text-[13px] text-foreground font-semibold">
-                        {j.records !== null && j.records !== undefined ? j.records.toLocaleString() : "—"}
+                        {isNewSourceOnboarding ? "—" : (j.records !== null && j.records !== undefined ? j.records.toLocaleString() : "—")}
                       </td>
                       <td className="px-4 py-3.5 text-right font-mono border-b border-border/40 text-[13px] text-foreground font-semibold">
                         {isNewSourceOnboarding
