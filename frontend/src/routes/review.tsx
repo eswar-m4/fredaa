@@ -874,7 +874,7 @@ function Review() {
     toast.success(`Sample rate applied: ${rate}%`);
   }
 
-  const PAGE_SIZE = 500;
+  const PAGE_SIZE = 10;
 
   const stepSize = useMemo(() => {
     if (!visibleRows.length) return 0;

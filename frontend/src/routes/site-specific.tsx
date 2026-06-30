@@ -139,7 +139,7 @@ function FrequencyWidget({ value, onChange }: { value: string; onChange: (v: str
 
               {showSubmenu && (
                 <div className="absolute left-full top-0 ml-1 w-32 rounded-md shadow-lg bg-card border border-border z-50 py-1 flex flex-col">
-                  {["Weekly", "Monthly", "Quarterly", "Yearly"].map((freq) => (
+                  {["Hourly", "Daily", "Weekly", "Monthly", "On-demand", "Custom"].map((freq) => (
                     <button
                       key={freq}
                       type="button"
@@ -993,10 +993,12 @@ function ScopeScheduleStep({
           <Select onChange={(e) => e.target.value && applyAll({ frequency: e.target.value })} value="" className="h-8 w-32 text-[12px]">
             <option value="">Frequency…</option>
             <option value="One-time">One-time</option>
+            <option value="Hourly">Recurring: Hourly</option>
+            <option value="Daily">Recurring: Daily</option>
             <option value="Weekly">Recurring: Weekly</option>
             <option value="Monthly">Recurring: Monthly</option>
-            <option value="Quarterly">Recurring: Quarterly</option>
-            <option value="Yearly">Recurring: Yearly</option>
+            <option value="On-demand">Recurring: On-demand</option>
+            <option value="Custom">Recurring: Custom</option>
           </Select>
           <Select onChange={(e) => e.target.value && applyAll({ scope: e.target.value as "full" | "partial" })} value="" className="h-8 w-32 text-[12px]">
             <option value="">Scope…</option>
