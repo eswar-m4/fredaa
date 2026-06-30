@@ -1188,13 +1188,13 @@ function Review() {
                         )}
                       </td>
                       <td className="px-3 py-2">
-                        {kind === "Change Monitoring" && (
+                        {j.kind === "Change Monitoring" && (
                           <Badge tone="warning">Change monitoring · {schedule}</Badge>
                         )}
-                        {kind === "Full Scrape" && (
+                        {j.kind === "Full Scrape" && (
                           <Badge tone="purple">Full scrape · {schedule}</Badge>
                         )}
-                        {kind === "Partial Scrape" && (
+                        {j.kind === "Partial Scrape" && (
                           <Badge tone="purple">Partial scrape · {schedule}</Badge>
                         )}
                       </td>
