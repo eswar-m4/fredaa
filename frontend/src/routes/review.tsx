@@ -591,7 +591,9 @@ function Review() {
              ? `${Math.round((j.changes_detected / (j.records || 1)) * 100)}% highlighted`
              : "100% new")
           : "—";
-        const kind = refreshCount > 0 ? "Change Monitoring" : "Full Dump";
+        const isCM = j.frequency !== "One-time" && refreshCount > 0;
+        const isPartial = String(j.scope || "").toLowerCase().includes("partial");
+        const kind = isCM ? "Change Monitoring" : (isPartial ? "Partial Scrape" : "Full Scrape");
         const changedPct = j.changes_detected !== undefined && j.changes_detected !== null
           ? Math.round((j.changes_detected / (j.records || 1)) * 100)
           : 15;
@@ -1100,9 +1102,7 @@ function Review() {
                       </td>
                       <td className="px-3 py-2">
                         {j.reviewStatus === "Completed" || reviewed[j.id] ? (
-                          <span className="text-[12px] text-muted-foreground font-semibold">
-                            Next refresh: {formatNextRefreshDate(j.nextRefresh)}
-                          </span>
+                          <Badge tone="success">Review completed</Badge>
                         ) : (
                           <Badge tone={(sc.approved + sc.rejected > 0) ? "info" : "warning"}>
                             {(sc.approved + sc.rejected > 0) ? "Review in progress" : "Review pending"}
@@ -1188,9 +1188,15 @@ function Review() {
                         )}
                       </td>
                       <td className="px-3 py-2">
-                        {isCM
-                          ? <Badge tone="warning">Change monitoring · {schedule}</Badge>
-                          : <Badge tone="purple">Full dump · {schedule}</Badge>}
+                        {kind === "Change Monitoring" && (
+                          <Badge tone="warning">Change monitoring · {schedule}</Badge>
+                        )}
+                        {kind === "Full Scrape" && (
+                          <Badge tone="purple">Full scrape · {schedule}</Badge>
+                        )}
+                        {kind === "Partial Scrape" && (
+                          <Badge tone="purple">Partial scrape · {schedule}</Badge>
+                        )}
                       </td>
                       <td className="px-3 py-2">
                         <div className="flex items-center gap-2">
@@ -1264,9 +1270,7 @@ function Review() {
                       </td>
                       <td className="px-3 py-2">
                         {j.reviewStatus === "Completed" || reviewed[j.id] ? (
-                          <span className="text-[12px] text-muted-foreground font-semibold">
-                            Next refresh: {formatNextRefreshDate(j.nextRefresh)}
-                          </span>
+                          <Badge tone="success">Review completed</Badge>
                         ) : (
                           <Badge tone={j.statusText === "Running" ? "info" : ((sc.approved + sc.rejected > 0) ? "info" : "warning")}>
                             {j.statusText === "Running" ? "Running" : ((sc.approved + sc.rejected > 0) ? "Review in progress" : "Review pending")}
@@ -1337,7 +1341,7 @@ function Review() {
               </div>
 
               <div className="flex flex-wrap gap-1.5 items-center">
-                {openJob.isDatasetJob === false && openJob.kind === "Full Dump" ? (
+                {openJob.isDatasetJob === false && openJob.kind === "Full Scrape" ? (
                   <>
                     <span className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mr-1">Change</span>
                     <Chip on={changeFilter === "all"} onClick={() => setChangeFilter("all")}>All</Chip>
