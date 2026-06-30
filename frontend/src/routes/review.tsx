@@ -748,8 +748,8 @@ function Review() {
           const totalRecords = enrichedRecords.length;
           const sampleCount = Math.max(1, Math.round((totalRecords * sampleRate) / 100));
 
-          const sampledEnriched = enrichedRecords.slice(0, sampleCount);
-          const sampledInput = inputRecords.slice(0, sampleCount);
+          const sampledEnriched = enrichedRecords;
+          const sampledInput = inputRecords;
 
           const rows: any[] = [];
           sampledEnriched.forEach((rec: any, i: number) => {
@@ -874,22 +874,27 @@ function Review() {
     toast.success(`Sample rate applied: ${rate}%`);
   }
 
-  const PAGE_SIZE = 10;
+  const recordsPerPage = useMemo(() => {
+    return sample?.sampledCount || 10;
+  }, [sample]);
 
-  const stepSize = useMemo(() => {
-    if (!visibleRows.length) return 0;
-    return Math.min(PAGE_SIZE, visibleRows.length);
-  }, [visibleRows]);
+  const totalRecords = useMemo(() => {
+    return sample?.totalSampled || 0;
+  }, [sample]);
 
   const paginatedRows = useMemo(() => {
-    return visibleRows.slice(pageOffset, pageOffset + (stepSize || 1));
-  }, [visibleRows, pageOffset, stepSize]);
+    return visibleRows.filter(r => r.recordIndex >= pageOffset && r.recordIndex < pageOffset + recordsPerPage);
+  }, [visibleRows, pageOffset, recordsPerPage]);
 
-  const startRow = visibleRows.length > 0 ? pageOffset + 1 : 0;
-  const endRow = Math.min(pageOffset + (stepSize || 1), visibleRows.length);
-  const totalPages = Math.max(1, Math.ceil(visibleRows.length / (stepSize || 1)));
-  const currentPage = Math.floor(pageOffset / (stepSize || 1)) + 1;
-  const shownRows = visibleRows.length > 0 ? endRow - startRow + 1 : 0;
+  const paginatedIndices = useMemo(() => {
+    return visibleRows.map((r, idx) => ({ r, idx })).filter(item => item.r.recordIndex >= pageOffset && item.r.recordIndex < pageOffset + recordsPerPage);
+  }, [visibleRows, pageOffset, recordsPerPage]);
+
+  const startRow = paginatedIndices.length > 0 ? paginatedIndices[0].idx + 1 : 0;
+  const endRow = paginatedIndices.length > 0 ? paginatedIndices[paginatedIndices.length - 1].idx + 1 : 0;
+  const totalPages = Math.max(1, Math.ceil(totalRecords / recordsPerPage));
+  const currentPage = Math.floor(pageOffset / recordsPerPage) + 1;
+  const shownRows = paginatedRows.length;
 
   useEffect(() => {
     setPageOffset(0);
@@ -1314,7 +1319,7 @@ function Review() {
                     variant="outline"
                     size="sm"
                     disabled={pageOffset === 0}
-                    onClick={() => setPageOffset((prev) => Math.max(0, prev - stepSize))}
+                    onClick={() => setPageOffset((prev) => Math.max(0, prev - recordsPerPage))}
                     className="h-8 text-[11px] px-2.5"
                   >
                     ← Previous
@@ -1322,8 +1327,8 @@ function Review() {
                   <Button
                     variant="outline"
                     size="sm"
-                    disabled={pageOffset + stepSize >= visibleRows.length}
-                    onClick={() => setPageOffset((prev) => prev + stepSize)}
+                    disabled={pageOffset + recordsPerPage >= totalRecords}
+                    onClick={() => setPageOffset((prev) => prev + recordsPerPage)}
                     className="h-8 text-[11px] px-2.5"
                   >
                     Next →
