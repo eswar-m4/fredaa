@@ -257,7 +257,11 @@ function Monitoring() {
       if (status === "Review" || status === "Review Pending") return 2;
       return 1;
     };
-    return score(b.status) - score(a.status);
+    const scoreDiff = score(b.status) - score(a.status);
+    if (scoreDiff !== 0) return scoreDiff;
+    const timeA = a.created_at ? new Date(a.created_at).getTime() : 0;
+    const timeB = b.created_at ? new Date(b.created_at).getTime() : 0;
+    return timeB - timeA;
   });
 
   for (const j of sortedJobs) {
