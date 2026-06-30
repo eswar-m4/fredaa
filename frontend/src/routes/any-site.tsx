@@ -399,6 +399,7 @@ function AnySite() {
             handleSeedFile={handleSeedFile}
             selectedOutputs={selectedOutputs}
             toggleOutput={toggleOutput}
+            setSelectedOutputs={setSelectedOutputs}
             mapping={mapping}
             setMapping={setMapping}
             downloadSample={downloadSample}
@@ -467,6 +468,7 @@ function MapStep(p: {
   handleSeedFile: (e: React.ChangeEvent<HTMLInputElement>) => void;
   selectedOutputs: string[];
   toggleOutput: (k: string) => void;
+  setSelectedOutputs: React.Dispatch<React.SetStateAction<string[]>>;
   mapping: Mapping;
   setMapping: (m: Mapping) => void;
   downloadSample: (kind: "csv" | "json", name: string) => void;
@@ -747,7 +749,30 @@ function MapStep(p: {
                 <table className="w-full text-[12.5px]">
                   <thead className="bg-secondary text-[11px] uppercase tracking-wider text-muted-foreground">
                     <tr>
-                      <th className="w-10 px-3 py-2"></th>
+                      <th className="w-10 px-3 py-2">
+                        <input
+                          type="checkbox"
+                          checked={attrs.every((a) => p.selectedOutputs.includes(a.key))}
+                          onChange={(e) => {
+                            const checked = e.target.checked;
+                            const groupKeys = attrs.map((a) => a.key);
+                            if (checked) {
+                              p.setSelectedOutputs((prev) => {
+                                const next = [...prev];
+                                groupKeys.forEach((k) => {
+                                  if (!next.includes(k)) {
+                                    next.push(k);
+                                  }
+                                });
+                                return next;
+                              });
+                            } else {
+                              p.setSelectedOutputs((prev) => prev.filter((k) => !groupKeys.includes(k)));
+                            }
+                          }}
+                          className="accent-primary"
+                        />
+                      </th>
                       <th className="text-left px-3 py-2">System attribute</th>
                       <th className="text-left px-3 py-2 w-24">Type</th>
                       {p.seedHeaders.length > 0 && <th className="text-left px-3 py-2 w-56">Your column</th>}
