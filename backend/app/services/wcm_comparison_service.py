@@ -344,9 +344,9 @@ def get_review_rows(job_id: str, sample_rate: float) -> dict:
     # Cap records at 500 for performance
     sample_count = min(sample_count, 500)
 
-    # Slice the records first
-    sampled_new = new_records[:sample_count]
-    sampled_baseline = baseline_records[:sample_count]
+    # Do not slice by sample_count, but keep the 500 cap for performance
+    sampled_new = new_records[:500]
+    sampled_baseline = baseline_records[:500]
 
     # Perform comparison
     rows, _ = compare_records(
