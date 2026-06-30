@@ -574,6 +574,8 @@ function Review() {
           filters: j.filters,
           mode: "By Dataset" as JobMode,
           nextRefresh: j.next_refresh,
+          approved_count: j.approved_count,
+          rejected_count: j.rejected_count,
         };
       });
     return dbDataset as JobRow[];
@@ -616,6 +618,8 @@ function Review() {
           changedPct: changedPct,
           lowConfPct: j.lowConfPct !== undefined && j.lowConfPct !== null ? j.lowConfPct : 2,
           nextRefresh: j.next_refresh,
+          approved_count: j.approved_count,
+          rejected_count: j.rejected_count,
         };
       });
       
@@ -631,9 +635,15 @@ function Review() {
     [allJobs, modeFilter],
   );
 
-  const getJobScore = (jobId: string) => {
-    const approved = Object.entries(rowStatus).filter(([key, val]) => key.startsWith(`${jobId}-`) && (val === "approved" || val === "auto")).length;
-    const rejected = Object.entries(rowStatus).filter(([key, val]) => key.startsWith(`${jobId}-`) && val === "rejected").length;
+  const getJobScore = (j: any) => {
+    if (j.approved_count !== undefined && j.approved_count !== null) {
+      return {
+        approved: j.approved_count,
+        rejected: j.rejected_count || 0
+      };
+    }
+    const approved = Object.entries(rowStatus).filter(([key, val]) => key.startsWith(`${j.id}-`) && (val === "approved" || val === "auto")).length;
+    const rejected = Object.entries(rowStatus).filter(([key, val]) => key.startsWith(`${j.id}-`) && val === "rejected").length;
     return { approved, rejected };
   };
 
@@ -1014,7 +1024,7 @@ function Review() {
                   const dirty = rate !== applied;
                   const sampled = Math.round((j.rows * rate) / 100);
                   const done = reviewed[j.id];
-                  const sc = getJobScore(j.id);
+                  const sc = getJobScore(j);
                   return (
                     <tr
                       key={j.id}
@@ -1158,7 +1168,7 @@ function Review() {
                   const applied = appliedRates[j.id] ?? 2;
                   const dirty = rate !== applied;
                   const sampled = Math.round((j.rows * rate) / 100);
-                  const sc = getJobScore(j.id);
+                  const sc = getJobScore(j);
                   const isNew = j.changesText === "100% new";
                   return (
                     <tr

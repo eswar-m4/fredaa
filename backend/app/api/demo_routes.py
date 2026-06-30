@@ -17,6 +17,8 @@ from app.services.scrapers.keysight_scraper import (
     scrape_keysight_products
 )
 from app.services.scrapers.webmd_scraper import main as run_webmd_scraper
+from app.services.partial_scrape_planner_service import partial_scrape_planner_service
+from app.services.partial_scrape_capabilities import get_partial_scrape_capability
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -603,6 +605,7 @@ class LaunchJobItem(BaseModel):
     source: str
     scope: str
     filters: str
+    custom_criteria: Optional[str] = None
     frequency: str
     delivery: str
     output_format: str
@@ -610,6 +613,7 @@ class LaunchJobItem(BaseModel):
     mode: str
     complexity: Optional[str] = None
     estimated_onboarding_time: Optional[str] = None
+    planner_json: Optional[Dict[str, Any]] = None
     records: Optional[int] = None
     input_data: Optional[List[Dict[str, str]]] = None
 
@@ -681,6 +685,43 @@ def filter_records(records: list, filters: dict) -> list:
         if match:
             filtered.append(r)
     return filtered
+
+
+def _is_partial_scope(scope: Optional[str]) -> bool:
+    return str(scope or "").strip().lower() in {"partial scrape", "partial dump", "custom dump", "custom"}
+
+
+def _planner_payload_to_json(plan_result: Any) -> str:
+    if plan_result is None:
+        return ""
+    if hasattr(plan_result, "model_dump"):
+        payload = plan_result.model_dump(mode="json")
+    elif hasattr(plan_result, "dict"):
+        payload = plan_result.dict()
+    elif isinstance(plan_result, dict):
+        payload = plan_result
+    else:
+        payload = {"value": plan_result}
+    return json.dumps(payload, ensure_ascii=False, default=str)
+
+
+def _extract_partial_scrape_filters(planner_json: Optional[str], legacy_filters: str) -> dict:
+    if planner_json:
+        try:
+            payload = json.loads(planner_json)
+            execution_plan = payload.get("execution_plan") if isinstance(payload, dict) else {}
+            if isinstance(execution_plan, dict):
+                filters = execution_plan.get("supported_filters") or {}
+                if isinstance(filters, dict):
+                    return filters
+                adapter_payload = execution_plan.get("adapter_payload") or {}
+                if isinstance(adapter_payload, dict):
+                    nested = adapter_payload.get("filters")
+                    if isinstance(nested, dict):
+                        return nested
+        except Exception:
+            pass
+    return parse_criteria(legacy_filters)
 
 def ensure_turkeybrokers_data():
     import pandas as pd
@@ -799,7 +840,7 @@ async def run_scraper_background(job_id: str):
     with get_connection() as conn:
         job_info_db = conn.execute(
             """SELECT refresh_count, frequency, mode, is_custom_source, complexity, estimated_onboarding_time,
-                      source, scope, filters, custom_criteria, records, status
+                      source, scope, filters, custom_criteria, planner_json, records, status
                FROM scraper_jobs WHERE id = ?""",
             (job_id,)
         ).fetchone()
@@ -817,8 +858,9 @@ async def run_scraper_background(job_id: str):
     scope = job_info_db[7]
     filters_str = job_info_db[8]
     custom_criteria = job_info_db[9]
-    uploaded_records = job_info_db[10]
-    current_status = job_info_db[11]
+    planner_json = job_info_db[10]
+    uploaded_records = job_info_db[11]
+    current_status = job_info_db[12]
 
     # Keep new source onboarding jobs pending until a dedicated onboarding flow updates them.
     if bool(is_custom) and str(current_status) == "Pending Onboarding":
@@ -863,10 +905,14 @@ async def run_scraper_background(job_id: str):
     
     # Reload job state to get updated filters_str if modified above
     with get_connection() as conn:
-        filters_str = conn.execute("SELECT filters FROM scraper_jobs WHERE id = ?", (job_id,)).fetchone()[0]
-    
+        row = conn.execute("SELECT filters, planner_json FROM scraper_jobs WHERE id = ?", (job_id,)).fetchone()
+        if row:
+            filters_str = row[0]
+            planner_json = row[1]
+
     records = []
     source_lower = source.lower()
+    resolved_filters = _extract_partial_scrape_filters(planner_json, filters_str)
     
     try:
         if job_mode in ("By Dataset", "Any-Site"):
@@ -1209,7 +1255,7 @@ async def run_scraper_background(job_id: str):
 
         if "keysight" in source_lower:
             from app.services.scrapers.keysight_scraper import scrape_keysight_products
-            filters = parse_criteria(filters_str)
+            filters = resolved_filters
             records = scrape_keysight_products(filters)
             
         elif "webmd" in source_lower:
@@ -1222,8 +1268,8 @@ async def run_scraper_background(job_id: str):
                     for k, v in r.items():
                         if pd.isna(v):
                             r[k] = None
-                if scope in ("Partial Dump", "Custom Dump", "Custom"):
-                    filters = parse_criteria(filters_str)
+                if _is_partial_scope(scope):
+                    filters = resolved_filters
                     records = filter_records(records, filters)
                     
         elif "investegate" in source_lower:
@@ -1236,8 +1282,8 @@ async def run_scraper_background(job_id: str):
                     for k, v in r.items():
                         if pd.isna(v):
                             r[k] = None
-                if scope in ("Partial Dump", "Custom Dump", "Custom"):
-                    filters = parse_criteria(filters_str)
+                if _is_partial_scope(scope):
+                    filters = resolved_filters
                     records = filter_records(records, filters)
                     
         elif "turkeybrokers" in source_lower:
@@ -1251,8 +1297,8 @@ async def run_scraper_background(job_id: str):
                     for k, v in r.items():
                         if pd.isna(v):
                             r[k] = None
-                if scope in ("Partial Dump", "Custom Dump", "Custom"):
-                    filters = parse_criteria(filters_str)
+                if _is_partial_scope(scope):
+                    filters = resolved_filters
                     records = filter_records(records, filters)
                     
         else:
@@ -1481,6 +1527,44 @@ async def run_scraper_background(job_id: str):
 @router.post("/jobs/launch")
 async def launch_jobs(request: LaunchJobsRequest, background_tasks: BackgroundTasks):
     for item in request.jobs:
+        raw_partial_request = (item.custom_criteria or "").strip()
+        if _is_partial_scope(item.scope) and not raw_partial_request and (item.filters.strip().startswith("{") or "=" in item.filters):
+            raw_partial_request = item.filters.strip()
+
+        planner_json_value: Optional[str] = None
+        effective_filters = item.filters.strip() if item.filters and item.filters.strip() else "—"
+        if _is_partial_scope(item.scope) and raw_partial_request:
+            capability = get_partial_scrape_capability(item.source)
+            if capability is None:
+                raise HTTPException(
+                    status_code=400,
+                    detail={
+                        "source": item.source,
+                        "status": "unsupported",
+                        "execution_summary": f"Partial Scrape is not configured for {item.source}.",
+                        "clarification_required": [],
+                        "unsupported_reason": "No capability profile is registered for this source.",
+                    },
+                )
+            plan_result = partial_scrape_planner_service.plan_partial_scrape(
+                source_name=item.source,
+                user_request=raw_partial_request,
+            )
+            if hasattr(plan_result, "model_dump"):
+                plan_payload = plan_result.model_dump(mode="json")
+            else:
+                plan_payload = plan_result.dict()
+            planner_json_value = json.dumps(plan_payload, ensure_ascii=False, default=str)
+            if plan_result.feedback.status != "supported":
+                raise HTTPException(
+                    status_code=422,
+                    detail=plan_payload["feedback"] | {
+                        "source": item.source,
+                        "planner_metadata": plan_payload["planner_metadata"],
+                        "execution_plan": plan_payload["execution_plan"],
+                    },
+                )
+
         with get_connection() as conn:
             exists = conn.execute("SELECT 1 FROM scraper_jobs WHERE id = ?", (item.id,)).fetchone()
         
@@ -1530,13 +1614,13 @@ async def launch_jobs(request: LaunchJobsRequest, background_tasks: BackgroundTa
         if exists:
             with get_connection() as conn:
                 conn.execute(
-                    """UPDATE scraper_jobs 
-                       SET source = ?, scope = ?, filters = ?, frequency = ?, delivery = ?, 
+                    """UPDATE scraper_jobs
+                       SET source = ?, scope = ?, filters = ?, custom_criteria = ?, planner_json = ?, frequency = ?, delivery = ?,
                            output_format = ?, dataset_path = ?, status = ?, 
                            created_at = ?, next_refresh = ?, is_custom_source = ?, mode = ?,
                            complexity = ?, estimated_onboarding_time = ?, records = ?
                        WHERE id = ?""",
-                    (item.source, item.scope, item.filters, item.frequency, item.delivery,
+                    (item.source, item.scope, effective_filters, raw_partial_request or item.custom_criteria or "—", item.frequency, item.delivery,
                      item.output_format, dataset_path, status_val, now_str, next_refresh_str,
                      1 if item.isCustomSource else 0, item.mode, complexity_val, sla_val, item.records, item.id)
                 )
@@ -1546,11 +1630,11 @@ async def launch_jobs(request: LaunchJobsRequest, background_tasks: BackgroundTa
                 conn.execute(
                     """INSERT INTO scraper_jobs (id, source, scope, filters, custom_criteria, frequency, delivery, 
                                                  output_format, dataset_path, status, created_at, next_refresh, 
-                                                 is_custom_source, mode, complexity, estimated_onboarding_time, records)
-                       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-                    (item.id, item.source, item.scope, item.filters, item.filters, item.frequency, item.delivery,
+                                                 is_custom_source, mode, complexity, estimated_onboarding_time, records, planner_json)
+                       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                    (item.id, item.source, item.scope, effective_filters, raw_partial_request or item.custom_criteria or "—", item.frequency, item.delivery,
                      item.output_format, dataset_path, status_val, now_str, next_refresh_str,
-                     1 if item.isCustomSource else 0, item.mode, complexity_val, sla_val, item.records)
+                     1 if item.isCustomSource else 0, item.mode, complexity_val, sla_val, item.records, planner_json_value)
                 )
                 conn.commit()
         
@@ -1644,6 +1728,20 @@ async def get_jobs():
                         except Exception:
                             pass
 
+            # Count decisions if they exist
+            approved_count = None
+            rejected_count = None
+            decisions_path = os.path.join(BASE_DIR, "datasets", f"{job_id}_review_decisions.json")
+            if os.path.exists(decisions_path):
+                try:
+                    with open(decisions_path, "r", encoding="utf-8") as f_dec:
+                        decisions = json.load(f_dec)
+                        if isinstance(decisions, list):
+                            approved_count = sum(1 for d in decisions if isinstance(d, dict) and d.get("reviewer_action") == "accepted")
+                            rejected_count = sum(1 for d in decisions if isinstance(d, dict) and d.get("reviewer_action") == "rejected")
+                except Exception:
+                    pass
+
             jobs.append({
                 "id": job_id,
                 "source": as_text(r["source"]),
@@ -1667,6 +1765,8 @@ async def get_jobs():
                 "refresh_history": history,
                 "complexity": r["complexity"] if "complexity" in r.keys() else None,
                 "estimated_onboarding_time": r["estimated_onboarding_time"] if "estimated_onboarding_time" in r.keys() else None,
+                "approved_count": approved_count,
+                "rejected_count": rejected_count,
             })
         except Exception as e:
             logger.warning("Skipping malformed scraper job row %s: %s", r["id"] if "id" in r.keys() else "unknown", e)
