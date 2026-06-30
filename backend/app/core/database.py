@@ -87,6 +87,7 @@ CREATE TABLE IF NOT EXISTS scraper_jobs (
     mode TEXT DEFAULT 'Site-Specific',
     refresh_history_json TEXT DEFAULT '[]',
     changes_detected INTEGER DEFAULT 0,
+    planner_json TEXT,
     complexity TEXT,
     estimated_onboarding_time TEXT
 );
@@ -134,6 +135,19 @@ def init_db() -> None:
             conn.commit()
         except sqlite3.OperationalError:
             pass  # Column already exists
+
+        # Schema migration: Add planner_json column if not already present
+        try:
+            conn.execute("ALTER TABLE scraper_jobs ADD COLUMN planner_json TEXT")
+            conn.commit()
+        except sqlite3.OperationalError:
+            pass  # Column already exists
+        # Mark stuck 'Running' jobs from previous sessions as 'Failed' on startup
+        try:
+            conn.execute("UPDATE scraper_jobs SET status = 'Failed' WHERE status = 'Running'")
+            conn.commit()
+        except Exception:
+            pass
             
     logger.info("SQLite database initialized at %s", _db_path())
 

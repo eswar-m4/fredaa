@@ -1622,6 +1622,16 @@ async def launch_jobs(request: LaunchJobsRequest, background_tasks: BackgroundTa
 
         status_val = "Running"
 
+        try:
+            with get_connection() as conn:
+                conn.execute(
+                    "UPDATE scraper_jobs SET status = 'Failed' WHERE source = ? AND status = 'Running' AND id != ?",
+                    (item.source, item.id)
+                )
+                conn.commit()
+        except Exception:
+            pass
+
         if exists:
             with get_connection() as conn:
                 conn.execute(
