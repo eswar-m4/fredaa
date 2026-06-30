@@ -46,6 +46,7 @@ function AnySite() {
   const [detectedRegion, setDetectedRegion] = useState<string>("Auto");
   const [selectedOutputs, setSelectedOutputs] = useState<string[]>([]);
   const [mapping, setMapping] = useState<Mapping>({});
+  const [isAiMapping, setIsAiMapping] = useState(false);
 
   // Step 3
   const [frequency, setFrequency] = useState("Weekly");
@@ -184,6 +185,7 @@ function AnySite() {
         const unresolvedHeaders = headers.filter((h) => !Object.values(exactMappings).includes(h));
         if (unresolvedHeaders.length > 0) {
           try {
+            setIsAiMapping(true);
             const mappingResponse = await fetch(`${baseApiUrl}/api/v1/workflows/field-mapping-suggestions`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -212,6 +214,8 @@ function AnySite() {
             }
           } catch (mappingErr) {
             console.warn("Backend field mapping suggestions failed:", mappingErr);
+          } finally {
+            setIsAiMapping(false);
           }
         }
       }
@@ -405,6 +409,7 @@ function AnySite() {
             downloadSample={downloadSample}
             onBack={() => setStep(0)}
             onNext={() => setStep(2)}
+            isAiMapping={isAiMapping}
           />
         )}
 
@@ -474,6 +479,7 @@ function MapStep(p: {
   downloadSample: (kind: "csv" | "json", name: string) => void;
   onBack: () => void;
   onNext: () => void;
+  isAiMapping: boolean;
 }) {
   const { ds } = p;
   const grouped = useMemo(() => {
@@ -725,16 +731,41 @@ function MapStep(p: {
           const totalCols = p.seedHeaders.length;
           const unmappedCols = p.seedHeaders.filter((h) => !Object.values(p.mapping).includes(h));
           return (
-            <div className="mb-4 grid grid-cols-1 md:grid-cols-2 gap-2">
-              <div className="rounded-md border border-success/40 bg-success-bg/60 p-3">
-                <div className="text-[11px] uppercase tracking-wider text-success font-semibold">Mapped</div>
-                <div className="text-[13px] font-semibold mt-0.5">{mappedCount} of {totalCols} uploaded columns matched</div>
-                <div className="text-[11px] text-muted-foreground mt-0.5 truncate">{Object.values(p.mapping).filter(Boolean).slice(0, 8).join(", ") || "—"}</div>
-              </div>
-              <div className="rounded-md border border-warning/40 bg-warning-bg/60 p-3">
-                <div className="text-[11px] uppercase tracking-wider text-warning font-semibold">Unmapped</div>
-                <div className="text-[13px] font-semibold mt-0.5">{unmappedCols.length} column{unmappedCols.length === 1 ? "" : "s"} need attention</div>
-                <div className="text-[11px] text-muted-foreground mt-0.5 truncate">{unmappedCols.slice(0, 8).join(", ") || "All your columns are mapped 🎉"}</div>
+            <div className="mb-4 space-y-2">
+              {p.isAiMapping && (
+                <div className="p-3 bg-secondary/85 rounded-md border border-border/80 text-[12.5px] flex items-center justify-between text-foreground font-medium animate-pulse">
+                  <div className="flex items-center gap-2">
+                    <Icons.Loader2 className="h-4 w-4 animate-spin text-primary" />
+                    <span>AI is improving field mappings... Analyzing uploaded columns...</span>
+                  </div>
+                  <Badge tone="info">Running AI analysis</Badge>
+                </div>
+              )}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                <div className="rounded-md border border-success/40 bg-success-bg/60 p-3 opacity-90 relative">
+                  <div className="text-[11px] uppercase tracking-wider text-success font-semibold flex items-center gap-1.5">
+                    Mapped
+                    {p.isAiMapping && <Icons.Loader2 className="h-2.5 w-2.5 animate-spin" />}
+                  </div>
+                  <div className="text-[13px] font-semibold mt-0.5">
+                    {p.isAiMapping ? "Calculating final mappings..." : `${mappedCount} of ${totalCols} uploaded columns matched`}
+                  </div>
+                  <div className="text-[11px] text-muted-foreground mt-0.5 truncate">
+                    {p.isAiMapping ? "Running LLM checks..." : (Object.values(p.mapping).filter(Boolean).slice(0, 8).join(", ") || "—")}
+                  </div>
+                </div>
+                <div className="rounded-md border border-warning/40 bg-warning-bg/60 p-3 opacity-90 relative">
+                  <div className="text-[11px] uppercase tracking-wider text-warning font-semibold flex items-center gap-1.5">
+                    Unmapped
+                    {p.isAiMapping && <Icons.Loader2 className="h-2.5 w-2.5 animate-spin" />}
+                  </div>
+                  <div className="text-[13px] font-semibold mt-0.5">
+                    {p.isAiMapping ? "Calculating unresolved columns..." : `${unmappedCols.length} column${unmappedCols.length === 1 ? "" : "s"} need attention`}
+                  </div>
+                  <div className="text-[11px] text-muted-foreground mt-0.5 truncate">
+                    {p.isAiMapping ? "Refining matches..." : (unmappedCols.slice(0, 8).join(", ") || "All your columns are mapped 🎉")}
+                  </div>
+                </div>
               </div>
             </div>
           );

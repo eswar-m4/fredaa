@@ -352,27 +352,27 @@ class WebsiteComplexityClassifierService:
 
         if unresolved:
             field_descriptions = {
-                "legal_name": "Official registered company or organization name.",
-                "dba": "Doing Business As, trading name, or brand name used by the company.",
-                "description": "A short summary, bio, or description of the company business or operations.",
-                "tagline": "Slogan or brief marketing tagline of the company.",
-                "hq_address": "Primary headquarters physical street address.",
-                "hq_city": "The city where the headquarters is located.",
-                "hq_state": "The state, province, or region where the headquarters is located.",
-                "hq_country": "The country where the headquarters is located.",
-                "website": "Official company corporate homepage website URL.",
-                "email": "General, contact, or business support email address of the company.",
-                "phone": "Main corporate phone number or telephone number of the company.",
-                "linkedin_url": "The company's official LinkedIn page or profile URL.",
-                "employee_count": "Number of employees, headcount, or staff size of the company.",
-                "industry": "Primary industry sector or vertical the business operates in.",
-                "registry_number": "Official corporate registration number, CIK number, or business registration ID.",
-                "sic_code": "Standard Industrial Classification (SIC) code.",
-                "naics_code": "North American Industry Classification System (NAICS) code.",
-                "tax_id": "Employer Identification Number (EIN) or corporate tax ID.",
-                "revenue": "Annual revenue or revenue range of the company.",
-                "valuation": "Estimated financial company valuation.",
-                "year_founded": "The year when the company was founded."
+                "legal_name": "Official registered company name, corporate entity name, business name, or legal name of the organization.",
+                "dba": "DBA (Doing Business As), trading name, brand name, operating name, or trading style.",
+                "description": "Short summary, profile, overview, business description, history, or company bio.",
+                "tagline": "Slogan, marketing tagline, motto, or short catchphrase.",
+                "hq_address": "Full physical headquarters street address, registered office address, head office location, legal address, or main office street address (excluding city/state/zip if they are separate columns).",
+                "hq_city": "The city or municipality where the company's main headquarters or office is located.",
+                "hq_state": "The state, province, territory, region, or canton of the company's headquarters.",
+                "hq_country": "The country or nation of the company's headquarters.",
+                "website": "Official corporate website, homepage URL, company domain, web address, or target site link.",
+                "email": "Primary corporate email address, contact email, general inquiry inbox, or business email.",
+                "phone": "Corporate telephone number, contact phone, business helpline, or mobile number.",
+                "linkedin_url": "Official LinkedIn company page URL or corporate social profile link.",
+                "employee_count": "Total headcount, staff size, number of employees, active personnel count, or employment volume.",
+                "industry": "Business industry, sector, classification vertical, or primary activity type.",
+                "registry_number": "Corporate registry number, registration number, company number, filing ID, or official CIK.",
+                "sic_code": "Standard Industrial Classification (SIC) identifier code.",
+                "naics_code": "North American Industry Classification System (NAICS) identifier code.",
+                "tax_id": "Employer Identification Number (EIN), business tax registration number, or tax ID.",
+                "revenue": "Annual revenue, total sales, annual turnover, or financial income bracket.",
+                "valuation": "Estimated financial company valuation, worth, or market capitalization.",
+                "year_founded": "The year when the company or organization was founded or incorporated."
             }
 
             semantic_list = []
@@ -385,23 +385,27 @@ class WebsiteComplexityClassifierService:
             superset_semantics = "\n\n".join(semantic_list)
 
             examples = (
-                "Representative Examples of Mappings:\n"
-                "Company Name, Business Name, Organization Name, Legal Entity Name -> legal_name\n"
-                "Address, Address Line 1, Street Address, Headquarters -> hq_address\n"
-                "City, HQ City -> hq_city\n"
-                "State, Region, Province -> hq_state\n"
-                "Zip, Postal Code, PIN Code -> zip_code\n"
-                "Website, Homepage, URL, Web Address -> website\n"
-                "Industry, Sector, Category -> industry\n"
-                "Phone, Telephone, Mobile -> phone\n"
-                "Email, Contact Email -> email"
+                "Here are representative examples of how input headers map to target fields:\n"
+                "- 'Address-Line 1', 'Address-Line2', 'Street Address', 'Headquarters Address', 'Registered Office', 'Head Office', 'Legal Address', 'Office Address' -> hq_address\n"
+                "- 'Company Name', 'Organization Name', 'Entity Name', 'Firm Name', 'Legal Entity' -> legal_name\n"
+                "- 'HQ City', 'Town', 'City Location' -> hq_city\n"
+                "- 'HQ State', 'Province', 'Region', 'Canton', 'State Name' -> hq_state\n"
+                "- 'Zip', 'Zip Code', 'Postal Code', 'PIN Code', 'Postcode' -> zip_code\n"
+                "- 'Website URL', 'Homepage', 'Domain Name', 'Web Address', 'Corp Site' -> website\n"
+                "- 'Sector', 'Business Type', 'Industry Category' -> industry\n"
+                "- 'Telephone', 'Corp Phone', 'Contact Number', 'Office Phone' -> phone\n"
+                "- 'Contact Email', 'Gen Email', 'Inquiry Email' -> email\n"
+                "- 'Employees', 'Headcount', 'Staff Size', 'Personnel' -> employee_count\n"
+                "- 'Registration No', 'Company Number', 'CIK' -> registry_number"
             )
 
             system_content = (
-                "You are an expert data classification AI. Your task is to map input headers from an uploaded dataset "
-                "to allowed fields from the target schema (superset fields) based on semantic understanding. "
-                "Map each input header to exactly one field from allowed superset fields, or an empty string if no reliable mapping exists. "
-                "You must return a strict JSON object with a single key 'mappings'. No other text outside the JSON block."
+                "You are an expert data classification AI assistant specializing in schema mapping.\n"
+                "Your task is to map input column headers from an uploaded dataset to target fields in a predefined company database schema (superset fields).\n"
+                "To ensure high accuracy, analyze the semantic meaning of the input header in the context of all dataset headers. "
+                "Look past abbreviations, typos, and alternate business terminology (e.g., 'Registered Office', 'Legal Address', or 'Head Office' all refer to the company's main street address, which is 'hq_address').\n"
+                "For each input header, decide on the single best target field name from the allowed list, or return an empty string if there is absolutely no semantic match.\n"
+                "Provide a step-by-step reasoning in the 'reason' field explaining the synonym mapping and why it fits."
             )
 
             user_content = (
@@ -452,9 +456,8 @@ class WebsiteComplexityClassifierService:
                     from app.services.ai_provider import AIProvider
                     provider = AIProvider(api_key=settings.GEMINI_API_KEY, model=settings.GEMINI_MODEL)
                     prompt = (
-                        "You are an AI assistant. Your task is to map input headers from an uploaded dataset "
-                        "to allowed fields from the target schema (superset fields) based on semantic understanding. "
-                        "Map each input header to exactly one field from allowed superset fields, or an empty string if no reliable mapping exists. "
+                        "You are an AI assistant specializing in database schema mapping. Your task is to map input column headers from an uploaded dataset "
+                        "to allowed fields from the target schema (superset fields) based on semantic understanding. Map each input header to exactly one field from allowed superset fields, or an empty string if no reliable mapping exists. "
                         "You must return a strict JSON object with a single key 'mappings' only.\n\n"
                         f"Complete Dataset Headers for Context:\n{headers}\n\n"
                         f"Allowed Superset Fields and Descriptions:\n{superset_semantics}\n\n"
