@@ -558,7 +558,7 @@ function Review() {
   // Combine database jobs with static mock jobs
   const datasetJobs = useMemo(() => {
     const dbDataset = dbJobs
-      .filter((j: any) => (j.mode === "By Dataset" || j.mode === "Any-Site") && (j.status === "Review Pending" || j.status === "Completed"))
+      .filter((j: any) => (j.mode === "By Dataset" || j.mode === "Any-Site") && !j.isCustomSource && (j.status === "Review Pending" || j.status === "Completed"))
       .map((j: any) => {
         const isCompleted = j.status === "Completed";
         return {
@@ -581,7 +581,7 @@ function Review() {
 
   const sourceJobs = useMemo(() => {
     const dbSource = dbJobs
-      .filter((j: any) => (j.mode === "Site-Specific" || j.mode === "By Source") && (j.status === "Completed" || j.status === "Review Pending" || j.status === "Review" || j.status === "Running"))
+      .filter((j: any) => (j.mode === "Site-Specific" || j.mode === "By Source") && !j.isCustomSource && (j.status === "Completed" || j.status === "Review Pending" || j.status === "Review" || j.status === "Running"))
       .map((j: any) => {
         const sourceDisplayName = getSourceDisplayName(j.source);
         const domain = cleanSourceName(j.source);
