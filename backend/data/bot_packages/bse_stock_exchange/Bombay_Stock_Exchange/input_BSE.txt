@@ -1,0 +1,11 @@
+clientid	InputId	target_site_domain	target_input_company_name	target_input_code	target_product_url
+1	1	bseindia.com	ABB India Ltd	ABB	https://www.bseindia.com/corporates/HistoricalAnnualReport.aspx
+2	2	bseindia.com	Amara Raja Energy & Mobility Limited	500008	https://www.bseindia.com/corporates/HistoricalAnnualReport.aspx
+3	3	bseindia.com	Ambalal Sarabhai Enterprises Ltd	500009	https://www.bseindia.com/corporates/HistoricalAnnualReport.aspx
+4	4	bseindia.com	The Andhra Petrochemicals Limited	500012	https://www.bseindia.com/corporates/HistoricalAnnualReport.aspx
+5	5	bseindia.com	Ansal Properties & Infrastructure Limited	500013	https://www.bseindia.com/corporates/HistoricalAnnualReport.aspx
+6	6	bseindia.com	Utique Enterprises Ltd	500014	https://www.bseindia.com/corporates/HistoricalAnnualReport.aspx
+7	7	bseindia.com	Bajaj Electricals Limited	BAJAJELEC	https://www.bseindia.com/corporates/HistoricalAnnualReport.aspx
+8	8	bseindia.com	Bajaj Hindustan Sugar Limited	500032	https://www.bseindia.com/corporates/HistoricalAnnualReport.aspx
+9	9	bseindia.com	Force Motors Limited	FORCEMOT	https://www.bseindia.com/corporates/HistoricalAnnualReport.aspx
+10	10	bseindia.com	Balrampur Chini Mills Limited	500038	https://www.bseindia.com/corporates/HistoricalAnnualReport.aspx

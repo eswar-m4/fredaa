@@ -1,0 +1,362 @@
+[
+  {
+    "record_index": 0,
+    "attribute": "Address",
+    "previous_value": "Ataturk Bulvari No: 12, Ankara",
+    "enriched_value": "Ataturk Bulvari No: 12, Ankara",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "City",
+    "previous_value": "Ankara",
+    "enriched_value": "Ankara",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "PrimaryKey",
+    "previous_value": "TB-001",
+    "enriched_value": "TB-001",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "Address",
+    "previous_value": "Istiklal Caddesi No: 45, Istanbul",
+    "enriched_value": "Istiklal Caddesi No: 45, Istanbul",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "City",
+    "previous_value": "Istanbul",
+    "enriched_value": "Istanbul",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "PrimaryKey",
+    "previous_value": "TB-002",
+    "enriched_value": "TB-002",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "Address",
+    "previous_value": "Cumhuriyet Meydani No: 8, Izmir",
+    "enriched_value": "Cumhuriyet Meydani No: 8, Izmir",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "City",
+    "previous_value": "Izmir",
+    "enriched_value": "Izmir",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "PrimaryKey",
+    "previous_value": "TB-003",
+    "enriched_value": "TB-003",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "Address",
+    "previous_value": "Mevlana Caddesi No: 99, Konya",
+    "enriched_value": "Mevlana Caddesi No: 99, Konya",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "City",
+    "previous_value": "Konya",
+    "enriched_value": "Konya",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "PrimaryKey",
+    "previous_value": "TB-004",
+    "enriched_value": "TB-004",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "Address",
+    "previous_value": "Talatpasa Bulvari No: 3, Izmir",
+    "enriched_value": "Talatpasa Bulvari No: 3, Izmir",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "City",
+    "previous_value": "Izmir",
+    "enriched_value": "Izmir",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "PrimaryKey",
+    "previous_value": "TB-005",
+    "enriched_value": "TB-005",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "Address",
+    "previous_value": "Bagdat Caddesi No: 202, Istanbul",
+    "enriched_value": "Bagdat Caddesi No: 202, Istanbul",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "City",
+    "previous_value": "Istanbul",
+    "enriched_value": "Istanbul",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "PrimaryKey",
+    "previous_value": "TB-006",
+    "enriched_value": "TB-006",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "Address",
+    "previous_value": "Barbaros Bulvari No: 88, Istanbul",
+    "enriched_value": "Barbaros Bulvari No: 88, Istanbul",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "City",
+    "previous_value": "Istanbul",
+    "enriched_value": "Istanbul",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "PrimaryKey",
+    "previous_value": "TB-007",
+    "enriched_value": "TB-007",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "Address",
+    "previous_value": "Kenan Evren Bulvari No: 15, Adana",
+    "enriched_value": "Kenan Evren Bulvari No: 15, Adana",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "City",
+    "previous_value": "Adana",
+    "enriched_value": "Adana",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "PrimaryKey",
+    "previous_value": "TB-008",
+    "enriched_value": "TB-008",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "Address",
+    "previous_value": "Gazi Mustafa Kemal Bulvari No: 54, Ankara",
+    "enriched_value": "Gazi Mustafa Kemal Bulvari No: 54, Ankara",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "City",
+    "previous_value": "Ankara",
+    "enriched_value": "Ankara",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "PrimaryKey",
+    "previous_value": "TB-009",
+    "enriched_value": "TB-009",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "Address",
+    "previous_value": "Ataturk Caddesi No: 77, Bursa",
+    "enriched_value": "Ataturk Caddesi No: 77, Bursa",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "City",
+    "previous_value": "Bursa",
+    "enriched_value": "Bursa",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "PrimaryKey",
+    "previous_value": "TB-010",
+    "enriched_value": "TB-010",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "Address",
+    "previous_value": "Inonu Caddesi No: 120, Izmir",
+    "enriched_value": "Inonu Caddesi No: 120, Izmir",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "City",
+    "previous_value": "Izmir",
+    "enriched_value": "Izmir",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "PrimaryKey",
+    "previous_value": "TB-011",
+    "enriched_value": "TB-011",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "Address",
+    "previous_value": "Halaskargazi Caddesi No: 34, Istanbul",
+    "enriched_value": "Halaskargazi Caddesi No: 34, Istanbul",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "City",
+    "previous_value": "Istanbul",
+    "enriched_value": "Istanbul",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "PrimaryKey",
+    "previous_value": "TB-012",
+    "enriched_value": "TB-012",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "Address",
+    "previous_value": "Ziya Gokalp Caddesi No: 9, Ankara",
+    "enriched_value": "Ziya Gokalp Caddesi No: 9, Ankara",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "City",
+    "previous_value": "Ankara",
+    "enriched_value": "Ankara",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "PrimaryKey",
+    "previous_value": "TB-013",
+    "enriched_value": "TB-013",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "Address",
+    "previous_value": "Fevzi Pasa Caddesi No: 150, Istanbul",
+    "enriched_value": "Fevzi Pasa Caddesi No: 150, Istanbul",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "City",
+    "previous_value": "Istanbul",
+    "enriched_value": "Istanbul",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "PrimaryKey",
+    "previous_value": "TB-014",
+    "enriched_value": "TB-014",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "Address",
+    "previous_value": "Mithatpasa Caddesi No: 21, Ankara",
+    "enriched_value": "Mithatpasa Caddesi No: 21, Ankara",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "City",
+    "previous_value": "Ankara",
+    "enriched_value": "Ankara",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "PrimaryKey",
+    "previous_value": "TB-015",
+    "enriched_value": "TB-015",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  }
+]

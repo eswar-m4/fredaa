@@ -1,0 +1,1170 @@
+[
+  {
+    "record_index": 0,
+    "attribute": "Add_to_Cart_Flag",
+    "previous_value": "1",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Configuration_Flag",
+    "previous_value": "0",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Discontinued",
+    "previous_value": "False",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Navigation_category",
+    "previous_value": "Products",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Selected_Configurations_row_price",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Selected_Configurations_row_qty",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Selected_Configurations_row_sku",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Selected_Configurations_row_sort",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Selected_Configurations_row_title",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "_associated_default_qty",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "_associated_position",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "_associated_sku",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "_attribute_set",
+    "previous_value": "Default",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "_category",
+    "previous_value": "Probes",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "_custom_option_configurator_header",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "_custom_option_is_required",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "_custom_option_max_characters",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "_custom_option_price",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "_custom_option_row_price",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "_custom_option_row_sku",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "_custom_option_row_sort",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "_custom_option_row_title",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "_custom_option_row_unspsc",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "_custom_option_sku",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "_custom_option_sort_order",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "_custom_option_store",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "_custom_option_title",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "_custom_option_type",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "_group_price_customer_group",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "_group_price_price",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "_group_price_website",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "_links_crosssell_position",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "_links_crosssell_sku",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "_links_related_position",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "_links_related_sku",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "_links_upsell_position",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "_links_upsell_sku",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "_media_attribute_id",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "_media_image",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "_media_is_disabled",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "_media_label",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "_media_position",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "_model_Num",
+    "previous_value": "10072A",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "_option_row_price",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "_option_row_sku",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "_option_row_title",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "_option_title",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "_product_websites",
+    "previous_value": "base",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "_root_category",
+    "previous_value": "Keysight",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "_store",
+    "previous_value": "default",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "_tier_price_customer_group",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "_tier_price_price",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "_tier_price_qty",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "_tier_price_website",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "_type",
+    "previous_value": "simple",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "allow_individual_quote_request",
+    "previous_value": "1",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "backorders",
+    "previous_value": "0",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "category",
+    "previous_value": "Probes",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "color",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "cost",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "country_of_manufacture",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "custom_design",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "custom_design_from",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "custom_design_to",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "custom_layout_update",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "description",
+    "previous_value": "Probe fine-pitch ICs with the ten included IC clips and two dual-lead adapters that connect to 10080 family probes.",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "enable_googlecheckout",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "enable_qty_increments",
+    "previous_value": "0",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "features",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "gallery",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "gift_message_available",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "gift_wrapping_available",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "gift_wrapping_price",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "has_options",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "image",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "image_label",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "is_decimal_divided",
+    "previous_value": "0",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "is_in_stock",
+    "previous_value": "1",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "is_qty_decimal",
+    "previous_value": "0",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "is_quotation",
+    "previous_value": "1",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "is_returnable",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "isspecial",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "key_specs",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "manage_stock",
+    "previous_value": "1",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "manufacturer",
+    "previous_value": "Keysight",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "max_sale_qty",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "media_gallery",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "meta_description",
+    "previous_value": "Probe fine-pitch ICs with the ten included IC clips and two dual-lead adapters that connect to 10080 family probes.",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "meta_keyword",
+    "previous_value": "10072A,surface,mount,smt,probe,ic,clips,clip,accessories,10072a,10072,oscilloscope",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "meta_title",
+    "previous_value": "10072A Surface Mount Clip Kit",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "min_qty",
+    "previous_value": "1",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "min_sale_qty",
+    "previous_value": "1",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "minimal_price",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "msrp",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "msrp_display_actual_price_type",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "msrp_enabled",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "name",
+    "previous_value": "10072A Surface Mount Clip Kit",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "news_from_date",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "news_to_date",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "notify_stock_qty",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "options_container",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "page_layout",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "pdf",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "pdf_like",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "price",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "prod_type",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "product_family",
+    "previous_value": "Other Instruments",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "product_series",
+    "previous_value": "General Series",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "qty",
+    "previous_value": "10",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "qty_increments",
+    "previous_value": "1",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "quotation_id",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "regarding_lead_time",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "region",
+    "previous_value": "US / English",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "related_tgtr_position_behavior",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "related_tgtr_position_limit",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "required_options",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "short_description",
+    "previous_value": "Probe fine-pitch ICs with the ten included IC clips and two dual-lead adapters that connect to 10080 family probes.",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "sku",
+    "previous_value": "10072A",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "small_image",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "small_image_label",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "special_from_date",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "special_price",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "special_to_date",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "specialends",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "srt",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "status",
+    "previous_value": "Enabled",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "stock_status_changed_auto",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "tax_class_id",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "thumbnail",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "thumbnail_label",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "unspsc",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "updated_at",
+    "previous_value": "2021-02-08T04:22:32.192-07:00",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "upsell_tgtr_position_behavior",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "upsell_tgtr_position_limit",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "url_key",
+    "previous_value": "surface-mount-clip-kit",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "url_path",
+    "previous_value": "/us/en/product/10072A/surface-mount-clip-kit.html",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "use_config_backorders",
+    "previous_value": "1",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "use_config_enable_qty_inc",
+    "previous_value": "1",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "use_config_manage_stock",
+    "previous_value": "1",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "use_config_max_sale_qty",
+    "previous_value": "1",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "use_config_min_qty",
+    "previous_value": "1",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "use_config_min_sale_qty",
+    "previous_value": "1",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "use_config_notify_stock_qty",
+    "previous_value": "1",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "use_config_qty_increments",
+    "previous_value": "1",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "visibility",
+    "previous_value": "Catalog, Search",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "weight",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  }
+]

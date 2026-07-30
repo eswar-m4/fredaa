@@ -1,0 +1,738 @@
+[
+  {
+    "record_index": 0,
+    "attribute": "Add_to_Cart_Flag",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Configuration_Flag",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Discontinued",
+    "previous_value": "—",
+    "enriched_value": "False",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Navigation_category",
+    "previous_value": "—",
+    "enriched_value": "Products",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "_attribute_set",
+    "previous_value": "—",
+    "enriched_value": "Default",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "_category",
+    "previous_value": "—",
+    "enriched_value": "Oscilloscopes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "_model_Num",
+    "previous_value": "—",
+    "enriched_value": "10070D",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "_product_websites",
+    "previous_value": "—",
+    "enriched_value": "base",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "_store",
+    "previous_value": "—",
+    "enriched_value": "default",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "_type",
+    "previous_value": "—",
+    "enriched_value": "simple",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "allow_individual_quote_request",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "backorders",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "category",
+    "previous_value": "—",
+    "enriched_value": "Oscilloscopes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "description",
+    "previous_value": "—",
+    "enriched_value": "The Keysight 10070D passive probe is designed for general purpose oscilloscope applications.",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "enable_qty_increments",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "is_decimal_divided",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "is_in_stock",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "is_qty_decimal",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "is_quotation",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "manage_stock",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "manufacturer",
+    "previous_value": "—",
+    "enriched_value": "Keysight",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "meta_description",
+    "previous_value": "—",
+    "enriched_value": "The Keysight 10070D passive probe is designed for general purpose oscilloscope applications.",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "meta_title",
+    "previous_value": "—",
+    "enriched_value": "Passive Probe, 1:1, 20 MHz, 1.5 m",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "min_qty",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "min_sale_qty",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "name",
+    "previous_value": "—",
+    "enriched_value": "Passive Probe, 1:1, 20 MHz, 1.5 m",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "product_family",
+    "previous_value": "—",
+    "enriched_value": "InfiniiVision Oscilloscopes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "product_series",
+    "previous_value": "—",
+    "enriched_value": "General Series",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "qty",
+    "previous_value": "—",
+    "enriched_value": "10",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "qty_increments",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "region",
+    "previous_value": "—",
+    "enriched_value": "US / English",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "short_description",
+    "previous_value": "—",
+    "enriched_value": "The Keysight 10070D passive probe is designed for general purpose oscilloscope applications.",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "sku",
+    "previous_value": "—",
+    "enriched_value": "10070D",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "status",
+    "previous_value": "—",
+    "enriched_value": "Enabled",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "updated_at",
+    "previous_value": "—",
+    "enriched_value": "2026-07-28 14:36:15",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "url_key",
+    "previous_value": "—",
+    "enriched_value": "passive-probe-1-1-20-mhz-1-5-m",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "url_path",
+    "previous_value": "—",
+    "enriched_value": "/us/en/product/10070D/passive-probe-1-1-20-mhz-1-5-m.html",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "use_config_backorders",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "use_config_enable_qty_inc",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "use_config_manage_stock",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "use_config_max_sale_qty",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "use_config_min_qty",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "use_config_min_sale_qty",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "use_config_notify_stock_qty",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "use_config_qty_increments",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "visibility",
+    "previous_value": "—",
+    "enriched_value": "Catalog, Search",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "Add_to_Cart_Flag",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "Configuration_Flag",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "Discontinued",
+    "previous_value": "—",
+    "enriched_value": "False",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "Navigation_category",
+    "previous_value": "—",
+    "enriched_value": "Products",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "_attribute_set",
+    "previous_value": "—",
+    "enriched_value": "Default",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "_category",
+    "previous_value": "—",
+    "enriched_value": "Waveform Generators",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "_model_Num",
+    "previous_value": "—",
+    "enriched_value": "33500B",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "_product_websites",
+    "previous_value": "—",
+    "enriched_value": "base",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "_store",
+    "previous_value": "—",
+    "enriched_value": "default",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "_type",
+    "previous_value": "—",
+    "enriched_value": "simple",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "allow_individual_quote_request",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "backorders",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "category",
+    "previous_value": "—",
+    "enriched_value": "Waveform Generators",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "description",
+    "previous_value": "—",
+    "enriched_value": "Keysight 33500B Trueform arbitrary waveform generator offers 20 MHz bandwidth with unmatched signal integrity.",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "enable_qty_increments",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "is_decimal_divided",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "is_in_stock",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "is_qty_decimal",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "is_quotation",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "manage_stock",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "manufacturer",
+    "previous_value": "—",
+    "enriched_value": "Keysight",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "meta_description",
+    "previous_value": "—",
+    "enriched_value": "Keysight 33500B Trueform arbitrary waveform generator offers 20 MHz bandwidth with unmatched signal integrity.",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "meta_title",
+    "previous_value": "—",
+    "enriched_value": "Trueform Waveform Generator, 20 MHz, 1-Channel",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "min_qty",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "min_sale_qty",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "name",
+    "previous_value": "—",
+    "enriched_value": "Trueform Waveform Generator, 20 MHz, 1-Channel",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "product_family",
+    "previous_value": "—",
+    "enriched_value": "Trueform Waveform Generators",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "product_series",
+    "previous_value": "—",
+    "enriched_value": "33500B/33600A Series",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "qty",
+    "previous_value": "—",
+    "enriched_value": "10",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "qty_increments",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "region",
+    "previous_value": "—",
+    "enriched_value": "US / English",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "short_description",
+    "previous_value": "—",
+    "enriched_value": "Keysight 33500B Trueform arbitrary waveform generator offers 20 MHz bandwidth with unmatched signal integrity.",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "sku",
+    "previous_value": "—",
+    "enriched_value": "33500B",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "status",
+    "previous_value": "—",
+    "enriched_value": "Enabled",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "updated_at",
+    "previous_value": "—",
+    "enriched_value": "2026-07-28 14:36:15",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "url_key",
+    "previous_value": "—",
+    "enriched_value": "trueform-waveform-generator",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "url_path",
+    "previous_value": "—",
+    "enriched_value": "/us/en/product/33500B/trueform-waveform-generator.html",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "use_config_backorders",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "use_config_enable_qty_inc",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "use_config_manage_stock",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "use_config_max_sale_qty",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "use_config_min_qty",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "use_config_min_sale_qty",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "use_config_notify_stock_qty",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "use_config_qty_increments",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "visibility",
+    "previous_value": "—",
+    "enriched_value": "Catalog, Search",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  }
+]

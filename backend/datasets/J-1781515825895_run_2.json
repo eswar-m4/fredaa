@@ -1,0 +1,20 @@
+[
+  {
+    "url": "https://bolt.new",
+    "title": "Sample Crawled Title for https://bolt.new",
+    "meta_description": "Onboarded and crawled successfully",
+    "emails": [
+      "info@example.com"
+    ],
+    "phone_numbers": [
+      "+1 555-0199"
+    ],
+    "social_links": [],
+    "detected_company_name": "https://bolt.new",
+    "detected_keywords": [
+      "crawled",
+      "verified"
+    ],
+    "page_text": "Sample visible page text parsed from company website"
+  }
+]

@@ -1,0 +1,138 @@
+[
+  {
+    "record_index": 0,
+    "attribute": "Article_Link",
+    "previous_value": "https://www.investegate.co.uk/announcement/rns/gcp-infrastructure-investments-ltd--gcp/transaction-in-own-shares/9613554",
+    "enriched_value": "https://www.investegate.co.uk/announcement/rns/gcp-infrastructure-investments-ltd--gcp/transaction-in-own-shares/9613554",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Article_Subject",
+    "previous_value": "Transaction in Own Shares",
+    "enriched_value": "Transaction in Own Shares",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Comments",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Company_Link",
+    "previous_value": "https://www.investegate.co.uk/company/GCP",
+    "enriched_value": "https://www.investegate.co.uk/company/GCP",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Company_Name",
+    "previous_value": "GCP Infrastructure Investments Ltd (GCP)",
+    "enriched_value": "GCP Infrastructure Investments Ltd (GCP)",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Disposition",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Disposition_Details",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Event_Name",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 0,
+    "attribute": "FTSE_Sector",
+    "previous_value": "Financial Services",
+    "enriched_value": "Financial Services",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "FTSE_index",
+    "previous_value": "FTSE 250",
+    "enriched_value": "FTSE 250",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "KeywordsMapped",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Listing_Category",
+    "previous_value": "Equity",
+    "enriched_value": "Equity",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Market",
+    "previous_value": "Main Market",
+    "enriched_value": "Main Market",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Published_Date",
+    "previous_value": "11 Jun 2026 09:00 AM",
+    "enriched_value": "11 Jun 2026 09:00 AM",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "RNS",
+    "previous_value": "Regulatory Announcement",
+    "enriched_value": "Regulatory Announcement",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Source",
+    "previous_value": "RNS",
+    "enriched_value": "RNS",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Total_MatchKeyword",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  }
+]

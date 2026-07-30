@@ -1,0 +1,4786 @@
+[
+  {
+    "record_index": 0,
+    "attribute": "DT_OF_SUS",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Flag",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Fld_AuthoriseDate",
+    "previous_value": "—",
+    "enriched_value": "2026-04-09T18:39:21.687",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Fld_ReSubmit",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Fld_ResubReason",
+    "previous_value": "—",
+    "enriched_value": " ",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "InputId",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "PDFDownload",
+    "previous_value": "—",
+    "enriched_value": "https://www.bseindia.com/xml-data/corpfiling/AttachHis/3e1f777e-4988-48f8-b545-f788c673245c.pdf",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Priorityflag",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "REV_DT",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "RN",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Scripcode",
+    "previous_value": "—",
+    "enriched_value": "500002",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "StatusForDelisted",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "StatusForSuS",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Year",
+    "previous_value": "—",
+    "enriched_value": "2025",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "clientid",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "isSpecial",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "revised_date_time",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "scrip_name",
+    "previous_value": "—",
+    "enriched_value": "ABB Ltd.",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "status",
+    "previous_value": "—",
+    "enriched_value": "New",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "target_input_code",
+    "previous_value": "—",
+    "enriched_value": "ABB",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "target_input_company_name",
+    "previous_value": "—",
+    "enriched_value": "ABB India Ltd",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "target_product_url",
+    "previous_value": "—",
+    "enriched_value": "https://www.bseindia.com/corporates/HistoricalAnnualReport.aspx",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "target_site_domain",
+    "previous_value": "—",
+    "enriched_value": "bseindia.com",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "DT_OF_SUS",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "Flag",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "Fld_AuthoriseDate",
+    "previous_value": "—",
+    "enriched_value": "2025-04-09T19:57:48.097",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "Fld_ReSubmit",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "Fld_ResubReason",
+    "previous_value": "—",
+    "enriched_value": " ",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "InputId",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "PDFDownload",
+    "previous_value": "—",
+    "enriched_value": "https://www.bseindia.com/xml-data/corpfiling/AttachHis/dd2b0650-5092-495e-9c42-f35f1e479dee.pdf",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "Priorityflag",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "REV_DT",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "RN",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "Scripcode",
+    "previous_value": "—",
+    "enriched_value": "500002",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "StatusForDelisted",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "StatusForSuS",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "Year",
+    "previous_value": "—",
+    "enriched_value": "2024",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "clientid",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "isSpecial",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "revised_date_time",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "scrip_name",
+    "previous_value": "—",
+    "enriched_value": "ABB Ltd.",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "status",
+    "previous_value": "—",
+    "enriched_value": "New",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "target_input_code",
+    "previous_value": "—",
+    "enriched_value": "ABB",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "target_input_company_name",
+    "previous_value": "—",
+    "enriched_value": "ABB India Ltd",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "target_product_url",
+    "previous_value": "—",
+    "enriched_value": "https://www.bseindia.com/corporates/HistoricalAnnualReport.aspx",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "target_site_domain",
+    "previous_value": "—",
+    "enriched_value": "bseindia.com",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "DT_OF_SUS",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "Flag",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "Fld_AuthoriseDate",
+    "previous_value": "—",
+    "enriched_value": "2024-04-05T20:53:26.45",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "Fld_ReSubmit",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "Fld_ResubReason",
+    "previous_value": "—",
+    "enriched_value": " ",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "InputId",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "PDFDownload",
+    "previous_value": "—",
+    "enriched_value": "https://www.bseindia.com/xml-data/corpfiling/AttachHis/35d46686-9499-482a-914c-0d1f8f13b6d5.pdf",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "Priorityflag",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "REV_DT",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "RN",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "Scripcode",
+    "previous_value": "—",
+    "enriched_value": "500002",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "StatusForDelisted",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "StatusForSuS",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "Year",
+    "previous_value": "—",
+    "enriched_value": "2023",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "clientid",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "isSpecial",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "revised_date_time",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "scrip_name",
+    "previous_value": "—",
+    "enriched_value": "ABB Ltd.",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "status",
+    "previous_value": "—",
+    "enriched_value": "New",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "target_input_code",
+    "previous_value": "—",
+    "enriched_value": "ABB",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "target_input_company_name",
+    "previous_value": "—",
+    "enriched_value": "ABB India Ltd",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "target_product_url",
+    "previous_value": "—",
+    "enriched_value": "https://www.bseindia.com/corporates/HistoricalAnnualReport.aspx",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "target_site_domain",
+    "previous_value": "—",
+    "enriched_value": "bseindia.com",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "DT_OF_SUS",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "Flag",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "Fld_AuthoriseDate",
+    "previous_value": "—",
+    "enriched_value": "2023-04-04T16:19:06.513",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "Fld_ReSubmit",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "Fld_ResubReason",
+    "previous_value": "—",
+    "enriched_value": " ",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "InputId",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "PDFDownload",
+    "previous_value": "—",
+    "enriched_value": "https://www.bseindia.com/xml-data/corpfiling/AttachHis/\\f5a4131a-d050-4c6f-9205-9f87fb552375.pdf",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "Priorityflag",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "REV_DT",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "RN",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "Scripcode",
+    "previous_value": "—",
+    "enriched_value": "500002",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "StatusForDelisted",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "StatusForSuS",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "Year",
+    "previous_value": "—",
+    "enriched_value": "2022",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "clientid",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "isSpecial",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "revised_date_time",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "scrip_name",
+    "previous_value": "—",
+    "enriched_value": "ABB Ltd.",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "status",
+    "previous_value": "—",
+    "enriched_value": "New",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "target_input_code",
+    "previous_value": "—",
+    "enriched_value": "ABB",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "target_input_company_name",
+    "previous_value": "—",
+    "enriched_value": "ABB India Ltd",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "target_product_url",
+    "previous_value": "—",
+    "enriched_value": "https://www.bseindia.com/corporates/HistoricalAnnualReport.aspx",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "target_site_domain",
+    "previous_value": "—",
+    "enriched_value": "bseindia.com",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "DT_OF_SUS",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "Flag",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "Fld_AuthoriseDate",
+    "previous_value": "—",
+    "enriched_value": "2022-04-05T00:00:00",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "Fld_ReSubmit",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "Fld_ResubReason",
+    "previous_value": "—",
+    "enriched_value": " ",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "InputId",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "PDFDownload",
+    "previous_value": "—",
+    "enriched_value": "https://www.bseindia.com/bseplus/AnnualReport/500002/72961500002.pdf",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "Priorityflag",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "REV_DT",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "RN",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "Scripcode",
+    "previous_value": "—",
+    "enriched_value": "500002",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "StatusForDelisted",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "StatusForSuS",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "Year",
+    "previous_value": "—",
+    "enriched_value": "2021",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "clientid",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "isSpecial",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "revised_date_time",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "scrip_name",
+    "previous_value": "—",
+    "enriched_value": "ABB Ltd.",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "status",
+    "previous_value": "—",
+    "enriched_value": "New",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "target_input_code",
+    "previous_value": "—",
+    "enriched_value": "ABB",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "target_input_company_name",
+    "previous_value": "—",
+    "enriched_value": "ABB India Ltd",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "target_product_url",
+    "previous_value": "—",
+    "enriched_value": "https://www.bseindia.com/corporates/HistoricalAnnualReport.aspx",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "target_site_domain",
+    "previous_value": "—",
+    "enriched_value": "bseindia.com",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "DT_OF_SUS",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "Flag",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "Fld_AuthoriseDate",
+    "previous_value": "—",
+    "enriched_value": "2021-03-29T00:00:00",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "Fld_ReSubmit",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "Fld_ResubReason",
+    "previous_value": "—",
+    "enriched_value": " ",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "InputId",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "PDFDownload",
+    "previous_value": "—",
+    "enriched_value": "https://www.bseindia.com/bseplus/AnnualReport/500002/68385500002.pdf",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "Priorityflag",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "REV_DT",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "RN",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "Scripcode",
+    "previous_value": "—",
+    "enriched_value": "500002",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "StatusForDelisted",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "StatusForSuS",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "Year",
+    "previous_value": "—",
+    "enriched_value": "2020",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "clientid",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "isSpecial",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "revised_date_time",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "scrip_name",
+    "previous_value": "—",
+    "enriched_value": "ABB Ltd.",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "status",
+    "previous_value": "—",
+    "enriched_value": "New",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "target_input_code",
+    "previous_value": "—",
+    "enriched_value": "ABB",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "target_input_company_name",
+    "previous_value": "—",
+    "enriched_value": "ABB India Ltd",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "target_product_url",
+    "previous_value": "—",
+    "enriched_value": "https://www.bseindia.com/corporates/HistoricalAnnualReport.aspx",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "target_site_domain",
+    "previous_value": "—",
+    "enriched_value": "bseindia.com",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "DT_OF_SUS",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "Flag",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "Fld_AuthoriseDate",
+    "previous_value": "—",
+    "enriched_value": "2020-06-28T00:00:00",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "Fld_ReSubmit",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "Fld_ResubReason",
+    "previous_value": "—",
+    "enriched_value": " ",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "InputId",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "PDFDownload",
+    "previous_value": "—",
+    "enriched_value": "https://www.bseindia.com/bseplus/AnnualReport/500002/5000021219.pdf",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "Priorityflag",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "REV_DT",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "RN",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "Scripcode",
+    "previous_value": "—",
+    "enriched_value": "500002",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "StatusForDelisted",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "StatusForSuS",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "Year",
+    "previous_value": "—",
+    "enriched_value": "2019",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "clientid",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "isSpecial",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "revised_date_time",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "scrip_name",
+    "previous_value": "—",
+    "enriched_value": "ABB Ltd.",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "status",
+    "previous_value": "—",
+    "enriched_value": "New",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "target_input_code",
+    "previous_value": "—",
+    "enriched_value": "ABB",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "target_input_company_name",
+    "previous_value": "—",
+    "enriched_value": "ABB India Ltd",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "target_product_url",
+    "previous_value": "—",
+    "enriched_value": "https://www.bseindia.com/corporates/HistoricalAnnualReport.aspx",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "target_site_domain",
+    "previous_value": "—",
+    "enriched_value": "bseindia.com",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "DT_OF_SUS",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "Flag",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "Fld_AuthoriseDate",
+    "previous_value": "—",
+    "enriched_value": "2019-05-09T00:00:00",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "Fld_ReSubmit",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "Fld_ResubReason",
+    "previous_value": "—",
+    "enriched_value": " ",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "InputId",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "PDFDownload",
+    "previous_value": "—",
+    "enriched_value": "https://www.bseindia.com/bseplus/AnnualReport/500002/5000021218.pdf",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "Priorityflag",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "REV_DT",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "RN",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "Scripcode",
+    "previous_value": "—",
+    "enriched_value": "500002",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "StatusForDelisted",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "StatusForSuS",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "Year",
+    "previous_value": "—",
+    "enriched_value": "2018",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "clientid",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "isSpecial",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "revised_date_time",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "scrip_name",
+    "previous_value": "—",
+    "enriched_value": "ABB Ltd.",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "status",
+    "previous_value": "—",
+    "enriched_value": "New",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "target_input_code",
+    "previous_value": "—",
+    "enriched_value": "ABB",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "target_input_company_name",
+    "previous_value": "—",
+    "enriched_value": "ABB India Ltd",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "target_product_url",
+    "previous_value": "—",
+    "enriched_value": "https://www.bseindia.com/corporates/HistoricalAnnualReport.aspx",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "target_site_domain",
+    "previous_value": "—",
+    "enriched_value": "bseindia.com",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "DT_OF_SUS",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "Flag",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "Fld_AuthoriseDate",
+    "previous_value": "—",
+    "enriched_value": "2018-05-10T00:00:00",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "Fld_ReSubmit",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "Fld_ResubReason",
+    "previous_value": "—",
+    "enriched_value": " ",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "InputId",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "PDFDownload",
+    "previous_value": "—",
+    "enriched_value": "https://www.bseindia.com/bseplus/AnnualReport/500002/5000021217.pdf",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "Priorityflag",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "REV_DT",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "RN",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "Scripcode",
+    "previous_value": "—",
+    "enriched_value": "500002",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "StatusForDelisted",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "StatusForSuS",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "Year",
+    "previous_value": "—",
+    "enriched_value": "2017",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "clientid",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "isSpecial",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "revised_date_time",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "scrip_name",
+    "previous_value": "—",
+    "enriched_value": "ABB Ltd.",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "status",
+    "previous_value": "—",
+    "enriched_value": "New",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "target_input_code",
+    "previous_value": "—",
+    "enriched_value": "ABB",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "target_input_company_name",
+    "previous_value": "—",
+    "enriched_value": "ABB India Ltd",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "target_product_url",
+    "previous_value": "—",
+    "enriched_value": "https://www.bseindia.com/corporates/HistoricalAnnualReport.aspx",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "target_site_domain",
+    "previous_value": "—",
+    "enriched_value": "bseindia.com",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "DT_OF_SUS",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "Flag",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "Fld_AuthoriseDate",
+    "previous_value": "—",
+    "enriched_value": "2017-05-10T00:00:00",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "Fld_ReSubmit",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "Fld_ResubReason",
+    "previous_value": "—",
+    "enriched_value": " ",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "InputId",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "PDFDownload",
+    "previous_value": "—",
+    "enriched_value": "https://www.bseindia.com/bseplus/AnnualReport/500002/5000021216.pdf",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "Priorityflag",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "REV_DT",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "RN",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "Scripcode",
+    "previous_value": "—",
+    "enriched_value": "500002",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "StatusForDelisted",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "StatusForSuS",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "Year",
+    "previous_value": "—",
+    "enriched_value": "2016",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "clientid",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "isSpecial",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "revised_date_time",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "scrip_name",
+    "previous_value": "—",
+    "enriched_value": "ABB Ltd.",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "status",
+    "previous_value": "—",
+    "enriched_value": "New",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "target_input_code",
+    "previous_value": "—",
+    "enriched_value": "ABB",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "target_input_company_name",
+    "previous_value": "—",
+    "enriched_value": "ABB India Ltd",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "target_product_url",
+    "previous_value": "—",
+    "enriched_value": "https://www.bseindia.com/corporates/HistoricalAnnualReport.aspx",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "target_site_domain",
+    "previous_value": "—",
+    "enriched_value": "bseindia.com",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "DT_OF_SUS",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "Flag",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "Fld_AuthoriseDate",
+    "previous_value": "—",
+    "enriched_value": "2016-03-29T00:00:00",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "Fld_ReSubmit",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "Fld_ResubReason",
+    "previous_value": "—",
+    "enriched_value": " ",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "InputId",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "PDFDownload",
+    "previous_value": "—",
+    "enriched_value": "https://www.bseindia.com/bseplus/AnnualReport/500002/5000021215.pdf",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "Priorityflag",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "REV_DT",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "RN",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "Scripcode",
+    "previous_value": "—",
+    "enriched_value": "500002",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "StatusForDelisted",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "StatusForSuS",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "Year",
+    "previous_value": "—",
+    "enriched_value": "2015",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "clientid",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "isSpecial",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "revised_date_time",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "scrip_name",
+    "previous_value": "—",
+    "enriched_value": "ABB Ltd.",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "status",
+    "previous_value": "—",
+    "enriched_value": "New",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "target_input_code",
+    "previous_value": "—",
+    "enriched_value": "ABB",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "target_input_company_name",
+    "previous_value": "—",
+    "enriched_value": "ABB India Ltd",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "target_product_url",
+    "previous_value": "—",
+    "enriched_value": "https://www.bseindia.com/corporates/HistoricalAnnualReport.aspx",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "target_site_domain",
+    "previous_value": "—",
+    "enriched_value": "bseindia.com",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "DT_OF_SUS",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "Flag",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "Fld_AuthoriseDate",
+    "previous_value": "—",
+    "enriched_value": "2015-04-08T00:00:00",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "Fld_ReSubmit",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "Fld_ResubReason",
+    "previous_value": "—",
+    "enriched_value": " ",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "InputId",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "PDFDownload",
+    "previous_value": "—",
+    "enriched_value": "https://www.bseindia.com/bseplus/AnnualReport/500002/5000021214.pdf",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "Priorityflag",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "REV_DT",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "RN",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "Scripcode",
+    "previous_value": "—",
+    "enriched_value": "500002",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "StatusForDelisted",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "StatusForSuS",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "Year",
+    "previous_value": "—",
+    "enriched_value": "2014",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "clientid",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "isSpecial",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "revised_date_time",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "scrip_name",
+    "previous_value": "—",
+    "enriched_value": "ABB Ltd.",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "status",
+    "previous_value": "—",
+    "enriched_value": "New",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "target_input_code",
+    "previous_value": "—",
+    "enriched_value": "ABB",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "target_input_company_name",
+    "previous_value": "—",
+    "enriched_value": "ABB India Ltd",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "target_product_url",
+    "previous_value": "—",
+    "enriched_value": "https://www.bseindia.com/corporates/HistoricalAnnualReport.aspx",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "target_site_domain",
+    "previous_value": "—",
+    "enriched_value": "bseindia.com",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "DT_OF_SUS",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "Flag",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "Fld_AuthoriseDate",
+    "previous_value": "—",
+    "enriched_value": "2014-04-02T00:00:00",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "Fld_ReSubmit",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "Fld_ResubReason",
+    "previous_value": "—",
+    "enriched_value": " ",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "InputId",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "PDFDownload",
+    "previous_value": "—",
+    "enriched_value": "https://www.bseindia.com/bseplus/AnnualReport/500002/5000021213.pdf",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "Priorityflag",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "REV_DT",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "RN",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "Scripcode",
+    "previous_value": "—",
+    "enriched_value": "500002",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "StatusForDelisted",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "StatusForSuS",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "Year",
+    "previous_value": "—",
+    "enriched_value": "2013",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "clientid",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "isSpecial",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "revised_date_time",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "scrip_name",
+    "previous_value": "—",
+    "enriched_value": "ABB Ltd.",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "status",
+    "previous_value": "—",
+    "enriched_value": "New",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "target_input_code",
+    "previous_value": "—",
+    "enriched_value": "ABB",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "target_input_company_name",
+    "previous_value": "—",
+    "enriched_value": "ABB India Ltd",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "target_product_url",
+    "previous_value": "—",
+    "enriched_value": "https://www.bseindia.com/corporates/HistoricalAnnualReport.aspx",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "target_site_domain",
+    "previous_value": "—",
+    "enriched_value": "bseindia.com",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "DT_OF_SUS",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "Flag",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "Fld_AuthoriseDate",
+    "previous_value": "—",
+    "enriched_value": "2013-05-15T00:00:00",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "Fld_ReSubmit",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "Fld_ResubReason",
+    "previous_value": "—",
+    "enriched_value": " ",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "InputId",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "PDFDownload",
+    "previous_value": "—",
+    "enriched_value": "https://www.bseindia.com/bseplus/AnnualReport/500002/5000021212.pdf",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "Priorityflag",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "REV_DT",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "RN",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "Scripcode",
+    "previous_value": "—",
+    "enriched_value": "500002",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "StatusForDelisted",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "StatusForSuS",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "Year",
+    "previous_value": "—",
+    "enriched_value": "2012",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "clientid",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "isSpecial",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "revised_date_time",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "scrip_name",
+    "previous_value": "—",
+    "enriched_value": "ABB Ltd.",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "status",
+    "previous_value": "—",
+    "enriched_value": "New",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "target_input_code",
+    "previous_value": "—",
+    "enriched_value": "ABB",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "target_input_company_name",
+    "previous_value": "—",
+    "enriched_value": "ABB India Ltd",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "target_product_url",
+    "previous_value": "—",
+    "enriched_value": "https://www.bseindia.com/corporates/HistoricalAnnualReport.aspx",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "target_site_domain",
+    "previous_value": "—",
+    "enriched_value": "bseindia.com",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "DT_OF_SUS",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "Flag",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "Fld_AuthoriseDate",
+    "previous_value": "—",
+    "enriched_value": "2012-04-17T00:00:00",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "Fld_ReSubmit",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "Fld_ResubReason",
+    "previous_value": "—",
+    "enriched_value": " ",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "InputId",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "PDFDownload",
+    "previous_value": "—",
+    "enriched_value": "https://www.bseindia.com/bseplus/AnnualReport/500002/5000021211.pdf",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "Priorityflag",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "REV_DT",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "RN",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "Scripcode",
+    "previous_value": "—",
+    "enriched_value": "500002",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "StatusForDelisted",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "StatusForSuS",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "Year",
+    "previous_value": "—",
+    "enriched_value": "2011",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "clientid",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "isSpecial",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "revised_date_time",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "scrip_name",
+    "previous_value": "—",
+    "enriched_value": "ABB Ltd.",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "status",
+    "previous_value": "—",
+    "enriched_value": "New",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "target_input_code",
+    "previous_value": "—",
+    "enriched_value": "ABB",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "target_input_company_name",
+    "previous_value": "—",
+    "enriched_value": "ABB India Ltd",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "target_product_url",
+    "previous_value": "—",
+    "enriched_value": "https://www.bseindia.com/corporates/HistoricalAnnualReport.aspx",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "target_site_domain",
+    "previous_value": "—",
+    "enriched_value": "bseindia.com",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "DT_OF_SUS",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "Flag",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "Fld_AuthoriseDate",
+    "previous_value": "—",
+    "enriched_value": "2011-10-03T00:00:00",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "Fld_ReSubmit",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "Fld_ResubReason",
+    "previous_value": "—",
+    "enriched_value": " ",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "InputId",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "PDFDownload",
+    "previous_value": "—",
+    "enriched_value": "https://www.bseindia.com/bseplus/AnnualReport/500002/5000021210.pdf",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "Priorityflag",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "REV_DT",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "RN",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "Scripcode",
+    "previous_value": "—",
+    "enriched_value": "500002",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "StatusForDelisted",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "StatusForSuS",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "Year",
+    "previous_value": "—",
+    "enriched_value": "2010",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "clientid",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "isSpecial",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "revised_date_time",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "scrip_name",
+    "previous_value": "—",
+    "enriched_value": "ABB Ltd.",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "status",
+    "previous_value": "—",
+    "enriched_value": "New",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "target_input_code",
+    "previous_value": "—",
+    "enriched_value": "ABB",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "target_input_company_name",
+    "previous_value": "—",
+    "enriched_value": "ABB India Ltd",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "target_product_url",
+    "previous_value": "—",
+    "enriched_value": "https://www.bseindia.com/corporates/HistoricalAnnualReport.aspx",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "target_site_domain",
+    "previous_value": "—",
+    "enriched_value": "bseindia.com",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "DT_OF_SUS",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "Flag",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "Fld_AuthoriseDate",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "Fld_ReSubmit",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "Fld_ResubReason",
+    "previous_value": "—",
+    "enriched_value": " ",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "InputId",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "PDFDownload",
+    "previous_value": "—",
+    "enriched_value": "https://www.bseindia.com/HIS_ANN_RPT/HISTANNR/2009/ABB_INDIA_LTD-500002-DECEMBER-2009.PDF",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "Priorityflag",
+    "previous_value": "—",
+    "enriched_value": "2",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "REV_DT",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "RN",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "Scripcode",
+    "previous_value": "—",
+    "enriched_value": "500002",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "StatusForDelisted",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "StatusForSuS",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "Year",
+    "previous_value": "—",
+    "enriched_value": "2009",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "clientid",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "isSpecial",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "revised_date_time",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "scrip_name",
+    "previous_value": "—",
+    "enriched_value": "ABB Ltd.",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "status",
+    "previous_value": "—",
+    "enriched_value": "New",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "target_input_code",
+    "previous_value": "—",
+    "enriched_value": "ABB",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "target_input_company_name",
+    "previous_value": "—",
+    "enriched_value": "ABB India Ltd",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "target_product_url",
+    "previous_value": "—",
+    "enriched_value": "https://www.bseindia.com/corporates/HistoricalAnnualReport.aspx",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "target_site_domain",
+    "previous_value": "—",
+    "enriched_value": "bseindia.com",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "DT_OF_SUS",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "Flag",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "Fld_AuthoriseDate",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "Fld_ReSubmit",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "Fld_ResubReason",
+    "previous_value": "—",
+    "enriched_value": " ",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "InputId",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "PDFDownload",
+    "previous_value": "—",
+    "enriched_value": "https://www.bseindia.com/HIS_ANN_RPT/HISTANNR/2008/ABB_INDIA_LTD-500002-DECEMBER-2008.PDF",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "Priorityflag",
+    "previous_value": "—",
+    "enriched_value": "2",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "REV_DT",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "RN",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "Scripcode",
+    "previous_value": "—",
+    "enriched_value": "500002",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "StatusForDelisted",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "StatusForSuS",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "Year",
+    "previous_value": "—",
+    "enriched_value": "2008",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "clientid",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "isSpecial",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "revised_date_time",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "scrip_name",
+    "previous_value": "—",
+    "enriched_value": "ABB Ltd.",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "status",
+    "previous_value": "—",
+    "enriched_value": "New",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "target_input_code",
+    "previous_value": "—",
+    "enriched_value": "ABB",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "target_input_company_name",
+    "previous_value": "—",
+    "enriched_value": "ABB India Ltd",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "target_product_url",
+    "previous_value": "—",
+    "enriched_value": "https://www.bseindia.com/corporates/HistoricalAnnualReport.aspx",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "target_site_domain",
+    "previous_value": "—",
+    "enriched_value": "bseindia.com",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "DT_OF_SUS",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "Flag",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "Fld_AuthoriseDate",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "Fld_ReSubmit",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "Fld_ResubReason",
+    "previous_value": "—",
+    "enriched_value": " ",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "InputId",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "PDFDownload",
+    "previous_value": "—",
+    "enriched_value": "https://www.bseindia.com/HIS_ANN_RPT/HISTANNR/2007/ABB_INDIA_LTD-500002-DECEMBER-2007.PDF",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "Priorityflag",
+    "previous_value": "—",
+    "enriched_value": "2",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "REV_DT",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "RN",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "Scripcode",
+    "previous_value": "—",
+    "enriched_value": "500002",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "StatusForDelisted",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "StatusForSuS",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "Year",
+    "previous_value": "—",
+    "enriched_value": "2007",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "clientid",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "isSpecial",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "revised_date_time",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "scrip_name",
+    "previous_value": "—",
+    "enriched_value": "ABB Ltd.",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "status",
+    "previous_value": "—",
+    "enriched_value": "New",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "target_input_code",
+    "previous_value": "—",
+    "enriched_value": "ABB",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "target_input_company_name",
+    "previous_value": "—",
+    "enriched_value": "ABB India Ltd",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "target_product_url",
+    "previous_value": "—",
+    "enriched_value": "https://www.bseindia.com/corporates/HistoricalAnnualReport.aspx",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "target_site_domain",
+    "previous_value": "—",
+    "enriched_value": "bseindia.com",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "DT_OF_SUS",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "Flag",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "Fld_AuthoriseDate",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "Fld_ReSubmit",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "Fld_ResubReason",
+    "previous_value": "—",
+    "enriched_value": " ",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "InputId",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "PDFDownload",
+    "previous_value": "—",
+    "enriched_value": "https://www.bseindia.com/HIS_ANN_RPT/HISTANNR/2006/ABB_INDIA_LTD-500002-DECEMBER-2006.PDF",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "Priorityflag",
+    "previous_value": "—",
+    "enriched_value": "2",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "REV_DT",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "RN",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "Scripcode",
+    "previous_value": "—",
+    "enriched_value": "500002",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "StatusForDelisted",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "StatusForSuS",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "Year",
+    "previous_value": "—",
+    "enriched_value": "2006",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "clientid",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "isSpecial",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "revised_date_time",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "scrip_name",
+    "previous_value": "—",
+    "enriched_value": "ABB Ltd.",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "status",
+    "previous_value": "—",
+    "enriched_value": "New",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "target_input_code",
+    "previous_value": "—",
+    "enriched_value": "ABB",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "target_input_company_name",
+    "previous_value": "—",
+    "enriched_value": "ABB India Ltd",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "target_product_url",
+    "previous_value": "—",
+    "enriched_value": "https://www.bseindia.com/corporates/HistoricalAnnualReport.aspx",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "target_site_domain",
+    "previous_value": "—",
+    "enriched_value": "bseindia.com",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "DT_OF_SUS",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "Flag",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "Fld_AuthoriseDate",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "Fld_ReSubmit",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "Fld_ResubReason",
+    "previous_value": "—",
+    "enriched_value": " ",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "InputId",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "PDFDownload",
+    "previous_value": "—",
+    "enriched_value": "https://www.bseindia.com/HIS_ANN_RPT/HISTANNR/2005/ABB_INDIA_LTD-500002-DECEMBER-2005.PDF",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "Priorityflag",
+    "previous_value": "—",
+    "enriched_value": "2",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "REV_DT",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "RN",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "Scripcode",
+    "previous_value": "—",
+    "enriched_value": "500002",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "StatusForDelisted",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "StatusForSuS",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "Year",
+    "previous_value": "—",
+    "enriched_value": "2005",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "clientid",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "isSpecial",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "revised_date_time",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "scrip_name",
+    "previous_value": "—",
+    "enriched_value": "ABB Ltd.",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "status",
+    "previous_value": "—",
+    "enriched_value": "New",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "target_input_code",
+    "previous_value": "—",
+    "enriched_value": "ABB",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "target_input_company_name",
+    "previous_value": "—",
+    "enriched_value": "ABB India Ltd",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "target_product_url",
+    "previous_value": "—",
+    "enriched_value": "https://www.bseindia.com/corporates/HistoricalAnnualReport.aspx",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "target_site_domain",
+    "previous_value": "—",
+    "enriched_value": "bseindia.com",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "DT_OF_SUS",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "Flag",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "Fld_AuthoriseDate",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "Fld_ReSubmit",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "Fld_ResubReason",
+    "previous_value": "—",
+    "enriched_value": " ",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "InputId",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "PDFDownload",
+    "previous_value": "—",
+    "enriched_value": "https://www.bseindia.com/HIS_ANN_RPT/HISTANNR/2004/ABB_INDIA_LTD-500002-DECEMBER-2004.PDF",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "Priorityflag",
+    "previous_value": "—",
+    "enriched_value": "2",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "REV_DT",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "RN",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "Scripcode",
+    "previous_value": "—",
+    "enriched_value": "500002",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "StatusForDelisted",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "StatusForSuS",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "Year",
+    "previous_value": "—",
+    "enriched_value": "2004",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "clientid",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "isSpecial",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "revised_date_time",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "scrip_name",
+    "previous_value": "—",
+    "enriched_value": "ABB Ltd.",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "status",
+    "previous_value": "—",
+    "enriched_value": "New",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "target_input_code",
+    "previous_value": "—",
+    "enriched_value": "ABB",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "target_input_company_name",
+    "previous_value": "—",
+    "enriched_value": "ABB India Ltd",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "target_product_url",
+    "previous_value": "—",
+    "enriched_value": "https://www.bseindia.com/corporates/HistoricalAnnualReport.aspx",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "target_site_domain",
+    "previous_value": "—",
+    "enriched_value": "bseindia.com",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "DT_OF_SUS",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "Flag",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "Fld_AuthoriseDate",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "Fld_ReSubmit",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "Fld_ResubReason",
+    "previous_value": "—",
+    "enriched_value": " ",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "InputId",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "PDFDownload",
+    "previous_value": "—",
+    "enriched_value": "https://www.bseindia.com/HIS_ANN_RPT/HISTANNR/2003/ABB_INDIA_LTD-500002-DECEMBER-2003.PDF",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "Priorityflag",
+    "previous_value": "—",
+    "enriched_value": "2",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "REV_DT",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "RN",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "Scripcode",
+    "previous_value": "—",
+    "enriched_value": "500002",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "StatusForDelisted",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "StatusForSuS",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "Year",
+    "previous_value": "—",
+    "enriched_value": "2003",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "clientid",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "isSpecial",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "revised_date_time",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "scrip_name",
+    "previous_value": "—",
+    "enriched_value": "ABB Ltd.",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "status",
+    "previous_value": "—",
+    "enriched_value": "New",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "target_input_code",
+    "previous_value": "—",
+    "enriched_value": "ABB",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "target_input_company_name",
+    "previous_value": "—",
+    "enriched_value": "ABB India Ltd",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "target_product_url",
+    "previous_value": "—",
+    "enriched_value": "https://www.bseindia.com/corporates/HistoricalAnnualReport.aspx",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "target_site_domain",
+    "previous_value": "—",
+    "enriched_value": "bseindia.com",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "DT_OF_SUS",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "Flag",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "Fld_AuthoriseDate",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "Fld_ReSubmit",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "Fld_ResubReason",
+    "previous_value": "—",
+    "enriched_value": " ",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "InputId",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "PDFDownload",
+    "previous_value": "—",
+    "enriched_value": "https://www.bseindia.com/HIS_ANN_RPT/HISTANNR/2002/ABB_INDIA_LTD-500002-DECEMBER-2002.PDF",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "Priorityflag",
+    "previous_value": "—",
+    "enriched_value": "2",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "REV_DT",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "RN",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "Scripcode",
+    "previous_value": "—",
+    "enriched_value": "500002",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "StatusForDelisted",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "StatusForSuS",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "Year",
+    "previous_value": "—",
+    "enriched_value": "2002",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "clientid",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "isSpecial",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "revised_date_time",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "scrip_name",
+    "previous_value": "—",
+    "enriched_value": "ABB Ltd.",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "status",
+    "previous_value": "—",
+    "enriched_value": "New",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "target_input_code",
+    "previous_value": "—",
+    "enriched_value": "ABB",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "target_input_company_name",
+    "previous_value": "—",
+    "enriched_value": "ABB India Ltd",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "target_product_url",
+    "previous_value": "—",
+    "enriched_value": "https://www.bseindia.com/corporates/HistoricalAnnualReport.aspx",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "target_site_domain",
+    "previous_value": "—",
+    "enriched_value": "bseindia.com",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "DT_OF_SUS",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "Flag",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "Fld_AuthoriseDate",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "Fld_ReSubmit",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "Fld_ResubReason",
+    "previous_value": "—",
+    "enriched_value": " ",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "InputId",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "PDFDownload",
+    "previous_value": "—",
+    "enriched_value": "https://www.bseindia.com/HIS_ANN_RPT/HISTANNR/2001/ABB_INDIA_LTD-500002-DECEMBER-2001.PDF",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "Priorityflag",
+    "previous_value": "—",
+    "enriched_value": "2",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "REV_DT",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "RN",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "Scripcode",
+    "previous_value": "—",
+    "enriched_value": "500002",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "StatusForDelisted",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "StatusForSuS",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "Year",
+    "previous_value": "—",
+    "enriched_value": "2001",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "clientid",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "isSpecial",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "revised_date_time",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "scrip_name",
+    "previous_value": "—",
+    "enriched_value": "ABB Ltd.",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "status",
+    "previous_value": "—",
+    "enriched_value": "New",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "target_input_code",
+    "previous_value": "—",
+    "enriched_value": "ABB",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "target_input_company_name",
+    "previous_value": "—",
+    "enriched_value": "ABB India Ltd",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "target_product_url",
+    "previous_value": "—",
+    "enriched_value": "https://www.bseindia.com/corporates/HistoricalAnnualReport.aspx",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "target_site_domain",
+    "previous_value": "—",
+    "enriched_value": "bseindia.com",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "DT_OF_SUS",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "Flag",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "Fld_AuthoriseDate",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "Fld_ReSubmit",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "Fld_ResubReason",
+    "previous_value": "—",
+    "enriched_value": " ",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "InputId",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "PDFDownload",
+    "previous_value": "—",
+    "enriched_value": "https://www.bseindia.com/HIS_ANN_RPT/HISTANNR/2000/ABB_INDIA_LTD-500002-DECEMBER-2000.PDF",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "Priorityflag",
+    "previous_value": "—",
+    "enriched_value": "2",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "REV_DT",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "RN",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "Scripcode",
+    "previous_value": "—",
+    "enriched_value": "500002",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "StatusForDelisted",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "StatusForSuS",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "Year",
+    "previous_value": "—",
+    "enriched_value": "2000",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "clientid",
+    "previous_value": "—",
+    "enriched_value": "1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "isSpecial",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "revised_date_time",
+    "previous_value": "—",
+    "enriched_value": "",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "scrip_name",
+    "previous_value": "—",
+    "enriched_value": "ABB Ltd.",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "status",
+    "previous_value": "—",
+    "enriched_value": "New",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "target_input_code",
+    "previous_value": "—",
+    "enriched_value": "ABB",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "target_input_company_name",
+    "previous_value": "—",
+    "enriched_value": "ABB India Ltd",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "target_product_url",
+    "previous_value": "—",
+    "enriched_value": "https://www.bseindia.com/corporates/HistoricalAnnualReport.aspx",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "target_site_domain",
+    "previous_value": "—",
+    "enriched_value": "bseindia.com",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  }
+]

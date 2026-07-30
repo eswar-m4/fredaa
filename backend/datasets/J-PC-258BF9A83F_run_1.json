@@ -1,0 +1,29 @@
+[
+  {
+    "full_name": "Jane Park",
+    "title": "VP Engineering",
+    "email": "jane@acme.com",
+    "linkedin_url": "https://www.linkedin.com/in/janepark",
+    "company_name": "Acme Inc",
+    "company_domain": "acme.com",
+    "source_url": null,
+    "confidence": 0.93,
+    "provider_used": "ollama-qwen",
+    "source_company": "Acme Inc",
+    "source_website": "https://acme.com",
+    "source_rank": 0,
+    "candidate_index": 0,
+    "evidence_urls": [
+      "https://acme.com",
+      "https://acme.com/team",
+      "https://acme.com/team",
+      "https://acme.com/team",
+      "https://acme.com/team"
+    ],
+    "provenance": {
+      "company_name": "scraper",
+      "company_domain": "input",
+      "contacts": "ollama-qwen"
+    }
+  }
+]

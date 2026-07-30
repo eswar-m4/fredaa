@@ -1,0 +1,1 @@
+{"bot_name": "Approval Gate Bot", "source": "https://approval-gated-example.com", "scope": "Full Dump", "runtime_type": "python", "entrypoint_file": "bot.py", "entrypoint_function": "run"}

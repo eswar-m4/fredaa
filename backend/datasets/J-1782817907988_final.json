@@ -1,0 +1,20 @@
+[
+  {
+    "detected_company_name": "Wayfair",
+    "detected_keywords": [
+      "crawled",
+      "verified"
+    ],
+    "emails": [
+      "info@example.com"
+    ],
+    "meta_description": "Onboarded and crawled successfully",
+    "page_text": "Sample visible page text parsed from company website",
+    "phone_numbers": [
+      "+1 555-0199"
+    ],
+    "social_links": [],
+    "title": "Sample Crawled Title for Wayfair",
+    "url": "Wayfair"
+  }
+]

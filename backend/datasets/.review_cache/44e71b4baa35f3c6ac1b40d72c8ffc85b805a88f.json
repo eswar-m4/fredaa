@@ -1,0 +1,100 @@
+{
+  "signature": "44e71b4baa35f3c6ac1b40d72c8ffc85b805a88f",
+  "payload": {
+    "rows": [
+      {
+        "id": "TB-005-Address",
+        "record": "Record 5",
+        "attribute": "Address",
+        "attributeKey": "Address",
+        "recordIndex": 0,
+        "previous": "—",
+        "value": "Talatpasa Bulvari No: 3, Izmir",
+        "changeType": "A",
+        "changed": true,
+        "conf": 0.89,
+        "sourceUrl": "https://TurkeyBrokers",
+        "source": "turkeybrokers",
+        "recordKey": "TB-005"
+      },
+      {
+        "id": "TB-005-City",
+        "record": "Record 5",
+        "attribute": "City",
+        "attributeKey": "City",
+        "recordIndex": 0,
+        "previous": "—",
+        "value": "Izmir",
+        "changeType": "A",
+        "changed": true,
+        "conf": 0.8,
+        "sourceUrl": "https://TurkeyBrokers",
+        "source": "turkeybrokers",
+        "recordKey": "TB-005"
+      },
+      {
+        "id": "TB-005-PrimaryKey",
+        "record": "Record 5",
+        "attribute": "Primarykey",
+        "attributeKey": "PrimaryKey",
+        "recordIndex": 0,
+        "previous": "—",
+        "value": "TB-005",
+        "changeType": "A",
+        "changed": true,
+        "conf": 0.89,
+        "sourceUrl": "https://TurkeyBrokers",
+        "source": "turkeybrokers",
+        "recordKey": "TB-005"
+      },
+      {
+        "id": "TB-006-Address",
+        "record": "Record 6",
+        "attribute": "Address",
+        "attributeKey": "Address",
+        "recordIndex": 1,
+        "previous": "—",
+        "value": "Bagdat Caddesi No: 202, Istanbul",
+        "changeType": "A",
+        "changed": true,
+        "conf": 0.89,
+        "sourceUrl": "https://TurkeyBrokers",
+        "source": "turkeybrokers",
+        "recordKey": "TB-006"
+      },
+      {
+        "id": "TB-006-City",
+        "record": "Record 6",
+        "attribute": "City",
+        "attributeKey": "City",
+        "recordIndex": 1,
+        "previous": "—",
+        "value": "Istanbul",
+        "changeType": "A",
+        "changed": true,
+        "conf": 0.89,
+        "sourceUrl": "https://TurkeyBrokers",
+        "source": "turkeybrokers",
+        "recordKey": "TB-006"
+      },
+      {
+        "id": "TB-006-PrimaryKey",
+        "record": "Record 6",
+        "attribute": "Primarykey",
+        "attributeKey": "PrimaryKey",
+        "recordIndex": 1,
+        "previous": "—",
+        "value": "TB-006",
+        "changeType": "A",
+        "changed": true,
+        "conf": 0.89,
+        "sourceUrl": "https://TurkeyBrokers",
+        "source": "turkeybrokers",
+        "recordKey": "TB-006"
+      }
+    ],
+    "totalSampled": 15,
+    "sampledCount": 2,
+    "coverage": null
+  }
+}

@@ -1,0 +1,99 @@
+{
+	"operator_id"		:	"TSO29",
+	"hours_add_sub"		:	-5,
+	"script_run_status"	:	true,
+	"data_url"			:	{"GCV":"http://extranet.net4gas.cz/caloricity.aspx","Gasflow":"http://extranet.net4gas.cz/gas_flow.aspx","P2P":"http://extranet.net4gas.cz/nomination_p2p.aspx","EntryExit":"http://extranet.net4gas.cz/nomination_ee.aspx"},
+	"demand"					:
+	{
+		"output_move"	:	true,
+		"start_day"					:	-4,
+		"end_day"					:	5,
+		"cache_path"				:	"C:/Paris/Cache/Demand/<OPERATORID>/<DATE>/",
+		"output_path"			:	"C:/Paris/RawData/Demand/<OPERATORID>/",
+		"gcv"					:	{"value":"10.93317851001","unit":"Kwh/Sm3"},
+		"operator_points"		:	{"National Gas":["Total Demand","Internal demand","Forecast LDZ"]},
+		"point_mapping"			:	{"Domestic SPP Distribúcia":"Domestic SPP Distribúcia","Domestic Veolia":"Domestic Veolia"},
+		"header"		:	["DemandName","IPID","PeriodFrom","PeriodTo","PeriodType","GasHour","CapturedTime","Version","StateId","GasQuality","TotalInEnergy","TotalEnergyUOMId","TotalEnergyTemperature","TotalInVolume","TotalVolumeUOMId","TotalVolumeTemperature","TotalGCV","TotalGCVUOMId","Industrial-PowerInEnergy","Industrial-PowerEnergyUOMId","Industrial-PowerEnergyTemperature","Industrial-PowerInVolume","Industrial-PowerVolumeUOMId","Industrial-PowerVolumeTemperature","Industrial-PowerGCV","Industrial-PowerGCVUOMId","IndustrialInEnergy","IndustrialEnergyUOMId","IndustrialEnergyTemperature","IndustrialInVolume","IndustrialVolumeUOMId","IndustrialVolumeTemperature","IndustrialGCV","IndustrialGCVUOMId","PowerInEnergy","PowerEnergyUOMId","PowerEnergyTemperature","PowerInVolume","PowerVolumeUOMId","PowerVolumeTemperature","PowerGCV","PowerGCVUOMId","LocalDistributionCompaniesInEnergy","LocalDistributionCompaniesEnergyUOMId","LocalDistributionCompaniesEnergyTemperature","LocalDistributionCompaniesInVolume","LocalDistributionCompaniesVolumeUOMId","LocalDistributionCompaniesVolumeTemperature","LocalDistributionCompaniesGCV","LocalDistributionCompaniesGCVUOMId","LocalDistributionZonesInEnergy","LocalDistributionZonesEnergyUOMId","LocalDistributionZonesEnergyTemperature","LocalDistributionZonesInVolume","LocalDistributionZonesVolumeUOMId","LocalDistributionZonesVolumeTemperature","LocalDistributionZonesGCV","LocalDistributionZonesGCVUOMId","PublicDistributionCompaniesInEnergy","PublicDistributionCompaniesEnergyUOMId","PublicDistributionCompaniesEnergyTemperature","PublicDistributionCompaniesInVolume","PublicDistributionCompaniesVolumeUOMId","PublicDistributionCompaniesVolumeTemperature","PublicDistributionCompaniesGCV","PublicDistributionCompaniesGCVUOMId","PrivateDistributionCompaniesInEnergy","PrivateDistributionCompaniesEnergyUOMId","PrivateDistributionCompaniesEnergyTemperature","PrivateDistributionCompaniesInVolume","PrivateDistributionCompaniesVolumeUOMId","PrivateDistributionCompaniesVolumeTemperature","PrivateDistributionCompaniesGCV","PrivateDistributionCompaniesGCVUOMId","IndustrialLocalDistributionZonesInEnergy","IndustrialLocalDistributionZonesEnergyUOMId","IndustrialLocalDistributionZonesEnergyTemperature","IndustrialLocalDistributionZonesInVolume","IndustrialLocalDistributionZonesVolumeUOMId","IndustrialLocalDistributionZonesVolumeTemperature","IndustrialLocalDistributionZonesGCV","IndustrialLocalDistributionZonesGCVUOMId","DataStatus"],
+		"missing_data"				:	{"Loenhout":["2022-12-30"]},
+		"empty_provisional_data"	:	{"Loenhout":["2022-12-28"]},
+		"point_names"		:	{"agi":{"name":"AGIA TRIADA","gcv":"11.0","gcv_unit":"kWh/Nm3"},"Sidirokastro":{"name":"SIDIROKASTRO","gcv":"11.35","gcv_unit":"kWh/Nm3"},"Kipi":{"name":"KIPI","gcv":"11.15","gcv_unit":"kWh/Nm3"},"Nea Meresimvria":{"name":"NEA MESIMVRIA","gcv":"11.0","gcv_unit":"kWh/Nm3"},"SIDIROKASTRO ΕΧΙΤ":{"name":"SIDIROKASTRO ΕΧΙΤ"}}
+	},
+	"SSO"					:
+	{
+		"output_move"	:	true,
+		"start_day"					:	-8,
+		"end_day"					:	1,
+		"cache_path"				:	"C:/Paris/Cache/SSO/<OPERATORID>/<DATE>/",
+		"output_path"			:	"C:/Paris/RawData/SSO/<OPERATORID>/",
+		"gcv"					:	{"value":"10.93317851001","unit":"Kwh/Sm3"},
+		"operator_points"		:	{"National Gas":["Total Demand","Internal demand","Forecast LDZ"]},
+		"point_mapping"			:	{"Domestic SPP Distribúcia":"Domestic SPP Distribúcia","Domestic Veolia":"Domestic Veolia"},
+		"header"		:	["SSONAME","IPId","PeriodFrom","PeriodTo","PeriodType","GasHour","CapturedTime","Version","StateId","CapcityTotalInEnergy","CapcityTotalEnergyUOMId","CapcityTotalEnergyTemperature","CapcityTotalInVolume","CapcityTotalVolumeUOMId","CapcityTotalVolumeTemperature","CapcityTotalGCV","CapcityTotalGCVUOMId","CapcityTotalVersion","StrategicReserveInEnergy","StrategicReserveEnergyUOMId","StrategicReserveEnergyTemperature","StrategicReserveInVolume","StrategicReserveVolumeUOMId","StrategicReserveVolumeTemperature","StrategicReserveGCV","StrategicReserveGCVUOMId","StrategicReserveVersion","CapacityAvailableInEnergy","CapacityAvailableEnergyUOMId","CapacityAvailableEnergyTemperature","CapacityAvailableInVolume","CapacityAvailableVolumeUOMId","CapacityAvailableVolumeTemperature","CapacityAvailableGCV","CapacityAvailableGCVUOMId","CapacityAvailableVersion","InventoryTotalInEnergy","InventoryTotalEnergyUOMId","InventoryTotalEnergyTemperature","InventoryTotalInVolume","InventoryTotalVolumeUOMId","InventoryTotalVolumeTemperature","InventoryTotalGCV","InventoryTotalGCVUOMId","InventoryTotalVersion","InventoryAvailableInEnergy","InventoryAvailableEnergyUOMId","InventoryAvailableEnergyTemperature","InventoryAvailableInVolume","InventoryAvailableVolumeUOMId","InventoryAvailableVolumeTemperature","InventoryAvailableGCV","InventoryAvailableGCVUOMId","InventoryAvailableVersion","NetInEnergy","NetEnergyUOMId","NetEnergyTemperature","NetInVolume","NetVolumeUOMId","NetVolumeTemperature","NetGCV","NetGCVUOMId","NetVersion","InjectionInEnergy","InjectionEnergyUOMId","InjectionEnergyTemperature","InjectionInVolume","InjectionVolumeUOMId","InjectionVolumeTemperature","InjectionGCV","InjectionGCVUOMId","InjectionVersion","WithdrawalInEnergy","WithdrawalEnergyUOMId","WithdrawalEnergyTemperature","WithdrawalInVolume","WithdrawalVolumeUOMId","WithdrawalVolumeTemperature","WithdrawalGCV","WithdrawalGCVUOMId","WithdrawalVersion","Datastatus"],
+		"missing_data"				:	{"Loenhout":["2022-12-30"]},
+		"empty_provisional_data"	:	{"Loenhout":["2022-12-28"]},
+		"point_names"		:	{"agi":{"name":"AGIA TRIADA","gcv":"11.0","gcv_unit":"kWh/Nm3"},"Sidirokastro":{"name":"SIDIROKASTRO","gcv":"11.35","gcv_unit":"kWh/Nm3"},"Kipi":{"name":"KIPI","gcv":"11.15","gcv_unit":"kWh/Nm3"},"Nea Meresimvria":{"name":"NEA MESIMVRIA","gcv":"11.0","gcv_unit":"kWh/Nm3"},"SIDIROKASTRO ΕΧΙΤ":{"name":"SIDIROKASTRO ΕΧΙΤ"}}
+	},
+	"gas-flow"			:
+	{
+		"output_move"	:	true,
+		"home_url"		:	"https://tis.eustream.sk/en/online-data/flows/",
+		"start_day"					:	-3,
+		"end_day"					:	0,
+		"cache_path"				:	"C:/Paris/Cache/TSO/<OPERATORID>/<DATE>/",
+		"output_path"			:	"C:/Paris/RawData/TSO/<OPERATORID>/",
+		"gcv"					:	{"Aldbrough":"39.727","Bacton BBL Interconnector":"38.3","Bacton Interconnector":"39.23","Easington-Langeled":"40.02","Grain":"39.00","Hatfield Moor":"39.79","Hill Top Farm":"39.204","Hole House Farm":"39.38","Holford":"39.558","Hornsea":"39.747","Humbly Grove":"39.437","Milford Haven - Dragon":"39","Milford Haven - South Hook":"39.29","Moffat Interconnector":"39.42","Rough":"39.04","St Fergus-NSMP":"39.424","STFergus-Shell":"38.347","Stublach":"39.54","NTS Power Station":"39.54","LDZ Direct":"39.41","Non Daily Meters":"39.41","NTS Industrial":"39.33","Julianadorp (BBL)":"38.3","Industrial Demand flow":"11.0466278188282","Interconnector Export Demand flow":"10.8","LDZ offtake flow":"10.937122174749","Power Station Demand Flow":"10.9218856129672","Storage Demand flow":"10.96","Linepack":"11.123"},
+		"operator_points"		:	{"National Gas":["Humbly Grove","Hill Top Farm","STFergus-Shell","Bacton BBL Interconnector","Aldbrough","Stublach","St Fergus-NSMP","Milford Haven - South Hook","Hatfield Moor","Bacton Interconnector","Holford","Milford Haven - Dragon","Moffat Interconnector","Rough","Hole House Farm","Easington-Langeled","Hornsea","Grain"]},
+		"point_mapping"			:	{"Humbly Grove":"Humbly Grove Stor","Hill Top Farm":"Hilltop Farm Stor","STFergus-Shell":"ST Fergus - Shell","Bacton BBL Interconnector":"Bacton - BBL Int","Aldbrough":"Aldbrough Stor","Stublach":"Stublach Stor","St Fergus-NSMP":"ST Fergus - NSMP","Milford Haven - South Hook":"Milford Haven - South Hook LNG","Hatfield Moor":"Hatfield Moor Stor","Bacton Interconnector":"Bacton Int","Holford":"Holford Stor","Milford Haven - Dragon":"Milford Haven - Dragon LNG","Moffat Interconnector":"Moffat Int","Rough":"Rough Stor","Hole House Farm":"Hole House Farm Stor","Easington-Langeled":"Easington - Langeled","Hornsea":"Hornsea Stor","Grain":"Grain"},
+		"header"		:	["TSONAME","IPId","PeriodFrom","PeriodTo","PeriodType","GasHour","TSOType","CapturedTime","Version","StateId","EntryInEnergy","EntryEnergyUOMId","EntryEnergyTemperature","EntryInVolume","EntryVolumeUOMId","EntryVolumeTemperature","EntryGCV","EntryGCVUOMId","ExitInEnergy","ExitEnergyUOMId","ExitEnergyTemperature","ExitInVolume","ExitVolumeUOMId","ExitVolumeTemperature","ExitGCV","ExitGCVUOMId","NetInEnergy","NetEnergyUOMId","NetEnergyTemperature","NetInVolume","NetVolumeUOMId","NetVolumeTemperature","NetGCV","NetGCVUOMId","Datastatus"],
+		"missing_data"				:	{"Milford Haven - Dragon":["2023-10-01"]},
+		"empty_provisional_data"	:	{"Loenhout":["2022-12-28"]}
+	},
+	"nomination"					:
+	{
+		"output_move"	:	true,
+		"home_url"		:	"https://data.nationalgas.com/reports/find-gas-reports/view",
+		"start_day"					:	-3,
+		"end_day"					:	0,
+		"cache_path"				:	"C:/Paris/Cache/Nomination/<OPERATORID>/<DATE>/",
+		"output_path"			:	"C:/Paris/RawData/TSO/<OPERATORID>/",
+		"gcv"					:	{"Aldbrough":"39.727","Bacton BBL Interconnector":"38.3","Bacton Interconnector":"39.23","Easington-Langeled":"40.02","Grain":"39.00","Hatfield Moor":"39.79","Hill Top Farm":"39.204","Hole House Farm":"39.38","Holford":"39.558","Hornsea":"39.747","Humbly Grove":"39.437","Milford Haven - Dragon":"39","Milford Haven - South Hook":"39.29","Moffat Interconnector":"39.42","Rough":"39.04","St Fergus-NSMP":"39.424","STFergus-Shell":"38.347","Stublach":"39.54","NTS Power Station":"39.54","LDZ Direct":"39.41","Non Daily Meters":"39.41","NTS Industrial":"39.33","Julianadorp (BBL)":"38.3","Industrial Demand flow":"11.0466278188282","Interconnector Export Demand flow":"10.8","LDZ offtake flow":"10.937122174749","Power Station Demand Flow":"10.9218856129672","Storage Demand flow":"10.96","Linepack":"11.123","LDZ Direct-NDM":"39.41"},
+		"operator_points"		:	{"National Gas":["Humbly Grove","Hill Top Farm","STFergus-Shell","Bacton BBL Interconnector","Aldbrough","Stublach","St Fergus-NSMP","Milford Haven - South Hook","Hatfield Moor","Bacton Interconnector","Holford","Milford Haven - Dragon","Moffat Interconnector","Rough","Hole House Farm","Easington-Langeled","Hornsea","Grain"]},
+		"point_mapping"			:	{"Hill Top Farm":{"entry":"Hilltop Farm Stor Storage Entry","exit":"Hilltop Farm Stor Storage Exit"},"Hatfield Moor":{"entry":"Hatfield Moor Stor Storage Entry","exit":"Hatfield Moor Stor Storage Exit"},"STFergus-Shell":{"entry":"ST Fergus - Shell Sub Terminal","exit":""},"Bacton BBL Interconnector":{"entry":"Bacton - BBL Int Entry Interconnector Entry","exit":"Bacton - BBL Int Exit Interconnector Exit"},"Aldbrough":{"entry":"Aldbrough Stor Storage Entry","exit":"Aldbrough Stor Storage Exit"},"Stublach":{"entry":"Stublach Stor Storage Entry","exit":"Stublach Stor Storage Exit"},"St Fergus-NSMP":{"entry":"ST Fergus - NSMP Sub Terminal","exit":""},"Milford Haven - South Hook":{"entry":"Milford Haven - South Hook LNG LNG Importation","exit":""},"Bacton Interconnector":{"entry":"Bacton Int Entry Interconnector Entry","exit":"Bacton Int Exit Interconnector Exit"},"Holford":{"entry":"Holford Stor Storage Entry","exit":"Holford Stor Storage Exit"},"Moffat Interconnector":{"entry":"Moffat Interconnector Entry","exit":"Moffat Int Exit Interconnector Exit"},"Rough":{"entry":"Rough Stor Storage Entry","exit":"Rough Stor Storage Exit"},"Easington-Langeled":{"entry":"Easington - Langeled Sub Terminal","exit":""},"Hornsea":{"entry":"Hornsea Stor Storage Entry","exit":"Hornsea Stor Storage Exit"},"LDZ Direct-NDM":{"entry":"LDZ Direct LDZ Direct","exit":""},"NTS Industrial":{"entry":"NTS Industrial NTS Industrial","exit":""},"NTS Power Station":{"entry":"NTS Power Station NTS Power Station","exit":""},"Milford Haven - Dragon":{"entry":"Milford Haven - Dragon LNG LNG Importation","exit":""},"Hole House Farm":{"entry":"Hole House Farm Stor Storage Entry","exit":""},"Humbly Grove":{"entry":"","exit":"Humbly Grove Stor Storage Exit"},"Grain":{"entry":"Grain NTS 1 LNG LNG Importation","exit":""}},
+		"header"		:	["TSONAME","IPId","PeriodFrom","PeriodTo","PeriodType","GasHour","TSOType","CapturedTime","Version","StateId","EntryInEnergy","EntryEnergyUOMId","EntryEnergyTemperature","EntryInVolume","EntryVolumeUOMId","EntryVolumeTemperature","EntryGCV","EntryGCVUOMId","ExitInEnergy","ExitEnergyUOMId","ExitEnergyTemperature","ExitInVolume","ExitVolumeUOMId","ExitVolumeTemperature","ExitGCV","ExitGCVUOMId","NetInEnergy","NetEnergyUOMId","NetEnergyTemperature","NetInVolume","NetVolumeUOMId","NetVolumeTemperature","NetGCV","NetGCVUOMId","Datastatus"],
+		"missing_data"				:	{"Loenhout":["2022-12-30"]},
+		"empty_provisional_data"	:	{"Loenhout":["2022-12-28"]}
+	},
+	"renomination"					:
+	{
+		"output_move"	:	true,
+		"start_day"					:	-3,
+		"end_day"					:	3,
+		"cache_path"				:	"C:/Paris/Cache/Renomination/<OPERATORID>/<DATE>/",
+		"output_path"			:	"C:/Paris/RawData/TSO/<OPERATORID>/",
+		"gcv"					:	{"Aldbrough":"39.727","Bacton BBL Interconnector":"38.3","Bacton Interconnector":"39.23","Easington-Langeled":"40.02","Grain":"39.00","Hatfield Moor":"39.79","Hill Top Farm":"39.204","Hole House Farm":"39.38","Holford":"39.558","Hornsea":"39.747","Humbly Grove":"39.437","Milford Haven - Dragon":"39","Milford Haven - South Hook":"39.29","Moffat Interconnector":"39.42","Rough":"39.04","St Fergus-NSMP":"39.424","STFergus-Shell":"38.347","Stublach":"39.54","NTS Power Station":"39.54","LDZ Direct":"39.41","Non Daily Meters":"39.41","NTS Industrial":"39.33","Julianadorp (BBL)":"38.3","Industrial Demand flow":"11.0466278188282","Interconnector Export Demand flow":"10.8","LDZ offtake flow":"10.937122174749","Power Station Demand Flow":"10.9218856129672","Storage Demand flow":"10.96","Linepack":"11.123","LDZ Direct-NDM":"39.41"},
+		"operator_points"		:	{"National Gas":["Humbly Grove","Hill Top Farm","STFergus-Shell","Bacton BBL Interconnector","Aldbrough","Stublach","St Fergus-NSMP","Milford Haven - South Hook","Hatfield Moor","Bacton Interconnector","Holford","Milford Haven - Dragon","Moffat Interconnector","Rough","Hole House Farm","Easington-Langeled","Hornsea","Grain"]},
+		"point_mapping"			:	{"Hill Top Farm":{"entry":"Hilltop Farm Stor Storage Entry","exit":"Hilltop Farm Stor Storage Exit"},"Hatfield Moor":{"entry":"Hatfield Moor Stor Storage Entry","exit":"Hatfield Moor Stor Storage Exit"},"STFergus-Shell":{"entry":"ST Fergus - Shell Sub Terminal","exit":""},"Bacton BBL Interconnector":{"entry":"Bacton - BBL Int Entry Interconnector Entry","exit":"Bacton - BBL Int Exit Interconnector Exit"},"Aldbrough":{"entry":"Aldbrough Stor Storage Entry","exit":"Aldbrough Stor Storage Exit"},"Stublach":{"entry":"Stublach Stor Storage Entry","exit":"Stublach Stor Storage Exit"},"St Fergus-NSMP":{"entry":"ST Fergus - NSMP Sub Terminal","exit":""},"Milford Haven - South Hook":{"entry":"Milford Haven - South Hook LNG LNG Importation","exit":""},"Bacton Interconnector":{"entry":"Bacton Int Entry Interconnector Entry","exit":"Bacton Int Exit Interconnector Exit"},"Holford":{"entry":"Holford Stor Storage Entry","exit":"Holford Stor Storage Exit"},"Moffat Interconnector":{"entry":"Moffat Interconnector Entry","exit":"Moffat Int Exit Interconnector Exit"},"Rough":{"entry":"Rough Stor Storage Entry","exit":"Rough Stor Storage Exit"},"Easington-Langeled":{"entry":"Easington - Langeled Sub Terminal","exit":""},"Hornsea":{"entry":"Hornsea Stor Storage Entry","exit":"Hornsea Stor Storage Exit"},"LDZ Direct-NDM":{"entry":"LDZ Direct LDZ Direct","exit":""},"NTS Industrial":{"entry":"NTS Industrial NTS Industrial","exit":""},"NTS Power Station":{"entry":"NTS Power Station NTS Power Station","exit":""},"Milford Haven - Dragon":{"entry":"Milford Haven - Dragon LNG LNG Importation","exit":""},"Hole House Farm":{"entry":"Hole House Farm Stor Storage Entry","exit":""},"Humbly Grove":{"entry":"","exit":"Humbly Grove Stor Storage Exit"},"Grain":{"entry":"Grain NTS 1 LNG LNG Importation","exit":""}},
+		"header"		:	["TSONAME","IPId","PeriodFrom","PeriodTo","PeriodType","GasHour","TSOType","CapturedTime","Version","StateId","EntryInEnergy","EntryEnergyUOMId","EntryEnergyTemperature","EntryInVolume","EntryVolumeUOMId","EntryVolumeTemperature","EntryGCV","EntryGCVUOMId","ExitInEnergy","ExitEnergyUOMId","ExitEnergyTemperature","ExitInVolume","ExitVolumeUOMId","ExitVolumeTemperature","ExitGCV","ExitGCVUOMId","NetInEnergy","NetEnergyUOMId","NetEnergyTemperature","NetInVolume","NetVolumeUOMId","NetVolumeTemperature","NetGCV","NetGCVUOMId","Datastatus"],
+		"missing_data"				:	{"Loenhout":["2022-12-30"]},
+		"empty_provisional_data"	:	{"Loenhout":["2022-12-28"]}
+	},
+	"production"		:
+	{
+		"output_move"	:	true,
+		"home_url"		:	"https://tis.eustream.sk/en/online-data/flows/",
+		"start_day"					:	-5,
+		"end_day"					:	0,
+		"cache_path"				:	"C:/Paris/Cache/Production/<OPERATORID>/<DATE>/",
+		"output_path"			:	"C:/Paris/RawData/Production/<OPERATORID>/",
+		"gcv"					:	{},
+		"operator_points"		:	{"National Gas":["Bacton SEAL","Barrow Terminal","Easington Dimlington","Bacton SHELL","Burton Point","STFergus-Mobil","STFergus-Shell","St Fergus-NSMP","Rough production","Teesside CATS","Teesside PX","Easington - York","Bacton Other"]},
+		"point_mapping"			:	{"Bacton SEAL":"Bacton - Seal","Barrow Terminal":"Barrow","Easington Dimlington":"Easington - Dimlington" ,"Bacton SHELL":"Bacton - Shell","Burton Point":"Burton Point","STFergus-Mobil":"ST Fergus - Mobil","STFergus-Shell":"ST Fergus - Shell","St Fergus-NSMP":"ST Fergus - NSMP","Rough production":"Easington - Rough","Teesside CATS":"Teesside - CATS","Teesside PX":"Teesside - PX","Easington - York":"Easington - York","Bacton Other":"Bacton - Perenco"},
+		"point_mapping_GCV"			:{"Bacton SEAL":["Bacton - Seal","40.675"],"Barrow Terminal":["Barrow","39.05"],"Easington Dimlington":["Easington - Dimlington","38.385"],"Bacton SHELL":["Bacton - Shell","38.65"],"Burton Point":["Burton Point","38.905"],"STFergus-Mobil":["ST Fergus - Mobil","41.47"],"STFergus-Shell":["ST Fergus - Shell","38.325"],"St Fergus-NSMP":["ST Fergus - NSMP","38.5875"],"Rough production":["Easington - Rough","39.04"],"Teesside CATS":["Teesside - CATS","11.4139"],"Teesside PX":["Teesside - PX","39.54"],"Easington - York":["Easington - York","38.845"],"Bacton Other":["Bacton - Perenco","38.74"]},
+		"header"		:	["ProductionName","IPID","PeriodFrom","PeriodTo","PeriodType","GasHour","CapturedTime","Version","StateId","GasQuality","TotalInEnergy","TotalEnergyUOMId","TotalEnergyTemperature","TotalInVolume","TotalVolumeUOMId","TotalVolumeTemperature","TotalGCV","TotalGCVUOMId","DataStatus"],
+		"missing_data"				:	{"Loenhout":["2022-12-30"]},
+		"empty_provisional_data"	:	{"Loenhout":["2022-12-28"]}
+	}
+}
+
+
+

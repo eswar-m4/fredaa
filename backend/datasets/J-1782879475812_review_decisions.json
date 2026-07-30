@@ -1,0 +1,5202 @@
+[
+  {
+    "record_index": 0,
+    "attribute": "Article_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/announcement/eqs/baywa-ag-baywa-ord-shs--0ah7/eqs-adhoc-baywa-ag-understanding-in-princip-/9645473",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Article_Subject",
+    "previous_value": "—",
+    "enriched_value": "EQS-Adhoc: BayWa AG: Understanding in princip...",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Comments",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Company_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/company/0AH7",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Company_Name",
+    "previous_value": "—",
+    "enriched_value": "Baywa AG Baywa Ord Shs (0AH7)",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Disposition",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Disposition_Details",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Event_Name",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 0,
+    "attribute": "KeywordsMapped",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Published_Date",
+    "previous_value": "—",
+    "enriched_value": "30 Jun 2026 07:43 PM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "RNS",
+    "previous_value": "—",
+    "enriched_value": "EQS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Source",
+    "previous_value": "—",
+    "enriched_value": "EQS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Total_MatchKeyword",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "Article_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/announcement/eqs/northern-data-ag--nb2d/eqs-dd-northern-data-ag-dr-tom-oliver-scho-/9645440",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "Article_Subject",
+    "previous_value": "—",
+    "enriched_value": "EQS-DD: Northern Data AG: Dr. Tom Oliver Scho...",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "Comments",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 1,
+    "attribute": "Company_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/company/NB2D",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "Company_Name",
+    "previous_value": "—",
+    "enriched_value": "NORTHERN DATA AG (NB2D)",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "Disposition",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 1,
+    "attribute": "Disposition_Details",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 1,
+    "attribute": "Event_Name",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 1,
+    "attribute": "KeywordsMapped",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 1,
+    "attribute": "Published_Date",
+    "previous_value": "—",
+    "enriched_value": "30 Jun 2026 07:04 PM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "RNS",
+    "previous_value": "—",
+    "enriched_value": "EQS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "Source",
+    "previous_value": "—",
+    "enriched_value": "EQS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "Total_MatchKeyword",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "Article_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/announcement/eqs/northern-data-ag--nb2d/eqs-dd-northern-data-ag-dr-tom-oliver-scho-/9645441",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "Article_Subject",
+    "previous_value": "—",
+    "enriched_value": "EQS-DD: Northern Data AG: Dr. Tom Oliver Scho...",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "Comments",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 2,
+    "attribute": "Company_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/company/NB2D",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "Company_Name",
+    "previous_value": "—",
+    "enriched_value": "NORTHERN DATA AG (NB2D)",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "Disposition",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 2,
+    "attribute": "Disposition_Details",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 2,
+    "attribute": "Event_Name",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 2,
+    "attribute": "KeywordsMapped",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 2,
+    "attribute": "Published_Date",
+    "previous_value": "—",
+    "enriched_value": "30 Jun 2026 07:04 PM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "RNS",
+    "previous_value": "—",
+    "enriched_value": "EQS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "Source",
+    "previous_value": "—",
+    "enriched_value": "EQS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "Total_MatchKeyword",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "Article_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/announcement/eqs/northern-data-ag--nb2d/eqs-dd-northern-data-ag-liebling-kronberg-c-/9645439",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "Article_Subject",
+    "previous_value": "—",
+    "enriched_value": "EQS-DD: Northern Data AG: Liebling Kronberg C...",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "Comments",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 3,
+    "attribute": "Company_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/company/NB2D",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "Company_Name",
+    "previous_value": "—",
+    "enriched_value": "NORTHERN DATA AG (NB2D)",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "Disposition",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 3,
+    "attribute": "Disposition_Details",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 3,
+    "attribute": "Event_Name",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 3,
+    "attribute": "KeywordsMapped",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 3,
+    "attribute": "Published_Date",
+    "previous_value": "—",
+    "enriched_value": "30 Jun 2026 07:01 PM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "RNS",
+    "previous_value": "—",
+    "enriched_value": "EQS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "Source",
+    "previous_value": "—",
+    "enriched_value": "EQS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "Total_MatchKeyword",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "Article_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/announcement/eqs/northern-data-ag--nb2d/eqs-dd-northern-data-ag-liebling-kronberg-c-/9645438",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "Article_Subject",
+    "previous_value": "—",
+    "enriched_value": "EQS-DD: Northern Data AG: Liebling Kronberg C...",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "Comments",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 4,
+    "attribute": "Company_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/company/NB2D",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "Company_Name",
+    "previous_value": "—",
+    "enriched_value": "NORTHERN DATA AG (NB2D)",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "Disposition",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 4,
+    "attribute": "Disposition_Details",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 4,
+    "attribute": "Event_Name",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 4,
+    "attribute": "KeywordsMapped",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 4,
+    "attribute": "Published_Date",
+    "previous_value": "—",
+    "enriched_value": "30 Jun 2026 07:01 PM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "RNS",
+    "previous_value": "—",
+    "enriched_value": "EQS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "Source",
+    "previous_value": "—",
+    "enriched_value": "EQS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "Total_MatchKeyword",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "Article_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/announcement/rns/80-mile--80m/final-results-for-the-year-ended-31-december-2025/9645468",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "Article_Subject",
+    "previous_value": "—",
+    "enriched_value": "Final Results for the Year Ended 31 December 2025",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "Comments",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 5,
+    "attribute": "Company_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/company/80M",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "Company_Name",
+    "previous_value": "—",
+    "enriched_value": "80 Mile (80M)",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "Disposition",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 5,
+    "attribute": "Disposition_Details",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 5,
+    "attribute": "Event_Name",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 5,
+    "attribute": "KeywordsMapped",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 5,
+    "attribute": "Published_Date",
+    "previous_value": "—",
+    "enriched_value": "30 Jun 2026 06:35 PM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "RNS",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "Source",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "Total_MatchKeyword",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "Article_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/announcement/rns/foresight-solar-fund-limited--fsfl/total-voting-rights/9645466",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "Article_Subject",
+    "previous_value": "—",
+    "enriched_value": "Total Voting Rights",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "Comments",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 6,
+    "attribute": "Company_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/company/FSFL",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "Company_Name",
+    "previous_value": "—",
+    "enriched_value": "Foresight Solar Fund Limited (FSFL)",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "Disposition",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 6,
+    "attribute": "Disposition_Details",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 6,
+    "attribute": "Event_Name",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 6,
+    "attribute": "KeywordsMapped",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 6,
+    "attribute": "Published_Date",
+    "previous_value": "—",
+    "enriched_value": "30 Jun 2026 06:32 PM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "RNS",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "Source",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "Total_MatchKeyword",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "Article_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/announcement/rns/foresight-solar-fund-limited--fsfl/transaction-in-own-shares/9645465",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "Article_Subject",
+    "previous_value": "—",
+    "enriched_value": "Transaction in Own Shares",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "Comments",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 7,
+    "attribute": "Company_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/company/FSFL",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "Company_Name",
+    "previous_value": "—",
+    "enriched_value": "Foresight Solar Fund Limited (FSFL)",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "Disposition",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 7,
+    "attribute": "Disposition_Details",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 7,
+    "attribute": "Event_Name",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 7,
+    "attribute": "KeywordsMapped",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 7,
+    "attribute": "Published_Date",
+    "previous_value": "—",
+    "enriched_value": "30 Jun 2026 06:32 PM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "RNS",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "Source",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "Total_MatchKeyword",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "Article_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/announcement/rns/active-energy-group--aeg/annual-financial-report-/9645464",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "Article_Subject",
+    "previous_value": "—",
+    "enriched_value": "Annual Financial Report",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "Comments",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 8,
+    "attribute": "Company_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/company/AEG",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "Company_Name",
+    "previous_value": "—",
+    "enriched_value": "Active Energy Group (AEG)",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "Disposition",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 8,
+    "attribute": "Disposition_Details",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 8,
+    "attribute": "Event_Name",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 8,
+    "attribute": "KeywordsMapped",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 8,
+    "attribute": "Published_Date",
+    "previous_value": "—",
+    "enriched_value": "30 Jun 2026 06:30 PM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "RNS",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "Source",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "Total_MatchKeyword",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "Article_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/announcement/gnw/nokia-oyj--0haf/notification-under-chapter-9-section-10-of-t-/9645463",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "Article_Subject",
+    "previous_value": "—",
+    "enriched_value": "Notification under Chapter 9, Section 10 of t...",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "Comments",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 9,
+    "attribute": "Company_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/company/0HAF",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "Company_Name",
+    "previous_value": "—",
+    "enriched_value": "Nokia OYJ (0HAF)",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "Disposition",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 9,
+    "attribute": "Disposition_Details",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 9,
+    "attribute": "Event_Name",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 9,
+    "attribute": "KeywordsMapped",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 9,
+    "attribute": "Published_Date",
+    "previous_value": "—",
+    "enriched_value": "30 Jun 2026 06:30 PM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "RNS",
+    "previous_value": "—",
+    "enriched_value": "GNW",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "Source",
+    "previous_value": "—",
+    "enriched_value": "GNW",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "Total_MatchKeyword",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "Article_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/announcement/rns/trellus-health--trls/delay-to-publication-of-annual-report-and-accounts/9645461",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "Article_Subject",
+    "previous_value": "—",
+    "enriched_value": "Delay to Publication of Annual Report and Accounts",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "Comments",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 10,
+    "attribute": "Company_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/company/TRLS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "Company_Name",
+    "previous_value": "—",
+    "enriched_value": "Trellus Health (TRLS)",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "Disposition",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 10,
+    "attribute": "Disposition_Details",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 10,
+    "attribute": "Event_Name",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 10,
+    "attribute": "KeywordsMapped",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 10,
+    "attribute": "Published_Date",
+    "previous_value": "—",
+    "enriched_value": "30 Jun 2026 06:30 PM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "RNS",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "Source",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "Total_MatchKeyword",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "Article_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/announcement/rns/mercantile-ports-logistics-limited--mpl/publication-of-annual-report-/9645460",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "Article_Subject",
+    "previous_value": "—",
+    "enriched_value": "Publication of Annual Report",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "Comments",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 11,
+    "attribute": "Company_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/company/MPL",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "Company_Name",
+    "previous_value": "—",
+    "enriched_value": "Mercantile Ports & Logistics Limited (MPL)",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "Disposition",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 11,
+    "attribute": "Disposition_Details",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 11,
+    "attribute": "Event_Name",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 11,
+    "attribute": "KeywordsMapped",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 11,
+    "attribute": "Published_Date",
+    "previous_value": "—",
+    "enriched_value": "30 Jun 2026 06:27 PM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "RNS",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "Source",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "Total_MatchKeyword",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "Article_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/announcement/rns/phoenix-digital-assets-plc--pnix/annual-results-/9645459",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "Article_Subject",
+    "previous_value": "—",
+    "enriched_value": "Annual Results",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "Comments",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 12,
+    "attribute": "Company_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/company/PNIX",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "Company_Name",
+    "previous_value": "—",
+    "enriched_value": "Phoenix Digital Assets PLC (PNIX)",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "Disposition",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 12,
+    "attribute": "Disposition_Details",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 12,
+    "attribute": "Event_Name",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 12,
+    "attribute": "KeywordsMapped",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 12,
+    "attribute": "Published_Date",
+    "previous_value": "—",
+    "enriched_value": "30 Jun 2026 06:25 PM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "RNS",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "Source",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "Total_MatchKeyword",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "Article_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/announcement/prn/vault-ventures-plc--vult/annual-report-for-the-year-ended-31-december-/9645457",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "Article_Subject",
+    "previous_value": "—",
+    "enriched_value": "Annual Report for the Year Ended 31 December ...",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "Comments",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 13,
+    "attribute": "Company_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/company/VULT",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "Company_Name",
+    "previous_value": "—",
+    "enriched_value": "Vault Ventures Plc (VULT)",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "Disposition",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 13,
+    "attribute": "Disposition_Details",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 13,
+    "attribute": "Event_Name",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 13,
+    "attribute": "KeywordsMapped",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 13,
+    "attribute": "Published_Date",
+    "previous_value": "—",
+    "enriched_value": "30 Jun 2026 06:21 PM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "RNS",
+    "previous_value": "—",
+    "enriched_value": "PRN",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "Source",
+    "previous_value": "—",
+    "enriched_value": "PRN",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "Total_MatchKeyword",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "Article_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/announcement/rns/rit-capital-partners--rcp/share-buyback-management-/9645454",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "Article_Subject",
+    "previous_value": "—",
+    "enriched_value": "Share Buyback Management",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "Comments",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 14,
+    "attribute": "Company_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/company/RCP",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "Company_Name",
+    "previous_value": "—",
+    "enriched_value": "RIT Capital Partners (RCP)",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "Disposition",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 14,
+    "attribute": "Disposition_Details",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 14,
+    "attribute": "Event_Name",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 14,
+    "attribute": "KeywordsMapped",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 14,
+    "attribute": "Published_Date",
+    "previous_value": "—",
+    "enriched_value": "30 Jun 2026 06:20 PM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "RNS",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "Source",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "Total_MatchKeyword",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "Article_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/announcement/rns/atc-music-group-plc--atc/result-of-annual-general-meeting/9645450",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "Article_Subject",
+    "previous_value": "—",
+    "enriched_value": "Result of Annual General Meeting",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "Comments",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 15,
+    "attribute": "Company_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/company/ATC",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "Company_Name",
+    "previous_value": "—",
+    "enriched_value": "ATC Music Group plc (ATC)",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "Disposition",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 15,
+    "attribute": "Disposition_Details",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 15,
+    "attribute": "Event_Name",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 15,
+    "attribute": "KeywordsMapped",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 15,
+    "attribute": "Published_Date",
+    "previous_value": "—",
+    "enriched_value": "30 Jun 2026 06:17 PM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "RNS",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "Source",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "Total_MatchKeyword",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "Article_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/announcement/rns/valereum-plc--vlrm/results-for-the-year-ended-31-december-2025/9645449",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "Article_Subject",
+    "previous_value": "—",
+    "enriched_value": "Results for the year ended 31 December 2025",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "Comments",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 16,
+    "attribute": "Company_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/company/VLRM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "Company_Name",
+    "previous_value": "—",
+    "enriched_value": "Valereum Plc (VLRM)",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "Disposition",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 16,
+    "attribute": "Disposition_Details",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 16,
+    "attribute": "Event_Name",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 16,
+    "attribute": "KeywordsMapped",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 16,
+    "attribute": "Published_Date",
+    "previous_value": "—",
+    "enriched_value": "30 Jun 2026 06:15 PM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "RNS",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "Source",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "Total_MatchKeyword",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "Article_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/announcement/rns/ondine-biomedical-inc-npv-cdi---obi/result-of-agm-and-voting-results-/9645448",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "Article_Subject",
+    "previous_value": "—",
+    "enriched_value": "Result of AGM and voting results",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "Comments",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 17,
+    "attribute": "Company_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/company/OBI",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "Company_Name",
+    "previous_value": "—",
+    "enriched_value": "Ondine Biomedical Inc. NPV (CDI) (OBI)",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "Disposition",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 17,
+    "attribute": "Disposition_Details",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 17,
+    "attribute": "Event_Name",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 17,
+    "attribute": "KeywordsMapped",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 17,
+    "attribute": "Published_Date",
+    "previous_value": "—",
+    "enriched_value": "30 Jun 2026 06:15 PM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "RNS",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "Source",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "Total_MatchKeyword",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "Article_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/announcement/rns/herald-investment-trust--hri/result-of-general-meeting/9645446",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "Article_Subject",
+    "previous_value": "—",
+    "enriched_value": "Result of General Meeting",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "Comments",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 18,
+    "attribute": "Company_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/company/HRI",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "Company_Name",
+    "previous_value": "—",
+    "enriched_value": "Herald Investment Trust (HRI)",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "Disposition",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 18,
+    "attribute": "Disposition_Details",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 18,
+    "attribute": "Event_Name",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 18,
+    "attribute": "KeywordsMapped",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 18,
+    "attribute": "Published_Date",
+    "previous_value": "—",
+    "enriched_value": "30 Jun 2026 06:15 PM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "RNS",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "Source",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "Total_MatchKeyword",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "Article_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/announcement/eqs/irish-residential-properties-reit-p-irish-residential-properties-ord-shs--0qt8/block-listing-interim-review/9645451",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "Article_Subject",
+    "previous_value": "—",
+    "enriched_value": "Block Listing Interim Review",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "Comments",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 19,
+    "attribute": "Company_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/company/0QT8",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "Company_Name",
+    "previous_value": "—",
+    "enriched_value": "IRISH RESIDENTIAL PROPERTIES REIT P IRISH RESIDENTIAL PROPERTIES ORD SHS (0QT8)",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "Disposition",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 19,
+    "attribute": "Disposition_Details",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 19,
+    "attribute": "Event_Name",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 19,
+    "attribute": "KeywordsMapped",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 19,
+    "attribute": "Published_Date",
+    "previous_value": "—",
+    "enriched_value": "30 Jun 2026 06:14 PM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "RNS",
+    "previous_value": "—",
+    "enriched_value": "EQS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "Source",
+    "previous_value": "—",
+    "enriched_value": "EQS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "Total_MatchKeyword",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "Article_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/announcement/rns/babcock-international-group--bab/transaction-in-own-shares/9645445",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "Article_Subject",
+    "previous_value": "—",
+    "enriched_value": "Transaction in Own Shares",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "Comments",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 20,
+    "attribute": "Company_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/company/BAB",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "Company_Name",
+    "previous_value": "—",
+    "enriched_value": "Babcock International Group (BAB)",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "Disposition",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 20,
+    "attribute": "Disposition_Details",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 20,
+    "attribute": "Event_Name",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 20,
+    "attribute": "KeywordsMapped",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 20,
+    "attribute": "Published_Date",
+    "previous_value": "—",
+    "enriched_value": "30 Jun 2026 06:14 PM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "RNS",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "Source",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "Total_MatchKeyword",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "Article_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/announcement/gnw/osb-group--osb/total-voting-rights/9645447",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "Article_Subject",
+    "previous_value": "—",
+    "enriched_value": "Total Voting Rights",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "Comments",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 21,
+    "attribute": "Company_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/company/OSB",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "Company_Name",
+    "previous_value": "—",
+    "enriched_value": "OSB Group (OSB)",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "Disposition",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 21,
+    "attribute": "Disposition_Details",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 21,
+    "attribute": "Event_Name",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 21,
+    "attribute": "KeywordsMapped",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 21,
+    "attribute": "Published_Date",
+    "previous_value": "—",
+    "enriched_value": "30 Jun 2026 06:14 PM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "RNS",
+    "previous_value": "—",
+    "enriched_value": "GNW",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "Source",
+    "previous_value": "—",
+    "enriched_value": "GNW",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "Total_MatchKeyword",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "Article_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/announcement/rns/herald-investment-trust--hri/result-of-agm/9645443",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "Article_Subject",
+    "previous_value": "—",
+    "enriched_value": "Result of AGM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "Comments",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 22,
+    "attribute": "Company_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/company/HRI",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "Company_Name",
+    "previous_value": "—",
+    "enriched_value": "Herald Investment Trust (HRI)",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "Disposition",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 22,
+    "attribute": "Disposition_Details",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 22,
+    "attribute": "Event_Name",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 22,
+    "attribute": "KeywordsMapped",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 22,
+    "attribute": "Published_Date",
+    "previous_value": "—",
+    "enriched_value": "30 Jun 2026 06:11 PM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "RNS",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "Source",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "Total_MatchKeyword",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "Article_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/announcement/eqs/funding-circle-holdings--fch/tvr-total-voting-rights/9645444",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "Article_Subject",
+    "previous_value": "—",
+    "enriched_value": "TVR-Total Voting Rights",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "Comments",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 23,
+    "attribute": "Company_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/company/FCH",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "Company_Name",
+    "previous_value": "—",
+    "enriched_value": "Funding Circle Holdings (FCH)",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "Disposition",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 23,
+    "attribute": "Disposition_Details",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 23,
+    "attribute": "Event_Name",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 23,
+    "attribute": "KeywordsMapped",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 23,
+    "attribute": "Published_Date",
+    "previous_value": "—",
+    "enriched_value": "30 Jun 2026 06:09 PM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "RNS",
+    "previous_value": "—",
+    "enriched_value": "EQS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "Source",
+    "previous_value": "—",
+    "enriched_value": "EQS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "Total_MatchKeyword",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "Article_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/announcement/rns/zinc-media-group--zin/replacement-payment-of-raw-cut-earn-out/9645436",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "Article_Subject",
+    "previous_value": "—",
+    "enriched_value": "Replacement: Payment of Raw Cut earn-out",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "Comments",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 24,
+    "attribute": "Company_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/company/ZIN",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "Company_Name",
+    "previous_value": "—",
+    "enriched_value": "Zinc Media Group (ZIN)",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "Disposition",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 24,
+    "attribute": "Disposition_Details",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 24,
+    "attribute": "Event_Name",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 24,
+    "attribute": "KeywordsMapped",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 24,
+    "attribute": "Published_Date",
+    "previous_value": "—",
+    "enriched_value": "30 Jun 2026 06:00 PM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "RNS",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "Source",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "Total_MatchKeyword",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "Article_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/announcement/rns/tooru-plc--too/final-results-for-the-year-ended-31-december-2025/9645435",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "Article_Subject",
+    "previous_value": "—",
+    "enriched_value": "Final Results for the year ended 31 December 2025",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "Comments",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 25,
+    "attribute": "Company_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/company/TOO",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "Company_Name",
+    "previous_value": "—",
+    "enriched_value": "Tooru PLC (TOO)",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "Disposition",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 25,
+    "attribute": "Disposition_Details",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 25,
+    "attribute": "Event_Name",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 25,
+    "attribute": "KeywordsMapped",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 25,
+    "attribute": "Published_Date",
+    "previous_value": "—",
+    "enriched_value": "30 Jun 2026 06:00 PM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "RNS",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "Source",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "Total_MatchKeyword",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 26,
+    "attribute": "Article_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/announcement/rns/tomco-energy--tom/result-of-agm/9645434",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 26,
+    "attribute": "Article_Subject",
+    "previous_value": "—",
+    "enriched_value": "Result of AGM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 26,
+    "attribute": "Comments",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 26,
+    "attribute": "Company_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/company/TOM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 26,
+    "attribute": "Company_Name",
+    "previous_value": "—",
+    "enriched_value": "Tomco Energy (TOM)",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 26,
+    "attribute": "Disposition",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 26,
+    "attribute": "Disposition_Details",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 26,
+    "attribute": "Event_Name",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 26,
+    "attribute": "KeywordsMapped",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 26,
+    "attribute": "Published_Date",
+    "previous_value": "—",
+    "enriched_value": "30 Jun 2026 06:00 PM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 26,
+    "attribute": "RNS",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 26,
+    "attribute": "Source",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 26,
+    "attribute": "Total_MatchKeyword",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 27,
+    "attribute": "Article_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/announcement/prn/fidelity-european-trust--fev/transaction-in-own-shares/9645437",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 27,
+    "attribute": "Article_Subject",
+    "previous_value": "—",
+    "enriched_value": "Transaction in Own Shares",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 27,
+    "attribute": "Comments",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 27,
+    "attribute": "Company_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/company/FEV",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 27,
+    "attribute": "Company_Name",
+    "previous_value": "—",
+    "enriched_value": "Fidelity European Trust (FEV)",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 27,
+    "attribute": "Disposition",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 27,
+    "attribute": "Disposition_Details",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 27,
+    "attribute": "Event_Name",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 27,
+    "attribute": "KeywordsMapped",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 27,
+    "attribute": "Published_Date",
+    "previous_value": "—",
+    "enriched_value": "30 Jun 2026 05:59 PM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 27,
+    "attribute": "RNS",
+    "previous_value": "—",
+    "enriched_value": "PRN",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 27,
+    "attribute": "Source",
+    "previous_value": "—",
+    "enriched_value": "PRN",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 27,
+    "attribute": "Total_MatchKeyword",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 28,
+    "attribute": "Article_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/announcement/rns/metals-one--met1/final-results/9645433",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 28,
+    "attribute": "Article_Subject",
+    "previous_value": "—",
+    "enriched_value": "Final Results",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 28,
+    "attribute": "Comments",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 28,
+    "attribute": "Company_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/company/MET1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 28,
+    "attribute": "Company_Name",
+    "previous_value": "—",
+    "enriched_value": "Metals one (MET1)",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 28,
+    "attribute": "Disposition",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 28,
+    "attribute": "Disposition_Details",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 28,
+    "attribute": "Event_Name",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 28,
+    "attribute": "KeywordsMapped",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 28,
+    "attribute": "Published_Date",
+    "previous_value": "—",
+    "enriched_value": "30 Jun 2026 05:55 PM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 28,
+    "attribute": "RNS",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 28,
+    "attribute": "Source",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 28,
+    "attribute": "Total_MatchKeyword",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 29,
+    "attribute": "Article_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/announcement/rns/lloyds-banking-group--lloy/transaction-in-own-shares/9645432",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 29,
+    "attribute": "Article_Subject",
+    "previous_value": "—",
+    "enriched_value": "Transaction in Own Shares",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 29,
+    "attribute": "Comments",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 29,
+    "attribute": "Company_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/company/LLOY",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 29,
+    "attribute": "Company_Name",
+    "previous_value": "—",
+    "enriched_value": "Lloyds Banking Group (LLOY)",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 29,
+    "attribute": "Disposition",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 29,
+    "attribute": "Disposition_Details",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 29,
+    "attribute": "Event_Name",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 29,
+    "attribute": "KeywordsMapped",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 29,
+    "attribute": "Published_Date",
+    "previous_value": "—",
+    "enriched_value": "30 Jun 2026 05:52 PM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 29,
+    "attribute": "RNS",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 29,
+    "attribute": "Source",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 29,
+    "attribute": "Total_MatchKeyword",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 30,
+    "attribute": "Article_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/announcement/rns/liontrust-asset-management--lio/transaction-in-own-shares/9645431",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 30,
+    "attribute": "Article_Subject",
+    "previous_value": "—",
+    "enriched_value": "Transaction in Own Shares",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 30,
+    "attribute": "Comments",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 30,
+    "attribute": "Company_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/company/LIO",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 30,
+    "attribute": "Company_Name",
+    "previous_value": "—",
+    "enriched_value": "Liontrust Asset Management (LIO)",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 30,
+    "attribute": "Disposition",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 30,
+    "attribute": "Disposition_Details",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 30,
+    "attribute": "Event_Name",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 30,
+    "attribute": "KeywordsMapped",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 30,
+    "attribute": "Published_Date",
+    "previous_value": "—",
+    "enriched_value": "30 Jun 2026 05:51 PM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 30,
+    "attribute": "RNS",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 30,
+    "attribute": "Source",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 30,
+    "attribute": "Total_MatchKeyword",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 31,
+    "attribute": "Article_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/announcement/rns/focus-xplore-plc--fox/final-results/9645430",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 31,
+    "attribute": "Article_Subject",
+    "previous_value": "—",
+    "enriched_value": "Final Results",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 31,
+    "attribute": "Comments",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 31,
+    "attribute": "Company_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/company/FOX",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 31,
+    "attribute": "Company_Name",
+    "previous_value": "—",
+    "enriched_value": "Focus Xplore PLC (FOX)",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 31,
+    "attribute": "Disposition",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 31,
+    "attribute": "Disposition_Details",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 31,
+    "attribute": "Event_Name",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 31,
+    "attribute": "KeywordsMapped",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 31,
+    "attribute": "Published_Date",
+    "previous_value": "—",
+    "enriched_value": "30 Jun 2026 05:50 PM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 31,
+    "attribute": "RNS",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 31,
+    "attribute": "Source",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 31,
+    "attribute": "Total_MatchKeyword",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 32,
+    "attribute": "Article_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/announcement/prn/fidelity-emerging-markets-limited-ptg-npv--feml/transaction-in-own-shares/9645429",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 32,
+    "attribute": "Article_Subject",
+    "previous_value": "—",
+    "enriched_value": "Transaction in Own Shares",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 32,
+    "attribute": "Comments",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 32,
+    "attribute": "Company_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/company/FEML",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 32,
+    "attribute": "Company_Name",
+    "previous_value": "—",
+    "enriched_value": "Fidelity Emerging Markets Limited Ptg NPV (FEML)",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 32,
+    "attribute": "Disposition",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 32,
+    "attribute": "Disposition_Details",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 32,
+    "attribute": "Event_Name",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 32,
+    "attribute": "KeywordsMapped",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 32,
+    "attribute": "Published_Date",
+    "previous_value": "—",
+    "enriched_value": "30 Jun 2026 05:47 PM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 32,
+    "attribute": "RNS",
+    "previous_value": "—",
+    "enriched_value": "PRN",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 32,
+    "attribute": "Source",
+    "previous_value": "—",
+    "enriched_value": "PRN",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 32,
+    "attribute": "Total_MatchKeyword",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 33,
+    "attribute": "Article_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/announcement/rns/ethernity-networks-ltd--enet/results-for-the-year-ended-31-december-2025/9645428",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 33,
+    "attribute": "Article_Subject",
+    "previous_value": "—",
+    "enriched_value": "Results for the Year Ended 31 December 2025",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 33,
+    "attribute": "Comments",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 33,
+    "attribute": "Company_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/company/ENET",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 33,
+    "attribute": "Company_Name",
+    "previous_value": "—",
+    "enriched_value": "Ethernity Networks Ltd (ENET)",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 33,
+    "attribute": "Disposition",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 33,
+    "attribute": "Disposition_Details",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 33,
+    "attribute": "Event_Name",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 33,
+    "attribute": "KeywordsMapped",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 33,
+    "attribute": "Published_Date",
+    "previous_value": "—",
+    "enriched_value": "30 Jun 2026 05:45 PM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 33,
+    "attribute": "RNS",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 33,
+    "attribute": "Source",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 33,
+    "attribute": "Total_MatchKeyword",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 34,
+    "attribute": "Article_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/announcement/rns/novacyt-s-a-cdi---ncyt/result-of-agm/9645427",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 34,
+    "attribute": "Article_Subject",
+    "previous_value": "—",
+    "enriched_value": "Result of AGM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 34,
+    "attribute": "Comments",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 34,
+    "attribute": "Company_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/company/NCYT",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 34,
+    "attribute": "Company_Name",
+    "previous_value": "—",
+    "enriched_value": "Novacyt S.A. (CDI) (NCYT)",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 34,
+    "attribute": "Disposition",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 34,
+    "attribute": "Disposition_Details",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 34,
+    "attribute": "Event_Name",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 34,
+    "attribute": "KeywordsMapped",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 34,
+    "attribute": "Published_Date",
+    "previous_value": "—",
+    "enriched_value": "30 Jun 2026 05:45 PM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 34,
+    "attribute": "RNS",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 34,
+    "attribute": "Source",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 34,
+    "attribute": "Total_MatchKeyword",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 35,
+    "attribute": "Article_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/announcement/rns/mountview-estates--mtvw/director-pdmr-shareholding/9645426",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 35,
+    "attribute": "Article_Subject",
+    "previous_value": "—",
+    "enriched_value": "Director/PDMR Shareholding",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 35,
+    "attribute": "Comments",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 35,
+    "attribute": "Company_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/company/MTVW",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 35,
+    "attribute": "Company_Name",
+    "previous_value": "—",
+    "enriched_value": "Mountview Estates (MTVW)",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 35,
+    "attribute": "Disposition",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 35,
+    "attribute": "Disposition_Details",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 35,
+    "attribute": "Event_Name",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 35,
+    "attribute": "KeywordsMapped",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 35,
+    "attribute": "Published_Date",
+    "previous_value": "—",
+    "enriched_value": "30 Jun 2026 05:42 PM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 35,
+    "attribute": "RNS",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 35,
+    "attribute": "Source",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 35,
+    "attribute": "Total_MatchKeyword",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 36,
+    "attribute": "Article_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/announcement/rns/serco-group--srp/transactions-in-own-shares-and-total-voting-rights/9645425",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 36,
+    "attribute": "Article_Subject",
+    "previous_value": "—",
+    "enriched_value": "Transactions in own shares and Total Voting Rights",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 36,
+    "attribute": "Comments",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 36,
+    "attribute": "Company_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/company/SRP",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 36,
+    "attribute": "Company_Name",
+    "previous_value": "—",
+    "enriched_value": "Serco Group (SRP)",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 36,
+    "attribute": "Disposition",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 36,
+    "attribute": "Disposition_Details",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 36,
+    "attribute": "Event_Name",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 36,
+    "attribute": "KeywordsMapped",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 36,
+    "attribute": "Published_Date",
+    "previous_value": "—",
+    "enriched_value": "30 Jun 2026 05:42 PM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 36,
+    "attribute": "RNS",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 36,
+    "attribute": "Source",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 36,
+    "attribute": "Total_MatchKeyword",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 37,
+    "attribute": "Article_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/announcement/rns/solid-state--soli/holding-s-in-company/9645424",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 37,
+    "attribute": "Article_Subject",
+    "previous_value": "—",
+    "enriched_value": "Holding(s) in Company",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 37,
+    "attribute": "Comments",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 37,
+    "attribute": "Company_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/company/SOLI",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 37,
+    "attribute": "Company_Name",
+    "previous_value": "—",
+    "enriched_value": "Solid State (SOLI)",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 37,
+    "attribute": "Disposition",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 37,
+    "attribute": "Disposition_Details",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 37,
+    "attribute": "Event_Name",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 37,
+    "attribute": "KeywordsMapped",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 37,
+    "attribute": "Published_Date",
+    "previous_value": "—",
+    "enriched_value": "30 Jun 2026 05:41 PM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 37,
+    "attribute": "RNS",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 37,
+    "attribute": "Source",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 37,
+    "attribute": "Total_MatchKeyword",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 38,
+    "attribute": "Article_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/announcement/rns/river-uk-micro-cap-limited--rmmc/update-on-sale-of-river-global-am-to-liontrust/9645422",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 38,
+    "attribute": "Article_Subject",
+    "previous_value": "—",
+    "enriched_value": "Update on Sale of River Global AM to LionTrust",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 38,
+    "attribute": "Comments",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 38,
+    "attribute": "Company_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/company/RMMC",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 38,
+    "attribute": "Company_Name",
+    "previous_value": "—",
+    "enriched_value": "River UK Micro Cap Limited (RMMC)",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 38,
+    "attribute": "Disposition",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 38,
+    "attribute": "Disposition_Details",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 38,
+    "attribute": "Event_Name",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 38,
+    "attribute": "KeywordsMapped",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 38,
+    "attribute": "Published_Date",
+    "previous_value": "—",
+    "enriched_value": "30 Jun 2026 05:40 PM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 38,
+    "attribute": "RNS",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 38,
+    "attribute": "Source",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 38,
+    "attribute": "Total_MatchKeyword",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 39,
+    "attribute": "Article_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/announcement/rns/team--team/completion-of-epic-book-acquisition/9645423",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 39,
+    "attribute": "Article_Subject",
+    "previous_value": "—",
+    "enriched_value": "Completion of EPIC Book acquisition",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 39,
+    "attribute": "Comments",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 39,
+    "attribute": "Company_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/company/TEAM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 39,
+    "attribute": "Company_Name",
+    "previous_value": "—",
+    "enriched_value": "Team (TEAM)",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 39,
+    "attribute": "Disposition",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 39,
+    "attribute": "Disposition_Details",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 39,
+    "attribute": "Event_Name",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 39,
+    "attribute": "KeywordsMapped",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 39,
+    "attribute": "Published_Date",
+    "previous_value": "—",
+    "enriched_value": "30 Jun 2026 05:40 PM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 39,
+    "attribute": "RNS",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 39,
+    "attribute": "Source",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 39,
+    "attribute": "Total_MatchKeyword",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 40,
+    "attribute": "Article_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/announcement/prn/4basebio--4bb/result-of-agm-issue-of-options/9645421",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 40,
+    "attribute": "Article_Subject",
+    "previous_value": "—",
+    "enriched_value": "Result of AGM & Issue of Options",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 40,
+    "attribute": "Comments",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 40,
+    "attribute": "Company_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/company/4BB",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 40,
+    "attribute": "Company_Name",
+    "previous_value": "—",
+    "enriched_value": "4basebio (4BB)",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 40,
+    "attribute": "Disposition",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 40,
+    "attribute": "Disposition_Details",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 40,
+    "attribute": "Event_Name",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 40,
+    "attribute": "KeywordsMapped",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 40,
+    "attribute": "Published_Date",
+    "previous_value": "—",
+    "enriched_value": "30 Jun 2026 05:37 PM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 40,
+    "attribute": "RNS",
+    "previous_value": "—",
+    "enriched_value": "PRN",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 40,
+    "attribute": "Source",
+    "previous_value": "—",
+    "enriched_value": "PRN",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 40,
+    "attribute": "Total_MatchKeyword",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 41,
+    "attribute": "Article_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/announcement/rns/schroder-uk-mid-cap-fund--scp/total-voting-rights/9645417",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 41,
+    "attribute": "Article_Subject",
+    "previous_value": "—",
+    "enriched_value": "Total Voting Rights",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 41,
+    "attribute": "Comments",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 41,
+    "attribute": "Company_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/company/SCP",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 41,
+    "attribute": "Company_Name",
+    "previous_value": "—",
+    "enriched_value": "Schroder UK Mid Cap Fund (SCP)",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 41,
+    "attribute": "Disposition",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 41,
+    "attribute": "Disposition_Details",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 41,
+    "attribute": "Event_Name",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 41,
+    "attribute": "KeywordsMapped",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 41,
+    "attribute": "Published_Date",
+    "previous_value": "—",
+    "enriched_value": "30 Jun 2026 05:37 PM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 41,
+    "attribute": "RNS",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 41,
+    "attribute": "Source",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 41,
+    "attribute": "Total_MatchKeyword",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 42,
+    "attribute": "Article_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/announcement/prn/finsbury-growth-income-trust--fgt/transaction-in-own-shares/9645420",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 42,
+    "attribute": "Article_Subject",
+    "previous_value": "—",
+    "enriched_value": "Transaction in Own Shares",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 42,
+    "attribute": "Comments",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 42,
+    "attribute": "Company_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/company/FGT",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 42,
+    "attribute": "Company_Name",
+    "previous_value": "—",
+    "enriched_value": "Finsbury Growth & Income Trust (FGT)",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 42,
+    "attribute": "Disposition",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 42,
+    "attribute": "Disposition_Details",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 42,
+    "attribute": "Event_Name",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 42,
+    "attribute": "KeywordsMapped",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 42,
+    "attribute": "Published_Date",
+    "previous_value": "—",
+    "enriched_value": "30 Jun 2026 05:37 PM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 42,
+    "attribute": "RNS",
+    "previous_value": "—",
+    "enriched_value": "PRN",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 42,
+    "attribute": "Source",
+    "previous_value": "—",
+    "enriched_value": "PRN",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 42,
+    "attribute": "Total_MatchKeyword",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 43,
+    "attribute": "Article_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/announcement/rns/schroder-oriental-income-fund-ltd---soi/total-voting-rights/9645416",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 43,
+    "attribute": "Article_Subject",
+    "previous_value": "—",
+    "enriched_value": "Total Voting Rights",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 43,
+    "attribute": "Comments",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 43,
+    "attribute": "Company_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/company/SOI",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 43,
+    "attribute": "Company_Name",
+    "previous_value": "—",
+    "enriched_value": "Schroder Oriental Income Fund Ltd. (SOI)",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 43,
+    "attribute": "Disposition",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 43,
+    "attribute": "Disposition_Details",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 43,
+    "attribute": "Event_Name",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 43,
+    "attribute": "KeywordsMapped",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 43,
+    "attribute": "Published_Date",
+    "previous_value": "—",
+    "enriched_value": "30 Jun 2026 05:37 PM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 43,
+    "attribute": "RNS",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 43,
+    "attribute": "Source",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 43,
+    "attribute": "Total_MatchKeyword",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 44,
+    "attribute": "Article_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/announcement/prn/fidelity-china-special-situations--fcss/transaction-in-own-shares/9645419",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 44,
+    "attribute": "Article_Subject",
+    "previous_value": "—",
+    "enriched_value": "Transaction in Own Shares",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 44,
+    "attribute": "Comments",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 44,
+    "attribute": "Company_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/company/FCSS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 44,
+    "attribute": "Company_Name",
+    "previous_value": "—",
+    "enriched_value": "Fidelity China Special Situations (FCSS)",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 44,
+    "attribute": "Disposition",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 44,
+    "attribute": "Disposition_Details",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 44,
+    "attribute": "Event_Name",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 44,
+    "attribute": "KeywordsMapped",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 44,
+    "attribute": "Published_Date",
+    "previous_value": "—",
+    "enriched_value": "30 Jun 2026 05:35 PM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 44,
+    "attribute": "RNS",
+    "previous_value": "—",
+    "enriched_value": "PRN",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 44,
+    "attribute": "Source",
+    "previous_value": "—",
+    "enriched_value": "PRN",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 44,
+    "attribute": "Total_MatchKeyword",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 45,
+    "attribute": "Article_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/announcement/rns/schroder-bsc-social-impact-trust--sbsi/total-voting-rights/9645414",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 45,
+    "attribute": "Article_Subject",
+    "previous_value": "—",
+    "enriched_value": "Total Voting Rights",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 45,
+    "attribute": "Comments",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 45,
+    "attribute": "Company_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/company/SBSI",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 45,
+    "attribute": "Company_Name",
+    "previous_value": "—",
+    "enriched_value": "Schroder BSC Social Impact Trust (SBSI)",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 45,
+    "attribute": "Disposition",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 45,
+    "attribute": "Disposition_Details",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 45,
+    "attribute": "Event_Name",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 45,
+    "attribute": "KeywordsMapped",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 45,
+    "attribute": "Published_Date",
+    "previous_value": "—",
+    "enriched_value": "30 Jun 2026 05:35 PM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 45,
+    "attribute": "RNS",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 45,
+    "attribute": "Source",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 45,
+    "attribute": "Total_MatchKeyword",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 46,
+    "attribute": "Article_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/announcement/rns/switch-metals-plc--swt/total-voting-rights/9645413",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 46,
+    "attribute": "Article_Subject",
+    "previous_value": "—",
+    "enriched_value": "Total Voting Rights",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 46,
+    "attribute": "Comments",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 46,
+    "attribute": "Company_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/company/SWT",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 46,
+    "attribute": "Company_Name",
+    "previous_value": "—",
+    "enriched_value": "Switch Metals Plc (SWT)",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 46,
+    "attribute": "Disposition",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 46,
+    "attribute": "Disposition_Details",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 46,
+    "attribute": "Event_Name",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 46,
+    "attribute": "KeywordsMapped",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 46,
+    "attribute": "Published_Date",
+    "previous_value": "—",
+    "enriched_value": "30 Jun 2026 05:34 PM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 46,
+    "attribute": "RNS",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 46,
+    "attribute": "Source",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 46,
+    "attribute": "Total_MatchKeyword",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 47,
+    "attribute": "Article_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/announcement/prn/blackrock-greater-europe-inv-trust--brge/transaction-in-own-shares/9645415",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 47,
+    "attribute": "Article_Subject",
+    "previous_value": "—",
+    "enriched_value": "Transaction in Own Shares",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 47,
+    "attribute": "Comments",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 47,
+    "attribute": "Company_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/company/BRGE",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 47,
+    "attribute": "Company_Name",
+    "previous_value": "—",
+    "enriched_value": "BlackRock Greater Europe Inv Trust (BRGE)",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 47,
+    "attribute": "Disposition",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 47,
+    "attribute": "Disposition_Details",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 47,
+    "attribute": "Event_Name",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 47,
+    "attribute": "KeywordsMapped",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 47,
+    "attribute": "Published_Date",
+    "previous_value": "—",
+    "enriched_value": "30 Jun 2026 05:34 PM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 47,
+    "attribute": "RNS",
+    "previous_value": "—",
+    "enriched_value": "PRN",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 47,
+    "attribute": "Source",
+    "previous_value": "—",
+    "enriched_value": "PRN",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 47,
+    "attribute": "Total_MatchKeyword",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 48,
+    "attribute": "Article_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/announcement/rns/roundhouse-ai-ltd--ethl/interim-results-/9645412",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 48,
+    "attribute": "Article_Subject",
+    "previous_value": "—",
+    "enriched_value": "Interim Results",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 48,
+    "attribute": "Comments",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 48,
+    "attribute": "Company_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/company/ETHL",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 48,
+    "attribute": "Company_Name",
+    "previous_value": "—",
+    "enriched_value": "Roundhouse AI LTD (ETHL)",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 48,
+    "attribute": "Disposition",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 48,
+    "attribute": "Disposition_Details",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 48,
+    "attribute": "Event_Name",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 48,
+    "attribute": "KeywordsMapped",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 48,
+    "attribute": "Published_Date",
+    "previous_value": "—",
+    "enriched_value": "30 Jun 2026 05:33 PM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 48,
+    "attribute": "RNS",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 48,
+    "attribute": "Source",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 48,
+    "attribute": "Total_MatchKeyword",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 49,
+    "attribute": "Article_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/announcement/rns/polar-capital-technology-trust--pct/transaction-in-own-shares/9645411",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 49,
+    "attribute": "Article_Subject",
+    "previous_value": "—",
+    "enriched_value": "Transaction in Own Shares",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 49,
+    "attribute": "Comments",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 49,
+    "attribute": "Company_Link",
+    "previous_value": "—",
+    "enriched_value": "https://www.investegate.co.uk/company/PCT",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 49,
+    "attribute": "Company_Name",
+    "previous_value": "—",
+    "enriched_value": "Polar Capital Technology Trust (PCT)",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 49,
+    "attribute": "Disposition",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 49,
+    "attribute": "Disposition_Details",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 49,
+    "attribute": "Event_Name",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 49,
+    "attribute": "KeywordsMapped",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 49,
+    "attribute": "Published_Date",
+    "previous_value": "—",
+    "enriched_value": "30 Jun 2026 05:33 PM",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 49,
+    "attribute": "RNS",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 49,
+    "attribute": "Source",
+    "previous_value": "—",
+    "enriched_value": "RNS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 49,
+    "attribute": "Total_MatchKeyword",
+    "previous_value": "—",
+    "enriched_value": "0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  }
+]

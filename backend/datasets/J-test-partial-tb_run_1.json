@@ -1,0 +1,27 @@
+[
+  {
+    "PrimaryKey": "TB-002",
+    "Address": "Istiklal Caddesi No: 45, Istanbul",
+    "City": "Istanbul"
+  },
+  {
+    "PrimaryKey": "TB-006",
+    "Address": "Bagdat Caddesi No: 202, Istanbul",
+    "City": "Istanbul"
+  },
+  {
+    "PrimaryKey": "TB-007",
+    "Address": "Barbaros Bulvari No: 88, Istanbul",
+    "City": "Istanbul"
+  },
+  {
+    "PrimaryKey": "TB-012",
+    "Address": "Halaskargazi Caddesi No: 34, Istanbul",
+    "City": "Istanbul"
+  },
+  {
+    "PrimaryKey": "TB-014",
+    "Address": "Fevzi Pasa Caddesi No: 150, Istanbul",
+    "City": "Istanbul"
+  }
+]

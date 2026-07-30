@@ -1,0 +1,31 @@
+{
+  "signature": "1cca9bbb502b2a5fe5d96065a11b588d35c8596a",
+  "payload": {
+    "rows": [],
+    "totalSampled": 0,
+    "sampledCount": 0,
+    "coverage": {
+      "job_coverage": null,
+      "source_coverage": null,
+      "record_coverage": null,
+      "weighted_job_coverage": null,
+      "records_in_scope": 0,
+      "expected_attributes": null,
+      "total_filled_cells": null,
+      "source_requested": null,
+      "source_returned": null,
+      "source_kind": null,
+      "source_breakdown": [
+        {
+          "source_key": "gasunie_deutschland_tso_demand_prod",
+          "source_label": "Gasunie Deutschland TSO Demand Prod",
+          "records_requested_from_source": 0,
+          "records_returned_by_source": 0,
+          "source_coverage": null,
+          "filled_fields": []
+        }
+      ],
+      "attribute_breakdown": []
+    }
+  }
+}

@@ -1,0 +1,414 @@
+{
+  "baseline_file": "J-1783492606683_final.json",
+  "current_file": "J-1783492606683_run_2.json",
+  "records_compared": 30,
+  "added": 0,
+  "modified": 30,
+  "deleted": 0,
+  "verified": 0,
+  "change_percentage": 100.0,
+  "modified_details": [
+    {
+      "record_key": "E36311A",
+      "attribute": "updated_at",
+      "old_value": "2026-07-08 06:37:01",
+      "new_value": "2026-07-15 07:33:59"
+    },
+    {
+      "record_key": "MSOX3024T",
+      "attribute": "updated_at",
+      "old_value": "2026-07-08 06:37:01",
+      "new_value": "2026-07-15 07:33:59"
+    },
+    {
+      "record_key": "E36313A",
+      "attribute": "updated_at",
+      "old_value": "2026-07-08 06:37:01",
+      "new_value": "2026-07-15 07:33:59"
+    },
+    {
+      "record_key": "33521B",
+      "attribute": "updated_at",
+      "old_value": "2026-07-08 06:37:05",
+      "new_value": "2026-07-15 07:33:59"
+    },
+    {
+      "record_key": "33612A",
+      "attribute": "updated_at",
+      "old_value": "2026-07-08 06:37:05",
+      "new_value": "2026-07-15 07:33:59"
+    },
+    {
+      "record_key": "MSOX4024A",
+      "attribute": "updated_at",
+      "old_value": "2026-07-08 06:37:06",
+      "new_value": "2026-07-15 07:33:59"
+    },
+    {
+      "record_key": "33522B",
+      "attribute": "updated_at",
+      "old_value": "2026-07-08 06:37:05",
+      "new_value": "2026-07-15 07:33:59"
+    },
+    {
+      "record_key": "10072A",
+      "attribute": "description",
+      "old_value": "Probe fine-pitch ICs with the ten included IC clips and two dual-lead adapters that connect to 10080 family probes.",
+      "new_value": "The Keysight 10072A surface mount clip kit provides clips for attaching probes to surface mount devices."
+    },
+    {
+      "record_key": "10072A",
+      "attribute": "meta_description",
+      "old_value": "Probe fine-pitch ICs with the ten included IC clips and two dual-lead adapters that connect to 10080 family probes.",
+      "new_value": "The Keysight 10072A surface mount clip kit provides clips for attaching probes to surface mount devices."
+    },
+    {
+      "record_key": "10072A",
+      "attribute": "meta_title",
+      "old_value": "10072A Surface Mount Clip Kit",
+      "new_value": "Surface Mount Clip Kit"
+    },
+    {
+      "record_key": "10072A",
+      "attribute": "name",
+      "old_value": "10072A Surface Mount Clip Kit",
+      "new_value": "Surface Mount Clip Kit"
+    },
+    {
+      "record_key": "10072A",
+      "attribute": "short_description",
+      "old_value": "Probe fine-pitch ICs with the ten included IC clips and two dual-lead adapters that connect to 10080 family probes.",
+      "new_value": "The Keysight 10072A surface mount clip kit provides clips for attaching probes to surface mount devices."
+    },
+    {
+      "record_key": "10072A",
+      "attribute": "updated_at",
+      "old_value": "2021-02-08T04:22:32.192-07:00",
+      "new_value": "2026-07-15 07:33:59"
+    },
+    {
+      "record_key": "34470A",
+      "attribute": "updated_at",
+      "old_value": "2026-07-08 06:37:01",
+      "new_value": "2026-07-15 07:33:59"
+    },
+    {
+      "record_key": "10069A",
+      "attribute": "Discontinued",
+      "old_value": "True",
+      "new_value": "False"
+    },
+    {
+      "record_key": "10069A",
+      "attribute": "description",
+      "old_value": "This product is no longer sold by Keysight. Please use the links on this page for available support and assistance",
+      "new_value": "The Keysight 10069A GPIB field kit allows easy integration of instruments with PC interfaces."
+    },
+    {
+      "record_key": "10069A",
+      "attribute": "is_in_stock",
+      "old_value": "0",
+      "new_value": "1"
+    },
+    {
+      "record_key": "10069A",
+      "attribute": "meta_description",
+      "old_value": "This product is no longer sold by Keysight. Please use the links on this page for available support and assistance",
+      "new_value": "The Keysight 10069A GPIB field kit allows easy integration of instruments with PC interfaces."
+    },
+    {
+      "record_key": "10069A",
+      "attribute": "meta_title",
+      "old_value": "10069A GP-IB FIELD KIT [Obsolete]",
+      "new_value": "GPIB Field Kit"
+    },
+    {
+      "record_key": "10069A",
+      "attribute": "name",
+      "old_value": "10069A GP-IB FIELD KIT [Obsolete]",
+      "new_value": "GPIB Field Kit"
+    },
+    {
+      "record_key": "10069A",
+      "attribute": "qty",
+      "old_value": "0",
+      "new_value": "10"
+    },
+    {
+      "record_key": "10069A",
+      "attribute": "short_description",
+      "old_value": "This product is no longer sold by Keysight. Please use the links on this page for available support and assistance",
+      "new_value": "The Keysight 10069A GPIB field kit allows easy integration of instruments with PC interfaces."
+    },
+    {
+      "record_key": "10069A",
+      "attribute": "updated_at",
+      "old_value": "2021-02-08T04:22:32.192-07:00",
+      "new_value": "2026-07-15 07:33:59"
+    },
+    {
+      "record_key": "33611A",
+      "attribute": "updated_at",
+      "old_value": "2026-07-08 06:37:06",
+      "new_value": "2026-07-15 07:33:59"
+    },
+    {
+      "record_key": "N5182B",
+      "attribute": "updated_at",
+      "old_value": "2026-07-08 06:37:06",
+      "new_value": "2026-07-15 07:33:59"
+    },
+    {
+      "record_key": "10070C",
+      "attribute": "Discontinued",
+      "old_value": "True",
+      "new_value": "False"
+    },
+    {
+      "record_key": "10070C",
+      "attribute": "_category",
+      "old_value": "Probes",
+      "new_value": "Oscilloscopes"
+    },
+    {
+      "record_key": "10070C",
+      "attribute": "category",
+      "old_value": "Probes",
+      "new_value": "Oscilloscopes"
+    },
+    {
+      "record_key": "10070C",
+      "attribute": "description",
+      "old_value": "The Keysight 10070C 20 MHz passive probe is a great choice if you are looking for high quality at a very reasonable price...",
+      "new_value": "The Keysight 10070C passive probe is a high-quality probe for oscilloscope measurements."
+    },
+    {
+      "record_key": "10070C",
+      "attribute": "is_in_stock",
+      "old_value": "0",
+      "new_value": "1"
+    },
+    {
+      "record_key": "10070C",
+      "attribute": "meta_description",
+      "old_value": "The Keysight 10070C 20 MHz passive probe is a great choice if you are looking for high quality at a very reasonable price...",
+      "new_value": "The Keysight 10070C passive probe is a high-quality probe for oscilloscope measurements."
+    },
+    {
+      "record_key": "10070C",
+      "attribute": "meta_title",
+      "old_value": "10070C Passive Probe, 1:1, 20 MHz, 1.5 m [Obsolete]",
+      "new_value": "Passive Probe, 1:1, 20 MHz, 1.5 m"
+    },
+    {
+      "record_key": "10070C",
+      "attribute": "name",
+      "old_value": "10070C Passive Probe, 1:1, 20 MHz, 1.5 m [Obsolete]",
+      "new_value": "Passive Probe, 1:1, 20 MHz, 1.5 m"
+    },
+    {
+      "record_key": "10070C",
+      "attribute": "product_family",
+      "old_value": "Other Instruments",
+      "new_value": "InfiniiVision Oscilloscopes"
+    },
+    {
+      "record_key": "10070C",
+      "attribute": "qty",
+      "old_value": "0",
+      "new_value": "10"
+    },
+    {
+      "record_key": "10070C",
+      "attribute": "short_description",
+      "old_value": "The Keysight 10070C 20 MHz passive probe is a great choice if you are looking for high quality at a very reasonable price...",
+      "new_value": "The Keysight 10070C passive probe is a high-quality probe for oscilloscope measurements."
+    },
+    {
+      "record_key": "10070C",
+      "attribute": "updated_at",
+      "old_value": "2021-02-08T04:22:32.192-07:00",
+      "new_value": "2026-07-15 07:33:59"
+    },
+    {
+      "record_key": "N5172B",
+      "attribute": "updated_at",
+      "old_value": "2026-07-08 06:37:06",
+      "new_value": "2026-07-15 07:33:59"
+    },
+    {
+      "record_key": "E36312A",
+      "attribute": "updated_at",
+      "old_value": "2026-07-08 06:37:01",
+      "new_value": "2026-07-15 07:33:59"
+    },
+    {
+      "record_key": "34972A",
+      "attribute": "updated_at",
+      "old_value": "2026-07-08 06:37:01",
+      "new_value": "2026-07-15 07:33:59"
+    },
+    {
+      "record_key": "N5171B",
+      "attribute": "updated_at",
+      "old_value": "2026-07-08 06:37:06",
+      "new_value": "2026-07-15 07:33:59"
+    },
+    {
+      "record_key": "10070D",
+      "attribute": "_category",
+      "old_value": "Probes",
+      "new_value": "Oscilloscopes"
+    },
+    {
+      "record_key": "10070D",
+      "attribute": "category",
+      "old_value": "Probes",
+      "new_value": "Oscilloscopes"
+    },
+    {
+      "record_key": "10070D",
+      "attribute": "meta_title",
+      "old_value": "10070D Passive Probe, 1:1, 20 MHz, 1.5 m",
+      "new_value": "Passive Probe, 1:1, 20 MHz, 1.5 m"
+    },
+    {
+      "record_key": "10070D",
+      "attribute": "name",
+      "old_value": "10070D Passive Probe, 1:1, 20 MHz, 1.5 m",
+      "new_value": "Passive Probe, 1:1, 20 MHz, 1.5 m"
+    },
+    {
+      "record_key": "10070D",
+      "attribute": "product_family",
+      "old_value": "Other Instruments",
+      "new_value": "InfiniiVision Oscilloscopes"
+    },
+    {
+      "record_key": "10070D",
+      "attribute": "updated_at",
+      "old_value": "2021-02-08T04:22:32.192-07:00",
+      "new_value": "2026-07-15 07:33:59"
+    },
+    {
+      "record_key": "MSOX4104A",
+      "attribute": "updated_at",
+      "old_value": "2026-07-08 06:37:06",
+      "new_value": "2026-07-15 07:33:59"
+    },
+    {
+      "record_key": "33512B",
+      "attribute": "updated_at",
+      "old_value": "2026-07-08 06:37:05",
+      "new_value": "2026-07-15 07:33:59"
+    },
+    {
+      "record_key": "10020A",
+      "attribute": "Discontinued",
+      "old_value": "True",
+      "new_value": "False"
+    },
+    {
+      "record_key": "10020A",
+      "attribute": "description",
+      "old_value": "The Keysight 10020A Resistive Divider Probe Kit is a signal probing system for measuring fast-transition-time signals...",
+      "new_value": "The Keysight 10020A resistive divider probe kit is designed for high frequency measurements."
+    },
+    {
+      "record_key": "10020A",
+      "attribute": "is_in_stock",
+      "old_value": "0",
+      "new_value": "1"
+    },
+    {
+      "record_key": "10020A",
+      "attribute": "meta_description",
+      "old_value": "The Keysight 10020A Resistive Divider Probe Kit is a signal probing system for measuring fast-transition-time signals...",
+      "new_value": "The Keysight 10020A resistive divider probe kit is designed for high frequency measurements."
+    },
+    {
+      "record_key": "10020A",
+      "attribute": "meta_title",
+      "old_value": "10020A Resistive Divider Probe Kit [Obsolete]",
+      "new_value": "Resistive Divider Probe Kit"
+    },
+    {
+      "record_key": "10020A",
+      "attribute": "name",
+      "old_value": "10020A Resistive Divider Probe Kit [Obsolete]",
+      "new_value": "Resistive Divider Probe Kit"
+    },
+    {
+      "record_key": "10020A",
+      "attribute": "qty",
+      "old_value": "0",
+      "new_value": "10"
+    },
+    {
+      "record_key": "10020A",
+      "attribute": "short_description",
+      "old_value": "The Keysight 10020A Resistive Divider Probe Kit is a signal probing system for measuring fast-transition-time signals...",
+      "new_value": "The Keysight 10020A resistive divider probe kit is designed for high frequency measurements."
+    },
+    {
+      "record_key": "10020A",
+      "attribute": "updated_at",
+      "old_value": "2021-02-08T04:22:32.192-07:00",
+      "new_value": "2026-07-15 07:33:59"
+    },
+    {
+      "record_key": "33511B",
+      "attribute": "updated_at",
+      "old_value": "2026-07-08 06:37:05",
+      "new_value": "2026-07-15 07:33:59"
+    },
+    {
+      "record_key": "DSOX1204A",
+      "attribute": "updated_at",
+      "old_value": "2026-07-08 06:37:01",
+      "new_value": "2026-07-15 07:33:59"
+    },
+    {
+      "record_key": "34465A",
+      "attribute": "updated_at",
+      "old_value": "2026-07-08 06:37:01",
+      "new_value": "2026-07-15 07:33:59"
+    },
+    {
+      "record_key": "33500B",
+      "attribute": "updated_at",
+      "old_value": "2026-07-08 06:37:05",
+      "new_value": "2026-07-15 07:33:59"
+    },
+    {
+      "record_key": "N5183B",
+      "attribute": "updated_at",
+      "old_value": "2026-07-08 06:37:06",
+      "new_value": "2026-07-15 07:33:59"
+    },
+    {
+      "record_key": "N5181A",
+      "attribute": "updated_at",
+      "old_value": "2026-07-08 06:37:01",
+      "new_value": "2026-07-15 07:33:59"
+    },
+    {
+      "record_key": "34970A",
+      "attribute": "updated_at",
+      "old_value": "2026-07-08 06:37:07",
+      "new_value": "2026-07-15 07:33:59"
+    },
+    {
+      "record_key": "34461A",
+      "attribute": "updated_at",
+      "old_value": "2026-07-08 06:37:01",
+      "new_value": "2026-07-15 07:33:59"
+    },
+    {
+      "record_key": "DSOX2024A",
+      "attribute": "updated_at",
+      "old_value": "2026-07-08 06:37:06",
+      "new_value": "2026-07-15 07:33:59"
+    }
+  ]
+}

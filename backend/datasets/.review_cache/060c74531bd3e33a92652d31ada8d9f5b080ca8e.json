@@ -1,0 +1,55 @@
+{
+  "signature": "060c74531bd3e33a92652d31ada8d9f5b080ca8e",
+  "payload": {
+    "rows": [
+      {
+        "id": "TB-003-Address",
+        "record": "Record 3",
+        "attribute": "Address",
+        "attributeKey": "Address",
+        "recordIndex": 0,
+        "previous": "—",
+        "value": "Cumhuriyet Meydani No: 8, Izmir",
+        "changeType": "A",
+        "changed": true,
+        "conf": 0.89,
+        "sourceUrl": "https://TurkeyBrokers",
+        "source": "turkeybrokers",
+        "recordKey": "TB-003"
+      },
+      {
+        "id": "TB-003-City",
+        "record": "Record 3",
+        "attribute": "City",
+        "attributeKey": "City",
+        "recordIndex": 0,
+        "previous": "—",
+        "value": "Izmir",
+        "changeType": "A",
+        "changed": true,
+        "conf": 0.8,
+        "sourceUrl": "https://TurkeyBrokers",
+        "source": "turkeybrokers",
+        "recordKey": "TB-003"
+      },
+      {
+        "id": "TB-003-PrimaryKey",
+        "record": "Record 3",
+        "attribute": "Primarykey",
+        "attributeKey": "PrimaryKey",
+        "recordIndex": 0,
+        "previous": "—",
+        "value": "TB-003",
+        "changeType": "A",
+        "changed": true,
+        "conf": 0.89,
+        "sourceUrl": "https://TurkeyBrokers",
+        "source": "turkeybrokers",
+        "recordKey": "TB-003"
+      }
+    ],
+    "totalSampled": 15,
+    "sampledCount": 1,
+    "coverage": null
+  }
+}

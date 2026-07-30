@@ -1,0 +1,445 @@
+{
+  "signature": "72fe33006fdf1e32c5f5ad874e5148836cfd1024",
+  "payload": {
+    "rows": [
+      {
+        "id": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview-Accepting_New_Patients",
+        "record": "Record 1",
+        "attribute": "Accepting New Patients",
+        "attributeKey": "Accepting_New_Patients",
+        "recordIndex": 0,
+        "previous": "—",
+        "value": "Yes",
+        "changeType": "A",
+        "changed": true,
+        "conf": 0.8,
+        "sourceUrl": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview",
+        "source": "doctor.webmd.com",
+        "recordKey": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview"
+      },
+      {
+        "id": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview-Address",
+        "record": "Record 1",
+        "attribute": "Address",
+        "attributeKey": "Address",
+        "recordIndex": 0,
+        "previous": "—",
+        "value": "5171 Liberty Ave",
+        "changeType": "A",
+        "changed": true,
+        "conf": 0.89,
+        "sourceUrl": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview",
+        "source": "doctor.webmd.com",
+        "recordKey": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview"
+      },
+      {
+        "id": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview-Business_Name",
+        "record": "Record 1",
+        "attribute": "Business Name",
+        "attributeKey": "Business_Name",
+        "recordIndex": 0,
+        "previous": "—",
+        "value": "Partners In Nephrology & Endocrinology",
+        "changeType": "A",
+        "changed": true,
+        "conf": 0.89,
+        "sourceUrl": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview",
+        "source": "doctor.webmd.com",
+        "recordKey": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview"
+      },
+      {
+        "id": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview-City",
+        "record": "Record 1",
+        "attribute": "City",
+        "attributeKey": "City",
+        "recordIndex": 0,
+        "previous": "—",
+        "value": "Pittsburgh",
+        "changeType": "A",
+        "changed": true,
+        "conf": 0.89,
+        "sourceUrl": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview",
+        "source": "doctor.webmd.com",
+        "recordKey": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview"
+      },
+      {
+        "id": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview-Company_Website",
+        "record": "Record 1",
+        "attribute": "Company Website",
+        "attributeKey": "Company_Website",
+        "recordIndex": 0,
+        "previous": "—",
+        "value": "—",
+        "changeType": "V",
+        "changed": false,
+        "conf": 0.6,
+        "sourceUrl": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview",
+        "source": "doctor.webmd.com",
+        "recordKey": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview"
+      },
+      {
+        "id": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview-Detail_Url",
+        "record": "Record 1",
+        "attribute": "Detail Url",
+        "attributeKey": "Detail_Url",
+        "recordIndex": 0,
+        "previous": "—",
+        "value": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview",
+        "changeType": "A",
+        "changed": true,
+        "conf": 0.815,
+        "sourceUrl": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview",
+        "source": "doctor.webmd.com",
+        "recordKey": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview"
+      },
+      {
+        "id": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview-Fax_Phone",
+        "record": "Record 1",
+        "attribute": "Fax Phone",
+        "attributeKey": "Fax_Phone",
+        "recordIndex": 0,
+        "previous": "—",
+        "value": "—",
+        "changeType": "V",
+        "changed": false,
+        "conf": 0.6,
+        "sourceUrl": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview",
+        "source": "doctor.webmd.com",
+        "recordKey": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview"
+      },
+      {
+        "id": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview-Hospital_Affiliations",
+        "record": "Record 1",
+        "attribute": "Hospital Affiliations",
+        "attributeKey": "Hospital_Affiliations",
+        "recordIndex": 0,
+        "previous": "—",
+        "value": "Upmc East",
+        "changeType": "A",
+        "changed": true,
+        "conf": 0.89,
+        "sourceUrl": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview",
+        "source": "doctor.webmd.com",
+        "recordKey": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview"
+      },
+      {
+        "id": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview-Languages_Spoken",
+        "record": "Record 1",
+        "attribute": "Languages Spoken",
+        "attributeKey": "Languages_Spoken",
+        "recordIndex": 0,
+        "previous": "—",
+        "value": "English, Polish",
+        "changeType": "A",
+        "changed": true,
+        "conf": 0.89,
+        "sourceUrl": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview",
+        "source": "doctor.webmd.com",
+        "recordKey": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview"
+      },
+      {
+        "id": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview-Medicaid_Accepted",
+        "record": "Record 1",
+        "attribute": "Medicaid Accepted",
+        "attributeKey": "Medicaid_Accepted",
+        "recordIndex": 0,
+        "previous": "—",
+        "value": "Yes",
+        "changeType": "A",
+        "changed": true,
+        "conf": 0.8,
+        "sourceUrl": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview",
+        "source": "doctor.webmd.com",
+        "recordKey": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview"
+      },
+      {
+        "id": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview-Medical_School",
+        "record": "Record 1",
+        "attribute": "Medical School",
+        "attributeKey": "Medical_School",
+        "recordIndex": 0,
+        "previous": "—",
+        "value": "Lewis Katz School Of Medicine At Temple University",
+        "changeType": "A",
+        "changed": true,
+        "conf": 0.89,
+        "sourceUrl": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview",
+        "source": "doctor.webmd.com",
+        "recordKey": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview"
+      },
+      {
+        "id": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview-Medicare_Accepted",
+        "record": "Record 1",
+        "attribute": "Medicare Accepted",
+        "attributeKey": "Medicare_Accepted",
+        "recordIndex": 0,
+        "previous": "—",
+        "value": "Yes",
+        "changeType": "A",
+        "changed": true,
+        "conf": 0.8,
+        "sourceUrl": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview",
+        "source": "doctor.webmd.com",
+        "recordKey": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview"
+      },
+      {
+        "id": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview-Primary_Contact_Name",
+        "record": "Record 1",
+        "attribute": "Primary Contact Name",
+        "attributeKey": "Primary_Contact_Name",
+        "recordIndex": 0,
+        "previous": "—",
+        "value": "Dr. Aaron Kulick",
+        "changeType": "A",
+        "changed": true,
+        "conf": 0.89,
+        "sourceUrl": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview",
+        "source": "doctor.webmd.com",
+        "recordKey": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview"
+      },
+      {
+        "id": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview-Primary_Phone",
+        "record": "Record 1",
+        "attribute": "Primary Phone",
+        "attributeKey": "Primary_Phone",
+        "recordIndex": 0,
+        "previous": "—",
+        "value": "(412) 683-4550",
+        "changeType": "A",
+        "changed": true,
+        "conf": 0.89,
+        "sourceUrl": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview",
+        "source": "doctor.webmd.com",
+        "recordKey": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview"
+      },
+      {
+        "id": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview-Specialty",
+        "record": "Record 1",
+        "attribute": "Specialty",
+        "attributeKey": "Specialty",
+        "recordIndex": 0,
+        "previous": "—",
+        "value": "Nephrology",
+        "changeType": "A",
+        "changed": true,
+        "conf": 0.89,
+        "sourceUrl": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview",
+        "source": "doctor.webmd.com",
+        "recordKey": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview"
+      },
+      {
+        "id": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview-State",
+        "record": "Record 1",
+        "attribute": "State",
+        "attributeKey": "State",
+        "recordIndex": 0,
+        "previous": "—",
+        "value": "PA",
+        "changeType": "A",
+        "changed": true,
+        "conf": 0.55,
+        "sourceUrl": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview",
+        "source": "doctor.webmd.com",
+        "recordKey": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview"
+      },
+      {
+        "id": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview-Year_of_Graduation",
+        "record": "Record 1",
+        "attribute": "Year Of Graduation",
+        "attributeKey": "Year_of_Graduation",
+        "recordIndex": 0,
+        "previous": "—",
+        "value": "1997.0",
+        "changeType": "A",
+        "changed": true,
+        "conf": 0.89,
+        "sourceUrl": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview",
+        "source": "doctor.webmd.com",
+        "recordKey": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview"
+      },
+      {
+        "id": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview-Zip",
+        "record": "Record 1",
+        "attribute": "Zip",
+        "attributeKey": "Zip",
+        "recordIndex": 0,
+        "previous": "—",
+        "value": "15224",
+        "changeType": "A",
+        "changed": true,
+        "conf": 0.84,
+        "sourceUrl": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview",
+        "source": "doctor.webmd.com",
+        "recordKey": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview"
+      }
+    ],
+    "totalSampled": 29,
+    "sampledCount": 1,
+    "coverage": {
+      "job_coverage": 0.7988505747126436,
+      "source_coverage": null,
+      "record_coverage": 0.7988505747126439,
+      "weighted_job_coverage": null,
+      "records_in_scope": 29,
+      "expected_attributes": 18,
+      "total_filled_cells": 417,
+      "source_requested": null,
+      "source_returned": null,
+      "source_kind": null,
+      "source_breakdown": [
+        {
+          "source_key": "webmd",
+          "source_label": "Webmd",
+          "records_requested_from_source": 29,
+          "records_returned_by_source": 29,
+          "source_coverage": 1.0,
+          "filled_fields": [
+            {
+              "attribute_key": "Business_Name"
+            },
+            {
+              "attribute_key": "Address"
+            },
+            {
+              "attribute_key": "City"
+            },
+            {
+              "attribute_key": "State"
+            },
+            {
+              "attribute_key": "Zip"
+            }
+          ]
+        }
+      ],
+      "attribute_breakdown": [
+        {
+          "attribute_key": "Business_Name",
+          "attribute_label": "Business Name",
+          "non_null_values": 29,
+          "total_records_in_scope": 29,
+          "attr_coverage": 1.0
+        },
+        {
+          "attribute_key": "Address",
+          "attribute_label": "Address",
+          "non_null_values": 29,
+          "total_records_in_scope": 29,
+          "attr_coverage": 1.0
+        },
+        {
+          "attribute_key": "City",
+          "attribute_label": "City",
+          "non_null_values": 29,
+          "total_records_in_scope": 29,
+          "attr_coverage": 1.0
+        },
+        {
+          "attribute_key": "State",
+          "attribute_label": "State",
+          "non_null_values": 29,
+          "total_records_in_scope": 29,
+          "attr_coverage": 1.0
+        },
+        {
+          "attribute_key": "Zip",
+          "attribute_label": "Zip",
+          "non_null_values": 29,
+          "total_records_in_scope": 29,
+          "attr_coverage": 1.0
+        },
+        {
+          "attribute_key": "Primary_Phone",
+          "attribute_label": "Primary Phone",
+          "non_null_values": 26,
+          "total_records_in_scope": 29,
+          "attr_coverage": 0.896551724137931
+        },
+        {
+          "attribute_key": "Fax_Phone",
+          "attribute_label": "Fax Phone",
+          "non_null_values": 0,
+          "total_records_in_scope": 29,
+          "attr_coverage": 0.0
+        },
+        {
+          "attribute_key": "Company_Website",
+          "attribute_label": "Company Website",
+          "non_null_values": 0,
+          "total_records_in_scope": 29,
+          "attr_coverage": 0.0
+        },
+        {
+          "attribute_key": "Accepting_New_Patients",
+          "attribute_label": "Accepting New Patients",
+          "non_null_values": 29,
+          "total_records_in_scope": 29,
+          "attr_coverage": 1.0
+        },
+        {
+          "attribute_key": "Medicare_Accepted",
+          "attribute_label": "Medicare Accepted",
+          "non_null_values": 13,
+          "total_records_in_scope": 29,
+          "attr_coverage": 0.4482758620689655
+        },
+        {
+          "attribute_key": "Medicaid_Accepted",
+          "attribute_label": "Medicaid Accepted",
+          "non_null_values": 17,
+          "total_records_in_scope": 29,
+          "attr_coverage": 0.5862068965517241
+        },
+        {
+          "attribute_key": "Primary_Contact_Name",
+          "attribute_label": "Primary Contact Name",
+          "non_null_values": 29,
+          "total_records_in_scope": 29,
+          "attr_coverage": 1.0
+        },
+        {
+          "attribute_key": "Year_of_Graduation",
+          "attribute_label": "Year Of Graduation",
+          "non_null_values": 22,
+          "total_records_in_scope": 29,
+          "attr_coverage": 0.7586206896551724
+        },
+        {
+          "attribute_key": "Medical_School",
+          "attribute_label": "Medical School",
+          "non_null_values": 23,
+          "total_records_in_scope": 29,
+          "attr_coverage": 0.7931034482758621
+        },
+        {
+          "attribute_key": "Languages_Spoken",
+          "attribute_label": "Languages Spoken",
+          "non_null_values": 29,
+          "total_records_in_scope": 29,
+          "attr_coverage": 1.0
+        },
+        {
+          "attribute_key": "Hospital_Affiliations",
+          "attribute_label": "Hospital Affiliations",
+          "non_null_values": 26,
+          "total_records_in_scope": 29,
+          "attr_coverage": 0.896551724137931
+        },
+        {
+          "attribute_key": "Specialty",
+          "attribute_label": "Specialty",
+          "non_null_values": 29,
+          "total_records_in_scope": 29,
+          "attr_coverage": 1.0
+        },
+        {
+          "attribute_key": "Detail_Url",
+          "attribute_label": "Detail Url",
+          "non_null_values": 29,
+          "total_records_in_scope": 29,
+          "attr_coverage": 1.0
+        }
+      ]
+    }
+  }
+}

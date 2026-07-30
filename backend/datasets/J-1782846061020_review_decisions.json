@@ -1,0 +1,202 @@
+[
+  {
+    "record_index": 0,
+    "attribute": "legal_name",
+    "previous_value": "Acme Corp",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "website",
+    "previous_value": "https://acme.com",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 0,
+    "attribute": "phone",
+    "previous_value": "+1 555-0199",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "email",
+    "previous_value": "info@acme.com",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "linkedin_url",
+    "previous_value": "https://www.linkedin.com/company/acme",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "legal_name",
+    "previous_value": "Bolt.new",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "website",
+    "previous_value": "https://bolt.new",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "phone",
+    "previous_value": "+1 555-0200",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "email",
+    "previous_value": "contact@bolt.new",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "linkedin_url",
+    "previous_value": "https://www.linkedin.com/company/boltdotnew",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "legal_name",
+    "previous_value": "Vercel",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "website",
+    "previous_value": "https://vercel.com",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "phone",
+    "previous_value": "+1 555-0201",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "email",
+    "previous_value": "support@vercel.com",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "linkedin_url",
+    "previous_value": "https://www.linkedin.com/company/vercel",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "legal_name",
+    "previous_value": "Supabase",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "phone",
+    "previous_value": "+1 555-0202",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "email",
+    "previous_value": "sales@supabase.io",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "linkedin_url",
+    "previous_value": "https://www.linkedin.com/company/supabase",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "legal_name",
+    "previous_value": "OpenAI",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "website",
+    "previous_value": "https://openai.com",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "phone",
+    "previous_value": "+1 555-0203",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "email",
+    "previous_value": "press@openai.com",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "linkedin_url",
+    "previous_value": "https://www.linkedin.com/company/openai",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  }
+]

@@ -1,0 +1,1 @@
+{"bot_name": "direct-probe", "source": "https://direct-probe.com", "scope": "Full Dump", "runtime_type": "python", "entrypoint_file": "bot.py", "entrypoint_function": "run"}

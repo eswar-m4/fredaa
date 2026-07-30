@@ -1,0 +1,26 @@
+[
+  {
+    "record_index": 0,
+    "attribute": "company_name",
+    "previous_value": "Alpha Co",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "email",
+    "previous_value": "a@alpha.example",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "website",
+    "previous_value": "https://alpha.example",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  }
+]

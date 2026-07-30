@@ -1,0 +1,47 @@
+[
+  {
+    "legal_name": "Tesla, Inc.",
+    "description": "Tesla | 12,374,407 followers on LinkedIn. Tesla is accelerating the world’s transition to sustainable abundance. To achieve our mission, we&#39;re building a world powered by solar, enabled by ...",
+    "industry": "Motor Vehicles & Passenger Car Bodies",
+    "employee_count": 140473,
+    "employee_range": "10,001+ employees",
+    "hq_address": "1 TESLA ROAD",
+    "hq_city": "AUSTIN",
+    "hq_state": "TX",
+    "hq_country": "USA",
+    "website": "https://www.tesla.com/",
+    "linkedin_url": "https://www.linkedin.com/company/tesla-motors",
+    "phone": "512-516-8177",
+    "registry_number": "0001318605"
+  },
+  {
+    "legal_name": "NETFLIX INC",
+    "description": "Netflix is one of the world's leading entertainment services.",
+    "industry": "Services-Video Tape Rental",
+    "employee_count": 12800,
+    "employee_range": "10,001+ employees",
+    "hq_address": "121 ALBRIGHT WAY",
+    "hq_city": "LOS GATOS",
+    "hq_state": "CA",
+    "hq_country": "USA",
+    "website": "https://www.netflix.com",
+    "linkedin_url": "https://www.linkedin.com/company/netflix",
+    "phone": "408-540-3700",
+    "registry_number": "0001065280"
+  },
+  {
+    "legal_name": "MICROSOFT CORP",
+    "description": "Microsoft | 28,390,105 followers on LinkedIn. Every company has a mission. What&#39;s ours? To empower every person and every organization to achieve more.",
+    "industry": "Services-Prepackaged Software",
+    "employee_count": 221000,
+    "employee_range": "10,001+ employees",
+    "hq_address": "ONE MICROSOFT WAY",
+    "hq_city": "REDMOND",
+    "hq_state": "WA",
+    "hq_country": "USA",
+    "website": "https://www.microsoft.com/en-us",
+    "linkedin_url": "https://www.linkedin.com/company/microsoft",
+    "phone": "425-882-8080",
+    "registry_number": "0000789019"
+  }
+]

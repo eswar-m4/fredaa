@@ -1,0 +1,4178 @@
+[
+  {
+    "record_index": 0,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "5171 Liberty Ave",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Partners In Nephrology & Endocrinology",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Pittsburgh",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Upmc East",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "English, Polish",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "Lewis Katz School Of Medicine At Temple University",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Aaron Kulick",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(412) 683-4550",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Nephrology",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "PA",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1997.0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "15224",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "No",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "2640 Pitcairn Rd",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Ananth Raman",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Monroeville",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/dr-aananth-raman-md-b5e38f84-77cd-40b5-a00f-0403cbbc1bcd-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Lifecare Hospitals Of Pittsburgh",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "English",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "Mysore Medical College And Research Institute",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Ananth Raman",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(724) 274-8484",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Pulmonology",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "PA",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1973.0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "15146",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "1345 West Bay Dr Ste 202",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Aaron Sheets",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Largo",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/dr-aaron-b-sheets-md-d95fb815-3988-46cb-9247-dfc56dc92054-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Morton Plant Hospital",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "English",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "Ohio State University / College of Medicine & Public Health",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Aaron Sheets",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(727) 559-0895",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Family Medicine",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "FL",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1999.0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "33770",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "No",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "1801 Lee Rd Ste 165",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Aaron Godshall",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Winter Park",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/dr-aaron-j-godshall-md-b9f2b147-d4fb-4946-95c5-563413516010-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Florida Hospital For Women",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "English",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Aaron Godshall",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(407) 975-0410",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Pediatrics",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "FL",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "32789",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "1 Tech Park Dr Ste 2100",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Aashish Dua",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Johnstown",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/dr-aashish-dua-md-4fd2f563-790c-4b7c-9367-0bb7ff165ddd-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Upmc East",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "English",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "Maulana Azad Medical College â University of Delhi Graduate, New Delhi, India,Saint Xavierâs School, New Delhi, India",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Aashish Dua",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(814) 475-8600",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Cardiovascular Disease",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "PA",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "15901",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "1024 Park Ave Ste 3",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Aaron Bellew",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Plainfield",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/dr-aaron-j-bellew-md-edba2263-6c96-4fb9-81ff-a3af3ad834ae-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Saint Clares Denville Hospital",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "English, Spanish",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Aaron Bellew",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(908) 755-5545",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Podiatry",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "NJ",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "7060",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "No",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "9000 N Main St Ste 405",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Dayton Gastroenterology",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Englewood",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/dr-aaron-l-knoll-md-fd3a4e4b-a17e-e111-a6a1-001f29e3eb44-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "English",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "Ohio State University College Of Medicine & Public Health",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Aaron Knoll",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(937) 320-5050",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Gastroenterology",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "OH",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1985.0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "45415",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "5323 4th Avenue Cir E",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Aaron Sudbury",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Bradenton",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/dr-aaron-m-sudbury-md-fa3c85a4-fedb-40d6-a661-00517b195e29-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Lakewood Ranch Medical Center, Hca Florida Blake Hospital, Manatee Memorial Hospital, Hca Florida Braden River Emergency",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "English",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "No",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "University Of Miami Leonard M Miller School Of Medicine",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Aaron Sudbury",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(941) 745-5115",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Obstetrics & Gynecology",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "FL",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "2000.0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "34208",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "9000 N Main St Ste 320",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Southwest Ohio ENT Specialists",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Englewood",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/dr-aban-fuentes-do-67767ca8-dd10-43ee-b072-161184e9183e-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Dayton Childrens Hospital",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "French, Spanish, Arabic, English",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Aban Fuentes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(937) 496-2600",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Plastic Surgery",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "OH",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "45415",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "No",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "122 Clinton St",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Abbie Jacobs",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Hoboken",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/dr-abbie-d-jacobs-md-741e46be-ffba-481a-ab40-5277356afaca-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Bayonne University Hospital",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "Spanish, English",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Abbie Jacobs",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(201) 418-3100",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Family Medicine",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "NJ",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "7030",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "No",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "639 McKeesport Rd",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Abdul Khan, MD, MPH",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Elizabeth",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/dr-abdul-q-khan-md-4aded7b1-ca58-4e93-adbf-32d0ef06b288-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Upmc East, Forbes Hospital, Upmc Mercy, Allegheny Valley Hospital, Upmc Presbyterian",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "English",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "No",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "Dow Medical College",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "No",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Abdul Khan, MD, MPH",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Internal Medicine",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "PA",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1990.0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "15037",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "125 Daugherty Dr Ste 301",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Abdul Aziz",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Monroeville",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/dr-abdul-r-aziz-md-a3acaedc-5c2c-4279-a511-1271a5ee47d7-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Upmc Shadyside, Forbes Hospital, Upmc East, Independence Health System Westmoreland Hospital, Penn Highlands Mon Valley, West Penn Hospital, Upmc Presbyterian, Ahn Hempfield Neighborhood Hospital",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "English",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "Kabul Medical University Faculty Of Curative Medicine",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Abdul Aziz",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(412) 856-4666",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Cardiovascular Disease",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "PA",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1977.0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "15146",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "No",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "300 Pinellas St",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Radiology Assocs Clearwater",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Clearwater",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/dr-abdul-r-shamsi-md-98ceb9bd-94b7-412f-936d-fae4d46cf6a6-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Morton Plant Hospital, Mease Countryside Hospital, Morton Plant North Bay Hospital, Mease Dunedin Hospital",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "English",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "University Of Wisconsin School Of Medicine & Public Health",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Abdul Shamsi",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(727) 462-7000",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Diagnostic Radiology",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "FL",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "2001.0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "33756",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "6701 Sunset Dr Ste 103",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Abdul Agha",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "South Miami",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/dr-abdul-s-agha-md-151300b0-bb4c-42d8-a84b-5f78341aca8f-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "South Miami Hospital",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "Spanish, Arabic, English",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "University Of Baghdad College Of Medicine",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Abdul Agha",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(305) 661-2041",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Cardiovascular Disease",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "FL",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1963.0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "33143",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "9000 N Main St Ste 320",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Southwest Ohio ENT Specialists",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Englewood",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/dr-abdulla-j-adib-md-3df3b3c8-ece7-4908-9dce-235d45a6a856-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Kettering Health Dayton",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "Spanish, English",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "University Of Damascus Faculty Of Medicine",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Abdulla Adib",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(937) 496-2600",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Plastic Surgery",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "OH",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1979.0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "45415",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "2035 Little Rd",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Interventional Cardiac Cnslts",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Trinity",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/dr-abdur-rahim-md-3d73559a-496e-44c6-88ac-8fb9cc8d07b7-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Hca Florida Trinity Hospital, Hca Florida Bayonet Point Hospital, Morton Plant Hospital, Adventhealth Tampa, Morton Plant North Bay Hospital",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "English, Spanish",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "All-India Institute Of Medical Sciences",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Abdur Rahim",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(727) 842-9486",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Cardiovascular Disease",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "FL",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1971.0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "34655",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "5230 Centre Ave",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Abena Osei-Wusu",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Pittsburgh",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/dr-abena-oseiwusu-md-abd78a19-2052-41a7-8df7-4b53accdcb26-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Luminis Health Anne Arundel Medical Center",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "English",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "University Of Maryland School Of Medicine",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Abena Osei-Wusu",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Cardiovascular Disease",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "PA",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "2003.0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "15232",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "No",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "5670 54th Ave N Ste A-1",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Abey Sarai",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Kenneth City",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/dr-abey-sarai-md-0935c54c-a7c6-49d7-9d7c-b10a96aab838-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Hca Florida Saint Petersburg Hospital",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "English, Spanish",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "T D Medical College Alappuzha",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Abey Sarai",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(727) 548-0260",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Infectious Disease",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "FL",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1985.0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "33709",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "No",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "3901 66th St N Ste 201",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Abhitabh Patil",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "St Petersburg",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/dr-abhitabh-a-patil-md-b40472a8-120e-45e5-824c-fc97742f6da1-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Morton Plant Hospital, Saint Anthonys Health Care",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "English, Spanish",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "University Of Florida College Of Medicine",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Abhitabh Patil",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Gastroenterology",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "FL",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "2002.0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "33709",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "4501 S Semoran Blvd",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Abid Rasool",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Orlando",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/dr-abid-rasool-md-2074c07a-17e5-4e24-ac43-4a9edac803e1-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Orlando Regional Medical Center And Patient Rehabilitation",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "English, Spanish",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "Dow Medical College",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Abid Rasool",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(407) 380-1428",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Internal Medicine",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "FL",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1991.0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "32822",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "No",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "1399 Hamlet Ave",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Abraham Totah",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Clearwater",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/dr-abraham-r-totah-md-861fddf7-e6e8-4c80-a511-dc34bd4a55b1-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Morton Plant Hospital",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "English",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "St Georges University School Of Medicine",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Abraham Totah",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(727) 442-7338",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Neurology",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "FL",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1996.0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "33756",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "10801 Lockwood Dr Ste 260",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Adam Lowy",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Silver Spring",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/dr-adam-b-lowy-md-2eff27a3-78ed-4d7c-8f6b-e9ffc7011900-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Adventist Rehabilitation White Oak",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "Spanish, Italian",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Adam Lowy",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(301) 439-0300",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Podiatry",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "MD",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "20901",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "No",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "1400 Locust St",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Adam Sohnen",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Pittsburgh",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/dr-adam-e-sohnen-md-6bb3001b-a256-4106-bced-10a447d7a88a-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Upmc Shadyside",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "English",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "Emory University School Of Medicine",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Adam Sohnen",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(412) 232-8111",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Internal Medicine",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "PA",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1993.0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "15219",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "1285 Orange Ave",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Jewett Orthopaedics Clinic",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Winter Park",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/dr-adam-fenichel-md-4121a029-e70f-4335-be02-9693d11fa2b5-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Orlando Regional Medical Center And Patient Rehabilitation",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "English, Spanish",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "University Of Florida College Of Medicine",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Adam Fenichel",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(407) 647-2287",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Hand Surgery",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "FL",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1987.0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "32789",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "92 W Miller St",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Pediatrix Medical Group",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Orlando",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/dr-adam-j-gerber-md-1d7d3f49-1d72-48a5-b77e-9642aedfb8ee-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "English",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "Washington University In St Louis School Of Medicine",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Adam Gerber",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(407) 649-9111",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Urology",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "FL",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1990.0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "32806",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "300 Halket St Ste 4628",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Adam Brufsky",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Pittsburgh",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/dr-adam-m-brufsky-md-627fbf31-63df-4ea8-a9ea-7f1409e70b22-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Upmc Magee Womens Hospital",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "English",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "UNIVERSITY OF CONNECTICUT SCHOOL OF MEDICINE",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Adam Brufsky",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(412) 641-4530",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Oncology",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "PA",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1990.0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "15213",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 26,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 26,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "612 Druid Rd E",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 26,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Arthritis And Rheumatism Associates Pl",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 26,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Clearwater",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 26,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 26,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/dr-adam-m-rosen-md-f6d458fe-4de6-4ff9-b2b9-976994610680-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 26,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 26,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Morton Plant Hospital",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 26,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "English, Spanish",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 26,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "No",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 26,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "University Of Illinois At Chicago College Of Medicine",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 26,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "No",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 26,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Adam Rosen",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 26,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(727) 443-6400",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 26,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Rheumatology",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 26,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "FL",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 26,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1989.0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 26,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "33756",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 27,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 27,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "5539 Hilliard Rome Office Park",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 27,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Adam Thomas",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 27,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Hilliard",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 27,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 27,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/dr-adam-m-thomas-md-d9c84284-ed58-458e-b644-0166f81c86d3-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 27,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 27,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 27,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "English",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 27,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 27,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 27,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "No",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 27,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Adam Thomas",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 27,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(614) 636-3668",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 27,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Podiatry",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 27,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "OH",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 27,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 27,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "43026",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 28,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "No",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 28,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "335 Brighton Ave",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 28,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Adam Cugalj",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 28,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Portland",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 28,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 28,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/dr-adam-p-cugalj-do-13a173f7-685a-4573-9069-d630fe9f27b5-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 28,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 28,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Concord Hospital",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 28,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "English",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 28,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 28,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "Lake Erie College Of Osteopathic Medicine",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 28,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 28,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Adam Cugalj",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 28,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(207) 775-4000",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 28,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Physical Medicine & Rehabilitation",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 28,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "ME",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 28,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "2003.0",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 28,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "4102",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  }
+]

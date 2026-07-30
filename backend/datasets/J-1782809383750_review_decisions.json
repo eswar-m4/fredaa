@@ -1,0 +1,7202 @@
+[
+  {
+    "record_index": 0,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "No",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "7215 Wyoming Springs Dr Ste 100",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Michael Grad",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Round Rock",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/michael-grad-986860eb-0399-468e-b8b5-1e176d5b1e27-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Saint Davids Round Rock Medical Center, Ascension Seton Medical Center Austin, Saint Davids South Austin Medical Center, Saint Davids Medical Center, Saint Davids Georgetown Hospital, Saint Davids North Austin Medical Center, Heart Hospital Of Austin, Cedar Park Regional Medical Center",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "English, Spanish",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "University Of Miami Leonard M Miller School Of Medicine",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Michael Grad",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(512) 807-3180",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Cardiovascular Disease",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "TX",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1998",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "78681",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "905 W Medical Center Blvd Ste 104",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Molham Aldeiri",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Webster",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/molham-aldeiri-dfcbe8de-ed52-44cd-8c90-6661dfe937cd-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Houston Methodist Clear Lake Hospital",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "Spanish, Arabic, English",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "University Of Damascus Faculty Of Medicine",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Molham Aldeiri",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(346) 200-4612",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Cardiovascular Disease",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "TX",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "2007",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "77598",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "1729 Weston Brent Ln Ste B",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Aung Min",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "El Paso",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/aung-min-f27ce811-4d70-df11-ae8e-001f29e3eb42-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "English",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "University Of Medicine",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Aung Min",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(915) 594-7554",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Interventional Cardiology",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "TX",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1992",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 2,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "79935",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "1003 NE Loop 410",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Max Garoutte",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "San Antonio",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/max-garoutte-878e4b3d-399c-497a-85e4-c0aecf2acdf8-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Methodist Hospital Northeast",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "Spanish, English",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "University Of Missouri Columbia School Of Medicine",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Max Garoutte",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(210) 654-6000",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Cardiovascular Disease",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "TX",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1985",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 3,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "78209",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "6550 Fannin St Ste 2123",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Mohammed Attar",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Houston",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/mohammed-attar-1e6f235f-5d4a-4e28-b6de-3ac85bbba4d7-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Houston Methodist Hospital, Houston Methodist Baytown Hospital",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "Spanish, Chinese",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "American University Of Beirut Faculty Of Medicine,The University Of Texas School Of Medicine At San Antonio",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Mohammed Attar",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(713) 790-3193",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Cardiovascular Disease",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "TX",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1963",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 4,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "77030",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "2559 Western Trails Blvd # 200",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Austin Heart PA",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Austin",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/norman-risinger-jr-0b3c01f0-65e3-4a3d-afdb-3240f319858d-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Heart Hospital Of Austin",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "Spanish, English",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "University Of Texas Medical Branch At Galveston",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Norman Risinger",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(512) 899-2028",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Cardiovascular Disease",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "TX",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1991",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 5,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "78745",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "920 Medical Plaza Dr Ste 520",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Laura Fernandes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Shenandoah",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/laura-fernandes-fb075582-5a18-4f1a-aeec-00c1f1abe6b8-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "Spanish, French, Portuguese, Russian, English",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "Faculdade De Ciencias Medicas De Pernambuco (Upe)",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Laura Fernandes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(832) 562-3974",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Interventional Cardiology",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "TX",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1985",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 6,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "77380",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "1401 Medical Pkwy",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Carl Carlino",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Cedar Park",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/carl-carlino-6eba3cfe-a9af-4bcb-ae2e-cd0c485d422b-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Cedar Park Regional Medical Center, Saint Davids Medical Center, Saint Davids Georgetown Hospital, Saint Davids Round Rock Medical Center",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "English, Spanish",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "Texas Tech University Health Science Center School Of Medicine",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Carl Carlino",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(512) 528-7000",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Cardiovascular Disease",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "TX",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "2004",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 7,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "78613",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "5236 W University Dr Ste 4450",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Michael Isaac",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "McKinney",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/michael-isaac-02b2a0f5-5379-412a-be4a-ac90fc9ef6c3-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Medical City Dallas Hospital",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "English",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "University of Texas Southwestern Medical School (Education)",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Michael Isaac",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(469) 800-6100",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Cardiovascular Disease",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "TX",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1992",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 8,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "75071",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "1015 E 32nd St Ste 508",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. David Terreson",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Austin",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/david-terreson-e42b86d5-64d8-4a1b-80ad-e9970ad68a68-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Saint Davids Medical Center",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "Spanish, English",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "University Of Mississippi School Of Medicine",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. David Terreson",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(512) 807-3140",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Cardiovascular Disease",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "TX",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1986",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 9,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "78705",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "703 E Marshall Ave Ste 5007",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Charles Machell",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Longview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/charles-machell-f2aa23e7-5355-4350-999c-25447e6d299b-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Baptist Medical Center",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "English",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "University of Tx Med Branch Galveston, Galveston Tx,Texas A&M University",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Charles Machell",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(903) 315-4500",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Cardiovascular Disease",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "TX",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1980",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 10,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "75601",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "8122 Datapoint Dr Ste 120",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Wassim Choucair",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "San Antonio",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/wassim-choucair-9c76b56b-4a70-405c-a89a-5451d89da526-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "English",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "Columbia University College Of Physicians & Surgeons",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Wassim Choucair",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(210) 998-6900",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Cardiovascular Disease",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "TX",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1994",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 11,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "78229",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "4541 Medical Center Dr Ste 800",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Amer Suleman",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "McKinney",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/amer-suleman-0a76919f-df65-4367-8b68-9cf55211c332-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Texas Health Presbyterian Hospital Plano",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "English",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "King Edward Medical University",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Amer Suleman",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(214) 504-9942",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Cardiovascular Disease",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "TX",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1990",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 12,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "75069",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "2503 N US Highway 281 Ste 260",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Paul Tucker II",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Marble Falls",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/paul-tucker-ii-09db2ece-781a-4fa1-b462-6ced6e6611c1-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Saint Davids Medical Center, Saint Davids South Austin Medical Center",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "Spanish, Vietnamese",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "Baylor College Of Medicine",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Paul Tucker II",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Cardiovascular Disease",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "TX",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1987",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 13,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "78654",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "No",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "6750 N MacArthur Blvd #201",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Jacob Chemmalakuzhy",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Irving",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/jacob-chemmalakuzhy-686a3645-491c-4f31-9fc2-87222dda437c-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Carrollton Regional Medical Center",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "English, Spanish",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "No",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "University Of Missouri-Kansas City School Of Medicine",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "No",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Jacob Chemmalakuzhy",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(469) 963-0656",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Cardiovascular Disease",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "TX",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1998",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 14,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "75039",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "No",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "113 W Young St",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Austin Heart Pllc Llano",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Llano",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/david-swett-jr-a2ceb779-2f2c-4719-8e30-413879c171da-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Llano Regional Hospital",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "English",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "Universita Degli Studi Di Bologna Scuola Di Medicina E Chirurgia",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. David Swett",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Cardiovascular Disease",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "TX",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1976",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 15,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "78643",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "2200 PARK BEND DR STE 401",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Cardiovascular Specialists Of Texas",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "AUSTIN",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/robert-wozniak-97bf5dfc-e61c-4a3a-93f7-100df83539bd-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Saint Davids Round Rock Medical Center, Ascension Seton Medical Center Austin, Saint Davids South Austin Medical Center, Saint Davids Medical Center, Saint Davids Georgetown Hospital, Saint Davids North Austin Medical Center, Heart Hospital Of Austin, Cedar Park Regional Medical Center",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "English, Spanish",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "Georgetown University School Of Medicine",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Robert Wozniak",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Cardiovascular Disease",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "TX",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1986",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 16,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "78758",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "2559 Western Trails Blvd # 200",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Austin Heart PA",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Austin",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/stanley-wang-ef933b48-a19b-427e-8581-3df1d9f59628-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "Spanish, German",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "University Of Texas Southwestern Medical School",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Stanley Wang",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(512) 899-2028",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Cardiovascular Disease",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "TX",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "2001",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 17,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "78745",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "1401 Shoal Crk Ste 240",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Raul Santos",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Highland Village",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/raul-santos-jr-108f8371-519f-4bf3-a4c8-01db07ee3b64-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Baylor Scott And White Medical Center Plano",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "English, Spanish",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "University of Texas Medical Branch at Galveston (Education)",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Raul Santos",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(469) 800-1030",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Cardiovascular Disease",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "TX",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1999",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 18,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "75077",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "No",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "7215 Wyoming Springs Dr Ste 100",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Joel Gage",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Round Rock",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/joel-gage-f1af009a-9a03-46ee-89c2-8a571609ba03-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Saint Davids Round Rock Medical Center, Saint Davids South Austin Medical Center, Saint Davids Medical Center, Saint Davids Georgetown Hospital, Saint Davids North Austin Medical Center, Heart Hospital Of Austin",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "English, Spanish",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "Mcgovern Medical School At The Univ Of Texas Health Science Ctr At Houston",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Joel Gage",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(512) 334-8999",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Cardiovascular Disease",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "TX",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1997",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 19,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "78681",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "1015 E 32nd St Ste 508",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Edward Chafizadeh",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Austin",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/edward-chafizadeh-929ba726-55ef-4e81-8810-05a5c717c97c-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Ascension Seton Medical Center Austin, Saint Davids Medical Center, Saint Davids South Austin Medical Center, Saint Davids Round Rock Medical Center, Saint Davids North Austin Medical Center, Heart Hospital Of Austin",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "Spanish, English",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "Baylor College Of Medicine",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Edward Chafizadeh",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(512) 807-3140",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Cardiovascular Disease",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "TX",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1989",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 20,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "78705",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "4401 Garth Rd",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Raghunandan Muppidi",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Baytown",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/raghunandan-muppidi-229ed19b-e21b-4dd3-b67a-d929e55184de-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Houston Methodist Hospital",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "English, Indian (Hindi), Telugu",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "Gandhi Medical College Secunderabad",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Raghunandan Muppidi",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(281) 420-8600",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Cardiovascular Disease",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "TX",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "2001",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 21,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "77521",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "915 Gessner Rd Ste 925",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Lalitha Sunder",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Houston",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/lalitha-sunder-5c8241d4-b17e-4163-9e3d-6471bf3ade69-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Memorial Hermann Memorial City Medical Center",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "Spanish, English",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "Bangalore Medical College",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Lalitha Sunder",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(713) 973-8821",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Cardiovascular Disease",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "TX",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1987",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 22,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "77024",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "No",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "1401 Medical Pkwy",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Stephen Garland",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Cedar Park",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/stephen-garland-6d351b7e-bcc5-44a8-8b40-5e8bc067bf37-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Saint Davids Georgetown Hospital",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "English",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "Universidad Autonoma De Guadalajara Facultad De Medicina",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Stephen Garland",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(512) 528-7000",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Cardiovascular Disease",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "TX",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1982",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 23,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "78613",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "2505 Scripture St Suite 100",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Sridevi Pitta",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Denton",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/sridevi-pitta-3ba7769c-deab-49c8-92f4-8725b129cf36-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "English",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "Kurnool Medical College",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Sridevi Pitta",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(940) 320-2188",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Cardiovascular Disease",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "TX",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1999",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 24,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "76201",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "2200 PARK BEND DR STE 401",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Cardiovascular Specialists Of Texas",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "AUSTIN",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/paolo-venegoni-d7f49beb-a485-4479-9ea1-839ad490041b-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Saint Davids Medical Center Inpatient Rehab Hospital",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "English, Spanish",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "Universita Degli Studi Di Milano Facolta Di Medicina E Chirurgia",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Paolo Venegoni",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Cardiovascular Disease",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "TX",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1987",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 25,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "78758",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 26,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 26,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "17350 St. Luke's Way Ste 400",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 26,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Kedarnath Vaidya",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 26,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "The Woodlands",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 26,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 26,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/kedarnath-vaidya-b4943d3d-fd99-4055-86a6-7f49e00b5865-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 26,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 26,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Hca Houston Healthcare Northwest",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 26,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "English",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 26,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 26,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "ECFMG On-line ServicesForeign Medical Student (MD or MBBS)",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 26,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 26,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Kedarnath Vaidya",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 26,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(281) 444-3278",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 26,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Cardiovascular Disease",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 26,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "TX",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 26,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 26,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "77384",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 27,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "No",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 27,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "1300 West Terrell Ave #500",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 27,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Timothy Hadden",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 27,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Fort Worth",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 27,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 27,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/timothy-hadden-db242639-76e7-48c4-ae22-ec3713dab023-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 27,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 27,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Texas Health Harris Methodist Hospital Fort Worth, Texas Health Harris Methodist Hospital Southwest Fort Worth, William P Clements Jr University Hospital, Baylor Scott And White All Saints Medical Center Fort Worth, Texas Rehabilitation Hospital Of Fort Worth",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 27,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "Spanish, English",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 27,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 27,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "University Of Oklahoma College Of Medicine",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 27,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 27,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Timothy Hadden",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 27,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 27,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Interventional Cardiology",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 27,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "TX",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 27,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1997",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 27,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "76104",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 28,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "No",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 28,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "1200 Binz St Ste 900",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 28,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Pranav Loyalka",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 28,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Houston",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 28,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 28,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/parnav-loyalka-adcf47aa-ec77-47c5-a025-1dd73793926a-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 28,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 28,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Memorial Hermann Texas Medical Center",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 28,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "English, Spanish",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 28,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 28,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "University Of Missouri Columbia School Of Medicine",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 28,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 28,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Pranav Loyalka",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 28,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(713) 522-0220",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 28,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Interventional Cardiology",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 28,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "TX",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 28,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1997",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 28,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "77004",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 29,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "No",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 29,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "16030 Park Valley Dr Ste 201",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 29,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Saint Davids Heart And Vascular Round Rock",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 29,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Round Rock",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 29,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 29,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/manish-chauhan-32d49fba-e008-416b-b5fe-89eb90ece7ed-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 29,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 29,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Saint Davids Medical Center Inpatient Rehab Hospital",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 29,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "English, Spanish",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 29,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 29,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "Seth G S Medical College",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 29,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 29,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Manish Chauhan",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 29,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(737) 931-1100",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 29,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Cardiovascular Disease",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 29,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "TX",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 29,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1991",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 29,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "78681",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 30,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 30,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "15200 Southwest Fwy Ste 290",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 30,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Gregory Pepper",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 30,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Sugar Land",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 30,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 30,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/gregory-pepper-ada6eb0c-d696-4dc3-b546-4ed78d8345a2-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 30,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 30,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Memorial Hermann Sugar Land Hospital",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 30,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "English, Spanish",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 30,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 30,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "Medical College Of Wisconsin",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 30,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "No",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 30,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Gregory Pepper",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 30,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(281) 980-1282",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 30,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Cardiovascular Disease",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 30,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "TX",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 30,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1996",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 30,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "77478",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 31,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "No",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 31,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "111 Dallas St",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 31,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Star Anesthesia",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 31,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "San Antonio",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 31,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 31,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/john-mulrow-ce8c3492-ec8b-47e3-a04d-750d58362d53-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 31,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 31,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Baptist Medical Center",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 31,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "English, Spanish",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 31,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 31,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "New York Medical College",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 31,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 31,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. John Mulrow",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 31,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(210) 297-7000",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 31,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Cardiovascular Disease",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 31,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "TX",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 31,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1978",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 31,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "78205",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 32,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "No",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 32,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "134 Menger Spgs Ste 1370",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 32,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Methodist Physician Practices PLLC",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 32,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Boerne",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 32,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 32,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/robert-saad-c0d933f8-f0ca-4218-8bbe-282877b133d7-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 32,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 32,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Methodist Childrens Hospital",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 32,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "Spanish, Arabic",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 32,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 32,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "Uniformed Services Univ Of The Health Sciences F E Hebert Schl Of Medicine",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 32,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 32,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Robert Saad",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 32,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(830) 331-8000",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 32,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Cardiovascular Disease",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 32,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "TX",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 32,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1985",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 32,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "78006",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 33,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 33,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "4701 Old Shepard Pl Ste 160",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 33,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Mordecai Klein",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 33,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Plano",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 33,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 33,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/mordecai-klein-9ad153c5-f1ac-4cb2-9c8c-45ddb6b5680a-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 33,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 33,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Medical City Plano Hospital, Texas Health Presbyterian Hospital Plano, Baylor Scott And White Medical Center Plano, Baylor Scott And White The Heart Hospital Plano",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 33,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "Spanish, English",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 33,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "No",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 33,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "University Of Illinois At Chicago College Of Medicine",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 33,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "No",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 33,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Mordecai Klein",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 33,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 33,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Cardiovascular Disease",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 33,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "TX",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 33,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1983",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 33,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "75093",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 34,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 34,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "4411 Medical Dr Ste 300",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 34,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Methodist Physician Practices PLLC",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 34,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "San Antonio",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 34,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 34,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/ananth-prasad-6e5f26ee-1b2e-4c32-991c-27f1e5f20a3e-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 34,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 34,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Methodist Childrens Hospital",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 34,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "Spanish, Arabic",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 34,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 34,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "Vijayanagar Institute Of Medical Sciences",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 34,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 34,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Ananth Prasad",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 34,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(210) 614-5400",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 34,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Cardiovascular Disease",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 34,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "TX",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 34,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1988",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 34,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "78229",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 35,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 35,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "1015 E 32nd St Ste 508",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 35,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Francisco Otero",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 35,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Austin",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 35,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 35,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/francisco-otero-2a9212c7-ce86-4fa1-ab49-727953f84e55-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 35,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 35,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Ascension Seton Medical Center Austin, Saint Davids Medical Center, Saint Davids South Austin Medical Center, Saint Davids North Austin Medical Center, Heart Hospital Of Austin, Ascension Seton Medical Center Hays",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 35,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "Spanish, English",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 35,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 35,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "Universidad De Cadiz Facultad De Medicina",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 35,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 35,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Francisco Otero",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 35,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(512) 807-3140",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 35,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Interventional Cardiology",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 35,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "TX",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 35,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1990",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 35,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "78705",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 36,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 36,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "8230 Walnut Hill Lane Suite 220",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 36,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. James Park",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 36,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Dallas",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 36,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 36,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/james-park-8f5ff98b-41cc-4f80-94a6-83bb8b93fbcd-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 36,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 36,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Texas Health Presbyterian Hospital Kaufman",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 36,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "Spanish, Korean",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 36,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 36,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "University Of California Irvine College Of Medicine",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 36,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 36,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. James Park",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 36,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(214) 345-8692",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 36,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Cardiovascular Disease",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 36,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "TX",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 36,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1991",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 36,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "75231",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 37,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 37,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "508 N Key Ave",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 37,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Austin Heart PA",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 37,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Lampasas",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 37,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 37,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/adolph-mares-jr-ff4f34eb-f16e-4cf0-9df1-278c47d0427f-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 37,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 37,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Adventhealth Rollins Brook",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 37,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "English, Spanish",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 37,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 37,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "Baylor College Of Medicine",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 37,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 37,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Adolph Mares Jr",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 37,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(254) 526-2085",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 37,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Cardiovascular Disease",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 37,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "TX",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 37,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1987",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 37,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "76550",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 38,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 38,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "3801 N Lamar Blvd Ste 300",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 38,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Austin Heart PA",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 38,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Austin",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 38,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 38,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/kunjan-bhatt-fb630d95-8177-4971-ae8b-b314b7e2a38f-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 38,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 38,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Baylor Scott And White Medical Center Taylor",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 38,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "English, Spanish",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 38,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 38,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "Suny Downstate Medical Center College Of Medicine",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 38,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 38,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Kunjan Bhatt",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 38,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(512) 206-3600",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 38,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Cardiovascular Disease",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 38,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "TX",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 38,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "2001",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 38,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "78756",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 39,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 39,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "5802 Saratoga Blvd Ste 320",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 39,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Mehrdad Salamat",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 39,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Corpus Christi",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 39,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 39,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/mehrdad-salamat-23f49b05-0551-4890-ac6c-a970ef05091d-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 39,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 39,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Driscoll Childrens Hospital, Post Acute Medical Specialty Hospital North Of Corpus Christi, Corpus Christi Medical Center Doctors Regional Hospital, Corpus Christi Medical Center Bay Area, Knapp Medical Center, Christus Spohn Hospital Corpus Christi South, Corpus Christi Medical Center Heart Hospital, Christus Spohn Hospital Corpus Christi Shoreline",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 39,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "English, Spanish",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 39,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 39,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "Albert-Ludwigs-Universitaet Freiburg Medizinische Fakultaet",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 39,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "No",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 39,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Mehrdad Salamat",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 39,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(361) 452-4404",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 39,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Cardiovascular Disease",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 39,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "TX",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 39,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1987",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 39,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "78414",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 40,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "No",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 40,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "7700 Floyd Curl Dr",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 40,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Jose Triana",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 40,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "San Antonio",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 40,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 40,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/jose-triana-a7cf14b2-e2ad-4888-92e0-85aec06cae4a-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 40,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 40,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "UVALDE MEMORIAL HOSPITAL",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 40,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "English, Spanish",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 40,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 40,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "Pontificia Universidad Javeriana Bogota Facultad De Medicina",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 40,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 40,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Jose Triana",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 40,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(210) 575-6800",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 40,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Cardiovascular Disease",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 40,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "TX",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 40,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1983",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 40,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "78229",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 41,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "No",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 41,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "12221 N Mopac Expy",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 41,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "The Austin Diagnostic Clinic",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 41,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Austin",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 41,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 41,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/francis-zidar-b7cd1b8c-f5dc-45b5-8b9e-3631b0258a02-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 41,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 41,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Heart Hospital Of Austin",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 41,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "Spanish, English",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 41,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 41,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "University Of Michigan Medical School",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 41,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 41,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Francis Zidar",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 41,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(512) 901-1000",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 41,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Interventional Cardiology",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 41,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "TX",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 41,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1997",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 41,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "78758",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 42,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 42,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "3101 Highway 71 E Ste 107",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 42,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Texas Heart And Vascular",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 42,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Bastrop",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 42,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 42,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/vinh-nguyen-87112146-8f4f-40d3-87bb-a0a8b54d9451-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 42,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 42,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Saint Davids Medical Center, Saint Davids South Austin Medical Center",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 42,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "Spanish, Vietnamese, English",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 42,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 42,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "Michigan State University College Of Osteopathic Medicine",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 42,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 42,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Vinh Nguyen",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 42,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 42,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Interventional Cardiology",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 42,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "TX",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 42,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1997",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 42,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "78602",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 43,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "No",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 43,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "2410 Round Rock Ave Ste 110",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 43,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Austin Heart PA",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 43,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Round Rock",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 43,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 43,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/joseph-szczytowski-75839724-f47f-4c41-9a6e-be5dc8d68f78-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 43,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 43,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Saint Davids Round Rock Medical Center",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 43,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "English",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 43,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 43,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "Univ Of North Texas Health Science Center Texas College Of Osteopathic Med",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 43,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 43,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Joseph Szczytowski",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 43,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(512) 341-0889",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 43,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Cardiovascular Disease",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 43,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "TX",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 43,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "2001",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 43,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "78681",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 44,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 44,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "1121 5th Ave",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 44,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Texas Health Care Pllc",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 44,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Fort Worth",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 44,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 44,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/mohanakrishnan-sathyamoorthy-90286aae-bd39-484c-b816-97d15629b306-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 44,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 44,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Baylor Scott And White All Saints Medical Center Fort Worth",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 44,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "English, Spanish",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 44,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 44,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "Renaissance School Of Medicine At Stony Brook University",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 44,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 44,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Mohanakrishnan Sathyamoorthy",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 44,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(817) 423-8585",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 44,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Cardiovascular Disease",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 44,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "TX",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 44,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "2001",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 44,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "76104",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 45,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "No",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 45,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "219A E Railroad Row",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 45,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Austin Heart Pllc Giddings",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 45,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Giddings",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 45,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 45,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/david-abrams-a46d14da-c92b-4283-8854-ac7feed07acd-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 45,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 45,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Heart Hospital Of Austin",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 45,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "English, Spanish",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 45,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 45,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "University Of Miami Leonard M Miller School Of Medicine",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 45,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 45,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. David Abrams",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 45,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(979) 242-5677",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 45,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Cardiovascular Disease",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 45,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "TX",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 45,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1977",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 45,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "78942",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 46,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 46,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "925 Gessner Rd #400",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 46,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Long Cao",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 46,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Houston",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 46,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 46,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/long-cao-a505e490-ed03-46ad-a4f7-3fe5cac15985-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 46,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 46,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Ecu Health Roanoke Chowan Hospital",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 46,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "English, Spanish",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 46,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 46,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "University Of Texas Medical Branch At Galveston",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 46,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 46,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Long Cao",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 46,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(713) 467-0605",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 46,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Cardiovascular Disease",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 46,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "TX",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 46,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "2008",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 46,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "77024",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 47,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "No",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 47,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "3901 W 15th St",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 47,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "US Anesthesia Partners",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 47,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Plano",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 47,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 47,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/saleem-akbar-9fab3f69-364a-4c57-be8a-862fba3974de-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 47,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 47,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Texas Health Presbyterian Hospital Plano",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 47,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "English, Spanish",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 47,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 47,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "Dow Medical College",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 47,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 47,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Saleem Akbar",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 47,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(972) 596-6800",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 47,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Cardiovascular Disease",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 47,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "TX",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 47,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1989",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 47,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "75075",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 48,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 48,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "915 Gessner Rd Ste 680",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 48,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Alexander Drtil",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 48,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Houston",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 48,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 48,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/alexander-drtil-54f41f4c-4638-493b-8cea-2161ea844d99-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 48,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 48,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Houston Methodist Continuing Care Hospital, Memorial Hermann Memorial City Medical Center, Memorial Hermann Southwest Hospital, Houston Methodist Hospital, Memorial Hermann Texas Medical Center, Memorial Hermann Heart And Vascular Institute Southwest, Childrens Memorial Hermann Hospital",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 48,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "Spanish, German",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 48,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 48,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "Mcgovern Medical School At The Univ Of Texas Health Science Ctr At Houston",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 48,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 48,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. Alexander Drtil",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 48,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "(713) 827-8710",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 48,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Cardiovascular Disease",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 48,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "TX",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 48,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1987",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 48,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "77024",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 49,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 49,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "4316 JAMES CASEY ST STE C",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 49,
+    "attribute": "Business_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. John Dieck",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 49,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "AUSTIN",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 49,
+    "attribute": "Company_Website",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 49,
+    "attribute": "Detail_Url",
+    "previous_value": "—",
+    "enriched_value": "https://doctor.webmd.com/doctor/john-dieck-jr-fa9d0eec-5386-4eca-b1ba-427cc9871558-overview",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 49,
+    "attribute": "Fax_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 49,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "—",
+    "enriched_value": "Saint Davids South Austin Medical Center, Saint Davids Medical Center, Ascension Seton Medical Center Austin, Saint Davids North Austin Medical Center, Heart Hospital Of Austin, Ascension Seton Southwest Hospital, Baylor Scott And White Medical Center Marble Falls",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 49,
+    "attribute": "Languages_Spoken",
+    "previous_value": "—",
+    "enriched_value": "Spanish, Vietnamese",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 49,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 49,
+    "attribute": "Medical_School",
+    "previous_value": "—",
+    "enriched_value": "Baylor College Of Medicine",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 49,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "—",
+    "enriched_value": "Yes",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 49,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "—",
+    "enriched_value": "Dr. John Dieck",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 49,
+    "attribute": "Primary_Phone",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 49,
+    "attribute": "Specialty",
+    "previous_value": "—",
+    "enriched_value": "Cardiovascular Disease",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 49,
+    "attribute": "State",
+    "previous_value": "—",
+    "enriched_value": "TX",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 49,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "—",
+    "enriched_value": "1984",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 49,
+    "attribute": "Zip",
+    "previous_value": "—",
+    "enriched_value": "78745",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  }
+]

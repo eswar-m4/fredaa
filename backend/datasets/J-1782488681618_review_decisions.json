@@ -1,0 +1,82 @@
+[
+  {
+    "record_index": 0,
+    "attribute": "detected_company_name",
+    "previous_value": "Data and Technology Services",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 0,
+    "attribute": "detected_keywords",
+    "previous_value": "['with', 'services', 'years', 'expertise', 'data', 'your', 'business', 'empowering', 'businesses', 'around']",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 0,
+    "attribute": "emails",
+    "previous_value": "[]",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 0,
+    "attribute": "meta_description",
+    "previous_value": "Empowering businesses around the world with 20+ years of expertise in Data and Technology services. Power your business with our industry-standard services.",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 0,
+    "attribute": "page_text",
+    "previous_value": "Empowering businesses around the world with 20+ years of expertise in Data and Technology services. Power your business with our industry-standard services. Artificial Intelligence We’re deeply invested in AI, analytics, and automation with years of expertise to provide high-quality, scalable, and customizable services across industries. We bring together the agility powered by technologies and the focus on data-driven decision-making to speed up the digital transformation that your business needs.",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 0,
+    "attribute": "page_text_length",
+    "previous_value": "503",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 0,
+    "attribute": "phone_numbers",
+    "previous_value": "[]",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 0,
+    "attribute": "social_links",
+    "previous_value": "['https://twitter.com/Mobius_Inc', 'https://www.linkedin.com/company/269452/', 'https://youtube.com/channel/UCLxpaJZS6EC84cCw9a6uEvg']",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 0,
+    "attribute": "title",
+    "previous_value": "Data and Technology Services | Top Data Solutions | Mobius",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 0,
+    "attribute": "url",
+    "previous_value": "https://mobiusservices.com",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "rejected"
+  }
+]

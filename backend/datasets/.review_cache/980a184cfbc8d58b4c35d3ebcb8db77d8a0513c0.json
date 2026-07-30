@@ -1,0 +1,100 @@
+{
+  "signature": "980a184cfbc8d58b4c35d3ebcb8db77d8a0513c0",
+  "payload": {
+    "rows": [
+      {
+        "id": "TB-009-Address",
+        "record": "Record 9",
+        "attribute": "Address",
+        "attributeKey": "Address",
+        "recordIndex": 0,
+        "previous": "—",
+        "value": "Gazi Mustafa Kemal Bulvari No: 54, Ankara",
+        "changeType": "A",
+        "changed": true,
+        "conf": 0.89,
+        "sourceUrl": "https://TurkeyBrokers",
+        "source": "turkeybrokers",
+        "recordKey": "TB-009"
+      },
+      {
+        "id": "TB-009-City",
+        "record": "Record 9",
+        "attribute": "City",
+        "attributeKey": "City",
+        "recordIndex": 0,
+        "previous": "—",
+        "value": "Ankara",
+        "changeType": "A",
+        "changed": true,
+        "conf": 0.89,
+        "sourceUrl": "https://TurkeyBrokers",
+        "source": "turkeybrokers",
+        "recordKey": "TB-009"
+      },
+      {
+        "id": "TB-009-PrimaryKey",
+        "record": "Record 9",
+        "attribute": "Primarykey",
+        "attributeKey": "PrimaryKey",
+        "recordIndex": 0,
+        "previous": "—",
+        "value": "TB-009",
+        "changeType": "A",
+        "changed": true,
+        "conf": 0.89,
+        "sourceUrl": "https://TurkeyBrokers",
+        "source": "turkeybrokers",
+        "recordKey": "TB-009"
+      },
+      {
+        "id": "TB-010-Address",
+        "record": "Record 10",
+        "attribute": "Address",
+        "attributeKey": "Address",
+        "recordIndex": 1,
+        "previous": "—",
+        "value": "Ataturk Caddesi No: 77, Bursa",
+        "changeType": "A",
+        "changed": true,
+        "conf": 0.89,
+        "sourceUrl": "https://TurkeyBrokers",
+        "source": "turkeybrokers",
+        "recordKey": "TB-010"
+      },
+      {
+        "id": "TB-010-City",
+        "record": "Record 10",
+        "attribute": "City",
+        "attributeKey": "City",
+        "recordIndex": 1,
+        "previous": "—",
+        "value": "Bursa",
+        "changeType": "A",
+        "changed": true,
+        "conf": 0.8,
+        "sourceUrl": "https://TurkeyBrokers",
+        "source": "turkeybrokers",
+        "recordKey": "TB-010"
+      },
+      {
+        "id": "TB-010-PrimaryKey",
+        "record": "Record 10",
+        "attribute": "Primarykey",
+        "attributeKey": "PrimaryKey",
+        "recordIndex": 1,
+        "previous": "—",
+        "value": "TB-010",
+        "changeType": "A",
+        "changed": true,
+        "conf": 0.89,
+        "sourceUrl": "https://TurkeyBrokers",
+        "source": "turkeybrokers",
+        "recordKey": "TB-010"
+      }
+    ],
+    "totalSampled": 15,
+    "sampledCount": 2,
+    "coverage": null
+  }
+}

@@ -1,0 +1,247 @@
+{
+  "signature": "34c0cd4938781db46c3c6b0c1712f95685118b79",
+  "payload": {
+    "rows": [
+      {
+        "id": "Bombay Stock Exchange-detected_company_name",
+        "record": "Record 1",
+        "attribute": "Detected Company Name",
+        "attributeKey": "detected_company_name",
+        "recordIndex": 0,
+        "previous": "—",
+        "value": "Bombay Stock Exchange",
+        "changeType": "A",
+        "changed": true,
+        "conf": 0.92,
+        "sourceUrl": "https://Bombay Stock Exchange",
+        "source": "bombay stock exchange",
+        "recordKey": "Bombay Stock Exchange"
+      },
+      {
+        "id": "Bombay Stock Exchange-detected_keywords",
+        "record": "Record 1",
+        "attribute": "Detected Keywords",
+        "attributeKey": "detected_keywords",
+        "recordIndex": 0,
+        "previous": "—",
+        "value": "['crawled', 'verified']",
+        "changeType": "A",
+        "changed": true,
+        "conf": 0.89,
+        "sourceUrl": "https://Bombay Stock Exchange",
+        "source": "bombay stock exchange",
+        "recordKey": "Bombay Stock Exchange"
+      },
+      {
+        "id": "Bombay Stock Exchange-emails",
+        "record": "Record 1",
+        "attribute": "Emails",
+        "attributeKey": "emails",
+        "recordIndex": 0,
+        "previous": "—",
+        "value": "['info@example.com']",
+        "changeType": "A",
+        "changed": true,
+        "conf": 0.89,
+        "sourceUrl": "https://Bombay Stock Exchange",
+        "source": "bombay stock exchange",
+        "recordKey": "Bombay Stock Exchange"
+      },
+      {
+        "id": "Bombay Stock Exchange-meta_description",
+        "record": "Record 1",
+        "attribute": "Meta Description",
+        "attributeKey": "meta_description",
+        "recordIndex": 0,
+        "previous": "—",
+        "value": "Onboarded and crawled successfully",
+        "changeType": "A",
+        "changed": true,
+        "conf": 0.89,
+        "sourceUrl": "https://Bombay Stock Exchange",
+        "source": "bombay stock exchange",
+        "recordKey": "Bombay Stock Exchange"
+      },
+      {
+        "id": "Bombay Stock Exchange-page_text",
+        "record": "Record 1",
+        "attribute": "Page Text",
+        "attributeKey": "page_text",
+        "recordIndex": 0,
+        "previous": "—",
+        "value": "Sample visible page text parsed from company website",
+        "changeType": "A",
+        "changed": true,
+        "conf": 0.89,
+        "sourceUrl": "https://Bombay Stock Exchange",
+        "source": "bombay stock exchange",
+        "recordKey": "Bombay Stock Exchange"
+      },
+      {
+        "id": "Bombay Stock Exchange-phone_numbers",
+        "record": "Record 1",
+        "attribute": "Phone Numbers",
+        "attributeKey": "phone_numbers",
+        "recordIndex": 0,
+        "previous": "—",
+        "value": "['+1 555-0199']",
+        "changeType": "A",
+        "changed": true,
+        "conf": 0.89,
+        "sourceUrl": "https://Bombay Stock Exchange",
+        "source": "bombay stock exchange",
+        "recordKey": "Bombay Stock Exchange"
+      },
+      {
+        "id": "Bombay Stock Exchange-social_links",
+        "record": "Record 1",
+        "attribute": "Social Links",
+        "attributeKey": "social_links",
+        "recordIndex": 0,
+        "previous": "—",
+        "value": "[]",
+        "changeType": "A",
+        "changed": true,
+        "conf": 0.55,
+        "sourceUrl": "https://Bombay Stock Exchange",
+        "source": "bombay stock exchange",
+        "recordKey": "Bombay Stock Exchange"
+      },
+      {
+        "id": "Bombay Stock Exchange-title",
+        "record": "Record 1",
+        "attribute": "Title",
+        "attributeKey": "title",
+        "recordIndex": 0,
+        "previous": "—",
+        "value": "Sample Crawled Title for Bombay Stock Exchange",
+        "changeType": "A",
+        "changed": true,
+        "conf": 0.89,
+        "sourceUrl": "https://Bombay Stock Exchange",
+        "source": "bombay stock exchange",
+        "recordKey": "Bombay Stock Exchange"
+      },
+      {
+        "id": "Bombay Stock Exchange-url",
+        "record": "Record 1",
+        "attribute": "Url",
+        "attributeKey": "url",
+        "recordIndex": 0,
+        "previous": "—",
+        "value": "Bombay Stock Exchange",
+        "changeType": "A",
+        "changed": true,
+        "conf": 0.765,
+        "sourceUrl": "https://Bombay Stock Exchange",
+        "source": "bombay stock exchange",
+        "recordKey": "Bombay Stock Exchange"
+      }
+    ],
+    "totalSampled": 1,
+    "sampledCount": 1,
+    "coverage": {
+      "job_coverage": 1.0,
+      "source_coverage": null,
+      "record_coverage": 1.0,
+      "weighted_job_coverage": null,
+      "records_in_scope": 1,
+      "expected_attributes": 9,
+      "total_filled_cells": 9,
+      "source_requested": null,
+      "source_returned": null,
+      "source_kind": null,
+      "source_breakdown": [
+        {
+          "source_key": "bombay_stock_exchange",
+          "source_label": "Bombay Stock Exchange",
+          "records_requested_from_source": 1,
+          "records_returned_by_source": 1,
+          "source_coverage": 1.0,
+          "filled_fields": [
+            {
+              "attribute_key": "url"
+            },
+            {
+              "attribute_key": "title"
+            },
+            {
+              "attribute_key": "meta_description"
+            },
+            {
+              "attribute_key": "emails"
+            },
+            {
+              "attribute_key": "phone_numbers"
+            }
+          ]
+        }
+      ],
+      "attribute_breakdown": [
+        {
+          "attribute_key": "url",
+          "attribute_label": "Url",
+          "non_null_values": 1,
+          "total_records_in_scope": 1,
+          "attr_coverage": 1.0
+        },
+        {
+          "attribute_key": "title",
+          "attribute_label": "Title",
+          "non_null_values": 1,
+          "total_records_in_scope": 1,
+          "attr_coverage": 1.0
+        },
+        {
+          "attribute_key": "meta_description",
+          "attribute_label": "Meta Description",
+          "non_null_values": 1,
+          "total_records_in_scope": 1,
+          "attr_coverage": 1.0
+        },
+        {
+          "attribute_key": "emails",
+          "attribute_label": "Emails",
+          "non_null_values": 1,
+          "total_records_in_scope": 1,
+          "attr_coverage": 1.0
+        },
+        {
+          "attribute_key": "phone_numbers",
+          "attribute_label": "Phone Numbers",
+          "non_null_values": 1,
+          "total_records_in_scope": 1,
+          "attr_coverage": 1.0
+        },
+        {
+          "attribute_key": "social_links",
+          "attribute_label": "Social Links",
+          "non_null_values": 1,
+          "total_records_in_scope": 1,
+          "attr_coverage": 1.0
+        },
+        {
+          "attribute_key": "detected_company_name",
+          "attribute_label": "Detected Company Name",
+          "non_null_values": 1,
+          "total_records_in_scope": 1,
+          "attr_coverage": 1.0
+        },
+        {
+          "attribute_key": "detected_keywords",
+          "attribute_label": "Detected Keywords",
+          "non_null_values": 1,
+          "total_records_in_scope": 1,
+          "attr_coverage": 1.0
+        },
+        {
+          "attribute_key": "page_text",
+          "attribute_label": "Page Text",
+          "non_null_values": 1,
+          "total_records_in_scope": 1,
+          "attr_coverage": 1.0
+        }
+      ]
+    }
+  }
+}

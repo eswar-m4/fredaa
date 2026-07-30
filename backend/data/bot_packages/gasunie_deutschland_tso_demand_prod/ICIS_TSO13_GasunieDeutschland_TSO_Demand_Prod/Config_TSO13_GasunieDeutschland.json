@@ -1,0 +1,155 @@
+{
+	"operatorId"		:	"TSO13",
+	"hoursAddSub"		:	-5,
+	"scriptRunStatus"	:	true,
+	"mailTrigger"		:	true,
+	"cachePath"			:	"C:/Paris/Cache/TSO/TSO13/<DATE>/",
+	
+	"IP_mapping":"",
+	"gasflow"				:
+	{
+		"cacheMove"					:	true,
+		"outputMove"				:	true,
+		"cachePath"					:	"C:/Paris/Cache/TSO/TSO13/<DATE>/",
+		"outputPath"				:	"C:/Paris/RawData/TSO/TSO13/",
+		
+		"dayCalc"					:	true,
+		"startDay"					:	-7,
+		"endDay"					:	0,
+		"dateCalc"					:	false,
+		"startDate"					:	"2024-04-01",
+		"endDate"					:	"2024-04-05",
+		"dateListCalc"				:	false,
+		"dateList"					:	["2022-10-07","2022-10-09"],
+		"intra-day"					:   true,
+		"gas-day"					:   true,
+		"replicatedate"				:"2026-03-22",
+		"replicatenumofdays"        :1,
+		"operator_points"			: 	{"Gasunie Deutschland": ["Brunsbuettel Hafen (FSRU)","Dornum","Ellund","Emden EPT1","VIP-TTF-THE-H"]},
+		"operator_points_"			: 	{"Gasunie Deutschland": ["VIP-TTF-THE-H"]},
+		
+		"op_details"				:	{"VIP-TTF-THE-H":["VIP TTF-THE-H"],"Brunsbuettel Hafen (FSRU)" : ["Brunsbuettel Hafen (FSRU)", "", "11.33884"], "Dornum" : ["Dornum", "", "11.33884"],"Ellund":["VIP DK-THE"],"Emden EPT1":["Emden-EPT1"]},
+		
+		"gcv"						:	{"Brunsbuettel Hafen (FSRU)":{"value":"11.53", "unit":""},"Dornum":{"value":"11.356", "unit":""},"Ellund":{"value":"11.23", "unit":""},"Emden EPT1":{"value":"11.45", "unit":""},"VIP-TTF-THE-H":{"value":"11.27", "unit":""}},
+		
+		
+		"missingData"      			: 	{"Brunsbuettel Hafen (FSRU)":[],"Dornum":[],"Ellund":[],"Emden EPT1":[],"VIP-TTF-THE-H":[],"All":[]},
+		
+		"emptyProvisionalData"		:	{"Brunsbuettel Hafen (FSRU)":[],"Dornum":[],"Ellund":[],"Emden EPT1":[],"VIP-TTF-THE-H":["2025-09-22","2025-09-23","2025-09-24","2025-09-25","2025-09-26","2025-09-27","2025-09-28","2025-09-29","2025-09-30","2026-01-18","2025-11-25"],"All":[]},
+		
+		"skipData"					:	{"Brunsbuettel Hafen (FSRU)":[],"Dornum":[],"Ellund":[],"Emden EPT1":[],"VIP-TTF-THE-H":[], "All":[]},
+		
+		"skipData_intra"					:	{"Brunsbuettel Hafen (FSRU)":[],"Dornum":[],"Ellund":[],"Emden EPT1":[],"VIP-TTF-THE-H":["2025-09-22","2025-09-23","2025-09-24","2025-09-25","2025-09-26","2025-09-27","2025-09-28","2025-09-29","2025-09-30"], "All":[]},
+		
+		"header"		:	["TSONAME", "IPId", "PeriodFrom", "PeriodTo", "PeriodType", "GasHour", "TSOType", "CapturedTime", "Version", "StateId", "EntryInEnergy", "EntryEnergyUOMId", "EntryEnergyTemperature", "EntryInVolume", "EntryVolumeUOMId", "EntryVolumeTemperature", "EntryGCV", "EntryGCVUOMId", "ExitInEnergy", "ExitEnergyUOMId", "ExitEnergyTemperature", "ExitInVolume", "ExitVolumeUOMId", "ExitVolumeTemperature", "ExitGCV", "ExitGCVUOMId", "NetInEnergy", "NetEnergyUOMId", "NetEnergyTemperature", "NetInVolume", "NetVolumeUOMId", "NetVolumeTemperature", "NetGCV", "NetGCVUOMId", "Datastatus"]	
+	},
+	
+	"nomination"				:
+	{
+		"cacheMove"					:	true,
+		"outputMove"				:	true,
+		"cachePath"					:	"C:/Paris/Cache/TSO/TSO13/<DATE>/",
+		"outputPath"				:	"C:/Paris/RawData/TSO/TSO13/",
+		
+		"dayCalc"					:	true,
+		"startDay"					:	-4,
+		"endDay"					:	1,
+		"dateCalc"					:	false,
+		"startDate"					:	"2024-04-01",
+		"endDate"					:	"2024-04-05",
+		"dateListCalc"				:	false,
+		"dateList"					:	["2022-10-07","2022-10-09"],
+		"intra-day"					:true,
+		"gas-day"					:true,
+		"operator_points"			: 	{"Gasunie Deutschland": ["Brunsbuettel Hafen (FSRU)","Dornum","Ellund","Emden EPT1","VIP-TTF-THE-H","Greifswald","Lubmin II GUD","VIP DK-THE"]},
+		"operator_points_"			: 	{"Gasunie Deutschland": ["Greifswald"]},
+		
+		"op_details"				:	{"VIP-TTF-THE-H":["VIP TTF-THE-H"],"Brunsbuettel Hafen (FSRU)" : ["Brunsbuettel Hafen (FSRU)", "", "11.33884"], "Dornum" : ["Dornum", "", "11.33884"],"Ellund":["VIP DK-THE"],"Emden EPT1":["Emden-EPT1"],"VIP DK-THE":["VIP DK-THE"],"Lubmin II GUD":["Lubmin II GUD"],"Greifswald":["Greifswald / Vierow"]},
+		
+		"gcv"						:	{"Brunsbuettel Hafen (FSRU)":{"value":"11.53", "unit":""},"Dornum":{"value":"11.356", "unit":""},"Ellund":{"value":"11.23", "unit":""},"Emden EPT1":{"value":"11.45", "unit":""},"VIP-TTF-THE-H":{"value":"9.74", "unit":""},"VIP DK-THE":{"value":"11.26", "unit":""},"Lubmin II GUD":{"value":"11.13", "unit":""},"Greifswald":{"value":"11.26", "unit":""}},
+		
+		
+		"missingData"      			: 	{"Brunsbuettel Hafen (FSRU)":[],"Dornum":[],"Ellund":[],"Emden EPT1":[],"VIP-TTF-THE-H":[],"VIP DK-THE":[],"Lubmin II GUD GUD":[],"Lubmin II GUD":[],"Greifswald":[],"All":[]},
+		
+		"emptyProvisionalData"		:	{"Brunsbuettel Hafen (FSRU)":[],"Dornum":[],"Ellund":[],"Emden EPT1":[],"VIP-TTF-THE-H":[],"VIP DK-THE":[],"Lubmin II GUD GUD":[],"Lubmin II GUD":[],"Greifswald":[],"All":[]},
+		
+		"skipData"					:	{"Brunsbuettel Hafen (FSRU)":[],"Dornum":[],"Ellund":[],"Emden EPT1":[],"VIP-TTF-THE-H":[],"VIP DK-THE":[],"Lubmin II GUD GUD":[],"Lubmin II GUD":[],"Greifswald":[], "All":[]},
+		
+		"header"		:	["TSONAME", "IPId", "PeriodFrom", "PeriodTo", "PeriodType", "GasHour", "TSOType", "CapturedTime", "Version", "StateId", "EntryInEnergy", "EntryEnergyUOMId", "EntryEnergyTemperature", "EntryInVolume", "EntryVolumeUOMId", "EntryVolumeTemperature", "EntryGCV", "EntryGCVUOMId", "ExitInEnergy", "ExitEnergyUOMId", "ExitEnergyTemperature", "ExitInVolume", "ExitVolumeUOMId", "ExitVolumeTemperature", "ExitGCV", "ExitGCVUOMId", "NetInEnergy", "NetEnergyUOMId", "NetEnergyTemperature", "NetInVolume", "NetVolumeUOMId", "NetVolumeTemperature", "NetGCV", "NetGCVUOMId", "Datastatus"]	
+	},
+	
+	"renomination"				:
+	{
+		"cacheMove"					:	true,
+		"outputMove"				:	true,
+		"cachePath"					:	"C:/Paris/Cache/TSO/TSO13/<DATE>/",
+		"outputPath"				:	"C:/Paris/RawData/TSO/TSO13/",
+		
+		"dayCalc"					:	true,
+		"startDay"					:	-4,
+		"endDay"					:	1,
+		"dateCalc"					:	false,
+		"startDate"					:	"2024-04-01",
+		"endDate"					:	"2024-04-05",
+		"dateListCalc"				:	false,
+		"dateList"					:	["2022-10-07","2022-10-09"],
+		"intra-day"					:true,
+		"gas-day"					:true,
+		"operator_points"			: 	{"Gasunie Deutschland": ["Brunsbuettel Hafen (FSRU)","Dornum","Ellund","Emden EPT1","VIP-TTF-THE-H","Greifswald","Lubmin II GUD","VIP DK-THE"]},
+		"operator_points_"			: 	{"Gasunie Deutschland": ["Greifswald"]},
+		
+		"op_details"				:	{"VIP-TTF-THE-H":["VIP TTF-THE-H"],"Brunsbuettel Hafen (FSRU)" : ["Brunsbuettel Hafen (FSRU)", "", "11.33884"], "Dornum" : ["Dornum", "", "11.33884"],"Ellund":["VIP DK-THE"],"Emden EPT1":["Emden-EPT1"],"VIP DK-THE":["VIP DK-THE"],"Lubmin II GUD":["Lubmin II GUD"],"Greifswald":["Greifswald / Vierow"]},
+		
+		"gcv"						:	{"Brunsbuettel Hafen (FSRU)":{"value":"11.53", "unit":""},"Dornum":{"value":"11.356", "unit":""},"Ellund":{"value":"11.23", "unit":""},"Emden EPT1":{"value":"11.45", "unit":""},"VIP-TTF-THE-H":{"value":"9.74", "unit":""},"VIP DK-THE":{"value":"11.26", "unit":""},"Lubmin II GUD":{"value":"11.13", "unit":""},"Greifswald":{"value":"11.26", "unit":""}},
+		
+		
+		"missingData"      			: 	{"Brunsbuettel Hafen (FSRU)":[],"Dornum":[],"Ellund":[],"Emden EPT1":[],"VIP-TTF-THE-H":[],"VIP DK-THE":[],"Lubmin II GUD GUD":[],"Lubmin II GUD":[],"Greifswald":[],"All":[]},
+		
+		"emptyProvisionalData"		:	{"Brunsbuettel Hafen (FSRU)":[],"Dornum":[],"Ellund":[],"Emden EPT1":[],"VIP-TTF-THE-H":[],"VIP DK-THE":[],"Lubmin II GUD GUD":[],"Lubmin II GUD":[],"Greifswald":[],"All":[]},
+		
+		"skipData"					:	{"Brunsbuettel Hafen (FSRU)":[],"Dornum":[],"Ellund":[],"Emden EPT1":[],"VIP-TTF-THE-H":[],"VIP DK-THE":[],"Lubmin II GUD GUD":[],"Lubmin II GUD":[],"Greifswald":[], "All":[]},
+		
+		"header"		:	["TSONAME", "IPId", "PeriodFrom", "PeriodTo", "PeriodType", "GasHour", "TSOType", "CapturedTime", "Version", "StateId", "EntryInEnergy", "EntryEnergyUOMId", "EntryEnergyTemperature", "EntryInVolume", "EntryVolumeUOMId", "EntryVolumeTemperature", "EntryGCV", "EntryGCVUOMId", "ExitInEnergy", "ExitEnergyUOMId", "ExitEnergyTemperature", "ExitInVolume", "ExitVolumeUOMId", "ExitVolumeTemperature", "ExitGCV", "ExitGCVUOMId", "NetInEnergy", "NetEnergyUOMId", "NetEnergyTemperature", "NetInVolume", "NetVolumeUOMId", "NetVolumeTemperature", "NetGCV", "NetGCVUOMId", "Datastatus"]	
+	},
+
+	"production"				:
+	{
+		"cacheMove"					:	true,
+		"outputMove"				:	true,
+		"cachePath"					:	"C:/Paris/Production/TSO/TSO13/<DATE>/",
+		"outputPath"				:	"C:/Paris/RawData/Production/TSO13/",
+		
+		"dayCalc"					:	true,
+		"startDay"					:	-4,
+		"endDay"					:	0,
+		"dateCalc"					:	true,
+		"startDate"					:	"2025-01-01",
+		"endDate"					:	"2025-03-31",
+		"dateListCalc"				:	true,
+		"dateList"					:	["2022-01-01"],
+		"intra-day"					:   true,
+		"gas-day"					:   true,
+		
+		"operator_points"			: 	{"Gasunie Deutschland" : ["Domestic ProductionH","Domestic ProductionL"]},
+		
+		"op_details"				:	{"Domestic ProductionH" : ["H-Gas-Summe Produktion PHSUM","","H"],"Domestic ProductionL":["L-Gas-Summe Produktion PLSUM","","L"]},
+		
+		"gcv"						:	{"Domestic ProductionH": {"value":"11.46", "unit":"kWh/Nm3"},"Domestic ProductionL": {"value":"11.46", "unit":"kWh/Nm3"}},
+		
+		"missingData"      			: 	{"Domestic ProductionH": [],"Domestic ProductionL": [], "All":[]},
+		
+		"emptyProvisionalData"		:	{"Domestic ProductionH": [], "Domestic ProductionL": [],"All":[]},
+		
+		"skipData"					:	{"Domestic ProductionH": [], "Domestic ProductionL": [],"All":[]},
+		
+		"header"		:	["ProductionName", "IPID", "PeriodFrom", "PeriodTo", "PeriodType", "GasHour", "CapturedTime", "Version", "StateId", "GasQuality", "TotalInEnergy", "TotalEnergyUOMId", "TotalEnergyTemperature", "TotalInVolume", "TotalVolumeUOMId", "TotalVolumeTemperature", "TotalGCV", "TotalGCVUOMId", "DataStatus"]
+	},
+	
+	
+	"emailUser" : "DAalerts@mobiusservices.com",
+	"emailPassword" : "D@alert5",
+	"senderEmail_1" : "DAalerts@mobiusservices.com",
+	"receiverEmails_1" : ["icisreports@mobiusservices.in", "madhubabu.venkateswarlu@mobiusservices.in"],
+	"senderEmail" : "uma.vijayan@mobiusservices.in",
+	"receiverEmails" : ["uma.vijayan@mobiusservices.in"]
+}

@@ -1,0 +1,25 @@
+{
+  "baseline_file": "J-1785300722616_run_7.json",
+  "current_file": "J-1785300722616_run_8.json",
+  "records_compared": 294,
+  "added": 0,
+  "modified": 0,
+  "deleted": 0,
+  "verified": 294,
+  "change_percentage": 0.0,
+  "entrypoint_file": "run.py",
+  "runtime_type": "python",
+  "entrypoint_function": "run",
+  "bot_execution": {
+    "bot_name": "Bombay Stock Exchange",
+    "source": "https://www.bseindia.com/corporates/HistoricalAnnualReport.aspx",
+    "api_base": "https://api.bseindia.com/BseIndiaAPI/api",
+    "input_rows_count": 10,
+    "resolved_rows_count": 10,
+    "unresolved_rows": [],
+    "records_count": 294,
+    "runtime_type": "python",
+    "entrypoint_file": "run.py",
+    "endpoint": "AnnualReport_New/w"
+  }
+}

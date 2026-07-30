@@ -1,0 +1,42 @@
+[
+  {
+    "record_index": 0,
+    "attribute": "legal_name",
+    "previous_value": "Acme Corp",
+    "enriched_value": "Acme Corp",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "website",
+    "previous_value": "https://acme.com",
+    "enriched_value": "acme.com",
+    "admv_status": "M",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "phone",
+    "previous_value": "+1 555-0199",
+    "enriched_value": "+1 555-0199",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "email",
+    "previous_value": "info@acme.com",
+    "enriched_value": "info@acme.com",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "linkedin_url",
+    "previous_value": "https://www.linkedin.com/company/acme",
+    "enriched_value": "linkedin.com/company/acme",
+    "admv_status": "M",
+    "reviewer_action": "accepted"
+  }
+]

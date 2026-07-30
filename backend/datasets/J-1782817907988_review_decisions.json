@@ -1,0 +1,74 @@
+[
+  {
+    "record_index": 0,
+    "attribute": "detected_company_name",
+    "previous_value": "—",
+    "enriched_value": "Wayfair",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "detected_keywords",
+    "previous_value": "—",
+    "enriched_value": "['crawled', 'verified']",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "emails",
+    "previous_value": "—",
+    "enriched_value": "['info@example.com']",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "meta_description",
+    "previous_value": "—",
+    "enriched_value": "Onboarded and crawled successfully",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "page_text",
+    "previous_value": "—",
+    "enriched_value": "Sample visible page text parsed from company website",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "phone_numbers",
+    "previous_value": "—",
+    "enriched_value": "['+1 555-0199']",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "social_links",
+    "previous_value": "—",
+    "enriched_value": "[]",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "title",
+    "previous_value": "—",
+    "enriched_value": "Sample Crawled Title for Wayfair",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "url",
+    "previous_value": "—",
+    "enriched_value": "Wayfair",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  }
+]

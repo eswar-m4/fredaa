@@ -1,0 +1,1 @@
+{"bot_name": "Sample Bot", "source": "https://example.com", "scope": "Full Scrape", "entrypoint_file": "bot.py", "entrypoint_function": "run"}

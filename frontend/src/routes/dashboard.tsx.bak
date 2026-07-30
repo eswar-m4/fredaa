@@ -1,0 +1,1188 @@
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  ArrowRight,
+  TrendingUp,
+} from "lucide-react";
+import {
+  Bar,
+  BarChart,
+  Cell,
+  CartesianGrid,
+  Pie,
+  PieChart,
+  XAxis,
+  YAxis,
+} from "recharts";
+
+import { AppLayout } from "@/components/AppLayout";
+import { Badge, Button, Card, PageHeader, Select } from "@/components/ui-bits";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { cn } from "@/lib/utils";
+import { readJobsCache, writeJobsCache } from "@/lib/jobs-cache";
+import type { ReviewSummary, ReviewSummarySlice } from "@/lib/review-summary";
+
+export const Route = createFileRoute("/dashboard")({
+  head: () => ({ meta: [{ title: "Dashboard - FreshData AI" }] }),
+  component: Dashboard,
+});
+
+type DashboardMetric = "coverage" | "accuracy";
+type DisplayMode = "chart" | "list" | "gaps";
+type DashboardTab = "By Source" | "By Dataset";
+
+type DashboardJob = {
+  id: string;
+  source?: string;
+  mode?: string;
+  rows?: number;
+  created_at?: string;
+  last_refresh?: string;
+  dataset_path?: string;
+  filters?: string;
+  coverage?: any;
+  approved_count?: number;
+  rejected_count?: number;
+  review_summary?: ReviewSummary;
+  review_summary_updated_at?: string;
+};
+
+type DashboardSlice = ReviewSummarySlice & {
+  value?: number | null;
+  color?: string;
+};
+
+const COLORS = [
+  "var(--color-primary)",
+  "var(--color-info)",
+  "var(--color-success)",
+  "var(--color-warning)",
+  "var(--color-purple-token)",
+  "var(--color-destructive)",
+];
+
+function Dashboard() {
+  const navigate = useNavigate();
+  const [jobs, setJobs] = useState<DashboardJob[]>(() => readJobsCache());
+  const [tab, setTab] = useState<DashboardTab>("By Source");
+  const [sourceJobId, setSourceJobId] = useState<string>("");
+  const [datasetJobId, setDatasetJobId] = useState<string>("");
+  const requestedSummaryIds = useRef<Set<string>>(new Set());
+
+  const [sourceBySourceDisplay, setSourceBySourceDisplay] = useState<DisplayMode>("chart");
+  const [sourceBySourceMetric, setSourceBySourceMetric] = useState<DashboardMetric>("coverage");
+  const [attributeBySourceDisplay, setAttributeBySourceDisplay] = useState<DisplayMode>("chart");
+  const [attributeBySourceMetric, setAttributeBySourceMetric] = useState<DashboardMetric>("coverage");
+
+  const [sourceByDatasetDisplay, setSourceByDatasetDisplay] = useState<DisplayMode>("chart");
+  const [sourceByDatasetMetric, setSourceByDatasetMetric] = useState<DashboardMetric>("coverage");
+  const [attributeByDatasetDisplay, setAttributeByDatasetDisplay] = useState<DisplayMode>("chart");
+  const [attributeByDatasetMetric, setAttributeByDatasetMetric] = useState<DashboardMetric>("coverage");
+
+  useEffect(() => {
+    const sync = () => {
+      const liveJobs = readJobsCache() as DashboardJob[];
+      const persistedJobs = loadPersistedJobsCache();
+      setJobs(mergeJobsById(liveJobs, persistedJobs));
+    };
+    sync();
+    const timer = window.setInterval(sync, 2000);
+    window.addEventListener("focus", sync);
+    return () => {
+      clearInterval(timer);
+      window.removeEventListener("focus", sync);
+    };
+  }, []);
+
+  const sourceJobs = useMemo(
+    () =>
+      [...jobs]
+        .filter((job) => isSourceJob(job))
+        .sort(sortJobs),
+    [jobs],
+  );
+  const datasetJobs = useMemo(
+    () =>
+      [...jobs]
+        .filter((job) => isDatasetJob(job))
+        .sort(sortJobs),
+    [jobs],
+  );
+
+  useEffect(() => {
+    if (!sourceJobId && sourceJobs.length) {
+      setSourceJobId(sourceJobs[0].id);
+    }
+    if (sourceJobId && !sourceJobs.some((job) => job.id === sourceJobId)) {
+      setSourceJobId(sourceJobs[0]?.id || "");
+    }
+  }, [sourceJobs, sourceJobId]);
+
+  useEffect(() => {
+    if (!datasetJobId && datasetJobs.length) {
+      setDatasetJobId(datasetJobs[0].id);
+    }
+    if (datasetJobId && !datasetJobs.some((job) => job.id === datasetJobId)) {
+      setDatasetJobId(datasetJobs[0]?.id || "");
+    }
+  }, [datasetJobs, datasetJobId]);
+
+  const baseApiUrl = useMemo(() => {
+    if (
+      typeof window !== "undefined" &&
+      (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") &&
+      window.location.port !== "8131"
+    ) {
+      return `http://${window.location.hostname}:8131`;
+    }
+    return "";
+  }, []);
+
+  const currentSourceJob = useMemo(
+    () => sourceJobs.find((job) => job.id === sourceJobId) || sourceJobs[0] || null,
+    [sourceJobs, sourceJobId],
+  );
+  const currentDatasetJob = useMemo(
+    () => datasetJobs.find((job) => job.id === datasetJobId) || datasetJobs[0] || null,
+    [datasetJobs, datasetJobId],
+  );
+
+  useEffect(() => {
+    const targets = [currentSourceJob, currentDatasetJob].filter(Boolean) as DashboardJob[];
+
+    targets.forEach((job) => {
+      const hasSummary = Boolean(
+        job.review_summary &&
+          job.review_summary.sourceBreakdown?.length &&
+          job.review_summary.attributeBreakdown?.length,
+      );
+      if (!job.id || hasSummary || requestedSummaryIds.current.has(String(job.id))) {
+        return;
+      }
+
+      requestedSummaryIds.current.add(String(job.id));
+
+      const controller = new AbortController();
+      fetch(`${baseApiUrl}/api/v1/demo/jobs/${encodeURIComponent(String(job.id))}/review_summary`, {
+        signal: controller.signal,
+      })
+        .then((response) => (response.ok ? response.json() : null))
+        .then((summary) => {
+          if (!summary || typeof summary !== "object") return;
+          setJobs((prev) => {
+            const next = prev.map((item) => {
+              if (String(item.id) !== String(job.id)) {
+                return item;
+              }
+              const mergedSummary = summary as ReviewSummary;
+              return {
+                ...item,
+                review_summary: mergedSummary,
+                review_summary_updated_at:
+                  mergedSummary.updatedAt || item.review_summary_updated_at || item.last_refresh || item.created_at,
+              };
+            });
+            writeJobsCache(next);
+            return next;
+          });
+        })
+        .catch((error) => {
+          if (error?.name !== "AbortError") {
+            console.warn("Failed to refresh dashboard review summary for job", job.id, error);
+          }
+        });
+
+      return () => controller.abort();
+    });
+  }, [baseApiUrl, currentDatasetJob, currentSourceJob]);
+
+  const currentSourceSummary = useMemo(
+    () => buildJobSummary(currentSourceJob),
+    [currentSourceJob],
+  );
+  const currentDatasetSummary = useMemo(
+    () => buildJobSummary(currentDatasetJob),
+    [currentDatasetJob],
+  );
+
+  const activeSummary = tab === "By Source" ? currentSourceSummary : currentDatasetSummary;
+  const activeJob = tab === "By Source" ? currentSourceJob : currentDatasetJob;
+
+  const topInsights = useMemo(() => {
+    const sourceSlices = activeSummary.sourceBreakdown;
+    const attributeSlices = activeSummary.attributeBreakdown;
+    const bestSource = pickBestSlice(sourceSlices, "coverage");
+    const mostCompleteAttribute = pickMostCompleteAttribute(attributeSlices);
+    return {
+      bestSource,
+      mostCompleteAttribute,
+    };
+  }, [activeSummary]);
+
+  const jumpToReview = () => {
+    if (activeJob?.id) {
+      navigate({ to: "/review", search: { jobId: activeJob.id } as any });
+      return;
+    }
+    navigate({ to: "/review" });
+  };
+
+  return (
+    <AppLayout>
+      <PageHeader
+        title="Dashboard"
+        subtitle="Monitor coverage, accuracy, and overall data quality across your selected runs."
+        actions={
+          <>
+            <Button variant="outline" size="sm" onClick={jumpToReview}>
+              <ArrowRight className="h-4 w-4" />
+              Jump to review
+            </Button>
+          </>
+        }
+      />
+
+      <div className="px-7 pb-8 space-y-5">
+        <Tabs value={tab} onValueChange={(value) => setTab(value as DashboardTab)}>
+          <TabsList className="w-full justify-start h-auto p-1 bg-secondary">
+            <TabsTrigger value="By Source">By Source</TabsTrigger>
+            <TabsTrigger value="By Dataset">By Data Set</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="By Source" className="mt-4 space-y-5">
+            <DashboardScopeCard
+              title="Select source run"
+              description="Dashboard view for the single selected source run."
+              jobs={sourceJobs}
+              selectedJobId={sourceJobId}
+              onSelectJobId={setSourceJobId}
+              activeJob={currentSourceJob}
+              onJumpToReview={jumpToReview}
+            />
+
+            <DashboardMetricsGrid summary={currentSourceSummary} />
+
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
+              <BreakdownCard
+                title="Source-wise breakdown"
+                subtitle="Coverage and accuracy for the source currently selected in the run."
+                slices={currentSourceSummary.sourceBreakdown}
+                metric={sourceBySourceMetric}
+                onMetricChange={setSourceBySourceMetric}
+                display={sourceBySourceDisplay}
+                onDisplayChange={setSourceBySourceDisplay}
+                chartKind="bar"
+                emptyLabel="No source breakdown is available yet."
+                sourceMode="single"
+              />
+              <BreakdownCard
+                title="Attribute-wise breakdown"
+                subtitle="Where the selected source is strongest or weakest across attributes."
+                slices={currentSourceSummary.attributeBreakdown}
+                metric={attributeBySourceMetric}
+                onMetricChange={setAttributeBySourceMetric}
+                display={attributeBySourceDisplay}
+                onDisplayChange={setAttributeBySourceDisplay}
+                chartKind="bar"
+                emptyLabel="No attribute breakdown is available yet."
+                sourceMode="single"
+              />
+            </div>
+
+            <QuickInsightsCard
+              title="Quick reads"
+              bestLabel="Strongest source"
+              bestSource={topInsights.bestSource}
+              mostCompleteAttribute={topInsights.mostCompleteAttribute}
+            />
+          </TabsContent>
+
+          <TabsContent value="By Dataset" className="mt-4 space-y-5">
+            <DashboardScopeCard
+              title="Select dataset run"
+              description="Dashboard view for a multi-source dataset run."
+              jobs={datasetJobs}
+              selectedJobId={datasetJobId}
+              onSelectJobId={setDatasetJobId}
+              activeJob={currentDatasetJob}
+              onJumpToReview={jumpToReview}
+            />
+
+            <DashboardMetricsGrid summary={currentDatasetSummary} />
+
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
+              <BreakdownCard
+                title="Source-wise breakdown"
+                subtitle="Pie view of how sources contribute to the selected dataset."
+                slices={currentDatasetSummary.sourceBreakdown}
+                metric={sourceByDatasetMetric}
+                onMetricChange={setSourceByDatasetMetric}
+                display={sourceByDatasetDisplay}
+                onDisplayChange={setSourceByDatasetDisplay}
+                chartKind="pie"
+                emptyLabel="No source contribution data is available yet."
+                sourceMode="multi"
+              />
+              <BreakdownCard
+                title="Attribute-wise breakdown"
+                subtitle="Coverage and accuracy across dataset attributes."
+                slices={currentDatasetSummary.attributeBreakdown}
+                metric={attributeByDatasetMetric}
+                onMetricChange={setAttributeByDatasetMetric}
+                display={attributeByDatasetDisplay}
+                onDisplayChange={setAttributeByDatasetDisplay}
+                chartKind="bar"
+                emptyLabel="No attribute breakdown is available yet."
+                sourceMode="multi"
+              />
+            </div>
+
+            <QuickInsightsCard
+              title="Quick reads"
+              bestLabel="Strongest source"
+              bestSource={pickBestSlice(currentDatasetSummary.sourceBreakdown, "coverage")}
+              mostCompleteAttribute={pickMostCompleteAttribute(currentDatasetSummary.attributeBreakdown)}
+            />
+          </TabsContent>
+        </Tabs>
+      </div>
+    </AppLayout>
+  );
+}
+
+function DashboardScopeCard({
+  title,
+  description,
+  jobs,
+  selectedJobId,
+  onSelectJobId,
+  activeJob,
+  onJumpToReview,
+}: {
+  title: string;
+  description: string;
+  jobs: DashboardJob[];
+  selectedJobId: string;
+  onSelectJobId: (value: string) => void;
+  activeJob: DashboardJob | null;
+  onJumpToReview: () => void;
+}) {
+  return (
+    <Card className="p-4">
+      <div className="flex flex-col lg:flex-row lg:items-end gap-4">
+        <div className="min-w-0">
+          <div className="text-[13px] font-semibold">{title}</div>
+          <div className="text-[12px] text-muted-foreground mt-0.5">{description}</div>
+        </div>
+        <div className="flex flex-wrap gap-2 lg:ml-auto">
+          <Button variant="outline" size="sm" onClick={onJumpToReview}>
+            <ArrowRight className="h-4 w-4" /> Jump to review
+          </Button>
+        </div>
+      </div>
+      <div className="mt-4 grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-3 items-end">
+        <div>
+          <label className="block text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5">
+            Selected run
+          </label>
+          <Select value={selectedJobId} onChange={(event) => onSelectJobId(event.target.value)}>
+            {jobs.length === 0 ? (
+              <option value="">No reviewed runs available</option>
+            ) : (
+              jobs.map((job) => (
+                <option key={job.id} value={job.id}>
+                  {jobLabel(job)}
+                </option>
+              ))
+            )}
+          </Select>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Badge tone="neutral">{jobs.length.toLocaleString()} runs</Badge>
+          {activeJob?.id ? <Badge tone="info">{activeJob.id}</Badge> : <Badge tone="warning">No run selected</Badge>}
+          {activeJob?.rows ? <Badge tone="purple">{activeJob.rows.toLocaleString()} rows</Badge> : null}
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+function DashboardMetricsGrid({ summary }: { summary: DashboardJobSummary }) {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+      <MetricCard
+        label="Source-wise coverage"
+        value={summary.sourceCoverage}
+        detail={summary.sourceCoverageDetail}
+        tone="info"
+      />
+      <MetricCard
+        label="Attribute-wise coverage"
+        value={summary.attributeCoverage}
+        detail={summary.attributeCoverageDetail}
+        tone="success"
+      />
+      <MetricCard
+        label="Source-wise accuracy"
+        value={summary.sourceAccuracy}
+        detail={summary.sourceAccuracyDetail}
+        tone="warning"
+      />
+      <MetricCard
+        label="Attribute-wise accuracy"
+        value={summary.attributeAccuracy}
+        detail={summary.attributeAccuracyDetail}
+        tone="purple"
+      />
+    </div>
+  );
+}
+
+function MetricCard({
+  label,
+  value,
+  detail,
+  tone,
+}: {
+  label: string;
+  value?: number | null;
+  detail?: string;
+  tone: "info" | "success" | "warning" | "purple";
+}) {
+  const toneClass =
+    tone === "info"
+      ? "bg-info-bg text-info"
+      : tone === "success"
+        ? "bg-success-bg text-success"
+        : tone === "warning"
+          ? "bg-warning-bg text-warning"
+          : "bg-purple-bg text-purple-token";
+
+  return (
+    <Card className="p-4">
+      <div className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">{label}</div>
+      <div className="mt-2 flex items-end justify-between gap-3">
+        <div className={cn("inline-flex items-center rounded-md px-2 py-1", toneClass)}>
+          <span className="text-[20px] font-semibold leading-none">{formatPct(value)}</span>
+        </div>
+        <Badge tone={tone === "purple" ? "purple" : tone}>{detail || "No reviewed items"}</Badge>
+      </div>
+      <div className="mt-3 h-1.5 rounded-full bg-secondary overflow-hidden">
+        <div
+          className="h-full rounded-full bg-primary"
+          style={{ width: `${clampPct(value)}%` }}
+        />
+      </div>
+    </Card>
+  );
+}
+
+function BreakdownCard({
+  title,
+  subtitle,
+  slices,
+  metric,
+  onMetricChange,
+  display,
+  onDisplayChange,
+  chartKind,
+  emptyLabel,
+  sourceMode,
+}: {
+  title: string;
+  subtitle: string;
+  slices: DashboardSlice[];
+  metric: DashboardMetric;
+  onMetricChange: (value: DashboardMetric) => void;
+  display: DisplayMode;
+  onDisplayChange: (value: DisplayMode) => void;
+  chartKind: "bar" | "pie";
+  emptyLabel: string;
+  sourceMode: "single" | "multi";
+}) {
+  const metricRows = useMemo(() => {
+    const rows = slices
+      .map((slice, index) => {
+        const value = metric === "coverage" ? slice.coverage : slice.accuracy;
+        return {
+          ...slice,
+          value: normalizePctValue(typeof value === "number" ? value : null),
+          color: COLORS[index % COLORS.length],
+        };
+      })
+      .filter((slice) => slice.value !== null) as Array<DashboardSlice & { value: number; color: string }>;
+    return [...rows].sort((a, b) => {
+      if (display === "gaps") {
+        return (a.value - b.value) || a.label.localeCompare(b.label);
+      }
+      return (b.value - a.value) || a.label.localeCompare(b.label);
+    });
+  }, [display, metric, slices]);
+
+  const metricLabel = metric === "coverage" ? "Coverage" : "Accuracy";
+
+  return (
+    <Card className="p-4">
+      <div className="flex flex-col gap-3">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <div className="text-[13px] font-semibold">{title}</div>
+            <div className="text-[12px] text-muted-foreground mt-0.5">{subtitle}</div>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <ModeButton active={metric === "coverage"} tone="info" onClick={() => onMetricChange("coverage")}>
+              Coverage
+            </ModeButton>
+            <ModeButton active={metric === "accuracy"} tone="warning" onClick={() => onMetricChange("accuracy")}>
+              Accuracy
+            </ModeButton>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          <ModeButton active={display === "chart"} onClick={() => onDisplayChange("chart")}>
+            Chart
+          </ModeButton>
+          <ModeButton active={display === "list"} onClick={() => onDisplayChange("list")}>
+            List
+          </ModeButton>
+          <ModeButton active={display === "gaps"} tone="warning" onClick={() => onDisplayChange("gaps")}>
+            Top gaps
+          </ModeButton>
+        </div>
+
+        {metricRows.length === 0 ? (
+          <div className="rounded-md border border-dashed border-border bg-secondary/20 px-4 py-8 text-center text-[12px] text-muted-foreground">
+            {emptyLabel}
+          </div>
+        ) : display === "chart" ? (
+          chartKind === "pie" ? (
+            <PieBreakdownChart rows={metricRows} metricLabel={metricLabel} />
+          ) : (
+            <BarBreakdownChart rows={metricRows} metricLabel={metricLabel} />
+          )
+        ) : (
+          <SliceList rows={metricRows} metricLabel={metricLabel} gaps={display === "gaps"} />
+        )}
+      </div>
+    </Card>
+  );
+}
+
+function BarBreakdownChart({
+  rows,
+  metricLabel,
+}: {
+  rows: Array<DashboardSlice & { value: number; color: string }>;
+  metricLabel: string;
+}) {
+  const chartHeight = Math.max(360, rows.length * 28 + 64);
+  const needsScroll = rows.length > 12;
+
+  return (
+    <div className={cn(needsScroll && "max-h-[460px] overflow-y-auto pr-1")}>
+      <ChartContainer
+        config={{
+          value: {
+            label: metricLabel,
+            color: "var(--color-primary)",
+          },
+        }}
+        className="w-full"
+        style={{ height: `${chartHeight}px` }}
+      >
+        <BarChart data={rows} layout="vertical" margin={{ left: 8, right: 16, top: 16, bottom: 8 }}>
+          <CartesianGrid horizontal={false} strokeDasharray="3 3" />
+          <XAxis
+            type="number"
+            domain={[0, 100]}
+            tickLine={false}
+            axisLine={false}
+            tickFormatter={(value) => `${value}%`}
+          />
+          <YAxis
+            dataKey="label"
+            type="category"
+            width={210}
+            interval={0}
+            tickLine={false}
+            axisLine={false}
+            tick={{ fontSize: 11 }}
+          />
+          <ChartTooltip
+            cursor={{ fill: "rgba(27,95,160,0.08)" }}
+            content={<ChartTooltipContent indicator="dot" />}
+          />
+          <Bar dataKey="value" radius={[0, 8, 8, 0]}>
+            {rows.map((row) => (
+              <Cell key={row.key} fill={row.color} />
+            ))}
+          </Bar>
+        </BarChart>
+      </ChartContainer>
+    </div>
+  );
+}
+
+function PieBreakdownChart({
+  rows,
+  metricLabel,
+}: {
+  rows: Array<DashboardSlice & { value: number; color: string }>;
+  metricLabel: string;
+}) {
+  return (
+    <ChartContainer
+      config={{
+        value: {
+          label: metricLabel,
+          color: "var(--color-primary)",
+        },
+      }}
+      className="h-[300px] w-full"
+    >
+      <PieChart>
+        <Pie
+          data={rows}
+          dataKey="value"
+          nameKey="label"
+          cx="50%"
+          cy="50%"
+          innerRadius={68}
+          outerRadius={108}
+          paddingAngle={2}
+        >
+          {rows.map((row) => (
+            <Cell key={row.key} fill={row.color} />
+          ))}
+        </Pie>
+        <ChartTooltip content={<ChartTooltipContent indicator="dot" hideLabel />} />
+      </PieChart>
+    </ChartContainer>
+  );
+}
+
+function SliceList({
+  rows,
+  metricLabel,
+  gaps,
+}: {
+  rows: Array<DashboardSlice & { value: number; color: string }>;
+  metricLabel: string;
+  gaps: boolean;
+}) {
+  return (
+    <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1">
+      {rows.map((row, index) => (
+        <div
+          key={row.key}
+          className={cn(
+            "rounded-md border border-border bg-secondary/20 px-3 py-2.5",
+            gaps && index < 3 && "border-warning/50 bg-warning-bg/40",
+          )}
+        >
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <div className="text-[13px] font-medium truncate">{row.label}</div>
+              <div className="text-[11px] text-muted-foreground mt-0.5">
+                {metricLabel === "Accuracy"
+                  ? row.reviewed > 0
+                    ? `${row.approved.toLocaleString()} / ${row.reviewed.toLocaleString()} approved`
+                    : "No reviewed items"
+                  : row.detail || `${row.reviewed.toLocaleString()} reviewed`}
+              </div>
+              {row.items?.length ? (
+                <div className="text-[11px] text-muted-foreground mt-1 line-clamp-2">
+                  {row.items.slice(0, 4).join(", ")}
+                </div>
+              ) : null}
+            </div>
+            <div className="flex flex-col items-end gap-1 shrink-0">
+              <Badge tone={metricTone(row.value)}>
+                {formatPct(row.value)}
+              </Badge>
+              <span className="text-[10.5px] text-muted-foreground">
+                {row.reviewed ? `${row.approved} approved - ${row.rejected} rejected` : "No reviewed items"}
+              </span>
+            </div>
+          </div>
+          <div className="mt-2 h-1.5 rounded-full bg-secondary overflow-hidden">
+            <div
+              className={cn("h-full rounded-full", gaps && index < 3 ? "bg-warning" : "bg-primary")}
+              style={{ width: `${clampPct(row.value)}%` }}
+            />
+          </div>
+        </div>
+      ))}
+      <div className="flex items-center justify-between gap-2 pt-1 text-[11px] text-muted-foreground">
+        <span>Metric: {metricLabel}</span>
+        {gaps ? <span>Lowest values are highlighted first.</span> : <span>Sorted highest to lowest.</span>}
+      </div>
+    </div>
+  );
+}
+
+function QuickInsightsCard({
+  title,
+  bestLabel,
+  bestSource,
+  mostCompleteAttribute,
+}: {
+  title: string;
+  bestLabel: string;
+  bestSource?: DashboardSlice | null;
+  mostCompleteAttribute?: DashboardSlice | null;
+}) {
+  return (
+    <Card className="p-4">
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <div className="text-[13px] font-semibold">{title}</div>
+          <div className="text-[12px] text-muted-foreground mt-0.5">
+            A quick scan of what stands out in the selected run.
+          </div>
+        </div>
+        <Badge tone="info">
+          <TrendingUp className="h-3.5 w-3.5" /> Snapshot
+        </Badge>
+      </div>
+      <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+        <InsightPill
+          label={bestLabel}
+          value={bestSource?.label || "No source data"}
+          detail={bestSource ? `${formatPct(bestSource.coverage)} coverage` : "No reviewed items"}
+        />
+        <InsightPill
+          label="Most Complete Attribute"
+          value={mostCompleteAttribute?.label || "No attribute data"}
+          detail={mostCompleteAttribute ? `${formatPct(mostCompleteAttribute.coverage)} populated` : "No reviewed items"}
+        />
+      </div>
+    </Card>
+  );
+}
+
+function InsightPill({
+  label,
+  value,
+  detail,
+}: {
+  label: string;
+  value: string;
+  detail: string;
+}) {
+  return (
+    <div className="rounded-md border border-border bg-secondary/20 px-3 py-3">
+      <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">{label}</div>
+      <div className="mt-1 text-[13px] font-semibold truncate">{value}</div>
+      <div className="mt-0.5 text-[11px] text-muted-foreground">{detail}</div>
+    </div>
+  );
+}
+
+function ModeButton({
+  active,
+  children,
+  onClick,
+  tone = "neutral",
+}: {
+  active: boolean;
+  children: React.ReactNode;
+  onClick: () => void;
+  tone?: "neutral" | "info" | "warning";
+}) {
+  const activeClass =
+    tone === "info"
+      ? "bg-info-bg text-info border-info/40"
+      : tone === "warning"
+        ? "bg-warning-bg text-warning border-warning/40"
+        : "bg-primary text-primary-foreground border-primary";
+  return (
+    <button
+      onClick={onClick}
+      className={cn(
+        "px-2.5 py-1 rounded-md border text-[12px] transition",
+        active ? activeClass : "bg-card border-border hover:bg-secondary",
+      )}
+    >
+      {children}
+    </button>
+  );
+}
+
+type DashboardJobSummary = {
+  sourceCoverage?: number | null;
+  attributeCoverage?: number | null;
+  sourceAccuracy?: number | null;
+  attributeAccuracy?: number | null;
+  sourceCoverageDetail: string;
+  attributeCoverageDetail: string;
+  sourceAccuracyDetail: string;
+  attributeAccuracyDetail: string;
+  sourceBreakdown: DashboardSlice[];
+  attributeBreakdown: DashboardSlice[];
+};
+
+function buildJobSummary(job: DashboardJob | null): DashboardJobSummary {
+  if (!job) {
+    return {
+      sourceCoverage: null,
+      attributeCoverage: null,
+      sourceAccuracy: null,
+      attributeAccuracy: null,
+      sourceCoverageDetail: "No reviewed items",
+      attributeCoverageDetail: "No reviewed items",
+      sourceAccuracyDetail: "No reviewed items",
+      attributeAccuracyDetail: "No reviewed items",
+      sourceBreakdown: [],
+      attributeBreakdown: [],
+    };
+  }
+
+  const summary = job.review_summary || null;
+  const coverage = job.coverage || null;
+
+  const coverageSourceBreakdown = mapCoverageSourceRows(coverage?.source_breakdown);
+  const coverageAttributeBreakdown = mapCoverageAttributeRows(coverage?.attribute_breakdown);
+  const reviewSourceBreakdown = mapReviewSummaryRows(summary?.sourceBreakdown);
+  const reviewAttributeBreakdown = mapReviewSummaryRows(summary?.attributeBreakdown);
+
+  const sourceBreakdown = mergeCoverageAndReviewRows(
+    coverageSourceBreakdown.length ? coverageSourceBreakdown : reviewSourceBreakdown,
+    reviewSourceBreakdown,
+  );
+  const attributeBreakdown = mergeCoverageAndReviewRows(
+    coverageAttributeBreakdown.length ? coverageAttributeBreakdown : reviewAttributeBreakdown,
+    reviewAttributeBreakdown,
+  );
+
+  const sourceCoverageRows = coverageSourceBreakdown.length ? coverageSourceBreakdown : reviewSourceBreakdown;
+  const attributeCoverageRows = coverageAttributeBreakdown.length ? coverageAttributeBreakdown : reviewAttributeBreakdown;
+
+  const sourceCoverage = averagePercent(sourceCoverageRows.map((row) => row.coverage).filter(isFiniteNumber));
+  const attributeCoverage = averagePercent(attributeCoverageRows.map((row) => row.coverage).filter(isFiniteNumber));
+  const approvedCount = isFiniteNumber(job.approved_count) ? Number(job.approved_count) : null;
+  const rejectedCount = isFiniteNumber(job.rejected_count) ? Number(job.rejected_count) : null;
+  const sourceAccuracyFromCounts =
+    approvedCount !== null || rejectedCount !== null
+      ? accuracyFromCounts(approvedCount ?? 0, rejectedCount ?? 0)
+      : null;
+  const sourceReviewedFromCounts = approvedCount !== null || rejectedCount !== null ? (approvedCount ?? 0) + (rejectedCount ?? 0) : 0;
+  const sourceAccuracy = sourceAccuracyFromCounts ?? weightedAccuracy(sourceBreakdown);
+  const attributeAccuracy = weightedAccuracy(reviewAttributeBreakdown);
+
+  const fallbackSourceSlice =
+    sourceBreakdown.length === 0 && (sourceCoverage !== null || sourceAccuracyFromCounts !== null || sourceReviewedFromCounts > 0)
+      ? [
+          {
+            key: String(job.id || job.source || "source"),
+            label: String(job.source || "Selected source"),
+            coverage: sourceCoverage,
+            reviewed: sourceReviewedFromCounts,
+            approved: approvedCount ?? 0,
+            rejected: rejectedCount ?? 0,
+            accuracy: sourceAccuracyFromCounts,
+            detail: sourceReviewedFromCounts > 0 ? `${sourceReviewedFromCounts.toLocaleString()} reviewed items` : undefined,
+            items: [],
+          } satisfies DashboardSlice,
+        ]
+      : [];
+
+  const sourceBreakdownWithAccuracy =
+    sourceBreakdown.length && sourceAccuracyFromCounts !== null
+      ? sourceBreakdown.map((row) => ({
+          ...row,
+          accuracy: row.accuracy ?? sourceAccuracyFromCounts,
+        }))
+      : sourceBreakdown.length
+        ? sourceBreakdown
+        : fallbackSourceSlice;
+
+  const attributeBreakdownWithAccuracy = attributeBreakdown.map((row) => ({
+    ...row,
+    accuracy: row.accuracy ?? accuracyFromCounts(row.approved, row.rejected),
+  }));
+
+  const sourceReviewed = sourceBreakdown.reduce((sum, row) => sum + (row.reviewed || 0), 0) || sourceReviewedFromCounts;
+  const attributeReviewed = reviewAttributeBreakdown.reduce((sum, row) => sum + (row.reviewed || 0), 0) || sourceReviewedFromCounts;
+
+  return {
+    sourceCoverage,
+    attributeCoverage,
+    sourceAccuracy,
+    attributeAccuracy,
+    sourceCoverageDetail: sourceCoverageRows.length ? `${sourceCoverageRows.length} sources` : "No reviewed items",
+    attributeCoverageDetail: attributeCoverageRows.length ? `${attributeCoverageRows.length} attributes` : "No reviewed items",
+    sourceAccuracyDetail: sourceReviewed ? `${sourceReviewed.toLocaleString()} reviewed slices` : "No reviewed items",
+    attributeAccuracyDetail: attributeReviewed ? `${attributeReviewed.toLocaleString()} reviewed slices` : "No reviewed items",
+    sourceBreakdown: sourceBreakdownWithAccuracy,
+    attributeBreakdown: attributeBreakdownWithAccuracy,
+  };
+}
+
+function accuracyFromCounts(approved: number, rejected: number) {
+  const reviewed = approved + rejected;
+  if (!reviewed) return null;
+  return approved / reviewed;
+}
+
+function loadPersistedJobsCache(): DashboardJob[] {
+  if (typeof window === "undefined" || !window.localStorage) return [];
+  try {
+    const raw = window.localStorage.getItem("freda.jobs.cache.v1");
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? (parsed as DashboardJob[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+function mergeJobsById(primary: DashboardJob[], fallback: DashboardJob[]) {
+  if (!fallback.length) return primary;
+
+  const fallbackById = new Map<string, DashboardJob>();
+  fallback.forEach((job) => {
+    if (job?.id !== undefined && job?.id !== null) {
+      fallbackById.set(String(job.id), job);
+    }
+  });
+
+  return primary.map((job) => {
+    const key = job?.id !== undefined && job?.id !== null ? String(job.id) : "";
+    const persisted = key ? fallbackById.get(key) : undefined;
+    if (!persisted) return job;
+
+    return {
+      ...persisted,
+      ...job,
+      review_summary: job.review_summary ?? persisted.review_summary,
+      review_summary_updated_at: job.review_summary_updated_at ?? persisted.review_summary_updated_at,
+      approved_count: job.approved_count ?? persisted.approved_count,
+      rejected_count: job.rejected_count ?? persisted.rejected_count,
+      is_urgent: job.is_urgent ?? persisted.is_urgent,
+      isUrgent: job.isUrgent ?? persisted.isUrgent,
+    };
+  });
+}
+
+function mapCoverageSourceRows(rows: any[] = []): DashboardSlice[] {
+  return rows.map((row, index) => ({
+    key: String(row.source_key || row.source_label || index),
+    label: String(row.source_label || row.source_key || `Source ${index + 1}`),
+    coverage: isFiniteNumber(row.source_coverage) ? Number(row.source_coverage) : null,
+    reviewed: 0,
+    approved: 0,
+    rejected: 0,
+    detail: typeof row.records_returned_by_source === "number" && typeof row.records_requested_from_source === "number"
+      ? `${row.records_returned_by_source.toLocaleString()} / ${row.records_requested_from_source.toLocaleString()} records`
+      : undefined,
+    items: Array.isArray(row.filled_fields)
+      ? row.filled_fields.map((field: any) => String(field.attribute_key || "").replace(/_/g, " ")).filter(Boolean)
+      : [],
+  }));
+}
+
+function mapCoverageAttributeRows(rows: any[] = []): DashboardSlice[] {
+  return rows.map((row, index) => ({
+    key: String(row.attribute_key || row.attribute_label || index),
+    label: String(row.attribute_label || row.attribute_key || `Attribute ${index + 1}`),
+    coverage: isFiniteNumber(row.attr_coverage) ? Number(row.attr_coverage) : null,
+    reviewed: 0,
+    approved: 0,
+    rejected: 0,
+    detail: typeof row.non_null_values === "number" && typeof row.total_records_in_scope === "number"
+      ? `${row.non_null_values.toLocaleString()} / ${row.total_records_in_scope.toLocaleString()} filled`
+      : undefined,
+  }));
+}
+
+function mapReviewSummaryRows(rows: ReviewSummarySlice[] = []): DashboardSlice[] {
+  return rows.map((row, index) => ({
+    key: String(row.key || index),
+    label: String(row.label || `Item ${index + 1}`),
+    coverage: isFiniteNumber(row.coverage) ? Number(row.coverage) : null,
+    reviewed: Number(row.reviewed || 0),
+    approved: Number(row.approved || 0),
+    rejected: Number(row.rejected || 0),
+    accuracy: isFiniteNumber(row.accuracy) ? Number(row.accuracy) : null,
+    detail: row.detail,
+    items: Array.isArray(row.items) ? row.items : [],
+    total: isFiniteNumber(row.total) ? Number(row.total) : null,
+  }));
+}
+
+function normalizeKey(value: unknown) {
+  return String(value ?? "")
+    .trim()
+    .toLowerCase()
+    .replace(/^https?:\/\//i, "")
+    .replace(/^www\./i, "")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim()
+    .replace(/\s+/g, " ");
+}
+
+function mergeCoverageAndReviewRows(
+  coverageRows: DashboardSlice[],
+  reviewRows: DashboardSlice[],
+) {
+  if (!coverageRows.length && !reviewRows.length) {
+    return [];
+  }
+
+  const reviewLookup = new Map<string, DashboardSlice>();
+  reviewRows.forEach((row) => {
+    reviewLookup.set(normalizeKey(row.key), row);
+    reviewLookup.set(normalizeKey(row.label), row);
+  });
+
+  return coverageRows.map((coverageRow) => {
+    const reviewRow = reviewLookup.get(normalizeKey(coverageRow.key)) || reviewLookup.get(normalizeKey(coverageRow.label));
+    const accuracy = reviewRow?.accuracy ?? weightedAccuracy([reviewRow || coverageRow].filter(Boolean) as DashboardSlice[]);
+    return {
+      ...coverageRow,
+      reviewed: reviewRow?.reviewed ?? coverageRow.reviewed ?? 0,
+      approved: reviewRow?.approved ?? coverageRow.approved ?? 0,
+      rejected: reviewRow?.rejected ?? coverageRow.rejected ?? 0,
+      accuracy: isFiniteNumber(accuracy) ? Number(accuracy) : null,
+      detail: coverageRow.detail || reviewRow?.detail,
+      items: coverageRow.items?.length ? coverageRow.items : reviewRow?.items,
+      total: coverageRow.total ?? reviewRow?.total ?? null,
+      coverage: coverageRow.coverage ?? reviewRow?.coverage ?? null,
+    };
+  });
+}
+
+function averagePercent(values: Array<number | null | undefined>) {
+  const filtered = values.filter(isFiniteNumber) as number[];
+  if (!filtered.length) return null;
+  return filtered.reduce((sum, value) => sum + value, 0) / filtered.length;
+}
+
+function weightedAccuracy(rows: DashboardSlice[]) {
+  const reviewed = rows.reduce((sum, row) => sum + (row.reviewed || 0), 0);
+  if (!reviewed) return null;
+  const approved = rows.reduce((sum, row) => sum + (row.approved || 0), 0);
+  return approved / reviewed;
+}
+
+function isFiniteNumber(value: unknown): value is number {
+  return typeof value === "number" && Number.isFinite(value);
+}
+
+function normalizePctValue(value?: number | null) {
+  if (value === null || value === undefined || Number.isNaN(value)) return null;
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) return null;
+  if (Math.abs(numeric) <= 1) return numeric * 100;
+  if (Math.abs(numeric) > 1000) return numeric / 100;
+  return numeric;
+}
+
+function formatPct(value?: number | null) {
+  const normalized = normalizePctValue(value);
+  if (normalized === null) return "-";
+  const rounded = Math.round(normalized * 100) / 100;
+  return `${Number.isInteger(rounded) ? rounded.toFixed(0) : rounded.toFixed(2)}%`;
+}
+
+function clampPct(value?: number | null) {
+  const normalized = normalizePctValue(value);
+  if (normalized === null) return 0;
+  return Math.max(0, Math.min(100, normalized));
+}
+
+function metricTone(value?: number | null) {
+  if (value === null || value === undefined || Number.isNaN(value)) return "neutral";
+  if (value >= 90) return "success";
+  if (value >= 75) return "info";
+  if (value >= 60) return "warning";
+  return "destructive";
+}
+
+function sortJobs(a: DashboardJob, b: DashboardJob) {
+  const timeA = new Date(a.review_summary_updated_at || a.last_refresh || a.created_at || 0).getTime();
+  const timeB = new Date(b.review_summary_updated_at || b.last_refresh || b.created_at || 0).getTime();
+  return timeB - timeA;
+}
+
+function isDatasetJob(job: DashboardJob) {
+  return String(job.mode || "").toLowerCase() === "by dataset" || Boolean((job as any).isDatasetJob);
+}
+
+function isSourceJob(job: DashboardJob) {
+  const mode = String(job.mode || "").toLowerCase();
+  return mode === "by source" || mode === "site-specific" || (!mode && !isDatasetJob(job));
+}
+
+function jobLabel(job: DashboardJob) {
+  if (isDatasetJob(job)) {
+    const datasetName = getDatasetFileName(job.filters) || extractFileStem(job.dataset_path) || String(job.source || "Untitled run").trim();
+    return `${datasetName} - By Dataset`;
+  }
+
+  const source = String(job.source || "Untitled run").trim();
+  return `${source} - By Source`;
+}
+
+function extractFileStem(value?: string) {
+  const raw = String(value || "").trim();
+  if (!raw) return "";
+  const fileName = raw.split(/[\\/]/).pop() || raw;
+  return fileName.replace(/\.[^/.]+$/, "");
+}
+
+function getDatasetFileName(filters?: string) {
+  if (!filters || filters === "—" || filters === "–" || filters === "−") return "";
+  try {
+    const parsed = JSON.parse(filters);
+    if (parsed && typeof parsed === "object") {
+      const candidates = ["seedFile", "seed_file", "filename", "fileName", "file_name", "inputFile", "input_file"];
+      for (const key of candidates) {
+        const value = (parsed as Record<string, unknown>)[key];
+        if (typeof value === "string" && value.trim()) {
+          return value.trim().replace(/\.(csv|xlsx|xls|json|jsonl)$/i, "");
+        }
+      }
+    }
+  } catch {
+    // Ignore malformed filters and fall back to other labels.
+  }
+  return "";
+}
+
+function pickBestSlice(rows: DashboardSlice[], metric: DashboardMetric) {
+  const filtered = rows.filter((row) => isFiniteNumber(metric === "coverage" ? row.coverage : row.accuracy));
+  if (!filtered.length) return null;
+  return [...filtered].sort((a, b) => (metric === "coverage" ? (b.coverage! - a.coverage!) : (b.accuracy! - a.accuracy!)))[0];
+}
+
+function pickWorstSlice(rows: DashboardSlice[], metric: DashboardMetric) {
+  const filtered = rows.filter((row) => isFiniteNumber(metric === "coverage" ? row.coverage : row.accuracy));
+  if (!filtered.length) return null;
+  return [...filtered].sort((a, b) => (metric === "coverage" ? (a.coverage! - b.coverage!) : (a.accuracy! - b.accuracy!)))[0];
+}
+
+function pickMostCompleteAttribute(rows: DashboardSlice[]) {
+  const filtered = rows.filter((row) => isFiniteNumber(row.coverage));
+  if (!filtered.length) return null;
+  return [...filtered].sort((a, b) => {
+    const coverageA = normalizePctValue(a.coverage) ?? -1;
+    const coverageB = normalizePctValue(b.coverage) ?? -1;
+    if (coverageB !== coverageA) return coverageB - coverageA;
+    const reviewedA = a.reviewed || 0;
+    const reviewedB = b.reviewed || 0;
+    if (reviewedB !== reviewedA) return reviewedB - reviewedA;
+    const accuracyA = normalizePctValue(a.accuracy) ?? -1;
+    const accuracyB = normalizePctValue(b.accuracy) ?? -1;
+    if (accuracyB !== accuracyA) return accuracyB - accuracyA;
+    if ((b.coverage || 0) !== (a.coverage || 0)) return (b.coverage || 0) - (a.coverage || 0);
+    return a.label.localeCompare(b.label);
+  })[0];
+}
