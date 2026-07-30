@@ -1,0 +1,42 @@
+[
+  {
+    "company_name": "Microsoft Corporation",
+    "website": "microsoft.com"
+  },
+  {
+    "company_name": "Infosys Limited",
+    "website": "infosys.com"
+  },
+  {
+    "company_name": "HSBC Holdings plc",
+    "website": "hsbc.com"
+  },
+  {
+    "company_name": "Tesco PLC",
+    "website": "tesco.com"
+  },
+  {
+    "company_name": "NVIDIA Corporation",
+    "website": "nvidia.com"
+  },
+  {
+    "company_name": "Tata Consultancy Services Limited",
+    "website": "tcs.com"
+  },
+  {
+    "company_name": "Barclays PLC",
+    "website": "barclays.com"
+  },
+  {
+    "company_name": "Apple Inc.",
+    "website": "apple.com"
+  },
+  {
+    "company_name": "BP PLC",
+    "website": "bp.com"
+  },
+  {
+    "company_name": "JPMorgan Chase & Co.",
+    "website": "jpmorganchase.com"
+  }
+]

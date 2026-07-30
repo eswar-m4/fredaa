@@ -1,0 +1,394 @@
+[
+  {
+    "record_index": 0,
+    "attribute": "legal_name",
+    "previous_value": "Tesla",
+    "enriched_value": "Tesla",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "dba",
+    "previous_value": "Tesla",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "description",
+    "previous_value": "\"Tesla is an electric vehicle and clean energy company based in Palo Alto",
+    "enriched_value": "Tesla | 12,380,849 followers on LinkedIn. Tesla is accelerating the world’s transition to sustainable abundance. To achieve our mission, we&#39;re building a world powered by solar, enabled by ...",
+    "admv_status": "M",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "tagline",
+    "previous_value": "California",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 0,
+    "attribute": "logo_url",
+    "previous_value": "known for its Model S",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 0,
+    "attribute": "year_founded",
+    "previous_value": "X",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 0,
+    "attribute": "company_type",
+    "previous_value": "3 and Y vehicles.\"",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "ownership",
+    "previous_value": "Accelerating the world's transition to sustainable energy",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "industry",
+    "previous_value": "https://tesla.co/assets/logo.png",
+    "enriched_value": "Motor Vehicles & Passenger Car Bodies",
+    "admv_status": "M",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "sub_industry",
+    "previous_value": "2003",
+    "enriched_value": "Motor Vehicles & Passenger Car Bodies",
+    "admv_status": "M",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "sic_code",
+    "previous_value": "Public",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "naics_code",
+    "previous_value": "Public",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "tags",
+    "previous_value": "Automotive Manufacturing",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "employee_count",
+    "previous_value": "Electric Vehicles",
+    "enriched_value": "140473",
+    "admv_status": "M",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "employee_range",
+    "previous_value": "—",
+    "enriched_value": "10,001+ employees",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "headcount_growth_yoy",
+    "previous_value": "336111",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "annual_revenue",
+    "previous_value": "EV;Automotive;Clean Energy;Battery;Solar",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "revenue_range",
+    "previous_value": "70000",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "ebitda",
+    "previous_value": "50001-100000",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "funding_total",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "latest_round",
+    "previous_value": "$81.5B",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "latest_round_amount",
+    "previous_value": "$50B-$100B",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "valuation",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "investors",
+    "previous_value": "N/A",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "ceo_name",
+    "previous_value": "N/A",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "ceo_email",
+    "previous_value": "N/A",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "ceo_linkedin",
+    "previous_value": "$620B",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "cfo_name",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "cto_name",
+    "previous_value": "Elon Musk",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "executives",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "board_members",
+    "previous_value": "https://linkedin.com/in/elonmusk",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "hq_address",
+    "previous_value": "Vaibhav Taneja",
+    "enriched_value": "Austin, TX, USA",
+    "admv_status": "M",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "hq_city",
+    "previous_value": "—",
+    "enriched_value": "Austin",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "hq_state",
+    "previous_value": "Elon Musk - CEO; Vaibhav Taneja - CFO",
+    "enriched_value": "TX",
+    "admv_status": "M",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "hq_country",
+    "previous_value": "—",
+    "enriched_value": "USA",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "office_locations",
+    "previous_value": "home",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "website",
+    "previous_value": "Palo Alto",
+    "enriched_value": "https://www.tesla.com/",
+    "admv_status": "M",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "linkedin_url",
+    "previous_value": "California",
+    "enriched_value": "https://www.linkedin.com/company/tesla-motors",
+    "admv_status": "M",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "twitter_url",
+    "previous_value": "USA",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "facebook_url",
+    "previous_value": "Fremont CA; Austin TX; Berlin Germany; Shanghai China",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "phone",
+    "previous_value": "tesla.co",
+    "enriched_value": "tesla.co",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "email",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "tech_stack",
+    "previous_value": "https://twitter.com/Tesla",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "cms",
+    "previous_value": "https://facebook.com/tesla",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "hosting",
+    "previous_value": "1-650-681-5000",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "registry_number",
+    "previous_value": "media@tesla.com",
+    "enriched_value": "media@tesla.com",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "lei",
+    "previous_value": "Python;AWS;Kubernetes;React",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "vat_number",
+    "previous_value": "—",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "tax_id",
+    "previous_value": "AWS",
+    "enriched_value": "—",
+    "admv_status": "D",
+    "reviewer_action": "accepted"
+  }
+]

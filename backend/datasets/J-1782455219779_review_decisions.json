@@ -1,0 +1,26 @@
+[
+  {
+    "record_index": 0,
+    "attribute": "Address",
+    "previous_value": "—",
+    "enriched_value": "Ataturk Bulvari No: 12, Ankara",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "City",
+    "previous_value": "—",
+    "enriched_value": "Ankara",
+    "admv_status": "A",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 0,
+    "attribute": "PrimaryKey",
+    "previous_value": "—",
+    "enriched_value": "TB-001",
+    "admv_status": "A",
+    "reviewer_action": "rejected"
+  }
+]

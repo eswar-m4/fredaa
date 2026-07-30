@@ -1,0 +1,106 @@
+[
+  {
+    "record_index": 0,
+    "attribute": "registry_number",
+    "previous_value": "123",
+    "enriched_value": "0001318605",
+    "admv_status": "M",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "hq_address",
+    "previous_value": "home",
+    "enriched_value": "1 TESLA ROAD",
+    "admv_status": "M",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 0,
+    "attribute": "hq_city",
+    "previous_value": "",
+    "enriched_value": "AUSTIN",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "hq_state",
+    "previous_value": "",
+    "enriched_value": "TX",
+    "admv_status": "A",
+    "reviewer_action": "rejected"
+  },
+  {
+    "record_index": 0,
+    "attribute": "legal_name",
+    "previous_value": "Tesla",
+    "enriched_value": "Tesla, Inc.",
+    "admv_status": "M",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "website",
+    "previous_value": "",
+    "enriched_value": "https://www.tesla.com/",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "legal_name",
+    "previous_value": "Netflix",
+    "enriched_value": "NETFLIX INC",
+    "admv_status": "M",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "registry_number",
+    "previous_value": "",
+    "enriched_value": "0001065280",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "hq_address",
+    "previous_value": "",
+    "enriched_value": "121 ALBRIGHT WAY",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "hq_city",
+    "previous_value": "",
+    "enriched_value": "LOS GATOS",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "hq_state",
+    "previous_value": "",
+    "enriched_value": "CA",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "hq_country",
+    "previous_value": "",
+    "enriched_value": "USA",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 1,
+    "attribute": "website",
+    "previous_value": "",
+    "enriched_value": "https://www.netflix.com/",
+    "admv_status": "A",
+    "reviewer_action": "accepted"
+  }
+]

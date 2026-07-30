@@ -1,0 +1,40 @@
+{
+  "signature": "8e132fd93c91ac96475c6d6ea7e1ecc845c46846",
+  "payload": {
+    "rows": [
+      {
+        "id": "idx_0-full_name",
+        "record": "Record 1",
+        "attribute": "Full Name",
+        "attributeKey": "full_name",
+        "recordIndex": 0,
+        "previous": "—",
+        "value": "—",
+        "changeType": "V",
+        "changed": false,
+        "conf": 0.6,
+        "sourceUrl": "https://People & Contacts",
+        "source": "people & contacts",
+        "recordKey": "idx_0"
+      },
+      {
+        "id": "idx_0-email",
+        "record": "Record 1",
+        "attribute": "Email",
+        "attributeKey": "email",
+        "recordIndex": 0,
+        "previous": "—",
+        "value": "—",
+        "changeType": "V",
+        "changed": false,
+        "conf": 0.6,
+        "sourceUrl": "https://People & Contacts",
+        "source": "people & contacts",
+        "recordKey": "idx_0"
+      }
+    ],
+    "totalSampled": 1,
+    "sampledCount": 1,
+    "coverage": null
+  }
+}

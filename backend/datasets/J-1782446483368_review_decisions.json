@@ -1,0 +1,146 @@
+[
+  {
+    "record_index": 0,
+    "attribute": "Accepting_New_Patients",
+    "previous_value": "Yes",
+    "enriched_value": "Yes",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Address",
+    "previous_value": "5171 Liberty Ave",
+    "enriched_value": "5171 Liberty Ave",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Business_Name",
+    "previous_value": "Partners In Nephrology & Endocrinology",
+    "enriched_value": "Partners In Nephrology & Endocrinology",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "City",
+    "previous_value": "Pittsburgh",
+    "enriched_value": "Pittsburgh",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Company_Website",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Detail_Url",
+    "previous_value": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview",
+    "enriched_value": "https://doctor.webmd.com/doctor/dr-aaron-f-kulick-md-40da227b-da51-4b23-9b37-5fa345719ea4-overview",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Fax_Phone",
+    "previous_value": "",
+    "enriched_value": "—",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Hospital_Affiliations",
+    "previous_value": "Upmc East",
+    "enriched_value": "Upmc East",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Languages_Spoken",
+    "previous_value": "English, Polish",
+    "enriched_value": "English, Polish",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Medicaid_Accepted",
+    "previous_value": "Yes",
+    "enriched_value": "Yes",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Medical_School",
+    "previous_value": "Lewis Katz School Of Medicine At Temple University",
+    "enriched_value": "Lewis Katz School Of Medicine At Temple University",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Medicare_Accepted",
+    "previous_value": "Yes",
+    "enriched_value": "Yes",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Primary_Contact_Name",
+    "previous_value": "Dr. Aaron Kulick",
+    "enriched_value": "Dr. Aaron Kulick",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Primary_Phone",
+    "previous_value": "(412) 683-4550",
+    "enriched_value": "(412) 683-4550",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Specialty",
+    "previous_value": "Nephrology",
+    "enriched_value": "Nephrology",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "State",
+    "previous_value": "PA",
+    "enriched_value": "PA",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Year_of_Graduation",
+    "previous_value": "1997.0",
+    "enriched_value": "1997.0",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  },
+  {
+    "record_index": 0,
+    "attribute": "Zip",
+    "previous_value": "15224",
+    "enriched_value": "15224",
+    "admv_status": "V",
+    "reviewer_action": "accepted"
+  }
+]

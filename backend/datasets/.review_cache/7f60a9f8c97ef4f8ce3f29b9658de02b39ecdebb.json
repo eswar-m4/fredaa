@@ -1,0 +1,34 @@
+{
+  "signature": "7f60a9f8c97ef4f8ce3f29b9658de02b39ecdebb",
+  "payload": {
+    "rows": [],
+    "totalSampled": 0,
+    "sampledCount": 0,
+    "coverage": {
+      "job_coverage": null,
+      "source_coverage": null,
+      "record_coverage": null,
+      "weighted_job_coverage": null,
+      "records_in_scope": 0,
+      "expected_attributes": null,
+      "total_filled_cells": null,
+      "source_requested": null,
+      "source_returned": null,
+      "attribute_breakdown": [],
+      "record_breakdown": [],
+      "source_breakdown": [
+        {
+          "source_key": "https://www.ark.org/corp_search/index.php",
+          "source_label": "https://www.ark.org/corp-search/index.php",
+          "records_requested_from_source": 0,
+          "records_returned_by_source": 0,
+          "source_coverage": null,
+          "filled_attributes": 0,
+          "filled_fields": []
+        }
+      ],
+      "weights_applied": false,
+      "source_kind": "New Source"
+    }
+  }
+}

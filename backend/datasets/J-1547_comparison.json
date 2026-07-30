@@ -1,0 +1,14 @@
+{
+  "baseline_file": "",
+  "current_file": "J-1547_run_1.json",
+  "records_compared": 2,
+  "added": 2,
+  "modified": 0,
+  "deleted": 0,
+  "verified": 0,
+  "change_percentage": 100.0,
+  "entrypoint_file": "SOS Scripts/Arkansas/main.py",
+  "runtime_type": "python",
+  "entrypoint_function": "",
+  "entrypoint_command": "python SOS Scripts/Arkansas/main.py"
+}

@@ -1,0 +1,1764 @@
+{
+  "baseline_file": "J-1782970324568_run_2.json",
+  "current_file": "J-1782970324568_run_3.json",
+  "records_compared": 50,
+  "added": 0,
+  "modified": 50,
+  "deleted": 0,
+  "verified": 0,
+  "change_percentage": 100.0,
+  "modified_details": [
+    {
+      "record_key": "idx_41",
+      "attribute": "Article_Link",
+      "old_value": "https://www.investegate.co.uk/announcement/rns/polar-capital-holdings--polr/transaction-in-own-shares/9659423",
+      "new_value": "https://www.investegate.co.uk/announcement/rns/sdi-group--sdi/notice-of-results-and-investor-presentation/9671312"
+    },
+    {
+      "record_key": "idx_41",
+      "attribute": "Article_Subject",
+      "old_value": "Transaction in Own Shares",
+      "new_value": "Notice of Results and Investor Presentation"
+    },
+    {
+      "record_key": "idx_41",
+      "attribute": "Company_Link",
+      "old_value": "https://www.investegate.co.uk/company/POLR",
+      "new_value": "https://www.investegate.co.uk/company/SDI"
+    },
+    {
+      "record_key": "idx_41",
+      "attribute": "Company_Name",
+      "old_value": "Polar Capital Holdings (POLR)",
+      "new_value": "SDI Group (SDI)"
+    },
+    {
+      "record_key": "idx_41",
+      "attribute": "Published_Date",
+      "old_value": "08 Jul 2026 05:05 PM",
+      "new_value": "16 Jul 2026 07:00 AM"
+    },
+    {
+      "record_key": "idx_46",
+      "attribute": "Article_Link",
+      "old_value": "https://www.investegate.co.uk/announcement/rns/hanetf-icav--metp/important-notice-to-shareholders/9659418",
+      "new_value": "https://www.investegate.co.uk/announcement/rns/somero-enterprises-inc-di---som/trading-update/9671290"
+    },
+    {
+      "record_key": "idx_46",
+      "attribute": "Article_Subject",
+      "old_value": "Important Notice to Shareholders",
+      "new_value": "Trading Update"
+    },
+    {
+      "record_key": "idx_46",
+      "attribute": "Company_Link",
+      "old_value": "https://www.investegate.co.uk/company/METP",
+      "new_value": "https://www.investegate.co.uk/company/SOM"
+    },
+    {
+      "record_key": "idx_46",
+      "attribute": "Company_Name",
+      "old_value": "HANETF ICAV (METP)",
+      "new_value": "Somero Enterprises Inc. (DI) (SOM)"
+    },
+    {
+      "record_key": "idx_46",
+      "attribute": "Published_Date",
+      "old_value": "08 Jul 2026 04:59 PM",
+      "new_value": "16 Jul 2026 07:00 AM"
+    },
+    {
+      "record_key": "idx_29",
+      "attribute": "Article_Link",
+      "old_value": "https://www.investegate.co.uk/announcement/rns/rights-issues-investment-trust--riii/transaction-in-own-shares/9659439",
+      "new_value": "https://www.investegate.co.uk/announcement/rns/oxford-biomedica--oxb/manufacturing-agreement-with-plowshare-therapies/9671322"
+    },
+    {
+      "record_key": "idx_29",
+      "attribute": "Article_Subject",
+      "old_value": "Transaction in Own Shares",
+      "new_value": "Manufacturing agreement with Plowshare Therapies"
+    },
+    {
+      "record_key": "idx_29",
+      "attribute": "Company_Link",
+      "old_value": "https://www.investegate.co.uk/company/RIII",
+      "new_value": "https://www.investegate.co.uk/company/OXB"
+    },
+    {
+      "record_key": "idx_29",
+      "attribute": "Company_Name",
+      "old_value": "Rights & Issues Investment Trust (RIII)",
+      "new_value": "Oxford Biomedica (OXB)"
+    },
+    {
+      "record_key": "idx_29",
+      "attribute": "Published_Date",
+      "old_value": "08 Jul 2026 05:15 PM",
+      "new_value": "16 Jul 2026 07:00 AM"
+    },
+    {
+      "record_key": "idx_20",
+      "attribute": "Article_Link",
+      "old_value": "https://www.investegate.co.uk/announcement/prn/fidelity-china-special-situations--fcss/transaction-in-own-shares/9659461",
+      "new_value": "https://www.investegate.co.uk/announcement/eqs/funding-circle-holdings--fch/half-year-2026-trading-update-/9671551"
+    },
+    {
+      "record_key": "idx_20",
+      "attribute": "Article_Subject",
+      "old_value": "Transaction in Own Shares",
+      "new_value": "Half Year 2026 Trading Update"
+    },
+    {
+      "record_key": "idx_20",
+      "attribute": "Company_Link",
+      "old_value": "https://www.investegate.co.uk/company/FCSS",
+      "new_value": "https://www.investegate.co.uk/company/FCH"
+    },
+    {
+      "record_key": "idx_20",
+      "attribute": "Company_Name",
+      "old_value": "Fidelity China Special Situations (FCSS)",
+      "new_value": "Funding Circle Holdings (FCH)"
+    },
+    {
+      "record_key": "idx_20",
+      "attribute": "Published_Date",
+      "old_value": "08 Jul 2026 05:26 PM",
+      "new_value": "16 Jul 2026 07:00 AM"
+    },
+    {
+      "record_key": "idx_20",
+      "attribute": "RNS",
+      "old_value": "PRN",
+      "new_value": "EQS"
+    },
+    {
+      "record_key": "idx_20",
+      "attribute": "Source",
+      "old_value": "PRN",
+      "new_value": "EQS"
+    },
+    {
+      "record_key": "idx_38",
+      "attribute": "Article_Link",
+      "old_value": "https://www.investegate.co.uk/announcement/rns/moneysupermarket-com-group--mony/transaction-in-own-shares/9659428",
+      "new_value": "https://www.investegate.co.uk/announcement/rns/northern-bear--ntbr/preliminary-results/9671298"
+    },
+    {
+      "record_key": "idx_38",
+      "attribute": "Article_Subject",
+      "old_value": "Transaction in Own Shares",
+      "new_value": "Preliminary Results"
+    },
+    {
+      "record_key": "idx_38",
+      "attribute": "Company_Link",
+      "old_value": "https://www.investegate.co.uk/company/MONY",
+      "new_value": "https://www.investegate.co.uk/company/NTBR"
+    },
+    {
+      "record_key": "idx_38",
+      "attribute": "Company_Name",
+      "old_value": "Moneysupermarket.com Group (MONY)",
+      "new_value": "Northern Bear (NTBR)"
+    },
+    {
+      "record_key": "idx_38",
+      "attribute": "Published_Date",
+      "old_value": "08 Jul 2026 05:06 PM",
+      "new_value": "16 Jul 2026 07:00 AM"
+    },
+    {
+      "record_key": "idx_24",
+      "attribute": "Article_Link",
+      "old_value": "https://www.investegate.co.uk/announcement/prn/finsbury-growth-income-trust--fgt/transaction-in-own-shares/9659456",
+      "new_value": "https://www.investegate.co.uk/announcement/rns/aura-energy-limited-npv-di---aura/swedish-nuclear-legislation-enacted/9671319"
+    },
+    {
+      "record_key": "idx_24",
+      "attribute": "Article_Subject",
+      "old_value": "Transaction in Own Shares",
+      "new_value": "Swedish nuclear legislation enacted"
+    },
+    {
+      "record_key": "idx_24",
+      "attribute": "Company_Link",
+      "old_value": "https://www.investegate.co.uk/company/FGT",
+      "new_value": "https://www.investegate.co.uk/company/AURA"
+    },
+    {
+      "record_key": "idx_24",
+      "attribute": "Company_Name",
+      "old_value": "Finsbury Growth & Income Trust (FGT)",
+      "new_value": "Aura Energy Limited NPV (DI) (AURA)"
+    },
+    {
+      "record_key": "idx_24",
+      "attribute": "Published_Date",
+      "old_value": "08 Jul 2026 05:21 PM",
+      "new_value": "16 Jul 2026 07:00 AM"
+    },
+    {
+      "record_key": "idx_24",
+      "attribute": "RNS",
+      "old_value": "PRN",
+      "new_value": "RNS"
+    },
+    {
+      "record_key": "idx_24",
+      "attribute": "Source",
+      "old_value": "PRN",
+      "new_value": "RNS"
+    },
+    {
+      "record_key": "idx_4",
+      "attribute": "Article_Link",
+      "old_value": "https://www.investegate.co.uk/announcement/gnw/ipsen-sa--0mh6/dysport-is-the-first-botulinum-toxin-to-achi-/9659560",
+      "new_value": "https://www.investegate.co.uk/announcement/rns/aew-uk-reit--aewu/disclosure-table-/9672207"
+    },
+    {
+      "record_key": "idx_4",
+      "attribute": "Article_Subject",
+      "old_value": "Dysport® is the first botulinum toxin to achi...",
+      "new_value": "Disclosure Table"
+    },
+    {
+      "record_key": "idx_4",
+      "attribute": "Company_Link",
+      "old_value": "https://www.investegate.co.uk/company/0MH6",
+      "new_value": "https://www.investegate.co.uk/company/AEWU"
+    },
+    {
+      "record_key": "idx_4",
+      "attribute": "Company_Name",
+      "old_value": "Ipsen SA (0MH6)",
+      "new_value": "Aew UK Reit (AEWU)"
+    },
+    {
+      "record_key": "idx_4",
+      "attribute": "Published_Date",
+      "old_value": "09 Jul 2026 06:00 AM",
+      "new_value": "16 Jul 2026 08:12 AM"
+    },
+    {
+      "record_key": "idx_4",
+      "attribute": "RNS",
+      "old_value": "GNW",
+      "new_value": "RNS"
+    },
+    {
+      "record_key": "idx_4",
+      "attribute": "Source",
+      "old_value": "GNW",
+      "new_value": "RNS"
+    },
+    {
+      "record_key": "idx_12",
+      "attribute": "Article_Link",
+      "old_value": "https://www.investegate.co.uk/announcement/rns/oxford-biomedica--oxb/holding-s-in-company/9659515",
+      "new_value": "https://www.investegate.co.uk/announcement/rns/kingfisher--kgf/share-repurchase-programme-second-tranche/9672074"
+    },
+    {
+      "record_key": "idx_12",
+      "attribute": "Article_Subject",
+      "old_value": "Holding(s) in Company",
+      "new_value": "Share repurchase programme – Second Tranche"
+    },
+    {
+      "record_key": "idx_12",
+      "attribute": "Company_Link",
+      "old_value": "https://www.investegate.co.uk/company/OXB",
+      "new_value": "https://www.investegate.co.uk/company/KGF"
+    },
+    {
+      "record_key": "idx_12",
+      "attribute": "Company_Name",
+      "old_value": "Oxford Biomedica (OXB)",
+      "new_value": "Kingfisher (KGF)"
+    },
+    {
+      "record_key": "idx_12",
+      "attribute": "Published_Date",
+      "old_value": "08 Jul 2026 05:57 PM",
+      "new_value": "16 Jul 2026 07:30 AM"
+    },
+    {
+      "record_key": "idx_10",
+      "attribute": "Article_Link",
+      "old_value": "https://www.investegate.co.uk/announcement/rns/lloyds-banking-group--lloy/transaction-in-own-shares/9659525",
+      "new_value": "https://www.investegate.co.uk/announcement/fnw/financewire-news--fnews/roboforex-launches-full-scale-trading-in-tele-/9672321"
+    },
+    {
+      "record_key": "idx_10",
+      "attribute": "Article_Subject",
+      "old_value": "Transaction in Own Shares",
+      "new_value": "RoboForex Launches Full-Scale Trading in Tele..."
+    },
+    {
+      "record_key": "idx_10",
+      "attribute": "Company_Link",
+      "old_value": "https://www.investegate.co.uk/company/LLOY",
+      "new_value": "https://www.investegate.co.uk/company/FNEWS"
+    },
+    {
+      "record_key": "idx_10",
+      "attribute": "Company_Name",
+      "old_value": "Lloyds Banking Group (LLOY)",
+      "new_value": "FinanceWire News (FNEWS)"
+    },
+    {
+      "record_key": "idx_10",
+      "attribute": "Published_Date",
+      "old_value": "08 Jul 2026 06:06 PM",
+      "new_value": "16 Jul 2026 07:32 AM"
+    },
+    {
+      "record_key": "idx_10",
+      "attribute": "RNS",
+      "old_value": "RNS",
+      "new_value": "FNW"
+    },
+    {
+      "record_key": "idx_10",
+      "attribute": "Source",
+      "old_value": "RNS",
+      "new_value": "FNW"
+    },
+    {
+      "record_key": "idx_16",
+      "attribute": "Article_Link",
+      "old_value": "https://www.investegate.co.uk/announcement/prn/aberforth-smaller-companies-trust--asl/transaction-in-own-shares/9659486",
+      "new_value": "https://www.investegate.co.uk/announcement/rns/orcadian-energy--orca/investor-presentation-via-investor-meet-company/9671552"
+    },
+    {
+      "record_key": "idx_16",
+      "attribute": "Article_Subject",
+      "old_value": "Transaction in Own Shares",
+      "new_value": "Investor Presentation via Investor Meet Company"
+    },
+    {
+      "record_key": "idx_16",
+      "attribute": "Company_Link",
+      "old_value": "https://www.investegate.co.uk/company/ASL",
+      "new_value": "https://www.investegate.co.uk/company/ORCA"
+    },
+    {
+      "record_key": "idx_16",
+      "attribute": "Company_Name",
+      "old_value": "Aberforth Smaller Companies Trust (ASL)",
+      "new_value": "Orcadian Energy (ORCA)"
+    },
+    {
+      "record_key": "idx_16",
+      "attribute": "Published_Date",
+      "old_value": "08 Jul 2026 05:43 PM",
+      "new_value": "16 Jul 2026 07:05 AM"
+    },
+    {
+      "record_key": "idx_16",
+      "attribute": "RNS",
+      "old_value": "PRN",
+      "new_value": "RNS"
+    },
+    {
+      "record_key": "idx_16",
+      "attribute": "Source",
+      "old_value": "PRN",
+      "new_value": "RNS"
+    },
+    {
+      "record_key": "idx_39",
+      "attribute": "Article_Link",
+      "old_value": "https://www.investegate.co.uk/announcement/rns/polar-capital-technology-trust--pct/transaction-in-own-shares/9659425",
+      "new_value": "https://www.investegate.co.uk/announcement/rns/savannah-resources--sav/investor-presentation-via-investor-meet-company/9671314"
+    },
+    {
+      "record_key": "idx_39",
+      "attribute": "Article_Subject",
+      "old_value": "Transaction in Own Shares",
+      "new_value": "Investor Presentation via Investor Meet Company"
+    },
+    {
+      "record_key": "idx_39",
+      "attribute": "Company_Link",
+      "old_value": "https://www.investegate.co.uk/company/PCT",
+      "new_value": "https://www.investegate.co.uk/company/SAV"
+    },
+    {
+      "record_key": "idx_39",
+      "attribute": "Company_Name",
+      "old_value": "Polar Capital Technology Trust (PCT)",
+      "new_value": "Savannah Resources (SAV)"
+    },
+    {
+      "record_key": "idx_39",
+      "attribute": "Published_Date",
+      "old_value": "08 Jul 2026 05:05 PM",
+      "new_value": "16 Jul 2026 07:00 AM"
+    },
+    {
+      "record_key": "idx_42",
+      "attribute": "Article_Link",
+      "old_value": "https://www.investegate.co.uk/announcement/rns/tata-steel-limited--ttst/press-release/9659422",
+      "new_value": "https://www.investegate.co.uk/announcement/rns/johnson-matthey--jmat/board-change/9671295"
+    },
+    {
+      "record_key": "idx_42",
+      "attribute": "Article_Subject",
+      "old_value": "Press Release",
+      "new_value": "Board change"
+    },
+    {
+      "record_key": "idx_42",
+      "attribute": "Company_Link",
+      "old_value": "https://www.investegate.co.uk/company/TTST",
+      "new_value": "https://www.investegate.co.uk/company/JMAT"
+    },
+    {
+      "record_key": "idx_42",
+      "attribute": "Company_Name",
+      "old_value": "TATA STEEL LIMITED (TTST)",
+      "new_value": "Johnson Matthey (JMAT)"
+    },
+    {
+      "record_key": "idx_42",
+      "attribute": "Published_Date",
+      "old_value": "08 Jul 2026 05:03 PM",
+      "new_value": "16 Jul 2026 07:00 AM"
+    },
+    {
+      "record_key": "idx_48",
+      "attribute": "Article_Link",
+      "old_value": "https://www.investegate.co.uk/announcement/prn/rightmove--rmv/transaction-in-own-shares/9659416",
+      "new_value": "https://www.investegate.co.uk/announcement/rns/crest-nicholson-holdings--crst/half-year-financial-report/9671288"
+    },
+    {
+      "record_key": "idx_48",
+      "attribute": "Article_Subject",
+      "old_value": "Transaction in Own Shares",
+      "new_value": "Half-year Financial Report"
+    },
+    {
+      "record_key": "idx_48",
+      "attribute": "Company_Link",
+      "old_value": "https://www.investegate.co.uk/company/RMV",
+      "new_value": "https://www.investegate.co.uk/company/CRST"
+    },
+    {
+      "record_key": "idx_48",
+      "attribute": "Company_Name",
+      "old_value": "Rightmove (RMV)",
+      "new_value": "Crest Nicholson Holdings (CRST)"
+    },
+    {
+      "record_key": "idx_48",
+      "attribute": "Published_Date",
+      "old_value": "08 Jul 2026 04:54 PM",
+      "new_value": "16 Jul 2026 07:00 AM"
+    },
+    {
+      "record_key": "idx_48",
+      "attribute": "RNS",
+      "old_value": "PRN",
+      "new_value": "RNS"
+    },
+    {
+      "record_key": "idx_48",
+      "attribute": "Source",
+      "old_value": "PRN",
+      "new_value": "RNS"
+    },
+    {
+      "record_key": "idx_19",
+      "attribute": "Article_Link",
+      "old_value": "https://www.investegate.co.uk/announcement/rns/international-biotech-trust--ibt/transaction-in-own-shares/9659460",
+      "new_value": "https://www.investegate.co.uk/announcement/rns/dcc-cdi---dcc/agm-trading-statement/9671447"
+    },
+    {
+      "record_key": "idx_19",
+      "attribute": "Article_Subject",
+      "old_value": "Transaction in Own Shares",
+      "new_value": "AGM Trading Statement"
+    },
+    {
+      "record_key": "idx_19",
+      "attribute": "Company_Link",
+      "old_value": "https://www.investegate.co.uk/company/IBT",
+      "new_value": "https://www.investegate.co.uk/company/DCC"
+    },
+    {
+      "record_key": "idx_19",
+      "attribute": "Company_Name",
+      "old_value": "International Biotech Trust (IBT)",
+      "new_value": "DCC (CDI) (DCC)"
+    },
+    {
+      "record_key": "idx_19",
+      "attribute": "Published_Date",
+      "old_value": "08 Jul 2026 05:26 PM",
+      "new_value": "16 Jul 2026 07:01 AM"
+    },
+    {
+      "record_key": "idx_44",
+      "attribute": "Article_Link",
+      "old_value": "https://www.investegate.co.uk/announcement/rns/shawbrook-group-plc--shaw/appointment-of-independent-non-executive-director/9659420",
+      "new_value": "https://www.investegate.co.uk/announcement/rns/gooch-housego--ghh/recommended-cash-acquisition-of-gooch-housego/9671293"
+    },
+    {
+      "record_key": "idx_44",
+      "attribute": "Article_Subject",
+      "old_value": "Appointment of Independent Non-Executive Director",
+      "new_value": "Recommended cash acquisition of Gooch & Housego"
+    },
+    {
+      "record_key": "idx_44",
+      "attribute": "Company_Link",
+      "old_value": "https://www.investegate.co.uk/company/SHAW",
+      "new_value": "https://www.investegate.co.uk/company/GHH"
+    },
+    {
+      "record_key": "idx_44",
+      "attribute": "Company_Name",
+      "old_value": "SHAWBROOK GROUP PLC (SHAW)",
+      "new_value": "Gooch & Housego (GHH)"
+    },
+    {
+      "record_key": "idx_44",
+      "attribute": "Published_Date",
+      "old_value": "08 Jul 2026 05:00 PM",
+      "new_value": "16 Jul 2026 07:00 AM"
+    },
+    {
+      "record_key": "idx_8",
+      "attribute": "Article_Link",
+      "old_value": "https://www.investegate.co.uk/announcement/prn/vesuvius--vsvs/director-pdmr-shareholding/9659536",
+      "new_value": "https://www.investegate.co.uk/announcement/rns/rotork--ror/disclosure-table/9672079"
+    },
+    {
+      "record_key": "idx_8",
+      "attribute": "Article_Subject",
+      "old_value": "Director/PDMR Shareholding",
+      "new_value": "Disclosure Table"
+    },
+    {
+      "record_key": "idx_8",
+      "attribute": "Company_Link",
+      "old_value": "https://www.investegate.co.uk/company/VSVS",
+      "new_value": "https://www.investegate.co.uk/company/ROR"
+    },
+    {
+      "record_key": "idx_8",
+      "attribute": "Company_Name",
+      "old_value": "Vesuvius (VSVS)",
+      "new_value": "Rotork (ROR)"
+    },
+    {
+      "record_key": "idx_8",
+      "attribute": "Published_Date",
+      "old_value": "08 Jul 2026 06:12 PM",
+      "new_value": "16 Jul 2026 07:45 AM"
+    },
+    {
+      "record_key": "idx_8",
+      "attribute": "RNS",
+      "old_value": "PRN",
+      "new_value": "RNS"
+    },
+    {
+      "record_key": "idx_8",
+      "attribute": "Source",
+      "old_value": "PRN",
+      "new_value": "RNS"
+    },
+    {
+      "record_key": "idx_2",
+      "attribute": "Article_Link",
+      "old_value": "https://www.investegate.co.uk/announcement/eqs/relief-therapeutics-holding-sa--0qkq/mindmaze-therapeutics-supports-university-of-/9659569",
+      "new_value": "https://www.investegate.co.uk/announcement/rns/international-personal-finance--ipf/holding-s-in-company/9672333"
+    },
+    {
+      "record_key": "idx_2",
+      "attribute": "Article_Subject",
+      "old_value": "MindMaze Therapeutics Supports University of ...",
+      "new_value": "Holding(s) in Company"
+    },
+    {
+      "record_key": "idx_2",
+      "attribute": "Company_Link",
+      "old_value": "https://www.investegate.co.uk/company/0QKQ",
+      "new_value": "https://www.investegate.co.uk/company/IPF"
+    },
+    {
+      "record_key": "idx_2",
+      "attribute": "Company_Name",
+      "old_value": "Relief Therapeutics Holding SA (0QKQ)",
+      "new_value": "International Personal Finance (IPF)"
+    },
+    {
+      "record_key": "idx_2",
+      "attribute": "Published_Date",
+      "old_value": "09 Jul 2026 06:00 AM",
+      "new_value": "16 Jul 2026 08:57 AM"
+    },
+    {
+      "record_key": "idx_2",
+      "attribute": "RNS",
+      "old_value": "EQS",
+      "new_value": "RNS"
+    },
+    {
+      "record_key": "idx_2",
+      "attribute": "Source",
+      "old_value": "EQS",
+      "new_value": "RNS"
+    },
+    {
+      "record_key": "idx_9",
+      "attribute": "Article_Link",
+      "old_value": "https://www.investegate.co.uk/announcement/rns/pri0r1ty-intelligence-group-plc--pr1/result-of-agm/9659528",
+      "new_value": "https://www.investegate.co.uk/announcement/rns/telecom-egypt-s-a-e---teeg/te-to-not-proceed-with-proposed-rdh-transaction/9672077"
+    },
+    {
+      "record_key": "idx_9",
+      "attribute": "Article_Subject",
+      "old_value": "Result of AGM",
+      "new_value": "TE to Not Proceed with Proposed RDH Transaction"
+    },
+    {
+      "record_key": "idx_9",
+      "attribute": "Company_Link",
+      "old_value": "https://www.investegate.co.uk/company/PR1",
+      "new_value": "https://www.investegate.co.uk/company/TEEG"
+    },
+    {
+      "record_key": "idx_9",
+      "attribute": "Company_Name",
+      "old_value": "Pri0r1ty Intelligence Group PLC (PR1)",
+      "new_value": "TELECOM EGYPT S.A.E. (TEEG)"
+    },
+    {
+      "record_key": "idx_9",
+      "attribute": "Published_Date",
+      "old_value": "08 Jul 2026 06:09 PM",
+      "new_value": "16 Jul 2026 07:34 AM"
+    },
+    {
+      "record_key": "idx_49",
+      "attribute": "Article_Link",
+      "old_value": "https://www.investegate.co.uk/announcement/rns/templeton-emerging-markets-inv-trust--tem/transaction-in-own-shares/9659415",
+      "new_value": "https://www.investegate.co.uk/announcement/rns/wynnstay-properties--wsp/results-of-annual-general-meeting/9671287"
+    },
+    {
+      "record_key": "idx_49",
+      "attribute": "Article_Subject",
+      "old_value": "Transaction in Own Shares",
+      "new_value": "Results of Annual General Meeting"
+    },
+    {
+      "record_key": "idx_49",
+      "attribute": "Company_Link",
+      "old_value": "https://www.investegate.co.uk/company/TEM",
+      "new_value": "https://www.investegate.co.uk/company/WSP"
+    },
+    {
+      "record_key": "idx_49",
+      "attribute": "Company_Name",
+      "old_value": "Templeton Emerging Markets Inv Trust (TEM)",
+      "new_value": "Wynnstay Properties (WSP)"
+    },
+    {
+      "record_key": "idx_49",
+      "attribute": "Published_Date",
+      "old_value": "08 Jul 2026 04:53 PM",
+      "new_value": "16 Jul 2026 07:00 AM"
+    },
+    {
+      "record_key": "idx_27",
+      "attribute": "Article_Link",
+      "old_value": "https://www.investegate.co.uk/announcement/rns/sdcl-efficiency-income-trust--seit/tr-1-notification-of-major-holdings/9659444",
+      "new_value": "https://www.investegate.co.uk/announcement/rns/b-hodl-plc--hodl/transaction-in-own-shares/9671305"
+    },
+    {
+      "record_key": "idx_27",
+      "attribute": "Article_Subject",
+      "old_value": "TR-1 Notification of Major Holdings",
+      "new_value": "Transaction in Own Shares"
+    },
+    {
+      "record_key": "idx_27",
+      "attribute": "Company_Link",
+      "old_value": "https://www.investegate.co.uk/company/SEIT",
+      "new_value": "https://www.investegate.co.uk/company/HODL"
+    },
+    {
+      "record_key": "idx_27",
+      "attribute": "Company_Name",
+      "old_value": "SDCL Efficiency Income Trust (SEIT)",
+      "new_value": "B HODL PLC (HODL)"
+    },
+    {
+      "record_key": "idx_27",
+      "attribute": "Published_Date",
+      "old_value": "08 Jul 2026 05:17 PM",
+      "new_value": "16 Jul 2026 07:00 AM"
+    },
+    {
+      "record_key": "idx_45",
+      "attribute": "Article_Link",
+      "old_value": "https://www.investegate.co.uk/announcement/rns/jpmorgan-japanese-inv-trust--jfj/transaction-in-own-shares/9659419",
+      "new_value": "https://www.investegate.co.uk/announcement/rns/dcc-cdi---dcc/extension-of-pusu-deadline/9671292"
+    },
+    {
+      "record_key": "idx_45",
+      "attribute": "Article_Subject",
+      "old_value": "Transaction in Own Shares",
+      "new_value": "Extension of PUSU Deadline"
+    },
+    {
+      "record_key": "idx_45",
+      "attribute": "Company_Link",
+      "old_value": "https://www.investegate.co.uk/company/JFJ",
+      "new_value": "https://www.investegate.co.uk/company/DCC"
+    },
+    {
+      "record_key": "idx_45",
+      "attribute": "Company_Name",
+      "old_value": "JPMorgan Japanese Inv Trust (JFJ)",
+      "new_value": "DCC (CDI) (DCC)"
+    },
+    {
+      "record_key": "idx_45",
+      "attribute": "Published_Date",
+      "old_value": "08 Jul 2026 04:59 PM",
+      "new_value": "16 Jul 2026 07:00 AM"
+    },
+    {
+      "record_key": "idx_7",
+      "attribute": "Article_Link",
+      "old_value": "https://www.investegate.co.uk/announcement/eqs/nagarro-se-n-ord-shs--0aa3/eqs-pvr-nagarro-se-release-according-to-art-/9659542",
+      "new_value": "https://www.investegate.co.uk/announcement/rns/aew-uk-reit--aewu/possible-offer-for-alternative-income-reit-plc-/9672081"
+    },
+    {
+      "record_key": "idx_7",
+      "attribute": "Article_Subject",
+      "old_value": "EQS-PVR: Nagarro SE: Release according to Art...",
+      "new_value": "Possible Offer for Alternative Income REIT plc"
+    },
+    {
+      "record_key": "idx_7",
+      "attribute": "Company_Link",
+      "old_value": "https://www.investegate.co.uk/company/0AA3",
+      "new_value": "https://www.investegate.co.uk/company/AEWU"
+    },
+    {
+      "record_key": "idx_7",
+      "attribute": "Company_Name",
+      "old_value": "Nagarro SE N Ord Shs (0AA3)",
+      "new_value": "Aew UK Reit (AEWU)"
+    },
+    {
+      "record_key": "idx_7",
+      "attribute": "Published_Date",
+      "old_value": "08 Jul 2026 07:35 PM",
+      "new_value": "16 Jul 2026 07:45 AM"
+    },
+    {
+      "record_key": "idx_7",
+      "attribute": "RNS",
+      "old_value": "EQS",
+      "new_value": "RNS"
+    },
+    {
+      "record_key": "idx_7",
+      "attribute": "Source",
+      "old_value": "EQS",
+      "new_value": "RNS"
+    },
+    {
+      "record_key": "idx_6",
+      "attribute": "Article_Link",
+      "old_value": "https://www.investegate.co.uk/announcement/eqs/nagarro-se-n-ord-shs--0aa3/eqs-pvr-nagarro-se-release-according-to-art-/9659543",
+      "new_value": "https://www.investegate.co.uk/announcement/prn/bodycote--boy/holding-s-in-company/9672096"
+    },
+    {
+      "record_key": "idx_6",
+      "attribute": "Article_Subject",
+      "old_value": "EQS-PVR: Nagarro SE: Release according to Art...",
+      "new_value": "Holding(s) in Company"
+    },
+    {
+      "record_key": "idx_6",
+      "attribute": "Company_Link",
+      "old_value": "https://www.investegate.co.uk/company/0AA3",
+      "new_value": "https://www.investegate.co.uk/company/BOY"
+    },
+    {
+      "record_key": "idx_6",
+      "attribute": "Company_Name",
+      "old_value": "Nagarro SE N Ord Shs (0AA3)",
+      "new_value": "Bodycote (BOY)"
+    },
+    {
+      "record_key": "idx_6",
+      "attribute": "Published_Date",
+      "old_value": "08 Jul 2026 07:37 PM",
+      "new_value": "16 Jul 2026 08:00 AM"
+    },
+    {
+      "record_key": "idx_6",
+      "attribute": "RNS",
+      "old_value": "EQS",
+      "new_value": "PRN"
+    },
+    {
+      "record_key": "idx_6",
+      "attribute": "Source",
+      "old_value": "EQS",
+      "new_value": "PRN"
+    },
+    {
+      "record_key": "idx_30",
+      "attribute": "Article_Link",
+      "old_value": "https://www.investegate.co.uk/announcement/rns/montanaro-uk-smaller-companies-inv-trust--mtu/transaction-in-own-shares/9659438",
+      "new_value": "https://www.investegate.co.uk/announcement/rns/orcadian-energy--orca/earlham-orwell-gas-development-concept-/9671317"
+    },
+    {
+      "record_key": "idx_30",
+      "attribute": "Article_Subject",
+      "old_value": "Transaction in Own Shares",
+      "new_value": "Earlham & Orwell gas development concept"
+    },
+    {
+      "record_key": "idx_30",
+      "attribute": "Company_Link",
+      "old_value": "https://www.investegate.co.uk/company/MTU",
+      "new_value": "https://www.investegate.co.uk/company/ORCA"
+    },
+    {
+      "record_key": "idx_30",
+      "attribute": "Company_Name",
+      "old_value": "Montanaro UK Smaller Companies Inv Trust (MTU)",
+      "new_value": "Orcadian Energy (ORCA)"
+    },
+    {
+      "record_key": "idx_30",
+      "attribute": "Published_Date",
+      "old_value": "08 Jul 2026 05:14 PM",
+      "new_value": "16 Jul 2026 07:00 AM"
+    },
+    {
+      "record_key": "idx_21",
+      "attribute": "Article_Link",
+      "old_value": "https://www.investegate.co.uk/announcement/rns/bankers-inv-trust--bnkr/transaction-in-own-shares/9659455",
+      "new_value": "https://www.investegate.co.uk/announcement/rns/helical--hlcl/trading-update/9671332"
+    },
+    {
+      "record_key": "idx_21",
+      "attribute": "Article_Subject",
+      "old_value": "Transaction in Own Shares",
+      "new_value": "Trading Update"
+    },
+    {
+      "record_key": "idx_21",
+      "attribute": "Company_Link",
+      "old_value": "https://www.investegate.co.uk/company/BNKR",
+      "new_value": "https://www.investegate.co.uk/company/HLCL"
+    },
+    {
+      "record_key": "idx_21",
+      "attribute": "Company_Name",
+      "old_value": "Bankers Inv Trust (BNKR)",
+      "new_value": "Helical (HLCL)"
+    },
+    {
+      "record_key": "idx_21",
+      "attribute": "Published_Date",
+      "old_value": "08 Jul 2026 05:24 PM",
+      "new_value": "16 Jul 2026 07:00 AM"
+    },
+    {
+      "record_key": "idx_1",
+      "attribute": "Article_Link",
+      "old_value": "https://www.investegate.co.uk/announcement/bzw/totalenergies-se--tte/mexico-totalenergies-ships-to-asia-the-very-/9659571",
+      "new_value": "https://www.investegate.co.uk/announcement/rns/herefordshire-capital-plc--60rg/directorate-change/9672341"
+    },
+    {
+      "record_key": "idx_1",
+      "attribute": "Article_Subject",
+      "old_value": "Mexico: TotalEnergies Ships to Asia the Very ...",
+      "new_value": "Directorate change"
+    },
+    {
+      "record_key": "idx_1",
+      "attribute": "Company_Link",
+      "old_value": "https://www.investegate.co.uk/company/TTE",
+      "new_value": "https://www.investegate.co.uk/company/60RG"
+    },
+    {
+      "record_key": "idx_1",
+      "attribute": "Company_Name",
+      "old_value": "TotalEnergies SE (TTE)",
+      "new_value": "HEREFORDSHIRE CAPITAL PLC (60RG)"
+    },
+    {
+      "record_key": "idx_1",
+      "attribute": "Published_Date",
+      "old_value": "09 Jul 2026 06:25 AM",
+      "new_value": "16 Jul 2026 09:03 AM"
+    },
+    {
+      "record_key": "idx_1",
+      "attribute": "RNS",
+      "old_value": "BZW",
+      "new_value": "RNS"
+    },
+    {
+      "record_key": "idx_1",
+      "attribute": "Source",
+      "old_value": "BZW",
+      "new_value": "RNS"
+    },
+    {
+      "record_key": "idx_43",
+      "attribute": "Article_Link",
+      "old_value": "https://www.investegate.co.uk/announcement/rns/foresight-solar-fund-limited--fsfl/transaction-in-own-shares/9659421",
+      "new_value": "https://www.investegate.co.uk/announcement/rns/rotork--ror/offer-for-rotork-plc/9671294"
+    },
+    {
+      "record_key": "idx_43",
+      "attribute": "Article_Subject",
+      "old_value": "Transaction in Own Shares",
+      "new_value": "Offer for Rotork plc"
+    },
+    {
+      "record_key": "idx_43",
+      "attribute": "Company_Link",
+      "old_value": "https://www.investegate.co.uk/company/FSFL",
+      "new_value": "https://www.investegate.co.uk/company/ROR"
+    },
+    {
+      "record_key": "idx_43",
+      "attribute": "Company_Name",
+      "old_value": "Foresight Solar Fund Limited (FSFL)",
+      "new_value": "Rotork (ROR)"
+    },
+    {
+      "record_key": "idx_43",
+      "attribute": "Published_Date",
+      "old_value": "08 Jul 2026 05:01 PM",
+      "new_value": "16 Jul 2026 07:00 AM"
+    },
+    {
+      "record_key": "idx_37",
+      "attribute": "Article_Link",
+      "old_value": "https://www.investegate.co.uk/announcement/rns/abrdn-uk-smaller-companies-growth-trust--ausc/transaction-in-own-shares/9659429",
+      "new_value": "https://www.investegate.co.uk/announcement/rns/cellbxhealth-plc--clbx/issue-of-share-options/9671300"
+    },
+    {
+      "record_key": "idx_37",
+      "attribute": "Article_Subject",
+      "old_value": "Transaction in Own Shares",
+      "new_value": "Issue of Share Options"
+    },
+    {
+      "record_key": "idx_37",
+      "attribute": "Company_Link",
+      "old_value": "https://www.investegate.co.uk/company/AUSC",
+      "new_value": "https://www.investegate.co.uk/company/CLBX"
+    },
+    {
+      "record_key": "idx_37",
+      "attribute": "Company_Name",
+      "old_value": "Abrdn UK Smaller Companies Growth Trust (AUSC)",
+      "new_value": "CelLBxHealth plc (CLBX)"
+    },
+    {
+      "record_key": "idx_37",
+      "attribute": "Published_Date",
+      "old_value": "08 Jul 2026 05:06 PM",
+      "new_value": "16 Jul 2026 07:00 AM"
+    },
+    {
+      "record_key": "idx_25",
+      "attribute": "Article_Link",
+      "old_value": "https://www.investegate.co.uk/announcement/rns/tiger-royalties-and-investments--tir/holding-s-in-company/9659445",
+      "new_value": "https://www.investegate.co.uk/announcement/rns/celebrus-technologies--clbs/director-pdmr-dealing/9671308"
+    },
+    {
+      "record_key": "idx_25",
+      "attribute": "Article_Subject",
+      "old_value": "Holding(s) in Company",
+      "new_value": "Director/PDMR Dealing"
+    },
+    {
+      "record_key": "idx_25",
+      "attribute": "Company_Link",
+      "old_value": "https://www.investegate.co.uk/company/TIR",
+      "new_value": "https://www.investegate.co.uk/company/CLBS"
+    },
+    {
+      "record_key": "idx_25",
+      "attribute": "Company_Name",
+      "old_value": "Tiger Royalties and Investments (TIR)",
+      "new_value": "Celebrus Technologies (CLBS)"
+    },
+    {
+      "record_key": "idx_25",
+      "attribute": "Published_Date",
+      "old_value": "08 Jul 2026 05:18 PM",
+      "new_value": "16 Jul 2026 07:00 AM"
+    },
+    {
+      "record_key": "idx_26",
+      "attribute": "Article_Link",
+      "old_value": "https://www.investegate.co.uk/announcement/prn/fidelity-asian-values--fas/transaction-in-own-shares/9659451",
+      "new_value": "https://www.investegate.co.uk/announcement/rns/dotdigital-group--dotd/dotdigital-loyalty-and-new-ai-capabilities/9671323"
+    },
+    {
+      "record_key": "idx_26",
+      "attribute": "Article_Subject",
+      "old_value": "Transaction in Own Shares",
+      "new_value": "Dotdigital Loyalty and new AI capabilities"
+    },
+    {
+      "record_key": "idx_26",
+      "attribute": "Company_Link",
+      "old_value": "https://www.investegate.co.uk/company/FAS",
+      "new_value": "https://www.investegate.co.uk/company/DOTD"
+    },
+    {
+      "record_key": "idx_26",
+      "attribute": "Company_Name",
+      "old_value": "Fidelity Asian Values (FAS)",
+      "new_value": "DotDigital Group (DOTD)"
+    },
+    {
+      "record_key": "idx_26",
+      "attribute": "Published_Date",
+      "old_value": "08 Jul 2026 05:17 PM",
+      "new_value": "16 Jul 2026 07:00 AM"
+    },
+    {
+      "record_key": "idx_26",
+      "attribute": "RNS",
+      "old_value": "PRN",
+      "new_value": "RNS"
+    },
+    {
+      "record_key": "idx_26",
+      "attribute": "Source",
+      "old_value": "PRN",
+      "new_value": "RNS"
+    },
+    {
+      "record_key": "idx_32",
+      "attribute": "Article_Link",
+      "old_value": "https://www.investegate.co.uk/announcement/rns/alliance-witan--alw/transaction-in-own-shares/9659435",
+      "new_value": "https://www.investegate.co.uk/announcement/rns/seplat-energy-di---sepl/notice-of-half-year-2026-financial-results/9671316"
+    },
+    {
+      "record_key": "idx_32",
+      "attribute": "Article_Subject",
+      "old_value": "Transaction in Own Shares",
+      "new_value": "Notice of Half Year 2026 Financial Results"
+    },
+    {
+      "record_key": "idx_32",
+      "attribute": "Company_Link",
+      "old_value": "https://www.investegate.co.uk/company/ALW",
+      "new_value": "https://www.investegate.co.uk/company/SEPL"
+    },
+    {
+      "record_key": "idx_32",
+      "attribute": "Company_Name",
+      "old_value": "Alliance Witan (ALW)",
+      "new_value": "Seplat Energy (DI) (SEPL)"
+    },
+    {
+      "record_key": "idx_32",
+      "attribute": "Published_Date",
+      "old_value": "08 Jul 2026 05:09 PM",
+      "new_value": "16 Jul 2026 07:00 AM"
+    },
+    {
+      "record_key": "idx_33",
+      "attribute": "Article_Link",
+      "old_value": "https://www.investegate.co.uk/announcement/rns/jpmorgan-european-discovery-trust--jedt/transaction-in-own-shares/9659434",
+      "new_value": "https://www.investegate.co.uk/announcement/rns/supermarket-income-reit--supr/publication-of-circular-and-notice-of-gm/9671315"
+    },
+    {
+      "record_key": "idx_33",
+      "attribute": "Article_Subject",
+      "old_value": "Transaction in Own Shares",
+      "new_value": "Publication of Circular and Notice of GM"
+    },
+    {
+      "record_key": "idx_33",
+      "attribute": "Company_Link",
+      "old_value": "https://www.investegate.co.uk/company/JEDT",
+      "new_value": "https://www.investegate.co.uk/company/SUPR"
+    },
+    {
+      "record_key": "idx_33",
+      "attribute": "Company_Name",
+      "old_value": "JPMorgan European Discovery Trust (JEDT)",
+      "new_value": "Supermarket Income Reit (SUPR)"
+    },
+    {
+      "record_key": "idx_33",
+      "attribute": "Published_Date",
+      "old_value": "08 Jul 2026 05:09 PM",
+      "new_value": "16 Jul 2026 07:00 AM"
+    },
+    {
+      "record_key": "idx_11",
+      "attribute": "Article_Link",
+      "old_value": "https://www.investegate.co.uk/announcement/prn/blackrock-american-income-trust-plc--brai/issue-of-equity/9659527",
+      "new_value": "https://www.investegate.co.uk/announcement/rns/reveille-resources-plc--rev/submission-of-val-vedello-eia-update-on-novazza/9672073"
+    },
+    {
+      "record_key": "idx_11",
+      "attribute": "Article_Subject",
+      "old_value": "Issue of Equity",
+      "new_value": "Submission of Val Vedello EIA & Update on Novazza"
+    },
+    {
+      "record_key": "idx_11",
+      "attribute": "Company_Link",
+      "old_value": "https://www.investegate.co.uk/company/BRAI",
+      "new_value": "https://www.investegate.co.uk/company/REV"
+    },
+    {
+      "record_key": "idx_11",
+      "attribute": "Company_Name",
+      "old_value": "BlackRock American Income Trust plc (BRAI)",
+      "new_value": "Reveille Resources PLC (REV)"
+    },
+    {
+      "record_key": "idx_11",
+      "attribute": "Published_Date",
+      "old_value": "08 Jul 2026 06:05 PM",
+      "new_value": "16 Jul 2026 07:30 AM"
+    },
+    {
+      "record_key": "idx_11",
+      "attribute": "RNS",
+      "old_value": "PRN",
+      "new_value": "RNS"
+    },
+    {
+      "record_key": "idx_11",
+      "attribute": "Source",
+      "old_value": "PRN",
+      "new_value": "RNS"
+    },
+    {
+      "record_key": "idx_5",
+      "attribute": "Article_Link",
+      "old_value": "https://www.investegate.co.uk/announcement/fnw/financewire-news--fnews/lockncharge-launches-forwardpass-to-close-the-/9659549",
+      "new_value": "https://www.investegate.co.uk/announcement/rns/dukhan-tier-1-sukuk-limited--14za/cancellation-dukhan-tier-1-sukuk-limited/9672092"
+    },
+    {
+      "record_key": "idx_5",
+      "attribute": "Article_Subject",
+      "old_value": "LocknCharge Launches Forwardpass to Close the...",
+      "new_value": "Cancellation - Dukhan Tier 1 Sukuk Limited"
+    },
+    {
+      "record_key": "idx_5",
+      "attribute": "Company_Link",
+      "old_value": "https://www.investegate.co.uk/company/FNEWS",
+      "new_value": "https://www.investegate.co.uk/company/14ZA"
+    },
+    {
+      "record_key": "idx_5",
+      "attribute": "Company_Name",
+      "old_value": "FinanceWire News (FNEWS)",
+      "new_value": "DUKHAN TIER 1 SUKUK LIMITED (14ZA)"
+    },
+    {
+      "record_key": "idx_5",
+      "attribute": "Published_Date",
+      "old_value": "08 Jul 2026 08:38 PM",
+      "new_value": "16 Jul 2026 08:00 AM"
+    },
+    {
+      "record_key": "idx_5",
+      "attribute": "RNS",
+      "old_value": "FNW",
+      "new_value": "RNS"
+    },
+    {
+      "record_key": "idx_5",
+      "attribute": "Source",
+      "old_value": "FNW",
+      "new_value": "RNS"
+    },
+    {
+      "record_key": "idx_34",
+      "attribute": "Article_Link",
+      "old_value": "https://www.investegate.co.uk/announcement/rns/murray-international-trust--myi/issue-of-equity/9659433",
+      "new_value": "https://www.investegate.co.uk/announcement/rns/maintel-holdings--mai/board-changes/9671303"
+    },
+    {
+      "record_key": "idx_34",
+      "attribute": "Article_Subject",
+      "old_value": "Issue of Equity",
+      "new_value": "Board Changes"
+    },
+    {
+      "record_key": "idx_34",
+      "attribute": "Company_Link",
+      "old_value": "https://www.investegate.co.uk/company/MYI",
+      "new_value": "https://www.investegate.co.uk/company/MAI"
+    },
+    {
+      "record_key": "idx_34",
+      "attribute": "Company_Name",
+      "old_value": "Murray International Trust (MYI)",
+      "new_value": "Maintel Holdings (MAI)"
+    },
+    {
+      "record_key": "idx_34",
+      "attribute": "Published_Date",
+      "old_value": "08 Jul 2026 05:08 PM",
+      "new_value": "16 Jul 2026 07:00 AM"
+    },
+    {
+      "record_key": "idx_47",
+      "attribute": "Article_Link",
+      "old_value": "https://www.investegate.co.uk/announcement/rns/galantas-gold-corp---gal/exercise-of-warrants/9659417",
+      "new_value": "https://www.investegate.co.uk/announcement/rns/neoterra-group--tera/updated-mre-incorporates-heavy-rare-earth-elements/9671289"
+    },
+    {
+      "record_key": "idx_47",
+      "attribute": "Article_Subject",
+      "old_value": "Exercise of Warrants",
+      "new_value": "Updated MRE Incorporates Heavy Rare Earth Elements"
+    },
+    {
+      "record_key": "idx_47",
+      "attribute": "Company_Link",
+      "old_value": "https://www.investegate.co.uk/company/GAL",
+      "new_value": "https://www.investegate.co.uk/company/TERA"
+    },
+    {
+      "record_key": "idx_47",
+      "attribute": "Company_Name",
+      "old_value": "Galantas Gold Corp. (GAL)",
+      "new_value": "NeoTerra Group (TERA)"
+    },
+    {
+      "record_key": "idx_47",
+      "attribute": "Published_Date",
+      "old_value": "08 Jul 2026 04:57 PM",
+      "new_value": "16 Jul 2026 07:00 AM"
+    },
+    {
+      "record_key": "idx_40",
+      "attribute": "Article_Link",
+      "old_value": "https://www.investegate.co.uk/announcement/rns/dunedin-income-growth-inv-trust--dig/transaction-in-own-shares/9659424",
+      "new_value": "https://www.investegate.co.uk/announcement/rns/helical--hlcl/helical-lets-the-12th-floor-at-the-bower/9671313"
+    },
+    {
+      "record_key": "idx_40",
+      "attribute": "Article_Subject",
+      "old_value": "Transaction in Own Shares",
+      "new_value": "Helical lets the 12th floor at The Bower"
+    },
+    {
+      "record_key": "idx_40",
+      "attribute": "Company_Link",
+      "old_value": "https://www.investegate.co.uk/company/DIG",
+      "new_value": "https://www.investegate.co.uk/company/HLCL"
+    },
+    {
+      "record_key": "idx_40",
+      "attribute": "Company_Name",
+      "old_value": "Dunedin Income Growth Inv Trust (DIG)",
+      "new_value": "Helical (HLCL)"
+    },
+    {
+      "record_key": "idx_40",
+      "attribute": "Published_Date",
+      "old_value": "08 Jul 2026 05:05 PM",
+      "new_value": "16 Jul 2026 07:00 AM"
+    },
+    {
+      "record_key": "idx_28",
+      "attribute": "Article_Link",
+      "old_value": "https://www.investegate.co.uk/announcement/rns/cqs-natural-resources-growth-and-income--cyn/transaction-in-own-shares/9659443",
+      "new_value": "https://www.investegate.co.uk/announcement/rns/evoke-di---evok/notice-of-interim-results/9671318"
+    },
+    {
+      "record_key": "idx_28",
+      "attribute": "Article_Subject",
+      "old_value": "Transaction in Own Shares",
+      "new_value": "Notice of Interim Results"
+    },
+    {
+      "record_key": "idx_28",
+      "attribute": "Company_Link",
+      "old_value": "https://www.investegate.co.uk/company/CYN",
+      "new_value": "https://www.investegate.co.uk/company/EVOK"
+    },
+    {
+      "record_key": "idx_28",
+      "attribute": "Company_Name",
+      "old_value": "CQS Natural Resources Growth and Income (CYN)",
+      "new_value": "Evoke (DI) (EVOK)"
+    },
+    {
+      "record_key": "idx_28",
+      "attribute": "Published_Date",
+      "old_value": "08 Jul 2026 05:16 PM",
+      "new_value": "16 Jul 2026 07:00 AM"
+    },
+    {
+      "record_key": "idx_23",
+      "attribute": "Article_Link",
+      "old_value": "https://www.investegate.co.uk/announcement/rns/schroder-oriental-income-fund-ltd---soi/transaction-in-own-shares/9659453",
+      "new_value": "https://www.investegate.co.uk/announcement/rns/brave-bison-group--bbsn/investor-presentation/9671320"
+    },
+    {
+      "record_key": "idx_23",
+      "attribute": "Article_Subject",
+      "old_value": "Transaction in Own Shares",
+      "new_value": "Investor Presentation"
+    },
+    {
+      "record_key": "idx_23",
+      "attribute": "Company_Link",
+      "old_value": "https://www.investegate.co.uk/company/SOI",
+      "new_value": "https://www.investegate.co.uk/company/BBSN"
+    },
+    {
+      "record_key": "idx_23",
+      "attribute": "Company_Name",
+      "old_value": "Schroder Oriental Income Fund Ltd. (SOI)",
+      "new_value": "Brave Bison Group (BBSN)"
+    },
+    {
+      "record_key": "idx_23",
+      "attribute": "Published_Date",
+      "old_value": "08 Jul 2026 05:23 PM",
+      "new_value": "16 Jul 2026 07:00 AM"
+    },
+    {
+      "record_key": "idx_14",
+      "attribute": "Article_Link",
+      "old_value": "https://www.investegate.co.uk/announcement/prn/blackrock-greater-europe-inv-trust--brge/transaction-in-own-shares/9659493",
+      "new_value": "https://www.investegate.co.uk/announcement/bzw/totalenergies-se--tte/totalenergies-se-second-quarter-2026-main-i-/9672069"
+    },
+    {
+      "record_key": "idx_14",
+      "attribute": "Article_Subject",
+      "old_value": "Transaction in Own Shares",
+      "new_value": "TotalEnergies SE: Second Quarter 2026: Main I..."
+    },
+    {
+      "record_key": "idx_14",
+      "attribute": "Company_Link",
+      "old_value": "https://www.investegate.co.uk/company/BRGE",
+      "new_value": "https://www.investegate.co.uk/company/TTE"
+    },
+    {
+      "record_key": "idx_14",
+      "attribute": "Company_Name",
+      "old_value": "BlackRock Greater Europe Inv Trust (BRGE)",
+      "new_value": "TotalEnergies SE (TTE)"
+    },
+    {
+      "record_key": "idx_14",
+      "attribute": "Published_Date",
+      "old_value": "08 Jul 2026 05:45 PM",
+      "new_value": "16 Jul 2026 07:22 AM"
+    },
+    {
+      "record_key": "idx_14",
+      "attribute": "RNS",
+      "old_value": "PRN",
+      "new_value": "BZW"
+    },
+    {
+      "record_key": "idx_14",
+      "attribute": "Source",
+      "old_value": "PRN",
+      "new_value": "BZW"
+    },
+    {
+      "record_key": "idx_35",
+      "attribute": "Article_Link",
+      "old_value": "https://www.investegate.co.uk/announcement/rns/montanaro-european-smaller-companies-trust--mte/transaction-in-own-shares/9659432",
+      "new_value": "https://www.investegate.co.uk/announcement/rns/empire-metals-limited-npv-di---eee/long-term-incentive-plan-and-grant-of-awards/9671302"
+    },
+    {
+      "record_key": "idx_35",
+      "attribute": "Article_Subject",
+      "old_value": "Transaction in Own Shares",
+      "new_value": "Long-Term Incentive Plan and Grant of Awards"
+    },
+    {
+      "record_key": "idx_35",
+      "attribute": "Company_Link",
+      "old_value": "https://www.investegate.co.uk/company/MTE",
+      "new_value": "https://www.investegate.co.uk/company/EEE"
+    },
+    {
+      "record_key": "idx_35",
+      "attribute": "Company_Name",
+      "old_value": "Montanaro European Smaller Companies Trust (MTE)",
+      "new_value": "Empire Metals Limited NPV (DI) (EEE)"
+    },
+    {
+      "record_key": "idx_35",
+      "attribute": "Published_Date",
+      "old_value": "08 Jul 2026 05:08 PM",
+      "new_value": "16 Jul 2026 07:00 AM"
+    },
+    {
+      "record_key": "idx_13",
+      "attribute": "Article_Link",
+      "old_value": "https://www.investegate.co.uk/announcement/prn/blackrock-energy-and-resources-income-trust--beri/transaction-in-own-shares/9659511",
+      "new_value": "https://www.investegate.co.uk/announcement/rns/ms-international--msi/directorate-changes/9672072"
+    },
+    {
+      "record_key": "idx_13",
+      "attribute": "Article_Subject",
+      "old_value": "Transaction in Own Shares",
+      "new_value": "Directorate changes"
+    },
+    {
+      "record_key": "idx_13",
+      "attribute": "Company_Link",
+      "old_value": "https://www.investegate.co.uk/company/BERI",
+      "new_value": "https://www.investegate.co.uk/company/MSI"
+    },
+    {
+      "record_key": "idx_13",
+      "attribute": "Company_Name",
+      "old_value": "BlackRock Energy and Resources Income Trust (BERI)",
+      "new_value": "MS International (MSI)"
+    },
+    {
+      "record_key": "idx_13",
+      "attribute": "Published_Date",
+      "old_value": "08 Jul 2026 05:55 PM",
+      "new_value": "16 Jul 2026 07:30 AM"
+    },
+    {
+      "record_key": "idx_13",
+      "attribute": "RNS",
+      "old_value": "PRN",
+      "new_value": "RNS"
+    },
+    {
+      "record_key": "idx_13",
+      "attribute": "Source",
+      "old_value": "PRN",
+      "new_value": "RNS"
+    },
+    {
+      "record_key": "idx_17",
+      "attribute": "Article_Link",
+      "old_value": "https://www.investegate.co.uk/announcement/prn/blackrock-income-and-growth-investment-trust--brig/transaction-in-own-shares/9659476",
+      "new_value": "https://www.investegate.co.uk/announcement/fnw/financewire-news--fnews/redotpay-earns-soc-2-type-ii-certification-d-/9672176"
+    },
+    {
+      "record_key": "idx_17",
+      "attribute": "Article_Subject",
+      "old_value": "Transaction in Own Shares",
+      "new_value": "RedotPay Earns SOC 2 Type II Certification, D..."
+    },
+    {
+      "record_key": "idx_17",
+      "attribute": "Company_Link",
+      "old_value": "https://www.investegate.co.uk/company/BRIG",
+      "new_value": "https://www.investegate.co.uk/company/FNEWS"
+    },
+    {
+      "record_key": "idx_17",
+      "attribute": "Company_Name",
+      "old_value": "Blackrock Income And Growth Investment Trust (BRIG)",
+      "new_value": "FinanceWire News (FNEWS)"
+    },
+    {
+      "record_key": "idx_17",
+      "attribute": "Published_Date",
+      "old_value": "08 Jul 2026 05:36 PM",
+      "new_value": "16 Jul 2026 07:01 AM"
+    },
+    {
+      "record_key": "idx_17",
+      "attribute": "RNS",
+      "old_value": "PRN",
+      "new_value": "FNW"
+    },
+    {
+      "record_key": "idx_17",
+      "attribute": "Source",
+      "old_value": "PRN",
+      "new_value": "FNW"
+    },
+    {
+      "record_key": "idx_3",
+      "attribute": "Article_Link",
+      "old_value": "https://www.investegate.co.uk/announcement/eqs/nordex-se-nordex-ord-shs--0mec/eqs-news-nordex-group-announces-3-1-gw-of-or-/9659568",
+      "new_value": "https://www.investegate.co.uk/announcement/rns/aew-uk-reit--aewu/possible-offer-for-alternative-income-reit-plc-/9672293"
+    },
+    {
+      "record_key": "idx_3",
+      "attribute": "Article_Subject",
+      "old_value": "EQS-News: Nordex Group announces 3.1 GW of or...",
+      "new_value": "Possible Offer for Alternative Income REIT plc"
+    },
+    {
+      "record_key": "idx_3",
+      "attribute": "Company_Link",
+      "old_value": "https://www.investegate.co.uk/company/0MEC",
+      "new_value": "https://www.investegate.co.uk/company/AEWU"
+    },
+    {
+      "record_key": "idx_3",
+      "attribute": "Company_Name",
+      "old_value": "Nordex SE Nordex Ord Shs (0MEC)",
+      "new_value": "Aew UK Reit (AEWU)"
+    },
+    {
+      "record_key": "idx_3",
+      "attribute": "Published_Date",
+      "old_value": "09 Jul 2026 06:00 AM",
+      "new_value": "16 Jul 2026 08:28 AM"
+    },
+    {
+      "record_key": "idx_3",
+      "attribute": "RNS",
+      "old_value": "EQS",
+      "new_value": "RNS"
+    },
+    {
+      "record_key": "idx_3",
+      "attribute": "Source",
+      "old_value": "EQS",
+      "new_value": "RNS"
+    },
+    {
+      "record_key": "idx_36",
+      "attribute": "Article_Link",
+      "old_value": "https://www.investegate.co.uk/announcement/rns/residential-secure-income--resi/result-of-general-meeting/9659431",
+      "new_value": "https://www.investegate.co.uk/announcement/rns/caledonia-mining-corporation-di---cmcl/holding-s-in-company/9671301"
+    },
+    {
+      "record_key": "idx_36",
+      "attribute": "Article_Subject",
+      "old_value": "Result of General Meeting",
+      "new_value": "Holding(s) in Company"
+    },
+    {
+      "record_key": "idx_36",
+      "attribute": "Company_Link",
+      "old_value": "https://www.investegate.co.uk/company/RESI",
+      "new_value": "https://www.investegate.co.uk/company/CMCL"
+    },
+    {
+      "record_key": "idx_36",
+      "attribute": "Company_Name",
+      "old_value": "Residential Secure Income (RESI)",
+      "new_value": "Caledonia Mining Corporation (DI) (CMCL)"
+    },
+    {
+      "record_key": "idx_36",
+      "attribute": "Published_Date",
+      "old_value": "08 Jul 2026 05:08 PM",
+      "new_value": "16 Jul 2026 07:00 AM"
+    },
+    {
+      "record_key": "idx_22",
+      "attribute": "Article_Link",
+      "old_value": "https://www.investegate.co.uk/announcement/rns/schroder-income-growth-fund--scf/transaction-in-own-shares/9659454",
+      "new_value": "https://www.investegate.co.uk/announcement/rns/inspecs-group--spec/appointment-of-chief-financial-officer/9671311"
+    },
+    {
+      "record_key": "idx_22",
+      "attribute": "Article_Subject",
+      "old_value": "Transaction in Own Shares",
+      "new_value": "Appointment of Chief Financial Officer"
+    },
+    {
+      "record_key": "idx_22",
+      "attribute": "Company_Link",
+      "old_value": "https://www.investegate.co.uk/company/SCF",
+      "new_value": "https://www.investegate.co.uk/company/SPEC"
+    },
+    {
+      "record_key": "idx_22",
+      "attribute": "Company_Name",
+      "old_value": "Schroder Income Growth Fund (SCF)",
+      "new_value": "Inspecs Group (SPEC)"
+    },
+    {
+      "record_key": "idx_22",
+      "attribute": "Published_Date",
+      "old_value": "08 Jul 2026 05:23 PM",
+      "new_value": "16 Jul 2026 07:00 AM"
+    },
+    {
+      "record_key": "idx_0",
+      "attribute": "Article_Link",
+      "old_value": "https://www.investegate.co.uk/announcement/eqs/vib-vermoegen-ag-n--0ac3/eqs-news-vib-verm-gen-ag-a-further-23-100-s-/9659576",
+      "new_value": "https://www.investegate.co.uk/announcement/rns/amigo-holdings--amgo/holding-s-in-company/9672342"
+    },
+    {
+      "record_key": "idx_0",
+      "attribute": "Article_Subject",
+      "old_value": "EQS-News: VIB Vermögen AG: A further 23,100 s...",
+      "new_value": "Holding(s) in Company"
+    },
+    {
+      "record_key": "idx_0",
+      "attribute": "Company_Link",
+      "old_value": "https://www.investegate.co.uk/company/0AC3",
+      "new_value": "https://www.investegate.co.uk/company/AMGO"
+    },
+    {
+      "record_key": "idx_0",
+      "attribute": "Company_Name",
+      "old_value": "VIB Vermoegen AG N (0AC3)",
+      "new_value": "Amigo Holdings (AMGO)"
+    },
+    {
+      "record_key": "idx_0",
+      "attribute": "Published_Date",
+      "old_value": "09 Jul 2026 06:46 AM",
+      "new_value": "16 Jul 2026 09:04 AM"
+    },
+    {
+      "record_key": "idx_0",
+      "attribute": "RNS",
+      "old_value": "EQS",
+      "new_value": "RNS"
+    },
+    {
+      "record_key": "idx_0",
+      "attribute": "Source",
+      "old_value": "EQS",
+      "new_value": "RNS"
+    },
+    {
+      "record_key": "idx_31",
+      "attribute": "Article_Link",
+      "old_value": "https://www.investegate.co.uk/announcement/prn/strategic-equity-capital--sec/transaction-in-own-shares/9659446",
+      "new_value": "https://www.investegate.co.uk/announcement/rns/sse--sse/directorate-change/9671304"
+    },
+    {
+      "record_key": "idx_31",
+      "attribute": "Article_Subject",
+      "old_value": "Transaction in Own Shares",
+      "new_value": "Directorate change"
+    },
+    {
+      "record_key": "idx_31",
+      "attribute": "Company_Link",
+      "old_value": "https://www.investegate.co.uk/company/SEC",
+      "new_value": "https://www.investegate.co.uk/company/SSE"
+    },
+    {
+      "record_key": "idx_31",
+      "attribute": "Company_Name",
+      "old_value": "Strategic Equity Capital (SEC)",
+      "new_value": "SSE (SSE)"
+    },
+    {
+      "record_key": "idx_31",
+      "attribute": "Published_Date",
+      "old_value": "08 Jul 2026 05:14 PM",
+      "new_value": "16 Jul 2026 07:00 AM"
+    },
+    {
+      "record_key": "idx_31",
+      "attribute": "RNS",
+      "old_value": "PRN",
+      "new_value": "RNS"
+    },
+    {
+      "record_key": "idx_31",
+      "attribute": "Source",
+      "old_value": "PRN",
+      "new_value": "RNS"
+    },
+    {
+      "record_key": "idx_15",
+      "attribute": "Article_Link",
+      "old_value": "https://www.investegate.co.uk/announcement/rns/porvair--prv/holding-s-in-company/9659485",
+      "new_value": "https://www.investegate.co.uk/announcement/rns/sig--shi/post-close-trading-update/9671556"
+    },
+    {
+      "record_key": "idx_15",
+      "attribute": "Article_Subject",
+      "old_value": "Holding(s) in Company",
+      "new_value": "Post-close Trading Update"
+    },
+    {
+      "record_key": "idx_15",
+      "attribute": "Company_Link",
+      "old_value": "https://www.investegate.co.uk/company/PRV",
+      "new_value": "https://www.investegate.co.uk/company/SHI"
+    },
+    {
+      "record_key": "idx_15",
+      "attribute": "Company_Name",
+      "old_value": "Porvair (PRV)",
+      "new_value": "SIG (SHI)"
+    },
+    {
+      "record_key": "idx_15",
+      "attribute": "Published_Date",
+      "old_value": "08 Jul 2026 05:45 PM",
+      "new_value": "16 Jul 2026 07:08 AM"
+    },
+    {
+      "record_key": "idx_18",
+      "attribute": "Article_Link",
+      "old_value": "https://www.investegate.co.uk/announcement/prn/worldwide-healthcare-trust--wwh/transaction-in-own-shares/9659472",
+      "new_value": "https://www.investegate.co.uk/announcement/rns/ramsdens-holdings--rfx/final-recommended-cash-offer/9671448"
+    },
+    {
+      "record_key": "idx_18",
+      "attribute": "Article_Subject",
+      "old_value": "Transaction in Own Shares",
+      "new_value": "FINAL* RECOMMENDED CASH OFFER"
+    },
+    {
+      "record_key": "idx_18",
+      "attribute": "Company_Link",
+      "old_value": "https://www.investegate.co.uk/company/WWH",
+      "new_value": "https://www.investegate.co.uk/company/RFX"
+    },
+    {
+      "record_key": "idx_18",
+      "attribute": "Company_Name",
+      "old_value": "Worldwide Healthcare Trust (WWH)",
+      "new_value": "Ramsdens Holdings (RFX)"
+    },
+    {
+      "record_key": "idx_18",
+      "attribute": "Published_Date",
+      "old_value": "08 Jul 2026 05:32 PM",
+      "new_value": "16 Jul 2026 07:01 AM"
+    },
+    {
+      "record_key": "idx_18",
+      "attribute": "RNS",
+      "old_value": "PRN",
+      "new_value": "RNS"
+    },
+    {
+      "record_key": "idx_18",
+      "attribute": "Source",
+      "old_value": "PRN",
+      "new_value": "RNS"
+    }
+  ]
+}

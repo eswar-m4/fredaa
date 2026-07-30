@@ -1,0 +1,62 @@
+[
+  {
+    "full_name": "Alice Example",
+    "title": "VP Sales",
+    "company_name": "Tesco PLC",
+    "company_domain": "tesco.com",
+    "company_size": "500 employees",
+    "city": "Austin",
+    "state": "TX",
+    "source_url": null,
+    "confidence": 0.9,
+    "provider_used": "ollama-qwen",
+    "country": null,
+    "source_company": "Tesco PLC",
+    "source_website": "https://tesco.com",
+    "source_rank": 0,
+    "candidate_index": 0,
+    "evidence_urls": [
+      "https://tesco.com",
+      "https://infosys.com/team",
+      "https://infosys.com/team",
+      "https://infosys.com/team",
+      "https://infosys.com/team"
+    ],
+    "fallback_used": false,
+    "provenance": {
+      "company_name": "input",
+      "company_domain": "input",
+      "contacts": "ollama-qwen"
+    }
+  },
+  {
+    "full_name": "Alice Example",
+    "title": "VP Sales",
+    "company_name": "Infosys Limited",
+    "company_domain": "infosys.com",
+    "company_size": "500 employees",
+    "city": "Austin",
+    "state": "TX",
+    "source_url": null,
+    "confidence": 0.9,
+    "provider_used": "ollama-qwen",
+    "country": null,
+    "source_company": "Infosys Limited",
+    "source_website": "https://infosys.com",
+    "source_rank": 1,
+    "candidate_index": 0,
+    "evidence_urls": [
+      "https://infosys.com",
+      "https://infosys.com/team",
+      "https://infosys.com/team",
+      "https://infosys.com/team",
+      "https://infosys.com/team"
+    ],
+    "fallback_used": false,
+    "provenance": {
+      "company_name": "input",
+      "company_domain": "input",
+      "contacts": "ollama-qwen"
+    }
+  }
+]

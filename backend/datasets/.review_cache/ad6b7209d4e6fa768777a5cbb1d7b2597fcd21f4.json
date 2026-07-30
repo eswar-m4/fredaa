@@ -1,0 +1,100 @@
+{
+  "signature": "ad6b7209d4e6fa768777a5cbb1d7b2597fcd21f4",
+  "payload": {
+    "rows": [
+      {
+        "id": "TB-007-Address",
+        "record": "Record 7",
+        "attribute": "Address",
+        "attributeKey": "Address",
+        "recordIndex": 0,
+        "previous": "—",
+        "value": "Barbaros Bulvari No: 88, Istanbul",
+        "changeType": "A",
+        "changed": true,
+        "conf": 0.89,
+        "sourceUrl": "https://TurkeyBrokers",
+        "source": "turkeybrokers",
+        "recordKey": "TB-007"
+      },
+      {
+        "id": "TB-007-City",
+        "record": "Record 7",
+        "attribute": "City",
+        "attributeKey": "City",
+        "recordIndex": 0,
+        "previous": "—",
+        "value": "Istanbul",
+        "changeType": "A",
+        "changed": true,
+        "conf": 0.89,
+        "sourceUrl": "https://TurkeyBrokers",
+        "source": "turkeybrokers",
+        "recordKey": "TB-007"
+      },
+      {
+        "id": "TB-007-PrimaryKey",
+        "record": "Record 7",
+        "attribute": "Primarykey",
+        "attributeKey": "PrimaryKey",
+        "recordIndex": 0,
+        "previous": "—",
+        "value": "TB-007",
+        "changeType": "A",
+        "changed": true,
+        "conf": 0.89,
+        "sourceUrl": "https://TurkeyBrokers",
+        "source": "turkeybrokers",
+        "recordKey": "TB-007"
+      },
+      {
+        "id": "TB-008-Address",
+        "record": "Record 8",
+        "attribute": "Address",
+        "attributeKey": "Address",
+        "recordIndex": 1,
+        "previous": "—",
+        "value": "Kenan Evren Bulvari No: 15, Adana",
+        "changeType": "A",
+        "changed": true,
+        "conf": 0.89,
+        "sourceUrl": "https://TurkeyBrokers",
+        "source": "turkeybrokers",
+        "recordKey": "TB-008"
+      },
+      {
+        "id": "TB-008-City",
+        "record": "Record 8",
+        "attribute": "City",
+        "attributeKey": "City",
+        "recordIndex": 1,
+        "previous": "—",
+        "value": "Adana",
+        "changeType": "A",
+        "changed": true,
+        "conf": 0.8,
+        "sourceUrl": "https://TurkeyBrokers",
+        "source": "turkeybrokers",
+        "recordKey": "TB-008"
+      },
+      {
+        "id": "TB-008-PrimaryKey",
+        "record": "Record 8",
+        "attribute": "Primarykey",
+        "attributeKey": "PrimaryKey",
+        "recordIndex": 1,
+        "previous": "—",
+        "value": "TB-008",
+        "changeType": "A",
+        "changed": true,
+        "conf": 0.89,
+        "sourceUrl": "https://TurkeyBrokers",
+        "source": "turkeybrokers",
+        "recordKey": "TB-008"
+      }
+    ],
+    "totalSampled": 15,
+    "sampledCount": 2,
+    "coverage": null
+  }
+}
