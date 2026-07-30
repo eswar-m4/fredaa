@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { Badge, Button, Card, Input, PageHeader, Select, SectionTitle, Steps } from "@/components/ui-bits";
+import { readJobsCache, writeJobsCache } from "@/lib/jobs-cache";
 import bots from "@/data/bots.json";
 import {
   Search,
@@ -51,6 +52,7 @@ type SourceItem = {
   bot: Bot;
   scope: "full" | "partial";
   partialCriteria: string;
+  criteriaFiles?: File[];
   frequency: string;
 };
 
@@ -63,6 +65,7 @@ type NewSite = {
   analysis: { complexity: string; sla: string; pages: string; reason: string };
   scope: "full" | "partial";
   partialCriteria: string;
+  criteriaFiles?: File[];
   frequency: string;
 };
 
@@ -72,6 +75,110 @@ type Selection = {
   delivery: string;
   format: string;
 };
+
+function CustomCriteriaEditor({
+  active,
+  criteria,
+  files,
+  onToggle,
+  onChange,
+  onFilesChange,
+  placeholder,
+}: {
+  active: boolean;
+  criteria: string;
+  files: File[];
+  onToggle: () => void;
+  onChange: (value: string) => void;
+  onFilesChange: (files: File[]) => void;
+  placeholder: string;
+}) {
+  const removeFileAt = (index: number) => {
+    onFilesChange(files.filter((_, i) => i !== index));
+  };
+
+  return (
+    <div className="inline-block text-left w-full">
+      <button
+        type="button"
+        onClick={onToggle}
+        className="inline-flex items-center h-8 px-3 text-[12px] bg-card hover:bg-secondary/20 rounded-md font-semibold text-foreground transition-colors border border-border"
+      >
+        <span>Configure</span>
+        {files.length > 0 && (
+          <span className="ml-2 rounded-full bg-secondary px-2 py-0.5 text-[10px] text-muted-foreground">
+            {files.length} file{files.length > 1 ? "s" : ""}
+          </span>
+        )}
+      </button>
+
+      {active && (
+        <>
+          <div className="fixed inset-0 z-40" onClick={onToggle} />
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="w-full max-w-xl rounded-lg border border-border bg-card p-5 shadow-2xl space-y-4">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <div className="text-[14px] font-semibold">Configure</div>
+                </div>
+                <button type="button" onClick={onToggle} className="text-muted-foreground hover:text-foreground">
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+              <div>
+                <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Scraping Instructions</div>
+                <textarea
+                  value={criteria}
+                  onChange={(e) => onChange(e.target.value)}
+                  placeholder={placeholder}
+                  className="mt-1 w-full min-h-[72px] rounded-md border border-border bg-background px-2.5 py-2 text-[12px] text-foreground outline-none focus:ring-1 focus:ring-ring"
+                />
+              </div>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <label className="inline-flex items-center gap-2 px-3 py-2 rounded-md border border-border bg-secondary/30 text-[12px] font-medium text-foreground cursor-pointer hover:bg-secondary/50">
+                  <input
+                    type="file"
+                    multiple
+                    accept=".txt,.csv,.json"
+                    className="hidden"
+                    onChange={(e) => {
+                      const picked = Array.from(e.target.files || []);
+                      if (picked.length > 0) {
+                        onFilesChange([...files, ...picked]);
+                      }
+                      e.target.value = "";
+                    }}
+                  />
+                  Upload file
+                </label>
+                <button type="button" onClick={onToggle} className="text-[12px] text-muted-foreground hover:text-foreground">
+                  Done
+                </button>
+              </div>
+              {files.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {files.map((file, index) => (
+                    <span key={`${file.name}-${index}`} className="inline-flex items-center gap-1 rounded-full border border-border bg-secondary/30 px-2.5 py-1 text-[11px] text-foreground">
+                      <span className="max-w-[220px] truncate">{file.name}</span>
+                      <button
+                        type="button"
+                        onClick={() => removeFileAt(index)}
+                        className="inline-flex h-4 w-4 items-center justify-center rounded-full text-muted-foreground hover:bg-secondary hover:text-foreground"
+                        aria-label={`Remove ${file.name}`}
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
 
 function getEstimatedRecords(bot: Bot): string {
   if (bot.name.toLowerCase() === "keysight") return "25,000";
@@ -209,7 +316,7 @@ function SiteSpecific() {
         }
         return true;
       })
-      .slice(0, 120);
+      ;
   }, [all, q, category, complexity, country]);
 
   const selectedIds = useMemo(() => new Set(sel.items.map((i) => i.bot.id)), [sel.items]);
@@ -221,7 +328,7 @@ function SiteSpecific() {
       if (exists) return { ...s, items: s.items.filter((x) => x.bot.id !== b.id) };
       return {
         ...s,
-        items: [...s.items, { id: b.id, bot: b, scope: "full", partialCriteria: "", frequency: "Weekly" }],
+        items: [...s.items, { id: b.id, bot: b, scope: "full", partialCriteria: "", criteriaFiles: [], frequency: "Weekly" }],
       };
     });
   }
@@ -232,7 +339,7 @@ function SiteSpecific() {
       const merged = [...s.items];
       filtered.forEach((b) => {
         if (!selectedIds.has(b.id))
-          merged.push({ id: b.id, bot: b, scope: "full", partialCriteria: "", frequency: "Weekly" });
+          merged.push({ id: b.id, bot: b, scope: "full", partialCriteria: "", criteriaFiles: [], frequency: "Weekly" });
       });
       return { ...s, items: merged };
     });
@@ -307,15 +414,6 @@ function SiteSpecific() {
                     <Select value={country} onChange={(e) => setCountry(e.target.value)} className="mt-1">
                       <option value="All">Any country</option>
                       {countries.map((c) => <option key={c} value={c}>{c}</option>)}
-                    </Select>
-                  </div>
-                  <div>
-                    <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Complexity</label>
-                    <Select value={complexity} onChange={(e) => setComplexity(e.target.value)} className="mt-1">
-                      <option value="All">Any complexity</option>
-                      <option>Simple</option>
-                      <option>Medium</option>
-                      <option>Complex</option>
                     </Select>
                   </div>
                 </div>
@@ -440,6 +538,7 @@ function SiteSpecific() {
             setShowAdd(false);
             setStep(1);
           }}
+          existingBots={all}
         />
       )}
     </AppLayout>
@@ -950,6 +1049,8 @@ function ScopeScheduleStep({
   onBack: () => void;
   onNext: () => void;
 }) {
+  const [activeConfigKey, setActiveConfigKey] = useState<string | null>(null);
+
   function applyAll(patch: Partial<SourceItem>) {
     setSel((s) => ({ ...s, items: s.items.map((i) => ({ ...i, ...patch })) }));
   }
@@ -985,7 +1086,7 @@ function ScopeScheduleStep({
         <div>
           <h3 className="font-semibold text-[15px]">Scope & schedule</h3>
           <p className="text-[12px] text-muted-foreground">
-            Configure each source independently — full vs partial dump and refresh cadence.
+            Configure each source independently — full vs custom scrape and refresh cadence.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -1003,7 +1104,7 @@ function ScopeScheduleStep({
           <Select onChange={(e) => e.target.value && applyAll({ scope: e.target.value as "full" | "partial" })} value="" className="h-8 w-32 text-[12px]">
             <option value="">Scope…</option>
             <option value="full">Full Scrape</option>
-            <option value="partial">Partial Scrape</option>
+            <option value="partial">Custom Scrape</option>
           </Select>
         </div>
       </div>
@@ -1035,20 +1136,30 @@ function ScopeScheduleStep({
                   </td>
                   <td className="px-3 py-2 align-top">
                     <Select value={i.scope} onChange={(e) => {
-                      updateItem(i.id, { scope: e.target.value as "full" | "partial", partialCriteria: "" });
+                      const nextScope = e.target.value as "full" | "partial";
+                      updateItem(i.id, {
+                        scope: nextScope,
+                        partialCriteria: nextScope === "full" ? "" : i.partialCriteria,
+                        criteriaFiles: nextScope === "full" ? [] : i.criteriaFiles ?? [],
+                      });
+                      if (nextScope === "full") {
+                        setActiveConfigKey((curr) => (curr === `item-${i.id}` ? null : curr));
+                      }
                     }} className="h-8 text-[12px]">
                       <option value="full">Full Scrape</option>
-                      <option value="partial">Partial Scrape</option>
+                      <option value="partial">Custom Scrape</option>
                     </Select>
                   </td>
                   <td className="px-3 py-2 align-top">
                     {i.scope === "partial" && (
-                      <input
-                        type="text"
-                        value={i.partialCriteria}
-                        onChange={(e) => updateItem(i.id, { partialCriteria: e.target.value })}
+                      <CustomCriteriaEditor
+                        active={activeConfigKey === `item-${i.id}`}
+                        criteria={i.partialCriteria}
+                        files={i.criteriaFiles ?? []}
+                        onToggle={() => setActiveConfigKey((curr) => (curr === `item-${i.id}` ? null : `item-${i.id}`))}
+                        onChange={(value) => updateItem(i.id, { partialCriteria: value })}
+                        onFilesChange={(files) => updateItem(i.id, { criteriaFiles: files })}
                         placeholder="Provide conditions or criteria to scrape."
-                        className="h-8 text-[12px] w-full border border-border rounded bg-card text-foreground px-2 font-medium focus:outline-none focus:ring-1 focus:ring-ring"
                       />
                     )}
                   </td>
@@ -1078,24 +1189,40 @@ function ScopeScheduleStep({
                   <Select
                     value={sel.newSite.scope}
                     onChange={(e) => {
-                      setSel((s) => ({ ...s, newSite: { ...s.newSite!, scope: e.target.value as "full" | "partial", partialCriteria: "" } }));
+                      const nextScope = e.target.value as "full" | "partial";
+                      setSel((s) => ({
+                        ...s,
+                        newSite: {
+                          ...s.newSite!,
+                          scope: nextScope,
+                          partialCriteria: nextScope === "full" ? "" : s.newSite?.partialCriteria || "",
+                          criteriaFiles: nextScope === "full" ? [] : s.newSite?.criteriaFiles ?? [],
+                        },
+                      }));
+                      if (nextScope === "full") {
+                        setActiveConfigKey((curr) => (curr === "newSite" ? null : curr));
+                      }
                     }}
                     className="h-8 text-[12px]"
                   >
                     <option value="full">Full Scrape</option>
-                    <option value="partial">Partial Scrape</option>
+                    <option value="partial">Custom Scrape</option>
                   </Select>
                 </td>
                 <td className="px-3 py-2 align-top">
                   {sel.newSite.scope === "partial" && (
-                    <input
-                      type="text"
-                      value={sel.newSite.partialCriteria}
-                      onChange={(e) =>
-                        setSel((s) => ({ ...s, newSite: { ...s.newSite!, partialCriteria: e.target.value } }))
+                    <CustomCriteriaEditor
+                      active={activeConfigKey === "newSite"}
+                      criteria={sel.newSite.partialCriteria}
+                      files={sel.newSite.criteriaFiles ?? []}
+                      onToggle={() => setActiveConfigKey((curr) => (curr === "newSite" ? null : "newSite"))}
+                      onChange={(value) =>
+                        setSel((s) => ({ ...s, newSite: { ...s.newSite!, partialCriteria: value } }))
+                      }
+                      onFilesChange={(files) =>
+                        setSel((s) => ({ ...s, newSite: { ...s.newSite!, criteriaFiles: files } }))
                       }
                       placeholder="Provide conditions or criteria to scrape."
-                      className="h-8 text-[12px] w-full border border-border rounded bg-card text-foreground px-2 font-medium focus:outline-none focus:ring-1 focus:ring-ring"
                     />
                   )}
                 </td>
@@ -1227,7 +1354,7 @@ function ReviewStep({ sel, onBack }: { sel: Selection; onBack: () => void }) {
         return {
           id: `J-${Date.now() + index}`,
           source: i.bot.name,
-          scope: i.scope === "full" ? "Full Scrape" : "Partial Scrape",
+          scope: i.scope === "full" ? "Full Scrape" : "Custom Scrape",
           filters: formatFilters(i.partialCriteria),
           frequency: i.frequency,
           delivery: sel.delivery,
@@ -1237,26 +1364,39 @@ function ReviewStep({ sel, onBack }: { sel: Selection; onBack: () => void }) {
         };
       });
 
+      const launchedAt = new Date().toISOString();
+      newJobs.forEach((job) => {
+        const isCustomScrape = job.status === "Pending Onboarding" || String(job.scope || "").toLowerCase().includes("custom");
+        job.status = isCustomScrape ? "Pending Onboarding" : "Running";
+        job.created_at = launchedAt;
+      });
+
       if (sel.newSite) {
         newJobs.push({
           id: `J-${Date.now() + 99}`,
           source: sel.newSite.url,
-          scope: sel.newSite.scope === "full" ? "Full Scrape" : "Partial Scrape",
+          scope: sel.newSite.scope === "full" ? "Full Scrape" : "Custom Scrape",
           filters: sel.newSite.partialCriteria || "—",
           frequency: sel.newSite.frequency,
           delivery: sel.delivery,
           output_format: sel.format,
           isCustomSource: true,
           mode: "Site-Specific",
+          status: "Pending Onboarding",
+          created_at: launchedAt,
           complexity: sel.newSite.analysis.complexity,
           estimated_onboarding_time: sel.newSite.analysis.sla
         });
       }
 
+      writeJobsCache([...readJobsCache(), ...newJobs]);
+
       const response = await fetch(`${baseApiUrl}/api/v1/demo/jobs/launch`, {
+        credentials: "include",
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ jobs: newJobs })
+        body: JSON.stringify({ jobs: newJobs }),
+        keepalive: true
       });
 
       if (!response.ok) {
@@ -1304,7 +1444,7 @@ function ReviewStep({ sel, onBack }: { sel: Selection; onBack: () => void }) {
                   )}
                   {i.scope === "partial" && (
                     <div>
-                      <div className="font-semibold text-foreground">Partial Scrape</div>
+                      <div className="font-semibold text-foreground">Custom Scrape</div>
                       <div className="text-[11px] text-muted-foreground">Criteria: {i.partialCriteria || "All Pages"}</div>
                     </div>
                   )}
@@ -1329,7 +1469,7 @@ function ReviewStep({ sel, onBack }: { sel: Selection; onBack: () => void }) {
                   )}
                   {sel.newSite.scope === "partial" && (
                     <div>
-                      <div className="font-semibold text-foreground">Partial Scrape</div>
+                      <div className="font-semibold text-foreground">Custom Scrape</div>
                       <div className="text-[11px] text-muted-foreground">Criteria: {sel.newSite.partialCriteria || "All Pages"}</div>
                     </div>
                   )}
@@ -1350,7 +1490,7 @@ function ReviewStep({ sel, onBack }: { sel: Selection; onBack: () => void }) {
         <Button variant="outline" onClick={onBack}>Back</Button>
         <Button
           onClick={() => {
-            handleLaunch();
+            void handleLaunch();
             navigate({ to: "/monitoring" });
           }}
         >
@@ -1398,7 +1538,7 @@ function SampleModal({ bot, onClose }: { bot: Bot; onClose: () => void }) {
         }
 
         const endpoint = isKeysight ? "keysight" : isWebMD ? "webmd" : (isTurkeyBrokers ? "turkeybrokers" : "sec");
-        const response = await fetch(`${baseApiUrl}/api/v1/demo/${endpoint}/sample`);
+        const response = await fetch(`${baseApiUrl}/api/v1/demo/${endpoint}/sample`, { credentials: "include" });
         if (!response.ok) {
           throw new Error(`Server returned status ${response.status}`);
         }
@@ -1605,10 +1745,31 @@ function extractDomain(urlStr: string) {
   }
 }
 
+function findExistingBotMatch(targetUrl: string, bots: Bot[]) {
+  let targetHost = "";
+  try {
+    targetHost = new URL(targetUrl).hostname.replace(/^www\./i, "").toLowerCase();
+  } catch {
+    targetHost = extractDomain(targetUrl).replace(/^www\./i, "").toLowerCase();
+  }
+  if (!targetHost) return null;
+
+  const targetTokens = targetHost.replace(/[^a-z0-9]/g, "");
+  return (
+    bots.find((bot) => {
+      const botHost = extractDomain(String(bot.url || "")).replace(/^www\./i, "").toLowerCase();
+      const botName = String(bot.name || "").trim().toLowerCase();
+      const botTokens = botName.replace(/[^a-z0-9]/g, "");
+      return botHost === targetHost || botHost.replace(/[^a-z0-9]/g, "") === targetTokens || botTokens === targetTokens;
+    }) || null
+  );
+}
+
 function AddSourceModal({
   onClose,
   onSubmit,
-}: { onClose: () => void; onSubmit: (ns: NewSite) => void }) {
+  existingBots,
+}: { onClose: () => void; onSubmit: (ns: NewSite) => void; existingBots: Bot[] }) {
   const [url, setUrl] = useState("");
   const [desc, setDesc] = useState("");
   const [category, setCategory] = useState("Registry & SEC");
@@ -1647,6 +1808,12 @@ function AddSourceModal({
     }
 
     const cleanName = extractDomain(targetUrl);
+    const existingMatch = findExistingBotMatch(targetUrl, existingBots);
+    if (existingMatch) {
+      setUrlError(`${existingMatch.name || cleanName} already exists in Sources & Agents.`);
+      setLoading(false);
+      return;
+    }
 
     try {
       let baseApiUrl = "";
@@ -1659,6 +1826,7 @@ function AddSourceModal({
       }
 
       const response = await fetch(`${baseApiUrl}/api/v1/source-analysis/analyze`, {
+        credentials: "include",
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -1771,6 +1939,7 @@ function AddSourceModal({
 
     try {
       fetch(`${baseApiUrl}/api/v1/demo/jobs/create_pending`, {
+        credentials: "include",
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newRecord)
@@ -1884,6 +2053,9 @@ function AddSourceModal({
 
           {analyzed && (
             <div className="space-y-3">
+              <div className="text-[11px] text-red-500 dark:text-red-400 font-medium">
+                Onboarding timeline is indicative and subject to change.
+              </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                 <Stat label="Complexity">
                   <Badge tone={analyzed.complexity === "Simple" || analyzed.complexity === "Easy" ? "success" : analyzed.complexity === "Medium" ? "warning" : "destructive"}>
@@ -1930,8 +2102,8 @@ function Stat({ label, children }: { label: string; children: React.ReactNode })
 
 const MOCK_JOBS = [
   { name: "SEC EDGAR", scope: "Full dump", freq: "Daily", status: "Running", next: "in 4h", kind: "existing" },
-  { name: "Companies House UK", scope: "Partial — /company/*", freq: "Weekly", status: "Healthy", next: "Mon 09:00", kind: "existing" },
-  { name: "wayfair.com/furniture/*", scope: "Partial dump", freq: "Daily", status: "Awaiting bot onboarding", next: "ETA 5 days", kind: "new" },
+  { name: "Companies House UK", scope: "Custom — /company/*", freq: "Weekly", status: "Healthy", next: "Mon 09:00", kind: "existing" },
+  { name: "wayfair.com/furniture/*", scope: "Custom dump", freq: "Daily", status: "Awaiting bot onboarding", next: "ETA 5 days", kind: "new" },
   { name: "Bombay Stock Exchange", scope: "Full dump", freq: "Daily", status: "Healthy", next: "in 2h", kind: "existing" },
 ];
 

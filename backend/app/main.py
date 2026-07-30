@@ -20,6 +20,8 @@ from pathlib import Path
 from app.config import settings
 from app.api import routes
 from app.api import demo_routes
+from app.api import auth_routes
+from app.api import admin_routes
 from app.api import source_analysis_routes
 from app.core.database import init_db
 from app.core.logger import setup_logger
@@ -97,6 +99,8 @@ async def global_exception_handler(request: Request, exc: Exception):
 # Include API routes
 app.include_router(routes.router, prefix="/api/v1", tags=["API"])
 app.include_router(demo_routes.router, prefix="/api/v1/demo", tags=["Demo"])
+app.include_router(auth_routes.router, prefix="/api/v1/auth", tags=["Auth"])
+app.include_router(admin_routes.router, prefix="/api/v1/admin", tags=["Admin"])
 app.include_router(source_analysis_routes.router, prefix="/api/v1/source-analysis", tags=["Source Analysis"])
 
 
@@ -114,7 +118,11 @@ async def refresh_scheduler_loop():
             
             with get_connection() as conn:
                 due_jobs = conn.execute(
-                    "SELECT id, source FROM scraper_jobs WHERE status = 'Completed' AND next_refresh IS NOT NULL AND next_refresh <= ?",
+                    """SELECT id, source FROM scraper_jobs 
+                       WHERE status IN ('Completed', 'Review Pending') 
+                         AND next_refresh IS NOT NULL 
+                         AND next_refresh <= ? 
+                         AND LOWER(COALESCE(frequency, '')) NOT IN ('one-time', 'one time', 'once', 'single', 'single run')""",
                     (now_str,)
                 ).fetchall()
                 
@@ -146,7 +154,24 @@ async def startup_event():
     init_db()
     
     import asyncio
+    async def warm_pending_review_caches():
+        try:
+            from app.core.database import get_connection
+            from app.services.wcm_comparison_service import warm_review_cache
+
+            with get_connection() as conn:
+                rows = conn.execute(
+                    "SELECT id FROM scraper_jobs WHERE status = 'Review Pending'"
+                ).fetchall()
+
+            for row in rows:
+                job_id = row[0]
+                asyncio.create_task(warm_review_cache(job_id, 2.0))
+        except Exception:
+            logger.exception("Failed to schedule review cache warmup")
+
     asyncio.create_task(refresh_scheduler_loop())
+    asyncio.create_task(warm_pending_review_caches())
     
     logger.info("Application initialization complete")
 

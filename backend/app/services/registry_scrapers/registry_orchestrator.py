@@ -8,8 +8,18 @@ from datetime import datetime
 from typing import Any, Dict, Optional
 
 from app.core.logger import setup_logger
+from app.services.company_verification_service import normalize_workflow_record, resolve_company_identity
+from app.services.registry_scrapers.companies_house_scraper import companies_house_scraper
+from app.services.registry_scrapers.gleif_scraper import gleif_scraper
 from app.services.registry_scrapers.mca_scraper import mca_scraper
+from app.services.registry_scrapers.registry_capabilities import (
+    REGISTRY_CAPABILITIES,
+    classify_registry_source_from_text,
+    normalize_registry_source_name,
+    registry_source_label,
+)
 from app.services.registry_scrapers.sec_scraper import sec_scraper
+from app.services.registry_scrapers.wikidata_scraper import wikidata_scraper
 
 logger = setup_logger(__name__)
 
@@ -45,10 +55,19 @@ def _source_text(config: Dict[str, Any]) -> str:
 def _requested_registry_sources(config: Dict[str, Any]) -> set[str]:
     text = _source_text(config)
     requested: set[str] = set()
+    for key in REGISTRY_CAPABILITIES:
+        if key in text:
+            requested.add(key)
     if "mca" in text or "india" in text:
         requested.add("mca_india")
     if "sec" in text or "edgar" in text:
         requested.add("sec_edgar")
+    if "companies house" in text or "company house" in text or "uk" in text or "united kingdom" in text:
+        requested.add("companies_house")
+    if "gleif" in text or "lei" in text:
+        requested.add("gleif")
+    if "wikidata" in text or "knowledge graph" in text:
+        requested.add("wikidata")
     return requested
 
 
@@ -86,6 +105,18 @@ US_COMPANY_HINTS = {
     "netflix",
 }
 
+UK_COMPANY_HINTS = {
+    "united kingdom",
+    "great britain",
+    "england",
+    "scotland",
+    "wales",
+    "northern ireland",
+    "uk",
+    ".co.uk",
+    "companies house",
+}
+
 
 def _country_registry_hint(record: Dict[str, Any], company_name: str, website_result: Optional[Dict[str, Any]]) -> Optional[str]:
     website_result = website_result or {}
@@ -99,11 +130,15 @@ def _country_registry_hint(record: Dict[str, Any], company_name: str, website_re
         return "mca_india"
     if country in {"united states", "usa", "us", "u.s.", "u.s.a.", "america"}:
         return "sec_edgar"
+    if country in {"united kingdom", "uk", "great britain", "gb", "britain"}:
+        return "companies_house"
 
     if record.get("cin") or record.get("CIN"):
         return "mca_india"
     if record.get("cik") or record.get("CIK") or record.get("ticker") or record.get("symbol"):
         return "sec_edgar"
+    if record.get("lei") or record.get("LEI") or record.get("lei_number"):
+        return "gleif"
 
     text = " ".join(
         [
@@ -116,8 +151,12 @@ def _country_registry_hint(record: Dict[str, Any], company_name: str, website_re
     ).lower()
     if ".in" in text or any(hint in text for hint in INDIAN_COMPANY_HINTS):
         return "mca_india"
+    if any(hint in text for hint in UK_COMPANY_HINTS):
+        return "companies_house"
     if any(hint in text for hint in US_COMPANY_HINTS):
         return "sec_edgar"
+    if "lei" in text or "legal entity identifier" in text:
+        return "gleif"
     return None
 
 
@@ -149,11 +188,75 @@ def _normalized_fallback(
 
 
 def _display_registry_source(registry_source: str) -> str:
-    if registry_source == "sec_edgar":
-        return "SEC EDGAR"
-    if registry_source == "mca_india":
-        return "MCA Registry"
-    return registry_source or "Registry"
+    return registry_source_label(registry_source)
+
+
+def _is_empty_value(value: Any) -> bool:
+    return value in (None, "", [], {})
+
+
+def _canonical_registry_field(field: Any) -> str:
+    key = str(field or "").strip().lower().replace(" ", "_").replace("-", "_")
+    aliases = {
+        "company_name": "company_name",
+        "legal_name": "company_name",
+        "entity_name": "company_name",
+        "sec_company_name": "company_name",
+        "name": "company_name",
+        "website": "website",
+        "website_url": "website",
+        "company_website": "website",
+        "homepage": "website",
+        "homepage_url": "website",
+        "url": "website",
+        "domain": "website",
+        "company_status": "company_status",
+        "status": "company_status",
+        "incorporation_date": "incorporation_date",
+        "registration_date": "incorporation_date",
+        "creation_date": "incorporation_date",
+        "created_at": "incorporation_date",
+        "hq_address": "hq_address",
+        "registered_office_address": "hq_address",
+        "business_address": "hq_address",
+        "mailing_address": "hq_address",
+        "legal_address": "hq_address",
+        "hq_city": "hq_city",
+        "city": "hq_city",
+        "registered_city": "hq_city",
+        "hq_state": "hq_state",
+        "state": "hq_state",
+        "region": "hq_state",
+        "hq_country": "hq_country",
+        "country": "hq_country",
+        "jurisdiction": "hq_country",
+        "industry": "industry",
+        "sic_description": "industry",
+        "business_activity": "industry",
+        "sector": "industry",
+        "legal_form": "legal_form",
+        "company_type": "legal_form",
+        "entity_type": "legal_form",
+        "year_founded": "year_founded",
+        "annual_revenue": "annual_revenue",
+        "revenue": "annual_revenue",
+        "employee_count": "employee_count",
+        "employees": "employee_count",
+        "parent_company": "parent_company",
+        "ultimate_parent_company": "ultimate_parent_company",
+        "subsidiaries": "subsidiaries",
+        "description": "description",
+    }
+    return aliases.get(key, key)
+
+
+def _ordered_capabilities(source_keys: list[str]) -> list[Any]:
+    capabilities = [
+        REGISTRY_CAPABILITIES[key]
+        for key in source_keys
+        if key in REGISTRY_CAPABILITIES
+    ]
+    return sorted(capabilities, key=lambda item: (-item.trust_weight, item.priority))
 
 
 class RegistryOrchestrator:
@@ -167,6 +270,215 @@ class RegistryOrchestrator:
 
     def __init__(self, *, timeout_seconds: int = DEFAULT_REGISTRY_TIMEOUT_SECONDS) -> None:
         self.timeout_seconds = timeout_seconds
+        self.adapters = {
+            "sec_edgar": sec_scraper,
+            "mca_india": mca_scraper,
+            "gleif": gleif_scraper,
+            "companies_house": companies_house_scraper,
+            "wikidata": wikidata_scraper,
+        }
+
+    def _raw_company_name(
+        self,
+        record: Dict[str, Any],
+        website_result: Optional[Dict[str, Any]],
+    ) -> str:
+        website_result = website_result or {}
+        normalized_record = normalize_workflow_record(record)
+        return _clean(
+            normalized_record.get("company")
+            or normalized_record.get("company_name")
+            or normalized_record.get("name")
+            or website_result.get("company")
+            or ""
+        )
+
+    def _normalized_company_name(
+        self,
+        record: Dict[str, Any],
+        website_result: Optional[Dict[str, Any]],
+    ) -> str:
+        normalized_record = normalize_workflow_record(record)
+        normalized = resolve_company_identity(normalized_record)
+        return normalized or self._raw_company_name(normalized_record, website_result)
+
+    def _registry_sources_for_record(
+        self,
+        record: Dict[str, Any],
+        *,
+        config: Optional[Dict[str, Any]] = None,
+        website_result: Optional[Dict[str, Any]] = None,
+    ) -> list[str]:
+        config = config or {}
+        requested = _requested_registry_sources(config)
+        if requested:
+            ordered = _ordered_capabilities(list(requested))
+            return [cap.source_key for cap in ordered]
+        inferred = self.choose_registry(record, config=config, website_result=website_result)
+        return [inferred] if inferred else []
+
+    async def _attempt_registry_source(
+        self,
+        source_key: str,
+        record: Dict[str, Any],
+        *,
+        lookup_company_name: str,
+        raw_company_name: str,
+    ) -> Dict[str, Any]:
+        adapter = self.adapters.get(source_key)
+        if not adapter:
+            return _normalized_fallback(
+                registry_source=source_key,
+                company_name=lookup_company_name or raw_company_name,
+                reason="registry_not_implemented",
+            )
+
+        try:
+            result = await asyncio.wait_for(
+                adapter.lookup_company(
+                    lookup_company_name or raw_company_name,
+                    raw_company_name=raw_company_name,
+                    normalized_company_name=lookup_company_name or raw_company_name,
+                    cik=record.get("cik") or record.get("CIK"),
+                    ticker=record.get("ticker") or record.get("symbol"),
+                    lei=record.get("lei") or record.get("LEI") or record.get("lei_number"),
+                    company_number=record.get("company_number") or record.get("company_no") or record.get("registration_number"),
+                    qid=record.get("wikidata_qid") or record.get("qid"),
+                ),
+                timeout=self.timeout_seconds,
+            )
+        except Exception as exc:
+            logger.warning("[Registry] %s failed for %s: %s", source_key, lookup_company_name or raw_company_name, exc)
+            return _normalized_fallback(
+                registry_source=source_key,
+                company_name=lookup_company_name or raw_company_name,
+                reason=str(exc),
+            )
+
+        raw_metadata = dict(result.get("raw_metadata") or {})
+        raw_metadata.setdefault("normalized_company_name", lookup_company_name or raw_company_name)
+        raw_metadata.setdefault("raw_company_name", raw_company_name)
+        raw_metadata.setdefault("attempted_source", source_key)
+        raw_metadata.setdefault("retrieved_at", datetime.utcnow().isoformat())
+
+        enriched = dict(result)
+        enriched["raw_metadata"] = raw_metadata
+        enriched.setdefault("registry_source", source_key)
+        return enriched
+
+    def _merge_registry_attempts(
+        self,
+        attempts: list[Dict[str, Any]],
+        *,
+        lookup_company_name: str,
+        raw_company_name: str,
+        website_result: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, Any]:
+        website_result = website_result or {}
+        source_rows: list[Dict[str, Any]] = []
+        for attempt in attempts:
+            source_key = _clean(attempt.get("registry_source") or attempt.get("attempted_source")).lower()
+            capability = REGISTRY_CAPABILITIES.get(source_key)
+            source_rows.append(
+                {
+                    "source_key": source_key,
+                    "source_label": _display_registry_source(source_key),
+                    "capability": capability,
+                    "registry_confidence": float(attempt.get("registry_confidence") or 0),
+                    "status": (attempt.get("raw_metadata") or {}).get("status"),
+                    "attempt": attempt,
+                }
+            )
+
+        source_rows.sort(
+            key=lambda item: (
+                -(item["capability"].trust_weight if item["capability"] else 0.0),
+                -item["registry_confidence"],
+                item["capability"].priority if item["capability"] else 999,
+                item["source_key"],
+            )
+        )
+
+        merged_fields: Dict[str, Any] = {}
+        source_contributions: list[Dict[str, Any]] = []
+        successful_sources: list[str] = []
+
+        for row in source_rows:
+            attempt = row["attempt"]
+            source_key = row["source_key"]
+            raw_fields = dict(attempt.get("extracted_fields") or {})
+            contributed_fields: list[str] = []
+            for raw_field, raw_value in raw_fields.items():
+                target_field = _canonical_registry_field(raw_field)
+                if _is_empty_value(raw_value):
+                    continue
+                if _is_empty_value(merged_fields.get(target_field)):
+                    merged_fields[target_field] = raw_value
+                    contributed_fields.append(target_field)
+            if source_key == "sec_edgar":
+                entity_name = raw_fields.get("entity_name")
+                if entity_name and _is_empty_value(merged_fields.get("sec_company_name")):
+                    merged_fields["sec_company_name"] = entity_name
+                profile = raw_fields.get("profile")
+                if isinstance(profile, dict):
+                    entity_type = profile.get("entity_type")
+                    if entity_type and _is_empty_value(merged_fields.get("sec_entity_type")):
+                        merged_fields["sec_entity_type"] = entity_type
+            if row["status"] == "success":
+                successful_sources.append(source_key)
+            source_contributions.append(
+                {
+                    "source_key": source_key,
+                    "source_label": row["source_label"],
+                    "registry_confidence": row["registry_confidence"],
+                    "status": row["status"],
+                    "contributed_fields": contributed_fields,
+                    "normalized_company_name": lookup_company_name,
+                    "raw_company_name": raw_company_name,
+                }
+            )
+
+        primary_source = next(
+            (row for row in source_rows if row["status"] == "success"),
+            source_rows[0] if source_rows else {},
+        )
+        primary_attempt = primary_source.get("attempt") or {}
+        primary_source_key = primary_source.get("source_key") or primary_attempt.get("registry_source") or "registry"
+        primary_confidence = float(primary_attempt.get("registry_confidence") or 0)
+        primary_source_type = primary_attempt.get("source_type") or "government_registry"
+
+        merged_raw_metadata = dict(primary_attempt.get("raw_metadata") or {})
+        merged_raw_metadata.update(
+            {
+                "status": "success" if successful_sources else "no_match",
+                "reason": None if successful_sources else "no_registry_matches",
+                "company_name": lookup_company_name or raw_company_name,
+                "normalized_company_name": lookup_company_name,
+                "raw_company_name": raw_company_name,
+                "retrieved_at": datetime.utcnow().isoformat(),
+                "website_fallback": {
+                    "website": website_result.get("website"),
+                    "confidence": website_result.get("confidence"),
+                    "scraped_metadata": website_result.get("scraped_metadata") or {},
+                },
+                "source_results": source_contributions,
+                "attempted_sources": [row["source_key"] for row in source_rows],
+                "successful_sources": successful_sources,
+            }
+        )
+
+        return {
+            "source_type": primary_source_type,
+            "registry_source": primary_source_key,
+            "registry_confidence": primary_confidence,
+            "extracted_fields": merged_fields,
+            "raw_metadata": merged_raw_metadata,
+            "registry_sources": [row["source_key"] for row in source_rows],
+            "source_results": source_contributions,
+            "merge_strategy": "fan_out",
+            "normalized_company_name": lookup_company_name,
+            "raw_company_name": raw_company_name,
+        }
 
     async def enrich_record(
         self,
@@ -176,70 +488,59 @@ class RegistryOrchestrator:
         config: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         config = config or {}
-        company_name = self._company_name(record, website_result)
-        registry_source = self.choose_registry(record, config=config, website_result=website_result)
+        normalized_record = normalize_workflow_record(record)
+        raw_company_name = self._raw_company_name(normalized_record, website_result)
+        lookup_company_name = self._normalized_company_name(normalized_record, website_result)
+        registry_sources = self._registry_sources_for_record(
+            normalized_record,
+            config=config,
+            website_result=website_result,
+        )
         logger.info(
-            "[Registry] orchestrator invoked company=%s selected_registry=%s",
-            company_name or "Unknown",
-            registry_source or "none",
+            "[Registry] orchestrator invoked raw_company=%s lookup_company=%s sources=%s",
+            raw_company_name or "Unknown",
+            lookup_company_name or "Unknown",
+            registry_sources or ["none"],
         )
 
-        if not registry_source:
+        if not registry_sources:
             logger.info(
                 "[Registry] skipped company=%s reason=registry_not_selected",
-                company_name or "Unknown",
+                lookup_company_name or raw_company_name or "Unknown",
             )
             return _normalized_fallback(
                 registry_source="unsupported",
-                company_name=company_name,
+                company_name=lookup_company_name or raw_company_name,
                 reason="registry_not_selected",
                 website_result=website_result,
             )
 
-        try:
-            if registry_source == "mca_india":
-                result = await asyncio.wait_for(
-                    mca_scraper.lookup_company(company_name),
-                    timeout=self.timeout_seconds,
+        attempts = await asyncio.gather(
+            *[
+                self._attempt_registry_source(
+                    source_key,
+                    normalized_record,
+                    lookup_company_name=lookup_company_name,
+                    raw_company_name=raw_company_name,
                 )
-            elif registry_source == "sec_edgar":
-                result = await asyncio.wait_for(
-                    sec_scraper.lookup_company(
-                        company_name,
-                        cik=record.get("cik") or record.get("CIK"),
-                        ticker=record.get("ticker") or record.get("symbol"),
-                    ),
-                    timeout=self.timeout_seconds,
-                )
-            else:
-                return _normalized_fallback(
-                    registry_source=registry_source,
-                    company_name=company_name,
-                    reason="registry_not_implemented",
-                    website_result=website_result,
-                )
-        except Exception as exc:
-            logger.warning("[Registry] %s failed for %s: %s", registry_source, company_name, exc)
-            return _normalized_fallback(
-                registry_source=registry_source,
-                company_name=company_name,
-                reason=str(exc),
-                website_result=website_result,
-            )
-
-        logger.info(
-            "[Registry] scraper response company=%s registry=%s confidence=%s status=%s",
-            company_name or "Unknown",
-            result.get("registry_source"),
-            result.get("registry_confidence"),
-            (result.get("raw_metadata") or {}).get("status"),
+                for source_key in registry_sources
+            ]
         )
-        if (result.get("registry_confidence") or 0) <= 0:
-            result.setdefault("raw_metadata", {})["website_fallback"] = {
-                "website": (website_result or {}).get("website"),
-                "confidence": (website_result or {}).get("confidence"),
-            }
-        return result
+        merged = self._merge_registry_attempts(
+            attempts,
+            lookup_company_name=lookup_company_name,
+            raw_company_name=raw_company_name,
+            website_result=website_result,
+        )
+        logger.info(
+            "[Registry] merged company=%s sources=%s primary=%s confidence=%s fields=%s",
+            lookup_company_name or raw_company_name or "Unknown",
+            merged.get("registry_sources") or [],
+            merged.get("registry_source"),
+            merged.get("registry_confidence"),
+            sorted((merged.get("extracted_fields") or {}).keys()),
+        )
+        return merged
 
     async def enrich_many(
         self,
@@ -274,6 +575,11 @@ class RegistryOrchestrator:
             "registry_confidence": registry_result.get("registry_confidence"),
             "extracted_fields": registry_result.get("extracted_fields") or {},
             "raw_metadata": registry_result.get("raw_metadata") or {},
+            "registry_sources": registry_result.get("registry_sources") or [],
+            "source_results": registry_result.get("source_results") or [],
+            "merge_strategy": registry_result.get("merge_strategy") or "legacy",
+            "normalized_company_name": registry_result.get("normalized_company_name"),
+            "raw_company_name": registry_result.get("raw_company_name"),
         }
         merged["registry_metadata"] = registry_metadata
         logger.info(
@@ -313,19 +619,30 @@ class RegistryOrchestrator:
             or record.get("registry_source")
             or record.get("registry")
         ).lower()
-        if explicit in {"mca", "mca_india", "india", "in"}:
-            return "mca_india"
-        if explicit in {"sec", "sec_edgar", "edgar", "us", "usa"}:
-            return "sec_edgar"
+        normalized_explicit = normalize_registry_source_name(explicit)
+        if normalized_explicit in self.adapters:
+            return normalized_explicit
 
         requested = _requested_registry_sources(config)
         regional_hint = _country_registry_hint(record, company_name, website_result)
         if regional_hint and (not requested or regional_hint in requested):
             return regional_hint
         if len(requested) == 1:
-            return next(iter(requested))
+            requested_source = next(iter(requested))
+            if requested_source in self.adapters:
+                return requested_source
         if len(requested) > 1:
-            return regional_hint or "sec_edgar"
+            if regional_hint and regional_hint in requested:
+                return regional_hint
+            ordered = sorted(
+                (REGISTRY_CAPABILITIES.get(src) for src in requested if REGISTRY_CAPABILITIES.get(src)),
+                key=lambda item: item.priority,
+            )
+            if ordered:
+                return ordered[0].source_key
+        inferred = classify_registry_source_from_text(_source_text(config))
+        if inferred in self.adapters:
+            return inferred
         return None
 
     def _company_name(

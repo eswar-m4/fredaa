@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import re
+from copy import deepcopy
+from time import perf_counter
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -17,6 +20,7 @@ logger = setup_logger(__name__)
 class WebsiteComplexityClassifierService:
     def __init__(self) -> None:
         self._criteria_cache: Optional[str] = None
+        self._field_mapping_cache: Dict[str, Dict[str, Any]] = {}
 
     def _criteria_paths(self) -> List[Path]:
         return [
@@ -76,6 +80,14 @@ class WebsiteComplexityClassifierService:
 
     def _normalize_token(self, value: str) -> str:
         return re.sub(r"[^a-z0-9]+", "_", str(value or "").strip().lower()).strip("_")
+
+    def _field_mapping_cache_key(self, input_headers: List[str], superset_fields: List[str]) -> str:
+        payload = {
+            "input_headers": [self._normalize_token(header) for header in input_headers],
+            "superset_fields": [self._normalize_token(field) for field in superset_fields],
+        }
+        blob = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+        return hashlib.sha1(blob.encode("utf-8")).hexdigest()
 
     def _ollama_chat(self, messages: List[Dict[str, str]]) -> Dict[str, Any]:
         # Preflight check: verify if local Ollama port is open and responsive (1.5s timeout)
@@ -326,9 +338,73 @@ class WebsiteComplexityClassifierService:
                 return target
         return ""
 
+    def _compact_field_catalog(self, unresolved_headers: List[str], superset_fields: List[str], remaining_superset: List[str]) -> List[str]:
+        """
+        Build a smaller but semantically relevant field catalog for the LLM.
+
+        This preserves the current mapping behavior while avoiding sending the
+        full schema vocabulary when only a few headers need AI help.
+        """
+        headers_blob = " ".join(unresolved_headers).lower()
+        groups = [
+            (
+                ["address", "street", "office", "headquarters", "head office", "registered", "legal address", "suite", "line1", "line2", "line 1", "line 2"],
+                ["hq_address", "address", "address_2", "registered_address", "mailing_address", "office_locations"],
+            ),
+            (
+                ["city", "town", "locality"],
+                ["hq_city", "city"],
+            ),
+            (
+                ["state", "province", "region", "canton"],
+                ["hq_state", "state"],
+            ),
+            (
+                ["country", "nation"],
+                ["hq_country", "country"],
+            ),
+            (
+                ["zip", "postal", "postcode", "pin code", "pin", "zipcode", "zip code"],
+                ["zip_code", "postal_code", "zip"],
+            ),
+            (
+                ["name", "organization", "entity", "firm", "company"],
+                ["legal_name", "dba"],
+            ),
+        ]
+
+        selected: List[str] = []
+        for keywords, candidates in groups:
+            if any(keyword in headers_blob for keyword in keywords):
+                for candidate in candidates:
+                    if candidate in remaining_superset and candidate not in selected:
+                        selected.append(candidate)
+
+        if not selected:
+            return remaining_superset
+
+        general_context = ["description", "industry", "website", "email", "phone", "registry_number", "tax_id"]
+        for field in general_context:
+            if field in remaining_superset and field not in selected:
+                selected.append(field)
+
+        return [field for field in selected if field in superset_fields]
+
     def suggest_field_mappings(self, input_headers: List[str], superset_fields: List[str]) -> Dict[str, Any]:
+        total_start = perf_counter()
         headers = [str(h).strip() for h in (input_headers or []) if str(h).strip()]
         superset = [self._normalize_token(f) for f in (superset_fields or []) if self._normalize_token(f)]
+        cache_key = self._field_mapping_cache_key(headers, superset)
+        cached_response = self._field_mapping_cache.get(cache_key)
+        if cached_response is not None:
+            logger.info(
+                "FIELD MAPPING CACHE HIT: headers=%s superset=%s mappings=%s",
+                len(headers),
+                len(superset),
+                len(cached_response.get("mappings") or []),
+            )
+            return deepcopy(cached_response)
+
         superset_set = set(superset)
         exact_matches: Dict[str, str] = {}
         unresolved: List[str] = []
@@ -347,169 +423,169 @@ class WebsiteComplexityClassifierService:
                 else:
                     unresolved.append(header)
 
+        stage_exact_heuristic_ms = (perf_counter() - total_start) * 1000.0
         llm_trace: Dict[str, Any] = {}
         used_fallback = False
 
         if unresolved:
+            prompt_prep_start = perf_counter()
             taken_targets = set(exact_matches.values()) | set(inferred.values())
             remaining_superset = [f for f in superset if f not in taken_targets]
 
             field_descriptions = {
-                "legal_name": "Official registered company name, corporate entity name, business name, or legal name of the organization.",
-                "dba": "DBA (Doing Business As), trading name, brand name, operating name, or trading style.",
-                "description": "Short summary, profile, overview, business description, history, or company bio.",
-                "tagline": "Slogan, marketing tagline, motto, or short catchphrase.",
-                "hq_address": "Full physical headquarters street address, registered office address, head office location, legal address, or main office street address (excluding city/state/zip if they are separate columns).",
-                "hq_city": "The city or municipality where the company's main headquarters or office is located.",
-                "hq_state": "The state, province, territory, region, or canton of the company's headquarters.",
-                "hq_country": "The country or nation of the company's headquarters.",
-                "website": "Official corporate website, homepage URL, company domain, web address, or target site link.",
-                "email": "Primary corporate email address, contact email, general inquiry inbox, or business email.",
-                "phone": "Corporate telephone number, contact phone, business helpline, or mobile number.",
-                "linkedin_url": "Official LinkedIn company page URL or corporate social profile link.",
-                "employee_count": "Total headcount, staff size, number of employees, active personnel count, or employment volume.",
-                "industry": "Business industry, sector, classification vertical, or primary activity type.",
-                "legal_name": "Official registered company or corporate name, legal entity name, or primary organization name.",
-                "dba": "DBA (Doing Business As), trading name, brand name, operating name, or registered trading style.",
-                "description": "Company description, profile, overview, business summary, history, or corporate bio.",
-                "tagline": "Slogan, marketing tagline, motto, or short corporate pitch/catchphrase.",
-                "logo_url": "URL pointing to the company's official logo or branding image.",
-                "year_founded": "The calendar year when the company or organization was founded or incorporated.",
-                "company_type": "The structure of the company (e.g. Public Company, Private Company, Non-Profit, Partnership).",
-                "ownership": "Ownership status, listing status, or corporate ownership details (e.g. public, private).",
-                "industry": "Primary industry sector, business vertical, or main business classification.",
-                "sub_industry": "Secondary industry sector, specialized sub-vertical, or niche market category.",
-                "sic_code": "Standard Industrial Classification (SIC) identifier code.",
-                "naics_code": "North American Industry Classification System (NAICS) identifier code.",
-                "tags": "Descriptive keywords, business tags, or tech descriptors.",
-                "employee_count": "Total headcount, number of employees, active personnel, or staff count.",
-                "employee_range": "Range tier of employee headcount (e.g. 10-50, 50-200, 500+).",
-                "headcount_growth_yoy": "Year-over-year employee headcount growth rate or percentage change.",
-                "hq_address": "Street address of the main headquarters, head office, registered office, primary legal address, or principal place of business. This is the street address line (e.g., '123 Main St').",
-                "hq_city": "The city, town, municipality, or locality where the headquarters or main office is situated.",
-                "hq_state": "The state, province, region, territory, or canton of the headquarters or main office.",
-                "hq_country": "The country, nation, or sovereign state of the headquarters or main office.",
-                "office_locations": "Additional physical office addresses, branches, stores, or regional locations.",
-                "address": "Generic physical street address or location address.",
-                "address_2": "Secondary street address details (e.g. Suite, Floor, Apartment, Unit).",
-                "registered_address": "Official registered corporate street address on record with regulatory authorities.",
-                "mailing_address": "Postal mailing address, P.O. Box, or mailing location.",
-                "city": "Generic city or municipality name.",
-                "state": "Generic state, province, or region name.",
-                "country": "Generic country or nation name.",
-                "zip": "Generic postal code, zip code, postcode, or PIN code.",
-                "postal_code": "Official postal code, postcode, zip code, or PIN code.",
-                "zip_code": "Official zip code, postal code, postcode, or PIN code.",
-                "website": "Official corporate homepage website URL, company domain, web address, or corporate URL.",
-                "linkedin_url": "The company's official LinkedIn page or profile URL.",
-                "twitter_url": "The company's official X / Twitter profile URL.",
-                "facebook_url": "The company's official Facebook page or profile URL.",
-                "phone": "Main corporate phone number, telephone number, corp phone, or office contact number.",
-                "email": "General company email address, contact email, info email, or inquiry inbox.",
-                "registry_number": "Official company registration number, corporate registry number, filing ID, or SEC CIK.",
-                "lei": "Legal Entity Identifier (LEI) code.",
-                "vat_number": "Value Added Tax (VAT) registration number.",
-                "tax_id": "Corporate tax identification number, EIN, or business tax ID."
+                "legal_name": "Official registered company name.",
+                "dba": "Doing Business As or trading name.",
+                "description": "Company profile or business summary.",
+                "tagline": "Marketing tagline or slogan.",
+                "logo_url": "Official logo URL.",
+                "year_founded": "Year the company was founded or incorporated.",
+                "company_type": "Public, private, non-profit, or partnership.",
+                "ownership": "Ownership or listing status.",
+                "industry": "Business industry or sector.",
+                "sub_industry": "Secondary industry or niche.",
+                "sic_code": "SIC code.",
+                "naics_code": "NAICS code.",
+                "tags": "Business tags or keywords.",
+                "employee_count": "Number of employees or headcount.",
+                "employee_range": "Employee size range.",
+                "headcount_growth_yoy": "Year-over-year headcount growth.",
+                "annual_revenue": "Annual revenue.",
+                "revenue_range": "Revenue range.",
+                "ebitda": "EBITDA.",
+                "funding_total": "Total funding raised.",
+                "latest_round": "Latest funding round.",
+                "latest_round_amount": "Latest funding round amount.",
+                "valuation": "Valuation.",
+                "investors": "Investors.",
+                "ceo_name": "CEO name.",
+                "ceo_email": "CEO email.",
+                "ceo_linkedin": "CEO LinkedIn URL.",
+                "cfo_name": "CFO name.",
+                "cto_name": "CTO name.",
+                "executives": "Executive team.",
+                "board_members": "Board members.",
+                "hq_address": "Street address of the headquarters or main office.",
+                "hq_city": "City of the headquarters or main office.",
+                "hq_state": "State or region of the headquarters or main office.",
+                "hq_country": "Country of the headquarters or main office.",
+                "office_locations": "Additional office locations.",
+                "address": "Generic street address.",
+                "address_2": "Secondary address line.",
+                "registered_address": "Registered corporate street address.",
+                "mailing_address": "Postal mailing address.",
+                "city": "Generic city.",
+                "state": "Generic state or region.",
+                "country": "Generic country.",
+                "zip": "Postal code or ZIP.",
+                "postal_code": "Postal code or postcode.",
+                "zip_code": "Postal code or ZIP.",
+                "website": "Official website URL.",
+                "linkedin_url": "Official LinkedIn URL.",
+                "twitter_url": "Official X / Twitter URL.",
+                "facebook_url": "Official Facebook URL.",
+                "phone": "Corporate phone number.",
+                "email": "Corporate email address.",
+                "registry_number": "Company registration number.",
+                "lei": "Legal Entity Identifier.",
+                "vat_number": "VAT registration number.",
+                "tax_id": "Tax ID or EIN.",
             }
 
+            prompt_fields = self._compact_field_catalog(unresolved, superset, remaining_superset)
             semantic_list = []
-            for field in superset:
-                desc = field_descriptions.get(field)
-                if not desc:
-                    clean_field = field.replace("_", " ").strip()
-                    desc = f"Company field representing {clean_field}."
+            for field in prompt_fields:
+                desc = field_descriptions.get(field) or f"Company field representing {field.replace('_', ' ')}."
                 status = "AVAILABLE for mapping" if field in remaining_superset else "ALREADY MAPPED (Do not map to this)"
                 semantic_list.append(f"- {field} ({status}): {desc}")
             superset_semantics = "\n".join(semantic_list)
 
-            examples = (
-                "Few-Shot Synonym Guidelines:\n"
-                "- 'Company Name', 'Organization Name', 'Entity Name', 'Firm Name', 'Legal Entity' -> legal_name\n"
-                "- 'Address-Line 1', 'Address-Line 2', 'Street', 'Registered Office', 'Head Office', 'Legal Address', 'Office Address', 'HQ Address', 'Headquarters' -> hq_address\n"
-                "- 'City', 'Town', 'Locality' -> hq_city\n"
-                "- 'State', 'Province', 'Region', 'Canton' -> hq_state\n"
-                "- 'Zip Code', 'Postal Code', 'PIN Code', 'Postcode', 'Zip' -> zip_code or postal_code or zip\n"
-                "- 'EIN', 'Tax No', 'Corporate Tax ID' -> tax_id\n"
-                "- 'Registration No', 'Company Number', 'CIK', 'Reg No' -> registry_number\n"
-                "- 'Website', 'Domain', 'Corp Site', 'URL' -> website\n"
-                "- 'Email', 'General Email', 'Contact Email' -> email\n"
-                "- 'Industry', 'Sector', 'Business Type' -> industry"
-            )
-
             system_content = (
-                "You are an expert data classification AI assistant specializing in schema mapping.\n\n"
-                "YOUR CORE OBJECTIVES:\n"
-                "1. Analyze the entire dataset's headers to infer the conceptual domain (e.g. company directory, real estate, contacts).\n"
-                "2. Look past literal string similarities. Map headers using business terminology, synonyms, abbreviations, and concepts.\n"
-                "3. Make active mapping attempts when there is strong semantic evidence. Do not be overly conservative; if a column semantically corresponds to a target schema field, map it.\n"
-                "4. If a header does not have any semantically matching attribute in the allowed target fields, return an empty string for that mapping.\n"
-                "5. STRICT CONSTRAINT: You must ONLY output target field names that are present in the provided list of allowed fields. Do NOT invent new target fields (e.g., do not return 'registered_office' or 'registered_address' if only 'hq_address' is in the allowed fields list; map it to 'hq_address' instead. If the allowed list contains 'zip_code' but not 'postal_code', map postal code headers to 'zip_code').\n\n"
-                "REASONING & SYNONYM RULES:\n"
-                "- Physical Street Address details ('Address-Line 1', 'Address-Line 2', 'Street', 'Registered Office', 'Head Office', 'Legal Address', 'Office Address', 'HQ Address', 'Headquarters') map to 'hq_address' or 'address'.\n"
-                "- Geographic fields ('City', 'Town') map to 'hq_city' or 'city'.\n"
-                "- Geographic fields ('State', 'Province', 'Region', 'Canton') map to 'hq_state' or 'state'.\n"
-                "- Geographic fields ('Country', 'Nation') map to 'hq_country' or 'country'.\n"
-                "- Geographic fields ('Zip Code', 'Postal Code', 'PIN Code', 'Postcode', 'Zip') map to 'zip_code' or 'postal_code' or 'zip'. If none are allowed in target schema, leave as empty.\n"
-                "- Company Identifier fields ('EIN', 'Tax No') map to 'tax_id'.\n"
-                "- Company Identifier fields ('CIK', 'Reg No', 'Company Number', 'Registration Number') map to 'registry_number'.\n"
-                "- Corporate Name ('Company Name', 'Organization Name', 'Entity Name', 'Firm Name', 'Legal Entity') maps to 'legal_name'.\n\n"
-                "You must return a strict JSON object with a single key 'mappings'. No other text outside the JSON block."
+                "You are a schema mapping assistant.\n"
+                "Map unresolved dataset headers to one of the allowed fields using semantic similarity.\n"
+                "Return strict JSON only with a single key 'mappings'.\n"
+                "Only use fields present in the allowed list.\n"
+                "Rules: Address-Line, Street, Registered Office, Head Office, Legal Address, Office Address, and HQ Address map to hq_address. "
+                "Address-Line2 maps only to address_2 when that field is allowed; otherwise return an empty mapping. "
+                "City/Town/Locality map to hq_city. State/Province/Region/Canton map to hq_state. "
+                "Zip Code/Postal Code/PIN/Postcode/Zip map only to zip_code, postal_code, or zip when one of those fields is allowed; otherwise return an empty mapping. "
+                "Never map postal/ZIP headers to hq_address."
             )
 
             user_content = (
-                "Dataset Schema Context (All uploaded headers in this file):\n"
-                f"{headers}\n\n"
                 "Allowed Superset Fields and Descriptions:\n"
                 f"{superset_semantics}\n\n"
-                f"{examples}\n\n"
+                "Synonym Hints:\n"
+                "- Company Name -> legal_name\n"
+                "- Address-Line 1 / Street / Registered Office / Head Office / Legal Address / Office Address / HQ Address / Headquarters -> hq_address\n"
+                "- Address-Line2 -> address_2 only if that field is allowed; otherwise empty\n"
+                "- City / Town / Locality -> hq_city\n"
+                "- State / Province / Region / Canton -> hq_state\n"
+                "- Zip Code / Postal Code / PIN / Postcode / Zip -> zip_code, postal_code, or zip only if one of those fields is allowed; otherwise empty\n\n"
                 "Input Headers to Map:\n"
                 f"{unresolved}\n\n"
-                "Instructions:\n"
-                "For each unresolved header, perform a semantic mapping to one of the allowed superset fields. "
-                "For each header, first determine what it represents conceptually, look for target synonyms in the target schema descriptions, and output the mapping.\n\n"
-                "Return a strict JSON object with mapping objects containing the following keys:\n"
+                "For each unresolved header, return one mapping object with these keys:\n"
                 "- 'input_header': the exact string from unresolved list.\n"
                 "- 'mapped_field': the matched target field name (from allowed superset fields only) or empty string.\n"
-                "- 'confidence': a float confidence score between 0.00 and 1.00 (assign high confidence if there is strong semantic/synonym evidence).\n"
-                "- 'reason': a brief explanation of why this mapping was selected, detailing the synonym/conceptual translation.\n\n"
+                "- 'confidence': a float confidence score between 0.00 and 1.00.\n"
+                "- 'reason': a brief explanation of why this mapping was selected.\n\n"
                 "Return Format Example:\n"
                 '{"mappings": [{"input_header": "Company Name", "mapped_field": "legal_name", "confidence": 0.99, "reason": "Conceptually represents the official company name."}]}'
             )
 
+            prompt_prep_ms = (perf_counter() - prompt_prep_start) * 1000.0
             messages = [
                 {"role": "system", "content": system_content},
                 {"role": "user", "content": user_content},
             ]
-            
+
             logger.info("=== FIELD MAPPING PIPELINE TRACE - START ===")
-            logger.info("PROMPT SENT TO QWEN (OLLAMA):\nSystem:\n%s\nUser:\n%s", system_content, user_content)
-            
+            logger.info(
+                "FIELD MAPPING PROMPT STAGES: exact_heuristic_ms=%.2f prompt_prep_ms=%.2f prompt_chars=%s unresolved=%s prompt_fields=%s",
+                stage_exact_heuristic_ms,
+                prompt_prep_ms,
+                len(system_content) + len(user_content),
+                len(unresolved),
+                len(prompt_fields),
+            )
+
             try:
+                llm_start = perf_counter()
                 llm_trace = self._ollama_chat(messages)
-                logger.info("RAW RESPONSE FROM QWEN:\n%s", json.dumps(llm_trace, indent=2))
-                
+                llm_ms = (perf_counter() - llm_start) * 1000.0
+                raw_response = llm_trace.get("raw_response") or {}
                 parsed = llm_trace.get("parsed") or {}
+                logger.info(
+                    "FIELD MAPPING LLM STAGES: request_ms=%.2f prompt_eval_ms=%s eval_ms=%s model=%s",
+                    llm_ms,
+                    raw_response.get("prompt_eval_duration"),
+                    raw_response.get("eval_duration"),
+                    raw_response.get("model"),
+                )
+
+                parse_start = perf_counter()
                 rows = parsed.get("mappings") if isinstance(parsed.get("mappings"), list) else []
-                logger.info("PARSED ROWS FROM QWEN:\n%s", json.dumps(rows, indent=2))
-                
+                parse_ms = (perf_counter() - parse_start) * 1000.0
+                logger.info("FIELD MAPPING PARSE STAGE: parse_ms=%.2f rows=%s", parse_ms, len(rows))
+
+                validation_start = perf_counter()
                 for row in rows:
                     if not isinstance(row, dict):
                         continue
                     header_raw = str(row.get("input_header") or "").strip()
                     mapped_raw = str(row.get("mapped_field") or "").strip()
-                    
+
                     normalized_header = self._normalize_token(header_raw)
                     mapped = self._normalize_token(mapped_raw)
-                    
+
                     matched_header = next((h for h in unresolved if self._normalize_token(h) == normalized_header), None)
-                    
+
                     is_unresolved = matched_header is not None
                     is_superset = mapped in superset_set
                     logger.info(
                         "VALIDATING SUGGESTION: HeaderRaw='%s' (Matched='%s') -> MappedFieldRaw='%s' (Normalized='%s') | InUnresolved=%s, InSuperset=%s",
                         header_raw, matched_header, mapped_raw, mapped, is_unresolved, is_superset
                     )
-                    
+
                     if is_unresolved and is_superset:
                         inferred[matched_header] = mapped
                         try:
@@ -519,6 +595,8 @@ class WebsiteComplexityClassifierService:
                         inferred_reason[matched_header] = str(row.get("reason") or "").strip()
                     else:
                         logger.info("DISCARDING SUGGESTION: Header='%s' -> MappedField='%s' (Validation failed)", header_raw, mapped)
+                validation_ms = (perf_counter() - validation_start) * 1000.0
+                logger.info("FIELD MAPPING VALIDATION STAGE: validation_ms=%.2f", validation_ms)
             except Exception as exc:
                 logger.warning("Ollama field mapping suggestions failed, falling back to central AIProvider: %s", exc)
                 used_fallback = True
@@ -526,30 +604,33 @@ class WebsiteComplexityClassifierService:
                     from app.services.ai_provider import AIProvider
                     provider = AIProvider(api_key=settings.GEMINI_API_KEY, model=settings.GEMINI_MODEL)
                     raw_response = provider.generate(f"{system_content}\n\n{user_content}", timeout=settings.AI_REQUEST_TIMEOUT_SEC, temperature=0.1)
-                    
+
                     cleaned = raw_response.strip()
-                    if cleaned.startswith("```json"): cleaned = cleaned[7:]
-                    if cleaned.startswith("```"): cleaned = cleaned[3:]
-                    if cleaned.endswith("```"): cleaned = cleaned[:-3]
-                    
+                    if cleaned.startswith("```json"):
+                        cleaned = cleaned[7:]
+                    if cleaned.startswith("```"):
+                        cleaned = cleaned[3:]
+                    if cleaned.endswith("```"):
+                        cleaned = cleaned[:-3]
+
                     parsed = json.loads(cleaned.strip())
                     llm_trace = {"provider": "central_ai_provider", "raw_response": raw_response, "parsed": parsed}
-                    
+
                     rows = parsed.get("mappings") if isinstance(parsed.get("mappings"), list) else []
                     for row in rows:
                         if not isinstance(row, dict):
                             continue
                         header_raw = str(row.get("input_header") or "").strip()
                         mapped_raw = str(row.get("mapped_field") or "").strip()
-                        
+
                         normalized_header = self._normalize_token(header_raw)
                         mapped = self._normalize_token(mapped_raw)
-                        
+
                         matched_header = next((h for h in unresolved if self._normalize_token(h) == normalized_header), None)
-                        
+
                         is_unresolved = matched_header is not None
                         is_superset = mapped in superset_set
-                        
+
                         if is_unresolved and is_superset:
                             inferred[matched_header] = mapped
                             try:
@@ -561,6 +642,7 @@ class WebsiteComplexityClassifierService:
                     logger.error("Fallback AIProvider mapping failed: %s", fallback_exc, exc_info=True)
                     llm_trace = {"error": str(exc), "fallback_error": str(fallback_exc)}
 
+        response_start = perf_counter()
         mappings = []
         for header in headers:
             mapped = exact_matches.get(header) or inferred.get(header) or ""
@@ -573,7 +655,7 @@ class WebsiteComplexityClassifierService:
             else:
                 confidence = inferred_conf.get(header, 0.0)
                 reason = inferred_reason.get(header, "")
-            
+
             mappings.append({
                 "input_header": header,
                 "mapped_field": mapped,
@@ -581,15 +663,25 @@ class WebsiteComplexityClassifierService:
                 "confidence": confidence,
                 "reason": reason
             })
-            
+        response_ms = (perf_counter() - response_start) * 1000.0
+        total_ms = (perf_counter() - total_start) * 1000.0
+
+        logger.info(
+            "FIELD MAPPING RESPONSE STAGE: response_ms=%.2f total_ms=%.2f mappings=%s",
+            response_ms,
+            total_ms,
+            len(mappings),
+        )
         logger.info("FINAL API RESPONSE RETURNED TO FRONTEND:\n%s", json.dumps(mappings, indent=2))
         logger.info("=== FIELD MAPPING PIPELINE TRACE - END ===")
-            
-        return {
+
+        result = {
             "mappings": mappings,
             "used_fallback": used_fallback,
             "llm_trace": llm_trace,
             "model": settings.OLLAMA_MODEL,
         }
+        self._field_mapping_cache[cache_key] = deepcopy(result)
+        return result
 
 website_complexity_classifier_service = WebsiteComplexityClassifierService()

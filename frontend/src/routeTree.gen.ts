@@ -13,9 +13,12 @@ import { Route as WorkflowsRouteImport } from './routes/workflows'
 import { Route as SiteSpecificRouteImport } from './routes/site-specific'
 import { Route as ReviewRouteImport } from './routes/review'
 import { Route as MonitoringRouteImport } from './routes/monitoring'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as LibraryRouteImport } from './routes/library'
 import { Route as ExportRouteImport } from './routes/export'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AnySiteRouteImport } from './routes/any-site'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 
 const WorkflowsRoute = WorkflowsRouteImport.update({
@@ -38,6 +41,11 @@ const MonitoringRoute = MonitoringRouteImport.update({
   path: '/monitoring',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LibraryRoute = LibraryRouteImport.update({
   id: '/library',
   path: '/library',
@@ -48,9 +56,19 @@ const ExportRoute = ExportRouteImport.update({
   path: '/export',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AnySiteRoute = AnySiteRouteImport.update({
   id: '/any-site',
   path: '/any-site',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -61,9 +79,12 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/any-site': typeof AnySiteRoute
+  '/dashboard': typeof DashboardRoute
   '/export': typeof ExportRoute
   '/library': typeof LibraryRoute
+  '/login': typeof LoginRoute
   '/monitoring': typeof MonitoringRoute
   '/review': typeof ReviewRoute
   '/site-specific': typeof SiteSpecificRoute
@@ -71,9 +92,12 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/any-site': typeof AnySiteRoute
+  '/dashboard': typeof DashboardRoute
   '/export': typeof ExportRoute
   '/library': typeof LibraryRoute
+  '/login': typeof LoginRoute
   '/monitoring': typeof MonitoringRoute
   '/review': typeof ReviewRoute
   '/site-specific': typeof SiteSpecificRoute
@@ -82,9 +106,12 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/any-site': typeof AnySiteRoute
+  '/dashboard': typeof DashboardRoute
   '/export': typeof ExportRoute
   '/library': typeof LibraryRoute
+  '/login': typeof LoginRoute
   '/monitoring': typeof MonitoringRoute
   '/review': typeof ReviewRoute
   '/site-specific': typeof SiteSpecificRoute
@@ -94,9 +121,12 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/any-site'
+    | '/dashboard'
     | '/export'
     | '/library'
+    | '/login'
     | '/monitoring'
     | '/review'
     | '/site-specific'
@@ -104,9 +134,12 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin'
     | '/any-site'
+    | '/dashboard'
     | '/export'
     | '/library'
+    | '/login'
     | '/monitoring'
     | '/review'
     | '/site-specific'
@@ -114,9 +147,12 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/any-site'
+    | '/dashboard'
     | '/export'
     | '/library'
+    | '/login'
     | '/monitoring'
     | '/review'
     | '/site-specific'
@@ -125,9 +161,12 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRoute
   AnySiteRoute: typeof AnySiteRoute
+  DashboardRoute: typeof DashboardRoute
   ExportRoute: typeof ExportRoute
   LibraryRoute: typeof LibraryRoute
+  LoginRoute: typeof LoginRoute
   MonitoringRoute: typeof MonitoringRoute
   ReviewRoute: typeof ReviewRoute
   SiteSpecificRoute: typeof SiteSpecificRoute
@@ -164,6 +203,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MonitoringRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/library': {
       id: '/library'
       path: '/library'
@@ -178,11 +224,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExportRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/any-site': {
       id: '/any-site'
       path: '/any-site'
       fullPath: '/any-site'
       preLoaderRoute: typeof AnySiteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -197,9 +257,12 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRoute,
   AnySiteRoute: AnySiteRoute,
+  DashboardRoute: DashboardRoute,
   ExportRoute: ExportRoute,
   LibraryRoute: LibraryRoute,
+  LoginRoute: LoginRoute,
   MonitoringRoute: MonitoringRoute,
   ReviewRoute: ReviewRoute,
   SiteSpecificRoute: SiteSpecificRoute,

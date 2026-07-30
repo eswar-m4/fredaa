@@ -23,6 +23,7 @@ from app.models.schemas import HealthCheckResponse, UploadResponse, ErrorRespons
 from app.models.ai_schemas import ProcessedInput, ProcessInputRequest
 from app.models.schema_inference_schemas import SchemaInferenceResult
 from app.services.upload_service import upload_service
+from app.services.bot_catalog_service import bot_catalog_service
 from app.services.workflow_service import workflow_service
 from app.services.parser_service import parser_service
 from app.services.ai_understanding_service import ai_understanding_service
@@ -165,28 +166,6 @@ async def workflow_preflight_analysis_endpoint(payload: Dict[str, Any]) -> Dict[
 
 
 @router.post(
-    "/workflows/field-mapping-suggestions",
-    summary="Suggest field mappings for unresolved headers",
-    description=(
-        "Uses exact normalized match first; unresolved headers fallback to Qwen (Ollama) "
-        "to map into allowed superset fields."
-    ),
-)
-async def field_mapping_suggestions_endpoint(payload: Dict[str, Any]) -> Dict[str, Any]:
-    try:
-        input_headers = payload.get("input_headers") or []
-        superset_fields = payload.get("superset_fields") or []
-        result = website_complexity_classifier_service.suggest_field_mappings(
-            input_headers=input_headers,
-            superset_fields=superset_fields,
-        )
-        return {"success": True, **result}
-    except Exception as e:
-        logger.error("Field mapping suggestion failed: %s", e, exc_info=True)
-        raise HTTPException(status_code=500, detail="Field mapping suggestion failed")
-
-
-@router.post(
     "/workflows/parse-file",
     summary="Parse CSV or Excel file",
     description="Parses an uploaded CSV, XLSX, or XLS file and returns columns, rows, and records.",
@@ -266,6 +245,16 @@ async def get_review_queue_for_dataset_endpoint(dataset_id: str) -> Dict[str, An
         "success": True,
         "review_queue": review_service.get_review_queue(dataset_id),
     }
+
+
+@router.get(
+    "/workflows/review-metrics",
+    summary="Get live review metrics",
+)
+async def get_review_metrics_endpoint() -> Dict[str, Any]:
+    from app.services.review_metrics_service import review_metrics_service
+
+    return {"success": True, "metrics": review_metrics_service.get_metrics()}
 
 
 def get_job_records_from_db(job_id: str) -> Optional[Dict[str, Any]]:
@@ -543,6 +532,7 @@ async def export_processed_dataset(
         # Resolve the latest run file on disk if exists to ensure edits/fresh runs are always reflected
         base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
         from app.core.database import get_connection
+        from app.api.demo_routes import _latest_run_number_for_job
         try:
             with get_connection() as conn:
                 row = conn.execute("SELECT status, mode, refresh_count, source FROM scraper_jobs WHERE id = ?", (run_id,)).fetchone()
@@ -559,9 +549,10 @@ async def export_processed_dataset(
                         "processed_dataset": records
                     }
                 else:
-                    if refresh_count == 0:
-                        refresh_count = 1
-                    filename = f"{run_id}_run_{refresh_count}.json"
+                    current_run_num = _latest_run_number_for_job(run_id, refresh_count)
+                    if current_run_num <= 0:
+                        current_run_num = 1
+                    filename = f"{run_id}_run_{current_run_num}.json"
                     if not os.path.exists(os.path.join(base_dir, "datasets", filename)):
                         filename = f"{run_id}_run_1.json"
                     run_file_path = os.path.join(base_dir, "datasets", filename)
@@ -585,6 +576,7 @@ async def export_processed_dataset(
         # Check if run file exists first for the latest run of this dataset
         base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
         from app.core.database import get_connection
+        from app.api.demo_routes import _latest_run_number_for_job
         try:
             with get_connection() as conn:
                 row = conn.execute("SELECT status, mode, refresh_count, source FROM scraper_jobs WHERE id = ?", (dataset_id,)).fetchone()
@@ -601,9 +593,10 @@ async def export_processed_dataset(
                         "processed_dataset": records
                     }
                 else:
-                    if refresh_count == 0:
-                        refresh_count = 1
-                    filename = f"{dataset_id}_run_1.json" if mode in ("By Dataset", "Any-Site") else f"{dataset_id}_run_{refresh_count}.json"
+                    current_run_num = _latest_run_number_for_job(dataset_id, refresh_count)
+                    if current_run_num <= 0:
+                        current_run_num = 1
+                    filename = f"{dataset_id}_run_{current_run_num}.json"
                     run_file_path = os.path.join(base_dir, "datasets", filename)
                     if os.path.exists(run_file_path):
                         with open(run_file_path, "r", encoding="utf-8") as f:
@@ -630,12 +623,20 @@ async def export_processed_dataset(
         raise HTTPException(status_code=404, detail="Processed dataset not found")
 
     rows = selected_run.get("processed_dataset") or []
+    public_rows = [
+        {
+            key: value
+            for key, value in (row or {}).items()
+            if not str(key).startswith("_")
+        }
+        for row in rows
+    ]
     export_format = (format or "csv").lower()
     filename = f"{selected_run.get('dataset_name') or 'processed_dataset'}-{selected_run.get('run_id')}"
     safe_filename = "".join(ch if ch.isalnum() or ch in ("-", "_") else "_" for ch in filename)
 
     if export_format == "json":
-        body = json.dumps(rows, ensure_ascii=False, indent=2)
+        body = json.dumps(public_rows, ensure_ascii=False, indent=2)
         return StreamingResponse(
             io.StringIO(body),
             media_type="application/json",
@@ -644,7 +645,7 @@ async def export_processed_dataset(
 
     elif export_format == "xlsx":
         import pandas as pd
-        df = pd.DataFrame(rows)
+        df = pd.DataFrame(public_rows)
         df_out = df.where(pd.notnull(df), None)
         output = io.BytesIO()
         with pd.ExcelWriter(output, engine="openpyxl") as writer:
@@ -658,14 +659,14 @@ async def export_processed_dataset(
 
     output = io.StringIO()
     fieldnames: List[str] = []
-    for row in rows:
+    for row in public_rows:
         for key in row.keys():
             if key not in fieldnames:
                 fieldnames.append(key)
     writer = csv.DictWriter(output, fieldnames=fieldnames or ["message"])
     writer.writeheader()
-    if rows:
-        writer.writerows(rows)
+    if public_rows:
+        writer.writerows(public_rows)
     else:
         writer.writerow({"message": "No processed records"})
     output.seek(0)
@@ -923,6 +924,7 @@ async def upload_file(file: UploadFile = File(...)) -> UploadResponse:
             file_size=file_size,
             format=file_format
         )
+        storage_path = upload_service.persist_upload_file(upload_record["id"], filename, file_content)
 
         # Parse the uploaded file immediately for Phase 2
         try:
@@ -944,6 +946,7 @@ async def upload_file(file: UploadFile = File(...)) -> UploadResponse:
             format=file_format,
             status="processed",
             message="File uploaded and parsed successfully.",
+            storage_path=storage_path,
             parsed_summary=parsed_summary
         )
     
@@ -959,6 +962,70 @@ async def upload_file(file: UploadFile = File(...)) -> UploadResponse:
             status_code=500,
             detail="Internal server error during file upload"
         )
+
+
+@router.post(
+    "/bot-packages/upload",
+    summary="Upload a trusted bot package",
+    description="Accepts a zip archive containing trusted bot files, including .py or .pl entrypoints, with optional manifest metadata.",
+)
+async def upload_bot_package(file: UploadFile = File(...)) -> Dict[str, Any]:
+    try:
+        filename = file.filename or "bot-package.zip"
+        file_content = await file.read()
+        file_size = len(file_content)
+        is_valid, error_message = upload_service.validate_file_metadata(
+            filename=filename,
+            file_size=file_size,
+            max_size_mb=settings.MAX_UPLOAD_SIZE_MB,
+        )
+        if not is_valid:
+            raise HTTPException(status_code=400, detail=error_message or "Invalid bot package")
+
+        file_format = upload_service.detect_file_format(filename)
+        if file_format != "zip":
+            raise HTTPException(status_code=400, detail="Bot package must be a zip archive")
+
+        upload_record = upload_service.create_upload_record(
+            filename=filename,
+            file_size=file_size,
+            format=file_format,
+        )
+        storage_path = upload_service.persist_upload_file(upload_record["id"], filename, file_content)
+
+        try:
+            package_bundle = bot_catalog_service.prepare_uploaded_bot_package(
+                storage_path,
+                upload_id=upload_record["id"],
+            )
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=str(exc))
+
+        upload_service.attach_parse_summary(upload_record["id"], package_bundle)
+        upload_service.update_upload_status(upload_record["id"], "processed")
+
+        return {
+            "success": True,
+            **upload_record,
+            "status": "processed",
+            "message": "Bot package uploaded successfully.",
+            "storage_path": storage_path,
+            **package_bundle,
+        }
+    except HTTPException:
+        raise
+    except Exception as exc:
+        logger.error("Bot package upload failed: %s", exc, exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Bot package upload failed: {str(exc)}")
+
+
+@router.get(
+    "/bots",
+    summary="List bot catalog",
+    description="Returns the merged built-in and admin-onboarded bot catalog.",
+)
+async def list_bots() -> Dict[str, Any]:
+    return bot_catalog_service.build_response()
 
 
 @router.post(

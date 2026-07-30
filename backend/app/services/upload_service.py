@@ -14,6 +14,7 @@ Later phases will add:
 
 import uuid
 from datetime import datetime
+from pathlib import Path
 from typing import Optional
 from app.core.logger import setup_logger
 
@@ -32,6 +33,8 @@ class UploadService:
         """Initialize upload service"""
         # In-memory storage for Phase 1 (will use database in production)
         self.uploads = {}
+        self._upload_root = Path(__file__).resolve().parents[2] / "data" / "uploads"
+        self._upload_root.mkdir(parents=True, exist_ok=True)
         logger.info("UploadService initialized")
     
     def validate_file_metadata(
@@ -118,9 +121,31 @@ class UploadService:
         
         # Store record (in-memory for Phase 1)
         self.uploads[upload_id] = upload_record
-        
+
         logger.info(f"Created upload record: {upload_id} for file {filename}")
         return upload_record
+
+    def persist_upload_file(self, upload_id: str, filename: str, content: bytes) -> str:
+        """
+        Persist uploaded file bytes to durable storage.
+
+        Args:
+            upload_id: Upload identifier.
+            filename: Original uploaded filename.
+            content: Raw file bytes.
+
+        Returns:
+            Absolute storage path for the persisted file.
+        """
+        safe_name = Path(filename or "upload.bin").name
+        target_dir = self._upload_root / upload_id
+        target_dir.mkdir(parents=True, exist_ok=True)
+        storage_path = target_dir / safe_name
+        storage_path.write_bytes(content)
+        if upload_id in self.uploads:
+            self.uploads[upload_id]["storage_path"] = str(storage_path)
+        logger.info("Persisted upload %s to %s", upload_id, storage_path)
+        return str(storage_path)
     
     def get_upload_record(self, upload_id: str) -> Optional[dict]:
         """

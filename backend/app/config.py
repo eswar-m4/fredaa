@@ -5,6 +5,8 @@ This module handles all configuration settings using environment variables
 and Pydantic for validation. Follows 12-factor app methodology.
 """
 
+from pathlib import Path
+
 from pydantic_settings import BaseSettings
 from typing import Optional
 
@@ -30,7 +32,9 @@ class Settings(BaseSettings):
     # Server settings
     API_HOST: str = "0.0.0.0"
     API_PORT: int = 8000
-    API_RELOAD: bool = True  # Set to False in production
+    # Keep auto-reload off by default so long-running bot jobs are not killed
+    # by file-change restarts during onboarding/execution.
+    API_RELOAD: bool = False
     
     # Logging settings
     LOG_LEVEL: str = "INFO"
@@ -39,7 +43,14 @@ class Settings(BaseSettings):
     MAX_UPLOAD_SIZE_MB: int = 100  # 100MB default limit
 
     # Persistence
-    FREDA_DB_PATH: str = "data/freda.db"
+    FREDA_DB_PATH: str = "../data/freda.db"
+    FREDA_AUTH_SALT: str = "freda-auth-salt"
+    FREDA_SESSION_TTL_HOURS: int = 72
+
+    # Partial scrape runtime controls
+    PARTIAL_SCRAPE_MAX_RESULTS: int = 50
+    BOT_RUNTIME_TIMEOUT_SEC: int = 1800
+    BOT_RUNTIME_TIMEOUT_OVERRIDES_JSON: str = '{"bot_J-8356": 5400}'
 
     # Workflow thresholds (defaults; overridable per request config)
     WORKFLOW_AUTO_APPROVE_THRESHOLD: int = 75
@@ -55,17 +66,20 @@ class Settings(BaseSettings):
         "linkedin",
         "company_website",
         "government_registry",
+        "gleif",
+        "companies_house",
+        "wikidata",
         "business_directory",
         "user_defined",
     ]
-    
-    # AI/LLM settings (Phase 3) - Using Google Gemini Flash
+
+    # AI/LLM settings
+    LOVABLE_API_KEY: Optional[str] = None
     GEMINI_API_KEY: Optional[str] = None
     GEMINI_MODEL: str = "gemini-1.5-flash"
     GROQ_API_KEY: Optional[str] = None
     GROQ_API_BASE: str = "https://api.groq.ai/v1"
     GROQ_MODEL: str = "llama3-70b-8192"
-    # OpenAI fallback (used when GROQ not configured or explicitly preferred)
     OPENAI_API_KEY: Optional[str] = None
     OPENAI_MODEL: str = "gpt-4o-mini"
     AI_REQUEST_TIMEOUT_SEC: int = 30
@@ -77,7 +91,7 @@ class Settings(BaseSettings):
     
     class Config:
         """Pydantic config class"""
-        env_file = ".env"
+        env_file = str(Path(__file__).resolve().parents[1] / ".env")
         env_file_encoding = "utf-8"
         case_sensitive = True
 

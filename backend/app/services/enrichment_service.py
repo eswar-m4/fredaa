@@ -74,6 +74,7 @@ class EnrichmentService:
         contact_page_url = self._extract_internal_page_url(html_text, url, ["contact", "support"])
         careers_page_url = self._extract_internal_page_url(html_text, url, ["careers", "jobs"])
         website = self._extract_website(html_text, url)
+        tech_signals = self._extract_tech_signals(html_text, url)
 
         return {
             "company_name": company_name,
@@ -87,6 +88,70 @@ class EnrichmentService:
             "contact_page_url": contact_page_url,
             "careers_page_url": careers_page_url,
             "description": description,
+            **tech_signals,
+        }
+
+    def _extract_tech_signals(self, html_text: str, url: str) -> Dict[str, Optional[str]]:
+        html_lower = (html_text or "").lower()
+        url_lower = (url or "").lower()
+
+        def _match(patterns: Dict[str, tuple[str, ...]]) -> Optional[str]:
+            for label, needles in patterns.items():
+                if any(needle in html_lower or needle in url_lower for needle in needles):
+                    return label
+            return None
+
+        cms = _match({
+            "WordPress": ("wp-content", "wp-includes", "wordpress"),
+            "Shopify": ("cdn.shopify.com", "shopify", "myshopify.com"),
+            "Webflow": ("webflow", "webflow.io", "webflow.com"),
+            "Squarespace": ("squarespace", "static1.squarespace.com"),
+            "Wix": ("wix.com", "wixstatic.com"),
+            "Drupal": ("drupal", "drupal-settings-json"),
+            "Joomla": ("joomla", "/media/system/js/"),
+            "Magento": ("magento", "mage/", "static/version"),
+            "HubSpot": ("hubspot", "hs-scripts.com", "hsforms.net"),
+            "Ghost": ("ghost", "ghost.org"),
+        })
+
+        frameworks = _match({
+            "Next.js": ("_next/", "nextjs", "next.js"),
+            "React": ("react", "react-dom", "data-reactroot"),
+            "Vue.js": ("vue", "nuxt"),
+            "Angular": ("angular", "ng-version"),
+            "Svelte": ("svelte", "sveltekit"),
+            "Gatsby": ("gatsby", "__gatsby"),
+            "Remix": ("remix", "remix-run"),
+        })
+
+        analytics = _match({
+            "Google Tag Manager": ("googletagmanager", "gtm.js", "gtm-"),
+            "Google Analytics": ("google-analytics", "gtag(", "ga4", "analytics.js"),
+            "Segment": ("segment.com", "analytics.js", "segment"),
+            "Mixpanel": ("mixpanel", "mp.min.js"),
+            "Hotjar": ("hotjar", "hjSettings"),
+            "Matomo": ("matomo", "piwik"),
+            "Plausible": ("plausible.io", "plausible.js"),
+        })
+
+        hosting = _match({
+            "Vercel": ("vercel", "vercel.app"),
+            "Netlify": ("netlify", "netlify.app"),
+            "Cloudflare": ("cloudflare", "cf-ray", "cdn-cgi"),
+            "AWS": ("amazonaws.com", "aws", "cloudfront"),
+            "Azure": ("azurewebsites.net", "azure", "microsoft.com"),
+            "Google Cloud": ("googleusercontent.com", "cloud.google.com", "gstatic.com"),
+        })
+
+        tech_stack_parts = [part for part in (cms, frameworks, analytics, hosting) if part]
+        tech_stack = ", ".join(dict.fromkeys(tech_stack_parts)) if tech_stack_parts else None
+
+        return {
+            "cms": cms,
+            "analytics": analytics,
+            "frameworks": frameworks,
+            "hosting": hosting,
+            "tech_stack": tech_stack,
         }
 
     def _extract_title(self, html_text: str) -> Optional[str]:
