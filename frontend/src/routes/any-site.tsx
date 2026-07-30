@@ -2,7 +2,9 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { Badge, Button, Card, Input, PageHeader, Select, Steps } from "@/components/ui-bits";
+import { readJobsCache, writeJobsCache } from "@/lib/jobs-cache";
 import { DATASETS, DATASET_CATEGORIES, type Dataset } from "@/data/datasets";
+import { WORKFLOWS } from "@/data/workflows";
 import {
   ArrowRight,
   Upload,
@@ -19,13 +21,11 @@ import * as Icons from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/any-site")({
-  head: () => ({ meta: [{ title: "By Dataset – Field Mapping – FreshData AI" }] }),
+  head: () => ({ meta: [{ title: "By Dataset – Dataset Setup – FreshData AI" }] }),
   component: AnySite,
 });
 
-const STEPS = ["Pick Dataset", "Pick Source & Map Fields", "Schedule & Launch"];
-
-type Mapping = Record<string, string>; // system attr key -> user column
+const STEPS = ["Pick Dataset", "Select Datapoints", "Schedule & Launch"];
 
 function AnySite() {
   const navigate = useNavigate();
@@ -45,8 +45,6 @@ function AnySite() {
   const [seedColumnCount, setSeedColumnCount] = useState<number>(0);
   const [detectedRegion, setDetectedRegion] = useState<string>("Auto");
   const [selectedOutputs, setSelectedOutputs] = useState<string[]>([]);
-  const [mapping, setMapping] = useState<Mapping>({});
-  const [isAiMapping, setIsAiMapping] = useState(false);
 
   // Step 3
   const [frequency, setFrequency] = useState("Weekly");
@@ -100,7 +98,6 @@ function AnySite() {
     setSelectedOutputs(d.outputAttributes.map((o) => o.key));
     setPickedSources(defaultSources(d, "Auto"));
     setFrequency(d.refreshDefault);
-    setMapping({});
     setSeedFile(null);
     setSeedHeaders([]);
     setSeedRecords([]);
@@ -139,6 +136,7 @@ function AnySite() {
       formData.append("file", f);
 
       const response = await fetch(`${baseApiUrl}/api/v1/workflows/parse-file`, {
+        credentials: "include",
         method: "POST",
         body: formData,
       });
@@ -159,65 +157,16 @@ function AnySite() {
       });
       const rowCount = Number(parsed.row_count ?? 0) || 0;
       const columnCount = Number(parsed.column_count ?? headers.length) || headers.length;
-      const previewText = JSON.stringify(previewRows[0] || {});
-
       setSeedHeaders(headers);
       setSeedRecords(normalizedRecords);
       setSeedRows(rowCount);
       setSeedColumnCount(columnCount);
 
       if (ds) {
+        const previewText = JSON.stringify(previewRows[0] || {});
         const detected = detectRegionFromHeaders(previewText, headers);
         setDetectedRegion(detected);
         setPickedSources(defaultSources(ds, detected));
-        // Auto-map headers by exact/label match first, then ask the backend for unresolved headers only.
-        const exactMappings: Mapping = {};
-        ds.outputAttributes.forEach((a) => {
-          const m = headers.find(
-            (h) =>
-              h.toLowerCase().replace(/[^a-z0-9]+/g, "") === a.key.replace(/_/g, "") ||
-              h.toLowerCase() === a.label.toLowerCase(),
-          );
-          if (m) exactMappings[a.key] = m;
-        });
-        setMapping(exactMappings);
-
-        const unresolvedHeaders = headers.filter((h) => !Object.values(exactMappings).includes(h));
-        if (unresolvedHeaders.length > 0) {
-          try {
-            setIsAiMapping(true);
-            const mappingResponse = await fetch(`${baseApiUrl}/api/v1/workflows/field-mapping-suggestions`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                input_headers: unresolvedHeaders,
-                superset_fields: ds.outputAttributes.map((a) => a.key),
-              }),
-            });
-
-            if (mappingResponse.ok) {
-              const suggestion = await mappingResponse.json();
-              const mappings = Array.isArray(suggestion?.mappings) ? suggestion.mappings : [];
-              setMapping((prev) => {
-                const next = { ...prev };
-                for (const row of mappings) {
-                  if (!row || typeof row !== "object") continue;
-                  const inputHeader = String((row as any).input_header || "").trim();
-                  const mappedField = String((row as any).mapped_field || "").trim();
-                  if (!inputHeader || !mappedField) continue;
-                  if (next[mappedField]) continue;
-                  if (!unresolvedHeaders.includes(inputHeader)) continue;
-                  next[mappedField] = inputHeader;
-                }
-                return next;
-              });
-            }
-          } catch (mappingErr) {
-            console.warn("Backend field mapping suggestions failed:", mappingErr);
-          } finally {
-            setIsAiMapping(false);
-          }
-        }
       }
     } catch (err) {
       console.error("Failed to parse uploaded file via backend:", err);
@@ -251,12 +200,261 @@ function AnySite() {
     toast.success(`Downloaded ${a.download}`);
   }
 
+  function toExcelColumnName(index: number) {
+    let n = index;
+    let col = "";
+    while (n > 0) {
+      const rem = (n - 1) % 26;
+      col = String.fromCharCode(65 + rem) + col;
+      n = Math.floor((n - 1) / 26);
+    }
+    return col;
+  }
+
+  async function downloadInputTemplate() {
+    if (!ds) return;
+
+    if (!ds.inputTemplateColumns?.length) {
+      downloadSample("csv", `${ds.name}-template`);
+      return;
+    }
+
+    const { default: ExcelJS } = await import("exceljs");
+    const workbook = new ExcelJS.Workbook();
+    workbook.creator = "FreshData AI";
+    workbook.created = new Date();
+
+    const worksheet = workbook.addWorksheet("Template", {
+      views: [{ state: "frozen", ySplit: 1 }],
+    });
+
+    const columns =
+      ds.id === "ds-firmographic"
+        ? Array.from(
+            new Map(
+              [...ds.inputAttributes, ...ds.outputAttributes.map((field) => ({
+                ...field,
+                role: "input" as const,
+                required: false,
+              }))].map((column) => [column.key, column]),
+            ).values(),
+          )
+        : ds.inputTemplateColumns;
+    const templateRows: Record<string, string>[] =
+      ds.id === "ds-firmographic"
+        ? [
+            {
+              company_name: "Acme Corp",
+              domain: "acmecorp.com",
+              website: "https://acmecorp.com",
+              linkedin_url: "https://www.linkedin.com/company/acme-corp",
+              country: "United States",
+              hq_city: "San Francisco",
+              hq_state: "California",
+              industry: "Software",
+              sub_industry: "B2B SaaS",
+              ticker: "ACME",
+              registry_number: "CA-2026-ACME-001",
+            },
+            {
+              company_name: "Northstar Systems",
+              domain: "northstarsystems.io",
+              website: "https://northstarsystems.io",
+              linkedin_url: "https://www.linkedin.com/company/northstar-systems",
+              country: "United States",
+              hq_city: "Austin",
+              hq_state: "Texas",
+              industry: "Information Technology",
+              sub_industry: "Cloud Infrastructure",
+              ticker: "NSTR",
+              registry_number: "TX-2026-NS-204",
+            },
+            {
+              company_name: "BluePeak Analytics",
+              domain: "bluepeakanalytics.com",
+              website: "https://bluepeakanalytics.com",
+              linkedin_url: "https://www.linkedin.com/company/bluepeak-analytics",
+              country: "United Kingdom",
+              hq_city: "London",
+              hq_state: "England",
+              industry: "Data & Analytics",
+              sub_industry: "Business Intelligence",
+              ticker: "BPAK",
+              registry_number: "UK-2026-BPA-778",
+            },
+            {
+              company_name: "Vertex Health Labs",
+              domain: "vertexhealthlabs.com",
+              website: "https://vertexhealthlabs.com",
+              linkedin_url: "https://www.linkedin.com/company/vertex-health-labs",
+              country: "Canada",
+              hq_city: "Toronto",
+              hq_state: "Ontario",
+              industry: "Healthcare",
+              sub_industry: "Health Tech",
+              ticker: "VHL",
+              registry_number: "ON-2026-VHL-019",
+            },
+            {
+              company_name: "Summit Retail Group",
+              domain: "summitretailgroup.com",
+              website: "https://summitretailgroup.com",
+              linkedin_url: "https://www.linkedin.com/company/summit-retail-group",
+              country: "Singapore",
+              hq_city: "Singapore",
+              hq_state: "Singapore",
+              industry: "Retail",
+              sub_industry: "Omnichannel Commerce",
+              ticker: "SMRT",
+              registry_number: "SG-2026-SRG-552",
+            },
+          ]
+        : ds.id === "ds-contacts"
+          ? [
+              {
+                full_name: "Jane Park",
+                company_name: "Acme Corp",
+                company_domain: "acmecorp.com",
+                title: "Chief Marketing Officer",
+                department: "Marketing",
+                seniority: "C-level",
+                email: "jane.park@acmecorp.com",
+                phone: "+1 415 555 0101",
+                linkedin_url: "https://www.linkedin.com/in/jane-park-acme",
+                country: "United States",
+                city: "San Francisco",
+                state: "California",
+              },
+              {
+                full_name: "Daniel Brooks",
+                company_name: "Northstar Systems",
+                company_domain: "northstarsystems.io",
+                title: "VP Sales",
+                department: "Sales",
+                seniority: "VP",
+                email: "daniel.brooks@northstarsystems.io",
+                phone: "+1 512 555 0144",
+                linkedin_url: "https://www.linkedin.com/in/daniel-brooks-northstar",
+                country: "United States",
+                city: "Austin",
+                state: "Texas",
+              },
+              {
+                full_name: "Priya Nair",
+                company_name: "BluePeak Analytics",
+                company_domain: "bluepeakanalytics.com",
+                title: "Director of Operations",
+                department: "Operations",
+                seniority: "Director",
+                email: "priya.nair@bluepeakanalytics.com",
+                phone: "+44 20 5555 0188",
+                linkedin_url: "https://www.linkedin.com/in/priya-nair-bluepeak",
+                country: "United Kingdom",
+                city: "London",
+                state: "England",
+              },
+              {
+                full_name: "Ethan Chen",
+                company_name: "Vertex Health Labs",
+                company_domain: "vertexhealthlabs.com",
+                title: "Senior Product Manager",
+                department: "Product",
+                seniority: "Senior Manager",
+                email: "ethan.chen@vertexhealthlabs.com",
+                phone: "+1 416 555 0177",
+                linkedin_url: "https://www.linkedin.com/in/ethan-chen-vertex",
+                country: "Canada",
+                city: "Toronto",
+                state: "Ontario",
+              },
+              {
+                full_name: "Sofia Tan",
+                company_name: "Summit Retail Group",
+                company_domain: "summitretailgroup.com",
+                title: "Head of Finance",
+                department: "Finance",
+                seniority: "Head",
+                email: "sofia.tan@summitretailgroup.com",
+                phone: "+65 5555 0199",
+                linkedin_url: "https://www.linkedin.com/in/sofia-tan-summit",
+                country: "Singapore",
+                city: "Singapore",
+                state: "Singapore",
+              },
+            ]
+          : [];
+
+    worksheet.columns = columns.map((column) => ({
+      key: column.key,
+      width: Math.max(16, column.key.length + 4),
+    }));
+
+    const headerRow = worksheet.getRow(1);
+    headerRow.height = 22;
+
+    columns.forEach((column, index) => {
+      const cell = headerRow.getCell(index + 1);
+      const isRequired = !!column.required;
+      cell.value = column.key;
+      cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
+      cell.border = {
+        top: { style: "thin", color: { argb: "FFD1D5DB" } },
+        left: { style: "thin", color: { argb: "FFD1D5DB" } },
+        bottom: { style: "thin", color: { argb: "FFD1D5DB" } },
+        right: { style: "thin", color: { argb: "FFD1D5DB" } },
+      };
+      cell.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: isRequired ? "FF1D4ED8" : "FFDBEAFE" },
+      };
+      cell.font = {
+        name: "Aptos",
+        size: 11,
+        bold: isRequired,
+        color: { argb: isRequired ? "FFFFFFFF" : "FF1E3A8A" },
+      };
+    });
+
+    templateRows.forEach((rowData) => {
+      const row = worksheet.addRow(columns.map((column) => rowData[column.key] ?? ""));
+      row.height = 20;
+      row.eachCell((cell) => {
+        cell.alignment = { vertical: "middle", wrapText: true };
+        cell.border = {
+          top: { style: "thin", color: { argb: "FFE5E7EB" } },
+          left: { style: "thin", color: { argb: "FFE5E7EB" } },
+          bottom: { style: "thin", color: { argb: "FFE5E7EB" } },
+          right: { style: "thin", color: { argb: "FFE5E7EB" } },
+        };
+      });
+    });
+
+    worksheet.autoFilter = {
+      from: "A1",
+      to: `${toExcelColumnName(columns.length)}1`,
+    };
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${ds.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-input-template.xlsx`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success(`Downloaded ${a.download}`);
+  }
+
   async function handleLaunch(): Promise<boolean> {
     if (!ds) return false;
 
     const filters = JSON.stringify({
+      datasetId: ds.id,
+      workflowId: ds.workflowId,
       selectedOutputs,
-      mapping,
       pickedSources,
       seedRows,
       frequency,
@@ -271,21 +469,29 @@ function AnySite() {
     const job = {
       id: `J-${Date.now()}`,
       source: ds.name,
-      scope: "Custom Dump",
+      dataset_name: ds.name,
+      seed_file: seedFile,
+      scope: "By Dataset",
       filters,
       frequency,
       delivery,
       output_format: format,
       isCustomSource: false,
-      mode: "Any-Site",
+      mode: "By Dataset",
+      status: "Running",
+      created_at: new Date().toISOString(),
       input_data: seedRecords.length > 0 ? seedRecords : undefined,
     };
 
+    writeJobsCache([...readJobsCache(), job]);
+
     try {
       const launchRequest = fetch(`${baseApiUrl}/api/v1/demo/jobs/launch`, {
+        credentials: "include",
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ jobs: [job] }),
+        keepalive: true,
       });
 
       const response = await launchRequest;
@@ -305,8 +511,8 @@ function AnySite() {
   return (
     <AppLayout>
       <PageHeader
-        title="By Dataset — Field Mapping"
-        subtitle="Pick a dataset, choose your sources or upload your own data, then map fields to our standard schema. A workflow runs behind the scenes."
+        title="By Dataset — Dataset Setup"
+        subtitle="Pick a dataset, choose your sources or upload your own data, then select your datapoints. A workflow runs behind the scenes."
         actions={
           <Link to="/site-specific">
             <Button variant="ghost" size="sm">← Switch to By Source</Button>
@@ -404,22 +610,20 @@ function AnySite() {
             selectedOutputs={selectedOutputs}
             toggleOutput={toggleOutput}
             setSelectedOutputs={setSelectedOutputs}
-            mapping={mapping}
-            setMapping={setMapping}
             downloadSample={downloadSample}
+            downloadInputTemplate={downloadInputTemplate}
             onBack={() => setStep(0)}
             onNext={() => setStep(2)}
-            isAiMapping={isAiMapping}
           />
         )}
 
         {step === 2 && ds && (
           <LaunchStep
             ds={ds}
-            selectedOutputs={selectedOutputs}
-            pickedSources={pickedSources}
-            seedFile={seedFile}
-            seedRows={seedRows}
+      selectedOutputs={selectedOutputs}
+      pickedSources={pickedSources}
+      seedFile={seedFile}
+      seedRows={seedRows}
             frequency={frequency}
             setFrequency={setFrequency}
             customCron={customCron}
@@ -428,11 +632,11 @@ function AnySite() {
             setDelivery={setDelivery}
             format={format}
             setFormat={setFormat}
-            onBack={() => setStep(1)}
-            onLaunch={handleLaunch}
-            navigateToMonitoring={() => navigate({ to: "/monitoring" })}
-          />
-        )}
+      onBack={() => setStep(1)}
+      onLaunch={handleLaunch}
+      navigateToMonitoring={() => navigate({ to: "/monitoring" })}
+    />
+  )}
       </div>
     </AppLayout>
   );
@@ -474,14 +678,19 @@ function MapStep(p: {
   selectedOutputs: string[];
   toggleOutput: (k: string) => void;
   setSelectedOutputs: React.Dispatch<React.SetStateAction<string[]>>;
-  mapping: Mapping;
-  setMapping: (m: Mapping) => void;
   downloadSample: (kind: "csv" | "json", name: string) => void;
+  downloadInputTemplate: () => void | Promise<void>;
   onBack: () => void;
   onNext: () => void;
-  isAiMapping: boolean;
 }) {
   const { ds } = p;
+  const [overviewOpen, setOverviewOpen] = useState(false);
+  const [configureOpen, setConfigureOpen] = useState(true);
+  const [configTab, setConfigTab] = useState<"upload" | "sources" | "attributes">("upload");
+  const workflow = useMemo(
+    () => WORKFLOWS.find((w) => w.id === ds.workflowId) || null,
+    [ds],
+  );
   const grouped = useMemo(() => {
     const g: Record<string, typeof ds.outputAttributes> = {};
     ds.outputAttributes.forEach((a) => {
@@ -534,315 +743,345 @@ function MapStep(p: {
     p.setPickedSources(next);
   }
 
-  function submitSources() {
-    if (p.pickedSources.length === 0) {
-      toast.error("Pick at least one source to continue");
-      return;
-    }
-    toast.success(`${p.pickedSources.length} source${p.pickedSources.length === 1 ? "" : "s"} submitted`);
-  }
-
   const wiredCount = ds.sources.length;
 
   return (
     <div className="space-y-5">
       {/* Header */}
-      <Card className="p-5">
-        <div className="flex items-start justify-between gap-3 flex-wrap mb-3">
+      <Card className="p-5 space-y-4">
+        <button
+          type="button"
+          onClick={() => setOverviewOpen((s) => !s)}
+          className="w-full flex items-center justify-between gap-3 rounded-md border border-border bg-secondary/40 px-4 py-3 text-left hover:bg-secondary transition"
+        >
           <div>
-            <h2 className="font-semibold text-[16px]">{ds.name} — pick a source</h2>
-            <p className="text-[12.5px] text-muted-foreground">
-              Use a wired source we already maintain, upload your own dataset, or just refresh existing rows. Workflow runs automatically.
-            </p>
+            <div className="font-semibold text-[15px]">Overview</div>
           </div>
-          <Badge tone="info">{wiredCount} sources wired</Badge>
-        </div>
+          <ChevronRight className={`h-4 w-4 text-muted-foreground transition-transform ${overviewOpen ? "rotate-90" : ""}`} />
+        </button>
 
-        {/* Two mode-selector cards (like screenshot) */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <button
-            type="button"
-            onClick={() => p.setSourceMode("upload")}
-            className={`text-left p-4 rounded-lg border transition ${
-              p.sourceMode === "upload"
-                ? "border-primary bg-info-bg/40 ring-1 ring-primary/40"
-                : "border-border bg-card hover:bg-secondary/40"
-            }`}
-          >
-            <FileSpreadsheet className="h-5 w-5 text-muted-foreground mb-2" />
-            <div className="font-semibold text-[14px]">1. Upload dataset</div>
-            <div className="text-[12px] text-muted-foreground">CSV / Excel — start here</div>
-          </button>
-          <button
-            type="button"
-            onClick={() => p.setSourceMode("sources")}
-            className={`text-left p-4 rounded-lg border transition ${
-              p.sourceMode === "sources"
-                ? "border-primary bg-info-bg/40 ring-1 ring-primary/40"
-                : "border-border bg-card hover:bg-secondary/40"
-            }`}
-          >
-            <Globe className="h-5 w-5 text-muted-foreground mb-2" />
-            <div className="font-semibold text-[14px]">2. Wired sources</div>
-            <div className="text-[12px] text-muted-foreground">{wiredCount} sources auto-recommended</div>
-          </button>
-        </div>
-      </Card>
-
-      {/* Active panel */}
-      {p.sourceMode === "upload" ? (
-        <Card className="p-5">
-          <div className="flex items-start justify-between gap-3 mb-3 flex-wrap">
-            <div>
-              <h3 className="font-semibold text-[15px]">Upload your dataset</h3>
-              <p className="text-[12px] text-muted-foreground">
-                We'll auto-map columns to the standard schema and auto-recommend the right wired sources by geography.
-              </p>
-            </div>
-            {p.seedFile && <Badge tone="success">{p.seedRows.toLocaleString()} rows</Badge>}
-          </div>
-
-          <div className="border border-dashed border-border rounded-md p-8 text-center">
-            <Upload className="h-7 w-7 mx-auto text-muted-foreground mb-3" />
-            <label className="inline-block">
-              <input type="file" accept=".csv,.xlsx,text/csv" onChange={p.handleSeedFile} className="hidden" />
-              <span className="px-4 py-2 rounded-md bg-primary text-primary-foreground text-[13px] font-medium cursor-pointer">
-                Choose CSV / Excel
-              </span>
-            </label>
-            <div className="text-[12px] text-muted-foreground mt-3">
-              {p.seedFile
-                ? `${p.seedFile} · ${p.seedRows.toLocaleString()} rows · ${p.seedColumnCount || p.seedHeaders.length} columns`
-                : "We'll auto-map columns to the standard schema and auto-recommend the right wired sources by geography."}
-            </div>
-            <button
-              onClick={() => p.downloadSample("csv", `${p.ds.name}-template`)}
-              className="mt-3 inline-flex items-center gap-1 text-[12px] text-info hover:underline"
-            >
-              <Download className="h-3 w-3" /> Download input template
-            </button>
-          </div>
-        </Card>
-      ) : (
-        <Card className="p-5">
-          <div className="flex items-start justify-between gap-3 mb-3 flex-wrap">
-            <div>
-              <h3 className="font-semibold text-[15px]">Wired sources ({p.pickedSources.length} selected)</h3>
-              <p className="text-[12px] text-muted-foreground">
-                Grouped by source type. Company website is default for Firmographic / News. Expand a group to tweak — then Submit.
-              </p>
-            </div>
-            <Button size="sm" onClick={submitSources}>
-              <CheckCircle2 className="h-3.5 w-3.5" /> Submit
-            </Button>
-          </div>
-
-          <div className="space-y-2 max-h-[480px] overflow-y-auto pr-1">
-            {sourceGroups.map(([groupName, arr]) => {
-              const open = openGroups[groupName] ?? false;
-              const onCount = arr.filter((s) => p.pickedSources.includes(s.name)).length;
-              const allOn = onCount === arr.length;
-              return (
-                <div key={groupName} className="border border-border rounded-md overflow-hidden">
-                  <button
-                    type="button"
-                    onClick={() => toggleGroup(groupName)}
-                    className="w-full flex items-center justify-between px-3 py-2 bg-secondary/50 hover:bg-secondary text-left"
-                  >
-                    <div className="flex items-center gap-2">
-                      <ChevronRight className={`h-4 w-4 transition-transform ${open ? "rotate-90" : ""}`} />
-                      <span className="font-semibold text-[13px]">{groupName}</span>
-                      <Badge tone="info">{onCount} / {arr.length}</Badge>
-                    </div>
-                    <span
-                      role="button"
-                      tabIndex={0}
-                      onClick={(e) => { e.stopPropagation(); selectGroup(arr, !allOn); }}
-                      onKeyDown={(e) => { if (e.key === "Enter") { e.stopPropagation(); selectGroup(arr, !allOn); } }}
-                      className="text-[11px] text-info hover:underline cursor-pointer"
-                    >
-                      {allOn ? "Deselect all" : "Select all"}
-                    </span>
-                  </button>
-                  {open && (
-                    <div className="divide-y divide-border">
-                      {arr.map((s) => {
-                        const on = p.pickedSources.includes(s.name);
-                        const isDefault = /target|auto-derived/i.test(s.url);
-                        return (
-                          <label
-                            key={s.name}
-                            className={`flex items-center gap-2 px-3 py-2 text-[12.5px] cursor-pointer ${on ? "bg-info-bg/30" : "hover:bg-secondary/60"}`}
-                          >
-                            <input
-                              type="checkbox"
-                              checked={on}
-                              onChange={() => p.toggleSource(s.name)}
-                              className="accent-primary"
-                            />
-                            <div className="flex-1 min-w-0">
-                              <div className="font-medium truncate">
-                                {s.name}
-                                {isDefault && <Badge tone="success" className="ml-1.5">default</Badge>}
-                              </div>
-                              <div className="text-[10.5px] text-muted-foreground truncate">{s.url}</div>
-                            </div>
-                            <span className="text-[10.5px] text-muted-foreground font-mono shrink-0">{s.attributes} attrs</span>
-                            <button
-                              onClick={(e) => { e.preventDefault(); p.downloadSample("csv", s.name); }}
-                              className="px-1.5 py-0.5 rounded border border-border text-[10.5px] inline-flex items-center gap-1 hover:bg-secondary shrink-0"
-                            >
-                              <Download className="h-3 w-3" />
-                            </button>
-                          </label>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </Card>
-      )}
-
-
-
-
-      {/* Field mapping / data point selection */}
-      <Card className="p-5">
-        <div className="flex items-start justify-between gap-3 mb-4 flex-wrap">
-          <div>
-            <h3 className="font-semibold text-[15px]">3. Data points & field mapping</h3>
-            <p className="text-[12px] text-muted-foreground">
-              Choose which of the <strong>{ds.outputAttributes.length}</strong> standard attributes to refresh. {p.seedHeaders.length > 0 && "Map your columns to ours."}
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Badge tone="info">{p.selectedOutputs.length} / {ds.outputAttributes.length} selected</Badge>
-            <Button size="sm" variant="outline" onClick={() => p.selectedOutputs.length === ds.outputAttributes.length ? p.setMapping({}) : ds.outputAttributes.forEach((a) => !p.selectedOutputs.includes(a.key) && p.toggleOutput(a.key))}>
-              {p.selectedOutputs.length === ds.outputAttributes.length ? "Clear" : "Select all"}
-            </Button>
-          </div>
-        </div>
-
-        {p.seedHeaders.length > 0 && (() => {
-          const mappedCount = Object.values(p.mapping).filter(Boolean).length;
-          const totalCols = p.seedHeaders.length;
-          const unmappedCols = p.seedHeaders.filter((h) => !Object.values(p.mapping).includes(h));
-          return (
-            <div className="mb-4 space-y-2">
-              {p.isAiMapping && (
-                <div className="p-3 bg-secondary/85 rounded-md border border-border/80 text-[12.5px] flex items-center justify-between text-foreground font-medium animate-pulse">
-                  <div className="flex items-center gap-2">
-                    <Icons.Loader2 className="h-4 w-4 animate-spin text-primary" />
-                    <span>AI is improving field mappings... Analyzing uploaded columns...</span>
+        {overviewOpen && (
+          <div className="space-y-4">
+            <div className="rounded-md border border-border bg-secondary/20 p-4">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h3 className="font-semibold text-[15px]">{ds.name}</h3>
+                    <Badge tone="purple">{ds.category}</Badge>
                   </div>
-                  <Badge tone="info">Running AI analysis</Badge>
+                  <p className="text-[12px] text-muted-foreground mt-1">{ds.description}</p>
+                </div>
+                <div className="text-right shrink-0">
+                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Workflow</div>
+                  <div className="text-[12px] font-semibold">{workflow?.name || "No matching workflow"}</div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-4 text-[12px]">
+                <OverviewStat label="Datapoints" value={ds.outputAttributes.length.toLocaleString()} />
+                <OverviewStat label="Sources" value={ds.sources.length.toLocaleString()} />
+                <OverviewStat label="Coverage" value={ds.coverage ? `${ds.coverage}%` : "—"} />
+                <OverviewStat label="Accuracy" value={ds.accuracy ? `${ds.accuracy}%` : "—"} />
+              </div>
+
+              {workflow ? (
+                <div className="mt-4 space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-[12px]">
+                    <OverviewStat label="Workflow category" value={workflow.category} />
+                    <OverviewStat label="Runtime" value={workflow.runtime} />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <OverviewList title="Input Attributes" items={workflow.inputAttributes ?? workflow.inputs} tone="info" />
+                    <OverviewList title="Output Attributes" items={workflow.outputAttributes ?? workflow.outputs ?? workflow.attributes} tone="success" />
+                  </div>
+
+                  <div>
+                    <div className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mb-2">Pipeline preview</div>
+                    <div className="flex items-center gap-1.5 overflow-x-auto">
+                      {workflow.steps.map((stepName, index) => (
+                        <div key={stepName} className="flex items-center gap-1.5 shrink-0">
+                          <div className="h-7 px-2.5 rounded-md bg-info-bg text-info text-[11px] font-medium inline-flex items-center">
+                            {stepName}
+                          </div>
+                          {index < workflow.steps.length - 1 && <ArrowRight className="h-3 w-3 text-muted-foreground" />}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mb-2">
+                      Sources ({workflow.sources.length})
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {workflow.sources.map((source) => (
+                        <Badge key={source} tone="info">{source}</Badge>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="mt-4 rounded-md border border-dashed border-border bg-card px-3 py-3 text-[12px] text-muted-foreground">
+                  No exact workflow is available in the repository for this dataset yet.
                 </div>
               )}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                <div className="rounded-md border border-success/40 bg-success-bg/60 p-3 opacity-90 relative">
-                  <div className="text-[11px] uppercase tracking-wider text-success font-semibold flex items-center gap-1.5">
-                    Mapped
-                    {p.isAiMapping && <Icons.Loader2 className="h-2.5 w-2.5 animate-spin" />}
+            </div>
+          </div>
+        )}
+      </Card>
+
+      <Card className="p-5 space-y-4">
+        <button
+          type="button"
+          onClick={() => setConfigureOpen((s) => !s)}
+          className="w-full flex items-center justify-between gap-3 rounded-md border border-border bg-secondary/40 px-4 py-3 text-left hover:bg-secondary transition"
+        >
+          <div>
+            <div className="font-semibold text-[15px]">Configure Data</div>
+          </div>
+          <ChevronRight className={`h-4 w-4 text-muted-foreground transition-transform ${configureOpen ? "rotate-90" : ""}`} />
+        </button>
+
+        {configureOpen && (
+          <div className="space-y-5">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setConfigTab("upload");
+                  p.setSourceMode("upload");
+                }}
+                className={`text-left p-4 rounded-lg border transition ${
+                  configTab === "upload"
+                    ? "border-primary bg-info-bg/40 ring-1 ring-primary/40"
+                    : "border-border bg-card hover:bg-secondary/40"
+                }`}
+              >
+                <FileSpreadsheet className="h-5 w-5 text-muted-foreground mb-2" />
+                <div className="font-semibold text-[14px]">1. Upload data set</div>
+                <div className="text-[12px] text-muted-foreground">CSV / Excel — start here</div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setConfigTab("sources");
+                  p.setSourceMode("sources");
+                }}
+                className={`text-left p-4 rounded-lg border transition ${
+                  configTab === "sources"
+                    ? "border-primary bg-info-bg/40 ring-1 ring-primary/40"
+                    : "border-border bg-card hover:bg-secondary/40"
+                }`}
+              >
+                <Globe className="h-5 w-5 text-muted-foreground mb-2" />
+                <div className="font-semibold text-[14px]">2. Wired Sources</div>
+                <div className="text-[12px] text-muted-foreground">{wiredCount} sources auto-recommended</div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setConfigTab("attributes")}
+                className={`text-left p-4 rounded-lg border transition ${
+                  configTab === "attributes"
+                    ? "border-primary bg-info-bg/40 ring-1 ring-primary/40"
+                    : "border-border bg-card hover:bg-secondary/40"
+                }`}
+              >
+                <Sparkles className="h-5 w-5 text-muted-foreground mb-2" />
+                <div className="font-semibold text-[14px]">3. Select data points</div>
+                <div className="text-[12px] text-muted-foreground">{p.selectedOutputs.length} selected</div>
+              </button>
+            </div>
+
+            {configTab === "upload" && (
+              <Card className="p-5">
+                <div className="flex items-start justify-between gap-3 mb-3 flex-wrap">
+                  <div>
+                    <h3 className="font-semibold text-[15px]">Upload your dataset</h3>
+                    <p className="text-[12px] text-muted-foreground">
+                      Upload your dataset to get started.
+                    </p>
                   </div>
-                  <div className="text-[13px] font-semibold mt-0.5">
-                    {p.isAiMapping ? "Calculating final mappings..." : `${mappedCount} of ${totalCols} uploaded columns matched`}
+                  {p.seedFile && <Badge tone="success">{p.seedRows.toLocaleString()} rows</Badge>}
+                </div>
+
+                <div className="border border-dashed border-border rounded-md p-8 text-center">
+                  <Upload className="h-7 w-7 mx-auto text-muted-foreground mb-3" />
+                  <label className="inline-block">
+                    <input type="file" accept=".csv,.xlsx,text/csv" onChange={p.handleSeedFile} className="hidden" />
+                    <span className="px-4 py-2 rounded-md bg-primary text-primary-foreground text-[13px] font-medium cursor-pointer">
+                      Choose CSV / Excel
+                    </span>
+                  </label>
+                  <div className="text-[12px] text-muted-foreground mt-3">
+                    {p.seedFile
+                      ? `${p.seedFile} · ${p.seedRows.toLocaleString()} rows · ${p.seedColumnCount || p.seedHeaders.length} columns`
+                      : "Upload your dataset to get started."}
                   </div>
-                  <div className="text-[11px] text-muted-foreground mt-0.5 truncate">
-                    {p.isAiMapping ? "Running LLM checks..." : (Object.values(p.mapping).filter(Boolean).slice(0, 8).join(", ") || "—")}
+                  <button
+                    type="button"
+                    onClick={() => void p.downloadInputTemplate()}
+                    className="mt-3 inline-flex items-center gap-1 text-[12px] text-info hover:underline"
+                  >
+                    <Download className="h-3 w-3" /> Download input template
+                  </button>
+                </div>
+              </Card>
+            )}
+
+            {configTab === "sources" && (
+              <Card className="p-5">
+                <div className="flex items-start justify-between gap-3 mb-3 flex-wrap">
+                  <div>
+                    <h3 className="font-semibold text-[15px]">Wired sources ({p.pickedSources.length} selected)</h3>
+                    <p className="text-[12px] text-muted-foreground">
+                      Grouped by source type. Company website is default for Firmographic / News. Expand a group to tweak.
+                    </p>
                   </div>
                 </div>
-                <div className="rounded-md border border-warning/40 bg-warning-bg/60 p-3 opacity-90 relative">
-                  <div className="text-[11px] uppercase tracking-wider text-warning font-semibold flex items-center gap-1.5">
-                    Unmapped
-                    {p.isAiMapping && <Icons.Loader2 className="h-2.5 w-2.5 animate-spin" />}
+
+                <div className="space-y-2 max-h-[480px] overflow-y-auto pr-1">
+                  {sourceGroups.map(([groupName, arr]) => {
+                    const open = openGroups[groupName] ?? false;
+                    const onCount = arr.filter((s) => p.pickedSources.includes(s.name)).length;
+                    const allOn = onCount === arr.length;
+                    return (
+                      <div key={groupName} className="border border-border rounded-md overflow-hidden">
+                        <button
+                          type="button"
+                          onClick={() => toggleGroup(groupName)}
+                          className="w-full flex items-center justify-between px-3 py-2 bg-secondary/50 hover:bg-secondary text-left"
+                        >
+                          <div className="flex items-center gap-2">
+                            <ChevronRight className={`h-4 w-4 transition-transform ${open ? "rotate-90" : ""}`} />
+                            <span className="font-semibold text-[13px]">{groupName}</span>
+                            <Badge tone="info">{onCount} / {arr.length}</Badge>
+                          </div>
+                          <span
+                            role="button"
+                            tabIndex={0}
+                            onClick={(e) => { e.stopPropagation(); selectGroup(arr, !allOn); }}
+                            onKeyDown={(e) => { if (e.key === "Enter") { e.stopPropagation(); selectGroup(arr, !allOn); } }}
+                            className="text-[11px] text-info hover:underline cursor-pointer"
+                          >
+                            {allOn ? "Deselect all" : "Select all"}
+                          </span>
+                        </button>
+                        {open && (
+                          <div className="divide-y divide-border">
+                            {arr.map((s) => {
+                              const on = p.pickedSources.includes(s.name);
+                              const isDefault = /target|auto-derived/i.test(s.url);
+                              return (
+                                <label
+                                  key={s.name}
+                                  className={`flex items-center gap-2 px-3 py-2 text-[12.5px] cursor-pointer ${on ? "bg-info-bg/30" : "hover:bg-secondary/60"}`}
+                                >
+                                  <input
+                                    type="checkbox"
+                                    checked={on}
+                                    onChange={() => p.toggleSource(s.name)}
+                                    className="accent-primary"
+                                  />
+                                  <div className="flex-1 min-w-0">
+                                    <div className="font-medium truncate">
+                                      {s.name}
+                                      {isDefault && <Badge tone="success" className="ml-1.5">default</Badge>}
+                                    </div>
+                                    <div className="text-[10.5px] text-muted-foreground truncate">{s.url}</div>
+                                  </div>
+                                </label>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </Card>
+            )}
+
+            {configTab === "attributes" && (
+              <Card className="p-5">
+                <div className="flex items-start justify-between gap-3 mb-4 flex-wrap">
+                  <div>
+                    <h3 className="font-semibold text-[15px]">3. Select data points</h3>
+                    <p className="text-[12px] text-muted-foreground">
+                      Choose which of the <strong>{ds.outputAttributes.length}</strong> standard attributes to refresh.
+                      {p.seedHeaders.length > 0 && ` Uploaded template detected with ${p.seedHeaders.length} column${p.seedHeaders.length === 1 ? "" : "s"}.`}
+                    </p>
                   </div>
-                  <div className="text-[13px] font-semibold mt-0.5">
-                    {p.isAiMapping ? "Calculating unresolved columns..." : `${unmappedCols.length} column${unmappedCols.length === 1 ? "" : "s"} need attention`}
-                  </div>
-                  <div className="text-[11px] text-muted-foreground mt-0.5 truncate">
-                    {p.isAiMapping ? "Refining matches..." : (unmappedCols.slice(0, 8).join(", ") || "All your columns are mapped 🎉")}
+                  <div className="flex items-center gap-2">
+                    <Badge tone="info">{p.selectedOutputs.length} / {ds.outputAttributes.length} selected</Badge>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => p.selectedOutputs.length === ds.outputAttributes.length
+                        ? p.setSelectedOutputs([])
+                        : p.setSelectedOutputs(ds.outputAttributes.map((a) => a.key))}
+                    >
+                      {p.selectedOutputs.length === ds.outputAttributes.length ? "Clear" : "Select all"}
+                    </Button>
                   </div>
                 </div>
-              </div>
-            </div>
-          );
-        })()}
 
-
-        <div className="space-y-4">
-          {Object.entries(grouped).map(([group, attrs]) => (
-            <div key={group}>
-              <SectionLabel>{group} · {attrs.length}</SectionLabel>
-              <div className="rounded-md border border-border overflow-hidden">
-                <table className="w-full text-[12.5px]">
-                  <thead className="bg-secondary text-[11px] uppercase tracking-wider text-muted-foreground">
-                    <tr>
-                      <th className="w-10 px-3 py-2">
-                        <input
-                          type="checkbox"
-                          checked={attrs.every((a) => p.selectedOutputs.includes(a.key))}
-                          onChange={(e) => {
-                            const checked = e.target.checked;
-                            const groupKeys = attrs.map((a) => a.key);
-                            if (checked) {
-                              p.setSelectedOutputs((prev) => {
-                                const next = [...prev];
-                                groupKeys.forEach((k) => {
-                                  if (!next.includes(k)) {
-                                    next.push(k);
-                                  }
-                                });
-                                return next;
-                              });
-                            } else {
-                              p.setSelectedOutputs((prev) => prev.filter((k) => !groupKeys.includes(k)));
-                            }
-                          }}
-                          className="accent-primary"
-                        />
-                      </th>
-                      <th className="text-left px-3 py-2">System attribute</th>
-                      <th className="text-left px-3 py-2 w-24">Type</th>
-                      {p.seedHeaders.length > 0 && <th className="text-left px-3 py-2 w-56">Your column</th>}
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border">
-                    {attrs.map((a) => {
-                      const on = p.selectedOutputs.includes(a.key);
-                      return (
-                        <tr key={a.key} className={on ? "" : "opacity-50"}>
-                          <td className="px-3 py-1.5">
-                            <input type="checkbox" checked={on} onChange={() => p.toggleOutput(a.key)} className="accent-primary" />
-                          </td>
-                          <td className="px-3 py-1.5">
-                            <div className="font-medium">{a.label}</div>
-                            <div className="text-[10.5px] text-muted-foreground font-mono">{a.key}</div>
-                          </td>
-                          <td className="px-3 py-1.5 text-muted-foreground">{a.type}</td>
-                          {p.seedHeaders.length > 0 && (
-                            <td className="px-3 py-1.5">
-                              <Select
-                                value={p.mapping[a.key] || ""}
-                                onChange={(e) => p.setMapping({ ...p.mapping, [a.key]: e.target.value })}
-                                className="h-8 text-[12px]"
-                              >
-                                <option value="">— not mapped —</option>
-                                {p.seedHeaders.map((h) => <option key={h} value={h}>{h}</option>)}
-                              </Select>
-                            </td>
-                          )}
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          ))}
-        </div>
+                <div className="space-y-4">
+                  {Object.entries(grouped).map(([group, attrs]) => (
+                    <div key={group}>
+                      <SectionLabel>{group} · {attrs.length}</SectionLabel>
+                      <div className="rounded-md border border-border overflow-hidden">
+                        <table className="w-full text-[12.5px]">
+                          <thead className="bg-secondary text-[11px] uppercase tracking-wider text-muted-foreground">
+                            <tr>
+                              <th className="w-10 px-3 py-2">
+                                <input
+                                  type="checkbox"
+                                  checked={attrs.every((a) => p.selectedOutputs.includes(a.key))}
+                                  onChange={(e) => {
+                                    const checked = e.target.checked;
+                                    const groupKeys = attrs.map((a) => a.key);
+                                    if (checked) {
+                                      p.setSelectedOutputs((prev) => Array.from(new Set([...prev, ...groupKeys])));
+                                    } else {
+                                      p.setSelectedOutputs((prev) => prev.filter((k) => !groupKeys.includes(k)));
+                                    }
+                                  }}
+                                  className="accent-primary"
+                                />
+                              </th>
+                              <th className="text-left px-3 py-2">System attribute</th>
+                              <th className="text-left px-3 py-2 w-24">Type</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-border">
+                            {attrs.map((a) => {
+                              const on = p.selectedOutputs.includes(a.key);
+                              return (
+                                <tr key={a.key} className={on ? "" : "opacity-50"}>
+                                  <td className="px-3 py-1.5">
+                                    <input type="checkbox" checked={on} onChange={() => p.toggleOutput(a.key)} className="accent-primary" />
+                                  </td>
+                                  <td className="px-3 py-1.5">
+                                    <div className="font-medium">{a.label}</div>
+                                    <div className="text-[10.5px] text-muted-foreground font-mono">{a.key}</div>
+                                  </td>
+                                  <td className="px-3 py-1.5 text-muted-foreground">{a.type}</td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            )}
+          </div>
+        )}
       </Card>
 
       <div className="flex justify-between">
@@ -851,6 +1090,39 @@ function MapStep(p: {
           Next: Schedule & Launch <ArrowRight className="h-4 w-4" />
         </Button>
       </div>
+    </div>
+  );
+}
+
+function OverviewStat({ label, value }: { label: string; value: React.ReactNode }) {
+  return (
+    <div className="rounded-md bg-card border border-border p-2.5">
+      <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">{label}</div>
+      <div className="text-[12px] font-semibold mt-0.5">{value}</div>
+    </div>
+  );
+}
+
+function OverviewList({
+  title,
+  items,
+  tone,
+}: {
+  title: string;
+  items: string[];
+  tone: "info" | "success";
+}) {
+  return (
+    <div>
+      <div className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mb-2">{title}</div>
+      <ul className="space-y-1">
+        {items.map((item) => (
+          <li key={item} className="text-[12px] flex items-start gap-1.5">
+            <Badge tone={tone} className="!py-0">{tone === "info" ? "in" : "out"}</Badge>
+            <span>{item}</span>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
@@ -893,7 +1165,13 @@ function LaunchStep(p: {
         <div>
           <label className="text-[12px] text-muted-foreground">Refresh frequency</label>
           <Select value={p.frequency} onChange={(e) => p.setFrequency(e.target.value)}>
-            {p.ds.refreshOptions.map((o) => <option key={o}>{o}</option>)}
+            <option>One-time</option>
+            <option>Hourly</option>
+            <option>Daily</option>
+            <option>Weekly</option>
+            <option>Monthly</option>
+            <option>On-demand</option>
+            <option>Custom</option>
           </Select>
           {p.frequency === "Custom" && (
             <Input
@@ -907,13 +1185,13 @@ function LaunchStep(p: {
         <div>
           <label className="text-[12px] text-muted-foreground">Delivery</label>
           <Select value={p.delivery} onChange={(e) => p.setDelivery(e.target.value)}>
-            <option>S3 bucket</option><option>Snowflake</option><option>Webhook</option><option>API pull</option>
+            <option>S3 bucket</option><option>Snowflake</option><option>Webhook</option><option>API pull</option><option>Export</option>
           </Select>
         </div>
         <div>
           <label className="text-[12px] text-muted-foreground">Format</label>
           <Select value={p.format} onChange={(e) => p.setFormat(e.target.value)}>
-            <option>JSON</option><option>CSV</option><option>Parquet</option><option>JSONL</option>
+            <option>JSON</option><option>CSV</option><option>Parquet</option>
           </Select>
         </div>
       </div>
@@ -929,11 +1207,9 @@ function LaunchStep(p: {
       <div className="flex justify-between pt-2">
         <Button variant="outline" onClick={p.onBack}>Back</Button>
         <Button
-          onClick={async () => {
-            const success = await p.onLaunch();
-            if (success) {
-              p.navigateToMonitoring();
-            }
+          onClick={() => {
+            void p.onLaunch();
+            p.navigateToMonitoring();
           }}
         >
           <Upload className="h-4 w-4" /> Launch & open Jobs

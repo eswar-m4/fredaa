@@ -1,16 +1,16 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { ReactNode, useState, useEffect } from "react";
 import {
   LayoutDashboard,
   Target,
   Globe2,
   Library,
+  BarChart3,
   Workflow as WorkflowIcon,
   Activity,
   CheckSquare,
   Upload,
   Bell,
-  Search,
   HelpCircle,
   GitBranch,
   RefreshCw,
@@ -18,7 +18,9 @@ import {
   Sun,
   Moon,
 } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { setUseCase, useUseCase, USE_CASES } from "@/lib/useCase";
+import { fetchSession, logoutRequest, type SessionInfo } from "@/lib/auth";
 
 type NavItem = { to: string; label: string; icon: typeof Target; hash?: string };
 type NavGroup = { group: string; items: NavItem[] };
@@ -40,29 +42,46 @@ const TARGETED: NavGroup = {
 const OPENWEB: NavGroup = {
   group: "BY DATASET",
   items: [
-    { to: "/any-site", label: "Field Mapping", icon: GitBranch },
-    { to: "/workflows", label: "Workflows", icon: WorkflowIcon },
+    { to: "/any-site", label: "Dataset Setup", icon: GitBranch },
   ],
 };
 
 const OPERATE: NavGroup = {
   group: "OPERATE",
   items: [
-    { to: "/review", label: "Review", icon: CheckSquare },
     { to: "/monitoring", label: "Monitoring", icon: Activity },
+    { to: "/review", label: "Review", icon: CheckSquare },
+    { to: "/dashboard", label: "Dashboard", icon: BarChart3 },
     { to: "/export", label: "Export & Sync", icon: Upload },
   ],
 };
 
 export function AppLayout({ children }: { children: ReactNode }) {
+  const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const hash = useRouterState({ select: (s) => s.location.hash });
   const uc = useUseCase();
 
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [notifications, setNotifications] = useState<Array<{ id: string; title: string; detail: string; tone: string }>>([]);
+  const [notificationsError, setNotificationsError] = useState("");
+  const [notificationsLoading, setNotificationsLoading] = useState(false);
+  const [session, setSession] = useState<SessionInfo | null>(null);
 
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [mounted, setMounted] = useState(false);
+
+  const baseApiUrl = (() => {
+    if (
+      typeof window !== "undefined" &&
+      (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") &&
+      window.location.port !== "8131"
+    ) {
+      return `http://${window.location.hostname}:8131`;
+    }
+    return "";
+  })();
 
   useEffect(() => {
     setMounted(true);
@@ -78,6 +97,29 @@ export function AppLayout({ children }: { children: ReactNode }) {
       }
     }
   }, []);
+
+  useEffect(() => {
+    let active = true;
+    async function checkSession() {
+      const session = await fetchSession();
+      if (!active) return;
+      if (session === null) {
+        navigate({ to: "/login", search: { next: pathname }, replace: true });
+        return;
+      }
+      if (session) {
+        setSession(session);
+        if (session.role === "admin") {
+          navigate({ to: "/admin", replace: true });
+          return;
+        }
+      }
+    }
+    void checkSession();
+    return () => {
+      active = false;
+    };
+  }, [navigate]);
 
   const toggleTheme = () => {
     const nextTheme = theme === "dark" ? "light" : "dark";
@@ -97,6 +139,53 @@ export function AppLayout({ children }: { children: ReactNode }) {
       return next;
     });
   };
+
+  async function handleLogout() {
+    try {
+      await logoutRequest();
+      window.location.replace("/login");
+    } finally {
+      // Hard redirect keeps stale router/session state from bouncing back into the app.
+    }
+  }
+
+  async function loadNotifications() {
+    setNotificationsLoading(true);
+    setNotificationsError("");
+    try {
+      const response = await fetch(`${baseApiUrl}/api/v1/demo/jobs`, { credentials: "include" });
+      if (!response.ok) {
+        throw new Error(`Failed to load notifications (${response.status})`);
+      }
+      const data = await response.json();
+      const sorted = [...(Array.isArray(data) ? data : [])].sort((a, b) => {
+        const timeA = a.created_at ? new Date(a.created_at).getTime() : 0;
+        const timeB = b.created_at ? new Date(b.created_at).getTime() : 0;
+        return timeB - timeA;
+      });
+      const nextItems = sorted.slice(0, 5).map((job: any) => {
+        const status = String(job.status || "Unknown");
+        const title = `${job.source || "Job"} · ${status}`;
+        const detail = job.last_refresh
+          ? `Updated ${formatRelativeTime(job.last_refresh)}`
+          : job.created_at
+            ? `Created ${formatRelativeTime(job.created_at)}`
+            : "Recent activity";
+        return {
+          id: String(job.id || `${title}-${detail}`),
+          title,
+          detail,
+          tone: notificationTone(status),
+        };
+      });
+      setNotifications(nextItems);
+    } catch (err) {
+      setNotifications([]);
+      setNotificationsError(err instanceof Error ? err.message : "Failed to load notifications");
+    } finally {
+      setNotificationsLoading(false);
+    }
+  }
 
   const groups: NavGroup[] = [BASE];
   if (uc === "targeted") groups.push(TARGETED);
@@ -188,30 +277,141 @@ export function AppLayout({ children }: { children: ReactNode }) {
           >
             <PanelLeft className="h-4.5 w-4.5" />
           </button>
-          <div className="relative flex-1 max-w-md">
-            <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-            <input
+          <div className="ml-auto flex items-center gap-3">
+            <Popover>
+              <PopoverTrigger asChild>
+                <button
+                  suppressHydrationWarning
+                  aria-label="Help"
+                  title="Help"
+                  className="h-9 w-9 inline-flex items-center justify-center rounded-md hover:bg-secondary text-muted-foreground transition"
+                >
+                  <HelpCircle className="h-4 w-4" />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent align="end" className="w-72 p-4">
+                <div className="space-y-3">
+                  <div>
+                    <div className="text-sm font-semibold text-foreground">Quick help</div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      Common actions for the current workspace.
+                    </div>
+                  </div>
+                  <div className="space-y-2 text-sm">
+                    <div>
+                      <div className="font-medium text-foreground">By Dataset</div>
+                      <div className="text-muted-foreground text-xs">
+                        Upload data, map fields, launch jobs, then review and save results.
+                      </div>
+                    </div>
+                    <div>
+                      <div className="font-medium text-foreground">By Source</div>
+                      <div className="text-muted-foreground text-xs">
+                        Choose a source, run a scrape, and inspect the records in Review.
+                      </div>
+                    </div>
+                    <div>
+                      <div className="font-medium text-foreground">Monitoring</div>
+                      <div className="text-muted-foreground text-xs">
+                        Track running, failed, and completed jobs from the latest run at the top.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
+            <Popover
+              open={notificationsOpen}
+              onOpenChange={(open) => {
+                setNotificationsOpen(open);
+                if (open && !notificationsLoading) {
+                  void loadNotifications();
+                }
+              }}
+            >
+              <PopoverTrigger asChild>
+                <button
+                  suppressHydrationWarning
+                  aria-label="Notifications"
+                  title="Notifications"
+                  className="h-9 w-9 inline-flex items-center justify-center rounded-md hover:bg-secondary text-muted-foreground transition"
+                >
+                  <Bell className="h-4 w-4" />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent align="end" className="w-80 p-0 overflow-hidden">
+                <div className="border-b border-border px-4 py-3">
+                  <div className="text-sm font-semibold text-foreground">Recent activity</div>
+                  <div className="text-xs text-muted-foreground mt-1">
+                    Latest job updates from Monitoring and Review.
+                  </div>
+                </div>
+                <div className="max-h-80 overflow-y-auto">
+                  {notificationsLoading ? (
+                    <div className="px-4 py-4 text-sm text-muted-foreground">Loading notifications…</div>
+                  ) : notificationsError ? (
+                    <div className="px-4 py-4 text-sm text-destructive">{notificationsError}</div>
+                  ) : notifications.length === 0 ? (
+                    <div className="px-4 py-4 text-sm text-muted-foreground">No recent notifications.</div>
+                  ) : (
+                    <div className="py-1">
+                      {notifications.map((item) => (
+                        <div key={item.id} className="px-4 py-3 hover:bg-secondary/50">
+                          <div className="flex items-start gap-2">
+                            <span className={["mt-1 h-2 w-2 rounded-full shrink-0", notificationDotClass(item.tone)].join(" ")} />
+                            <div className="min-w-0">
+                              <div className="text-sm font-medium text-foreground truncate">{item.title}</div>
+                              <div className="text-xs text-muted-foreground mt-0.5">{item.detail}</div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </PopoverContent>
+            </Popover>
+            <button
+              onClick={toggleTheme}
               suppressHydrationWarning
-              placeholder="Search sources, workflows, attributes…"
-              className="w-full h-9 pl-9 pr-3 rounded-md bg-secondary text-[13px] outline-none focus:ring-2 focus:ring-ring/40"
-            />
-          </div>
-          <button suppressHydrationWarning className="h-9 w-9 inline-flex items-center justify-center rounded-md hover:bg-secondary text-muted-foreground">
-            <HelpCircle className="h-4 w-4" />
-          </button>
-          <button suppressHydrationWarning className="h-9 w-9 inline-flex items-center justify-center rounded-md hover:bg-secondary text-muted-foreground">
-            <Bell className="h-4 w-4" />
-          </button>
-          <button
-            onClick={toggleTheme}
-            suppressHydrationWarning
-            title={theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
-            className="h-9 w-9 inline-flex items-center justify-center rounded-md hover:bg-secondary text-muted-foreground transition"
-          >
-            {mounted && theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-          </button>
-          <div className="h-8 w-8 rounded-full bg-primary text-primary-foreground inline-flex items-center justify-center text-[12px] font-semibold">
-            JD
+              title={theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
+              className="h-9 w-9 inline-flex items-center justify-center rounded-md hover:bg-secondary text-muted-foreground transition"
+            >
+              {mounted && theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </button>
+            <Popover>
+              <PopoverTrigger asChild>
+                <button
+                  suppressHydrationWarning
+                  aria-label="Account"
+                  title="Account"
+                  className="h-8 w-8 rounded-full bg-primary text-primary-foreground inline-flex items-center justify-center text-[12px] font-semibold hover:opacity-90 transition"
+                >
+                  {getAccountInitials(session)}
+                </button>
+              </PopoverTrigger>
+              <PopoverContent align="end" className="w-64 p-0 overflow-hidden">
+                <div className="px-4 py-3 border-b border-border">
+                  <div className="text-sm font-semibold text-foreground">
+                    {session?.display_name || "User"}
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-0.5">
+                    {session?.username || "user"}
+                  </div>
+                  <div className="mt-2 inline-flex rounded-full bg-secondary px-2 py-0.5 text-[11px] font-medium text-foreground">
+                    {session?.role || "user"}
+                  </div>
+                </div>
+                <div className="p-2">
+                  <button
+                    onClick={() => void handleLogout()}
+                    className="w-full rounded-md px-3 py-2 text-left text-sm text-foreground hover:bg-secondary transition"
+                  >
+                    Log out
+                  </button>
+                </div>
+              </PopoverContent>
+            </Popover>
           </div>
         </header>
         <main className="flex-1 overflow-y-auto">{children}</main>
@@ -222,4 +422,47 @@ export function AppLayout({ children }: { children: ReactNode }) {
 
 function sameRouteHasHashSibling(g: NavGroup, n: NavItem) {
   return g.items.some((i) => i.to === n.to && i.label !== n.label && i.hash);
+}
+
+function getAccountInitials(session: SessionInfo | null) {
+  const source = (session?.display_name || session?.username || "").trim();
+  if (!source) return "U";
+  const parts = source
+    .replace(/[^A-Za-z0-9\s.-]/g, " ")
+    .split(/\s+/)
+    .filter(Boolean);
+  if (parts.length >= 2) {
+    return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
+  }
+  if (source.length >= 2) {
+    return source.slice(0, 2).toUpperCase();
+  }
+  return source[0].toUpperCase();
+}
+
+function formatRelativeTime(isoStr: string) {
+  if (!isoStr) return "just now";
+  const diff = Date.now() - new Date(isoStr).getTime();
+  if (diff < 60000) return "just now";
+  const mins = Math.floor(diff / 60000);
+  if (mins < 60) return `${mins}m ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours}h ago`;
+  return new Date(isoStr).toLocaleDateString();
+}
+
+function notificationTone(status: string) {
+  if (status === "Running") return "info";
+  if (status === "Review" || status === "Review Pending") return "warning";
+  if (status === "Completed" || status === "Execution Completed") return "success";
+  if (status === "Failed") return "destructive";
+  return "muted";
+}
+
+function notificationDotClass(tone: string) {
+  if (tone === "info") return "bg-sky-500";
+  if (tone === "warning") return "bg-amber-500";
+  if (tone === "success") return "bg-emerald-500";
+  if (tone === "destructive") return "bg-rose-500";
+  return "bg-muted-foreground";
 }

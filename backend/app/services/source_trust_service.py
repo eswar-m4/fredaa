@@ -18,6 +18,7 @@ TRUST_WEIGHTS: Dict[str, float] = {
     "linkedin": 0.88,
     "crunchbase": 0.72,
     "government_registry": 0.85,
+    "knowledge_graph": 0.62,
     "business_directory": 0.55,
     "search_result": 0.62,
     "heuristic": 0.45,
@@ -28,6 +29,9 @@ DOMAIN_HINTS: List[tuple[str, str]] = [
     (r"linkedin\.com", "linkedin"),
     (r"crunchbase\.com", "crunchbase"),
     (r"(gov|sec\.gov|business\.gov)", "government_registry"),
+    (r"gleif\.org|api\.gleif\.org", "government_registry"),
+    (r"company-information\.service\.gov\.uk|companieshouse\.gov\.uk", "government_registry"),
+    (r"wikidata\.org", "knowledge_graph"),
     (r"(yellowpages|yelp|dnb|zoominfo|bbb\.org)", "business_directory"),
 ]
 
@@ -50,6 +54,11 @@ class SourceTrustService:
         source = (candidate.get("source") or "").lower()
         if source.startswith("heuristic"):
             return "heuristic"
+        source_key = (candidate.get("source_key") or "").lower()
+        if source_key in {"wikidata"}:
+            return "knowledge_graph"
+        if source_key in {"gleif", "companies_house", "sec_edgar", "mca_india"}:
+            return "government_registry"
         domain = (candidate.get("domain") or "").lower()
         return self.classify_url(domain or candidate.get("url") or "")
 

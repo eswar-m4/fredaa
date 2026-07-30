@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { Badge, Button, Card, PageHeader, Select } from "@/components/ui-bits";
 import { Database, Cloud, Webhook, FileDown } from "lucide-react";
-import bots from "@/data/bots.json";
+import { fetchBotCatalog, getBotDisplayName, type BotCatalogEntry } from "@/lib/bot-catalog";
 
 export const Route = createFileRoute("/export")({
   head: () => ({ meta: [{ title: "Export & Sync – FreshData AI" }] }),
@@ -63,38 +63,14 @@ function cleanSourceName(name: string) {
 
 function getSourceDisplayName(source: string) {
   if (!source) return "";
-  let clean = cleanSourceName(source);
-  
-  const dotIdx = clean.indexOf(".");
-  let baseName = dotIdx !== -1 ? clean.substring(0, dotIdx) : clean;
-  
-  const lowerBase = baseName.toLowerCase().replace(/[^a-z0-9]/g, "");
-  if (FRIENDLY_NAME_MAP[lowerBase]) {
-    return FRIENDLY_NAME_MAP[lowerBase];
-  }
-  
-  const catalogMatch = bots.bots.find(b => {
-    const bNameClean = b.name.toLowerCase().replace(/[^a-z0-9]/g, "");
-    return bNameClean === lowerBase || 
-      lowerBase.includes(bNameClean) ||
-      bNameClean.includes(lowerBase);
-  });
-  if (catalogMatch) {
-    if (catalogMatch.name.toLowerCase() === "webmd") return "WebMD";
-    return catalogMatch.name;
-  }
-  
-  if (/^\d+[a-z]/i.test(baseName)) {
-    const numPart = baseName.match(/^\d+/)?.[0] || "";
-    const textPart = baseName.slice(numPart.length);
-    return numPart + textPart.charAt(0).toUpperCase() + textPart.slice(1);
-  }
-  return baseName.charAt(0).toUpperCase() + baseName.slice(1);
+  const clean = cleanSourceName(source);
+  return clean.charAt(0).toUpperCase() + clean.slice(1);
 }
 
 function ExportPage() {
   const [customJobs, setCustomJobs] = useState<any[]>([]);
   const [selectedJobId, setSelectedJobId] = useState<string>("");
+  const [catalog, setCatalog] = useState<BotCatalogEntry[]>([]);
 
   const baseApiUrl = (() => {
     if (
@@ -111,7 +87,7 @@ function ExportPage() {
     let active = true;
     async function fetchJobs() {
       try {
-        const response = await fetch(`${baseApiUrl}/api/v1/demo/jobs`);
+        const response = await fetch(`${baseApiUrl}/api/v1/demo/jobs`, { credentials: "include" });
         if (response.ok) {
           const data = await response.json();
           if (active) {
@@ -130,6 +106,22 @@ function ExportPage() {
       clearInterval(interval);
     };
   }, [baseApiUrl]);
+
+  useEffect(() => {
+    let active = true;
+    fetchBotCatalog()
+      .then((payload) => {
+        if (!active) return;
+        setCatalog(payload.bots || []);
+      })
+      .catch(() => {
+        if (!active) return;
+        setCatalog([]);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const completedJobs = [...customJobs]
     .reverse()
@@ -191,7 +183,7 @@ function ExportPage() {
             <Select value={selectedJobId} onChange={(e) => setSelectedJobId(e.target.value)}>
               <option value="">-- Select a completed job --</option>
               {completedJobs.map((j) => {
-                const sourceDisplayName = getSourceDisplayName(j.source);
+                const sourceDisplayName = getBotDisplayName(j.source, catalog);
                 const rowCountStr = (j.records !== null && j.records !== undefined) ? ` — ${j.records.toLocaleString()} rows` : "";
                 return (
                   <option key={j.id} value={j.id}>
@@ -227,4 +219,3 @@ function ExportPage() {
     </AppLayout>
   );
 }
-

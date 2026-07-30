@@ -217,18 +217,85 @@ class InvestegatePartialScrapeAdapter(PartialScrapeAdapter):
         import os
         from app.api.demo_routes import filter_records, BASE_DIR
         
-        csv_path = os.path.join(BASE_DIR, "sample_investegate.csv")
+        # Check for URL hint
+        live_url = None
+        if plan.url_hints:
+            live_url = plan.url_hints[0]
+        elif plan.crawl_limits and isinstance(plan.crawl_limits, dict) and plan.crawl_limits.get("seed_urls"):
+            live_url = plan.crawl_limits["seed_urls"][0]
+
         records = []
-        if os.path.exists(csv_path):
-            df = pd.read_csv(csv_path)
-            records = df.to_dict(orient="records")
-            for r in records:
-                for k, v in r.items():
-                    if pd.isna(v):
-                        r[k] = None
+        parsed_live = False
+        if live_url:
+            import requests
+            from bs4 import BeautifulSoup
+            headers = {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+            }
+            try:
+                response = requests.get(live_url, headers=headers, timeout=20)
+                if response.status_code == 200:
+                    soup = BeautifulSoup(response.text, "html.parser")
+                    table = soup.find("table", class_="table-investegate")
+                    if table:
+                        rows = table.find_all("tr")
+                        for row in rows[1:]:
+                            cols = row.find_all("td")
+                            if len(cols) < 4:
+                                continue
+                            published_date = cols[0].text.strip()
+                            source = cols[1].text.strip()
+                            
+                            company_col = cols[2]
+                            company_name = company_col.text.strip()
+                            company_link = ""
+                            company_a = company_col.find("a", href=True)
+                            if company_a:
+                                company_link = company_a["href"]
+                                if not company_link.startswith("http"):
+                                    company_link = "https://www.investegate.co.uk" + company_link
+                                    
+                            article_col = cols[3]
+                            article_subject = article_col.text.strip()
+                            article_link = ""
+                            article_a = article_col.find("a", href=True)
+                            if article_a:
+                                article_link = article_a["href"]
+                                if not article_link.startswith("http"):
+                                    article_link = "https://www.investegate.co.uk" + article_link
+                                    
+                            records.append({
+                                "Company_Name": company_name,
+                                "Company_Link": company_link,
+                                "Article_Link": article_link,
+                                "Article_Subject": article_subject,
+                                "Published_Date": published_date,
+                                "Source": source,
+                                "RNS": source,
+                                "Disposition": None,
+                                "Comments": None,
+                                "Disposition_Details": None,
+                                "KeywordsMapped": None,
+                                "Total_MatchKeyword": 0,
+                                "Event_Name": None,
+                            })
+                        if records:
+                            parsed_live = True
+            except Exception as e:
+                pass
 
         filters = plan.supported_filters or {}
-        records = filter_records(records, filters)
+        if not parsed_live:
+            csv_path = os.path.join(BASE_DIR, "sample_investegate.csv")
+            if os.path.exists(csv_path):
+                df = pd.read_csv(csv_path)
+                records = df.to_dict(orient="records")
+                for r in records:
+                    for k, v in r.items():
+                        if pd.isna(v):
+                            r[k] = None
+            records = filter_records(records, filters)
+
         records = _apply_include_exclude_terms(records, plan.include_terms, plan.exclude_terms)
 
         total_matched = len(records)
@@ -246,6 +313,8 @@ class InvestegatePartialScrapeAdapter(PartialScrapeAdapter):
                     "adapter_kind": plan.adapter_kind,
                     "adapter_payload": plan.adapter_payload,
                     "filters": filters,
+                    "live_url_used": live_url,
+                    "parsed_live": parsed_live,
                 },
             ),
         )

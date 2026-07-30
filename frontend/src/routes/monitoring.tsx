@@ -2,8 +2,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { Badge, Card, PageHeader, Button } from "@/components/ui-bits";
-import { Download, ChevronDown } from "lucide-react";
-import bots from "@/data/bots.json";
+import { Download, ChevronDown, Trash2, Star } from "lucide-react";
+import { apiFetch } from "@/lib/api";
+import { clearDeletedJob, jobsCacheUpdatedEventName, markJobDeleted, readJobsCache, writeJobsCache } from "@/lib/jobs-cache";
+import { fetchBotCatalog, getBotDisplayName, type BotCatalogEntry } from "@/lib/bot-catalog";
 
 
 export const Route = createFileRoute("/monitoring")({
@@ -25,6 +27,10 @@ export function startJobDemoLifecycleSimulation(
         const now = new Date();
         const lastRefresh = now.toISOString();
         let nextDate = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000); // Default Weekly
+        const freq = String(j.frequency || "").trim().toLowerCase();
+        if (freq === "hourly" || freq === "every hour" || freq === "1 hour" || freq === "1 hr" || freq === "60 minutes") {
+          nextDate = new Date(now.getTime() + 60 * 60 * 1000);
+        }
         if (j.frequency === "Daily") {
           nextDate = new Date(now.getTime() + 24 * 60 * 60 * 1000);
         } else if (j.frequency === "Monthly") {
@@ -74,11 +80,56 @@ function formatRelativeTime(isoStr: string) {
   return new Date(isoStr).toLocaleDateString();
 }
 
+function formatDateTime(isoStr: string) {
+  if (!isoStr) return "—";
+  const date = new Date(isoStr);
+  if (Number.isNaN(date.getTime())) return isoStr;
+  return date.toLocaleString([], {
+    year: "numeric",
+    month: "short",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function computeNextRunTime(job: any) {
+  const freq = String(job?.frequency || "").trim().toLowerCase();
+  const nextRefreshValue = job?.next_refresh || job?.nextRefresh || null;
+  const nextRefresh = nextRefreshValue ? new Date(nextRefreshValue) : null;
+  if (nextRefresh && !Number.isNaN(nextRefresh.getTime())) {
+    return nextRefresh.toISOString();
+  }
+
+  const baseValue = job?.last_refresh || job?.created_at || job?.createdAt || null;
+  const base = baseValue ? new Date(baseValue) : null;
+  if (!base || Number.isNaN(base.getTime())) {
+    return null;
+  }
+
+  const next = new Date(base.getTime());
+  if (freq === "hourly" || freq === "every hour" || freq === "1 hour" || freq === "1 hr" || freq === "60 minutes") {
+    next.setHours(next.getHours() + 1);
+  } else if (freq === "daily") {
+    next.setDate(next.getDate() + 1);
+  } else if (freq === "monthly") {
+    next.setMonth(next.getMonth() + 1);
+  } else if (freq === "quarterly") {
+    next.setMonth(next.getMonth() + 3);
+  } else if (freq === "weekly") {
+    next.setDate(next.getDate() + 7);
+  } else {
+    return null;
+  }
+  return next.toISOString();
+}
+
 function tone(s: string) {
   if (s === "Running") return "info" as const;
   if (s === "Completed" || s === "Execution Completed") return "success" as const;
   if (s === "Review" || s === "Review Pending") return "warning" as const;
-  if (s === "Analysis Complete" || s === "Pending Onboarding") return "warning" as const;
+  if (s === "Analysis Complete" || s === "Pending Approval" || s === "Pending Onboarding") return "warning" as const;
+  if (s === "Rejected") return "destructive" as const;
   return "destructive" as const;
 }
 
@@ -111,52 +162,6 @@ function cleanSourceName(name: string) {
   return clean;
 }
 
-const FRIENDLY_NAME_MAP: Record<string, string> = {
-  "webmd": "WebMD",
-  "instagram": "Instagram",
-  "99acres": "99Acres",
-  "keysight": "Keysight",
-  "turkeybrokers": "TurkeyBrokers",
-  "linkedin": "LinkedIn",
-  "github": "GitHub",
-  "companieshouse": "Companies House (UK)",
-  "mca": "MCA (India)",
-  "crunchbase": "Crunchbase",
-  "secedgar": "SEC EDGAR",
-  "napdiscovery": "NAP Discovery",
-};
-
-function getSourceDisplayName(source: string) {
-  if (!source) return "";
-  let clean = cleanSourceName(source);
-  
-  const dotIdx = clean.indexOf(".");
-  let baseName = dotIdx !== -1 ? clean.substring(0, dotIdx) : clean;
-  
-  const lowerBase = baseName.toLowerCase().replace(/[^a-z0-9]/g, "");
-  if (FRIENDLY_NAME_MAP[lowerBase]) {
-    return FRIENDLY_NAME_MAP[lowerBase];
-  }
-  
-  const catalogMatch = bots.bots.find(b => {
-    const bNameClean = b.name.toLowerCase().replace(/[^a-z0-9]/g, "");
-    return bNameClean === lowerBase || 
-      lowerBase.includes(bNameClean) ||
-      bNameClean.includes(lowerBase);
-  });
-  if (catalogMatch) {
-    if (catalogMatch.name.toLowerCase() === "webmd") return "WebMD";
-    return catalogMatch.name;
-  }
-  
-  if (/^\d+[a-z]/i.test(baseName)) {
-    const numPart = baseName.match(/^\d+/)?.[0] || "";
-    const textPart = baseName.slice(numPart.length);
-    return numPart + textPart.charAt(0).toUpperCase() + textPart.slice(1);
-  }
-  return baseName.charAt(0).toUpperCase() + baseName.slice(1);
-}
-
 function getNewSourceDisplayName(source: string) {
   if (!source) return "";
   const clean = cleanSourceName(source);
@@ -177,10 +182,11 @@ function getAnySiteUploadedFilename(filters: string) {
   }
 }
 
-
 function Monitoring() {
-  const [customJobs, setCustomJobs] = useState<any[]>([]);
+  const [customJobs, setCustomJobs] = useState<any[]>(() => readJobsCache());
   const [openExportId, setOpenExportId] = useState<string | null>(null);
+  const [catalog, setCatalog] = useState<BotCatalogEntry[]>([]);
+  const [urgentBusyId, setUrgentBusyId] = useState<string | null>(null);
 
   const baseApiUrl = (() => {
     if (
@@ -197,11 +203,14 @@ function Monitoring() {
     let active = true;
     async function fetchJobs() {
       try {
-        const response = await fetch(`${baseApiUrl}/api/v1/demo/jobs`);
+        const response = await fetch(`${baseApiUrl}/api/v1/demo/jobs`, { credentials: "include" });
         if (response.ok) {
           const data = await response.json();
           if (active) {
-            setCustomJobs(data);
+            // Merge server rows into the existing cache so a freshly launched job
+            // stays visible even if the backend list is briefly behind the UI.
+            const mergedJobs = writeJobsCache([...readJobsCache(), ...data]);
+            setCustomJobs(mergedJobs);
           }
         }
       } catch (err) {
@@ -211,11 +220,90 @@ function Monitoring() {
 
     fetchJobs();
     const interval = setInterval(fetchJobs, 3000);
+    const handleCacheUpdate = () => {
+      if (!active) return;
+      setCustomJobs(readJobsCache());
+    };
+    window.addEventListener(jobsCacheUpdatedEventName(), handleCacheUpdate as EventListener);
     return () => {
       active = false;
       clearInterval(interval);
+      window.removeEventListener(jobsCacheUpdatedEventName(), handleCacheUpdate as EventListener);
     };
   }, [baseApiUrl]);
+
+  useEffect(() => {
+    let active = true;
+    fetchBotCatalog()
+      .then((payload) => {
+        if (!active) return;
+        setCatalog(payload.bots || []);
+      })
+      .catch(() => {
+        if (!active) return;
+        setCatalog([]);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  async function deleteJob(jobId: string) {
+    let previousJobs: any[] = [];
+    markJobDeleted(jobId);
+    setCustomJobs((current) => {
+      previousJobs = current;
+      const next = current.filter((job) => job.id !== jobId);
+      writeJobsCache(next);
+      return next;
+    });
+    if (openExportId === jobId) {
+      setOpenExportId(null);
+    }
+    try {
+      const response = await apiFetch(`/api/v1/demo/jobs/${jobId}`, {
+        method: "DELETE",
+      });
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data?.detail || data?.message || "Failed to delete job");
+      }
+    } catch (err) {
+      console.error(err);
+      clearDeletedJob(jobId);
+      setCustomJobs(previousJobs);
+      writeJobsCache(previousJobs);
+    }
+  }
+
+  async function toggleUrgent(job: any) {
+    const nextUrgent = !Boolean(job.isUrgent);
+    setUrgentBusyId(job.id);
+    setCustomJobs((current) => {
+      const next = current.map((item) =>
+        item.id === job.id ? { ...item, is_urgent: nextUrgent ? 1 : 0, isUrgent: nextUrgent } : item,
+      );
+      writeJobsCache(next);
+      return next;
+    });
+    try {
+      const response = await apiFetch(`/api/v1/demo/jobs/${job.id}/urgent`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ is_urgent: nextUrgent }),
+      });
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data?.detail || data?.message || "Failed to update urgent flag");
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setUrgentBusyId((current) => (current === job.id ? null : current));
+    }
+  }
 
   const combinedJobs = [...customJobs].reverse().map((j) => {
     const sourceName = String(j.source || j.source_name || j.website_url || "Unknown Source");
@@ -224,7 +312,7 @@ function Monitoring() {
       source: sourceName,
       mode: j.mode || "By Source",
       run: formatRelativeTime(j.created_at),
-      status: j.isCustomSource ? "Pending Onboarding" : j.status,
+      status: j.status,
       records: j.records !== undefined ? j.records : null,
       fresh: j.fresh !== undefined ? j.fresh : null,
       frequency: j.frequency || "Weekly",
@@ -237,6 +325,7 @@ function Monitoring() {
       dataset_path: j.dataset_path || `datasets/${sourceName.toLowerCase().replace(/[^a-z0-9]/g, "_")}_sample.csv`,
       refresh_history: j.refresh_history || [],
       isCustomSource: j.isCustomSource ?? true,
+      isUrgent: Boolean(j.is_urgent ?? j.isUrgent),
       changes_detected: j.changes_detected ?? 0,
       complexity: j.complexity || null,
       estimated_onboarding_time: j.estimated_onboarding_time || null,
@@ -244,48 +333,42 @@ function Monitoring() {
     };
   });
 
-  // Deduplicate combinedJobs by ID and clean source name
+  // Deduplicate combinedJobs by ID only.
   const deduplicatedJobs: any[] = [];
   const seenIds = new Set<string>();
-  const seenSources = new Set<string>();
 
-  // Sort: we want Completed/Running/Review status to take precedence over Pending Onboarding / Analysis Complete
-  const sortedJobs = [...combinedJobs].sort((a, b) => {
-    const score = (status: string) => {
-      if (status === "Running") return 3;
-      if (status === "Completed" || status === "Execution Completed") return 2;
-      if (status === "Review" || status === "Review Pending") return 2;
-      return 1;
-    };
-    const scoreDiff = score(b.status) - score(a.status);
-    if (scoreDiff !== 0) return scoreDiff;
-    const timeA = a.created_at ? new Date(a.created_at).getTime() : 0;
-    const timeB = b.created_at ? new Date(b.created_at).getTime() : 0;
-    return timeB - timeA;
-  });
-
-  for (const j of sortedJobs) {
+  for (const j of combinedJobs) {
     if (seenIds.has(j.id)) continue;
     seenIds.add(j.id);
-
-    if (j.mode === "By Source" || j.mode === "Site-Specific") {
-      const nameKey = cleanSourceName(String(j.source || "")).toLowerCase();
-      if (seenSources.has(nameKey)) {
-        continue;
-      }
-      seenSources.add(nameKey);
-    }
     deduplicatedJobs.push(j);
   }
 
-  // Restore the original sorting by filtering combinedJobs
-  const finalJobs = combinedJobs.filter((j) => deduplicatedJobs.some((dj) => dj.id === j.id));
+  // Restore a stable, recency-first sort for display.
+  const finalJobs = [...deduplicatedJobs].sort((a, b) => {
+    const timeA = a.created_at ? new Date(a.created_at).getTime() : 0;
+    const timeB = b.created_at ? new Date(b.created_at).getTime() : 0;
+    const timeDiff = timeB - timeA;
+    if (timeDiff !== 0) return timeDiff;
+
+    const score = (status: string) => {
+      if (status === "Running") return 4;
+      if (status === "Review" || status === "Review Pending") return 3;
+      if (status === "Completed" || status === "Execution Completed") return 2;
+      if (status === "Failed" || status === "Aborted") return 1;
+      return 0;
+    };
+    return score(b.status) - score(a.status);
+  });
 
   const runningCount = finalJobs.filter((j) => j.status === "Running").length;
   const completedCount = finalJobs.filter((j) => j.status === "Completed" || j.status === "Execution Completed").length;
   const reviewCount = finalJobs.filter((j) => j.status === "Review" || j.status === "Review Pending").length;
-  const pendingOnboardingCount = finalJobs.filter((j) => j.status === "Pending Onboarding").length;
-  const failedCount = finalJobs.filter((j) => j.status === "Failed").length;
+  const pendingOnboardingCount = finalJobs.filter((j) => j.status === "Pending Approval" || j.status === "Pending Onboarding").length;
+  const abortedCount = finalJobs.filter((j) => j.status === "Failed" || j.status === "Aborted").length;
+  const isCustomScrapeJob = (j: any) => {
+    const scope = String(j.scope || "").toLowerCase();
+    return Boolean(j.isCustomSource) || scope.includes("custom") || scope.includes("partial");
+  };
   return (
     <AppLayout>
       <PageHeader title="Monitoring" subtitle="Live state of refreshes across both approaches." />
@@ -296,7 +379,7 @@ function Monitoring() {
             { l: "Completed today", v: completedCount, t: "success" as const },
             { l: "Needs review", v: reviewCount, t: "warning" as const },
             { l: "Pending onboarding", v: pendingOnboardingCount, t: "warning" as const },
-            { l: "Failed", v: failedCount, t: "destructive" as const },
+            { l: "Aborted", v: abortedCount, t: "destructive" as const },
           ].map((s) => (
             <Card key={s.l} className="p-4">
               <div className="text-[12px] text-muted-foreground">{s.l}</div>
@@ -331,10 +414,12 @@ function Monitoring() {
                 finalJobs.map((j) => {
                   const showNewBadge = j.isCustomSource;
                   const isNewSourceOnboarding = j.isCustomSource;
+                  const isCustomScrape = isCustomScrapeJob(j);
+                  const displayStatus = j.status === "Failed" ? "Aborted" : j.status;
                   const uploadedFilename = (j.mode === "Any-Site" || j.mode === "By Dataset") ? getAnySiteUploadedFilename(j.filters) : "";
                   const sourceDisplayName = isNewSourceOnboarding
                     ? getNewSourceDisplayName(j.source)
-                    : (uploadedFilename || getSourceDisplayName(j.source));
+                    : (uploadedFilename || getBotDisplayName(j.source, catalog));
 
                   return (
                     <tr key={j.id} className="hover:bg-secondary/60 group">
@@ -360,16 +445,16 @@ function Monitoring() {
                       <td className="px-4 py-3.5 text-muted-foreground border-b border-border/40 text-left">
                         <div className="flex flex-col">
                           <span>{j.last_refresh ? formatRelativeTime(j.last_refresh) : j.run || "—"}</span>
-                          {j.next_refresh && j.status === "Completed" && (
+                          {j.status !== "Pending Onboarding" && (computeNextRunTime(j) || j.next_refresh) && (
                             <span className="text-[11px] text-muted-foreground/75 mt-0.5 font-medium">
-                              Next: {new Date(j.next_refresh).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                              Next: {formatDateTime(computeNextRunTime(j) || j.next_refresh)}
                             </span>
                           )}
                         </div>
                       </td>
                       <td className="px-4 py-3.5 border-b border-border/40 text-left">
                         <div className="flex items-center gap-2">
-                          <Badge tone={tone(j.status)}>{j.status}</Badge>
+                          <Badge tone={tone(j.status)}>{displayStatus}</Badge>
                           {j.status === "Running" && (
                             <span className="flex h-2 w-2 relative">
                               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
@@ -379,60 +464,96 @@ function Monitoring() {
                         </div>
                       </td>
                       <td className="px-4 py-3.5 text-right font-mono border-b border-border/40 text-[13px] text-foreground font-semibold">
-                        {isNewSourceOnboarding ? "—" : (j.records !== null && j.records !== undefined ? j.records.toLocaleString() : "—")}
+                        {isCustomScrape ? "—" : (j.records !== null && j.records !== undefined ? j.records.toLocaleString() : "—")}
                       </td>
                       <td className="px-4 py-3.5 text-right font-mono border-b border-border/40 text-[13px] text-foreground font-semibold">
-                        {isNewSourceOnboarding
+                        {isCustomScrape
                           ? "—"
-                          : (j.status === "Completed" ? "100%" : (j.status === "Failed" ? "0%" : (j.fresh !== null && j.fresh !== undefined ? `${j.fresh}%` : "—")))}
+                          : (j.status === "Completed" ? "100%" : ((j.status === "Failed" || j.status === "Aborted") ? "0%" : (j.fresh !== null && j.fresh !== undefined ? `${j.fresh}%` : "—")))}
                       </td>
                       <td className="px-4 py-3.5 text-right border-b border-border/40 pr-6 relative">
-                        <div className="inline-block text-left">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            disabled={j.status !== "Completed"}
-                            onClick={() => setOpenExportId(openExportId === j.id ? null : j.id)}
-                            className="flex items-center gap-1 h-8 px-2.5 text-[12px] bg-card border border-border rounded-md font-medium transition hover:bg-secondary"
+                        <div className="inline-flex items-center justify-end gap-2">
+                          <button
+                            type="button"
+                            title={j.isUrgent ? "Clear urgent" : "Mark urgent"}
+                            aria-label={`${j.isUrgent ? "Clear urgent" : "Mark urgent"} job ${j.id}`}
+                            disabled={urgentBusyId === j.id}
+                            onMouseDown={(e) => e.stopPropagation()}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              void toggleUrgent(j);
+                            }}
+                            className={`relative z-10 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border transition cursor-pointer ${
+                              j.isUrgent
+                                ? "border-warning bg-warning-bg/40 text-warning hover:bg-warning-bg/60"
+                                : "border-border bg-card text-muted-foreground hover:bg-secondary hover:text-foreground"
+                            } ${urgentBusyId === j.id ? "opacity-70" : ""}`}
+                            style={{
+                              pointerEvents: urgentBusyId === j.id ? "none" : "auto",
+                            }}
                           >
-                            <Download className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                            <span>Export</span>
-                            <ChevronDown className="h-3 w-3 text-muted-foreground shrink-0 ml-0.5" />
-                          </Button>
-                          {openExportId === j.id && (
-                            <>
-                              <div className="fixed inset-0 z-40" onClick={() => setOpenExportId(null)} />
-                              <div className="absolute right-0 mt-1 w-32 rounded-md shadow-lg bg-card border border-border z-50 py-1 text-left">
-                                <button
-                                  onClick={() => {
-                                    setOpenExportId(null);
-                                    window.open(`${baseApiUrl}/api/v1/export?run_id=${j.id}&format=csv`, "_blank");
-                                  }}
-                                  className="w-full text-left px-3 py-1.5 hover:bg-secondary/60 text-[12px] text-foreground font-medium"
-                                >
-                                  CSV
-                                </button>
-                                <button
-                                  onClick={() => {
-                                    setOpenExportId(null);
-                                    window.open(`${baseApiUrl}/api/v1/export?run_id=${j.id}&format=json`, "_blank");
-                                  }}
-                                  className="w-full text-left px-3 py-1.5 hover:bg-secondary/60 text-[12px] text-foreground font-medium"
-                                >
-                                  JSON
-                                </button>
-                                <button
-                                  onClick={() => {
-                                    setOpenExportId(null);
-                                    window.open(`${baseApiUrl}/api/v1/export?run_id=${j.id}&format=xlsx`, "_blank");
-                                  }}
-                                  className="w-full text-left px-3 py-1.5 hover:bg-secondary/60 text-[12px] text-foreground font-medium"
-                                >
-                                  Excel (.xlsx)
-                                </button>
-                              </div>
-                            </>
-                          )}
+                            <Star className={`h-3.5 w-3.5 ${j.isUrgent ? "fill-warning" : ""}`} />
+                          </button>
+                          <button
+                            type="button"
+                            title="Delete job"
+                            aria-label={`Delete job ${j.id}`}
+                            onMouseDown={(e) => e.stopPropagation()}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              void deleteJob(j.id);
+                            }}
+                            className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border bg-card text-muted-foreground transition hover:bg-destructive/10 hover:text-destructive"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                          <div className="inline-block text-left">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              disabled={j.status !== "Completed"}
+                              onClick={() => setOpenExportId(openExportId === j.id ? null : j.id)}
+                              className="flex items-center gap-1 h-8 px-2.5 text-[12px] bg-card border border-border rounded-md font-medium transition hover:bg-secondary"
+                            >
+                              <Download className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                              <span>Export</span>
+                              <ChevronDown className="h-3 w-3 text-muted-foreground shrink-0 ml-0.5" />
+                            </Button>
+                            {openExportId === j.id && (
+                              <>
+                                <div className="fixed inset-0 z-40" onClick={() => setOpenExportId(null)} />
+                                <div className="absolute right-0 mt-1 w-32 rounded-md shadow-lg bg-card border border-border z-50 py-1 text-left">
+                                  <button
+                                    onClick={() => {
+                                      setOpenExportId(null);
+                                      window.open(`${baseApiUrl}/api/v1/export?run_id=${j.id}&format=csv`, "_blank");
+                                    }}
+                                    className="w-full text-left px-3 py-1.5 hover:bg-secondary/60 text-[12px] text-foreground font-medium"
+                                  >
+                                    CSV
+                                  </button>
+                                  <button
+                                    onClick={() => {
+                                      setOpenExportId(null);
+                                      window.open(`${baseApiUrl}/api/v1/export?run_id=${j.id}&format=json`, "_blank");
+                                    }}
+                                    className="w-full text-left px-3 py-1.5 hover:bg-secondary/60 text-[12px] text-foreground font-medium"
+                                  >
+                                    JSON
+                                  </button>
+                                  <button
+                                    onClick={() => {
+                                      setOpenExportId(null);
+                                      window.open(`${baseApiUrl}/api/v1/export?run_id=${j.id}&format=xlsx`, "_blank");
+                                    }}
+                                    className="w-full text-left px-3 py-1.5 hover:bg-secondary/60 text-[12px] text-foreground font-medium"
+                                  >
+                                    Excel (.xlsx)
+                                  </button>
+                                </div>
+                              </>
+                            )}
+                          </div>
                         </div>
                       </td>
                     </tr>

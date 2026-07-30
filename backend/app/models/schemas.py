@@ -59,6 +59,7 @@ class UploadResponse(BaseModel):
     status: str = Field(..., description="Upload status (pending, processing, etc.)")
     timestamp: datetime = Field(default_factory=datetime.utcnow, description="Upload time")
     message: Optional[str] = Field(None, description="Optional status message")
+    storage_path: Optional[str] = Field(None, description="Durable filesystem path for the uploaded file")
     parsed_summary: Optional[ParsedFileSummary] = Field(
         None,
         description="Summary metadata created by file parsing"

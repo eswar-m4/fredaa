@@ -1,9 +1,10 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { Badge, Button, Card, PageHeader } from "@/components/ui-bits";
-import bots from "@/data/bots.json";
 import { WORKFLOWS } from "@/data/workflows";
 import { Target, Globe2, ArrowRight, Sparkles, Database, Workflow as WorkflowIcon, Activity } from "lucide-react";
+import { fetchBotCatalog } from "@/lib/bot-catalog";
 import { setUseCase, useUseCase, USE_CASES } from "@/lib/useCase";
 
 export const Route = createFileRoute("/")({
@@ -16,16 +17,34 @@ export const Route = createFileRoute("/")({
   component: Home,
 });
 
-const STATS = [
-  { label: "Agents in Library", value: (bots as any).bots.length, icon: Database, tone: "info" as const },
-  { label: "Workflows", value: WORKFLOWS.length, icon: WorkflowIcon, tone: "purple" as const },
-  { label: "Active Jobs", value: 18, icon: Activity, tone: "success" as const },
-  { label: "Pending Review", value: 7, icon: Sparkles, tone: "warning" as const },
-];
-
 function Home() {
   const uc = useUseCase();
   const navigate = useNavigate();
+  const [botCount, setBotCount] = useState(0);
+
+  useEffect(() => {
+    let active = true;
+    fetchBotCatalog()
+      .then((payload) => {
+        if (!active) return;
+        const libraryCount = payload.bots?.filter((bot) => bot.catalog_kind === "built_in").length ?? payload.total ?? 0;
+        setBotCount(libraryCount);
+      })
+      .catch(() => {
+        if (!active) return;
+        setBotCount(0);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const stats = [
+    { label: "Agents in Library", value: botCount, icon: Database, tone: "info" as const },
+    { label: "Workflows", value: WORKFLOWS.length, icon: WorkflowIcon, tone: "purple" as const },
+    { label: "Active Jobs", value: 18, icon: Activity, tone: "success" as const },
+    { label: "Pending Review", value: 7, icon: Sparkles, tone: "warning" as const },
+  ];
 
   const pick = (mode: "targeted" | "openweb") => {
     setUseCase(mode);
@@ -41,7 +60,7 @@ function Home() {
 
       <div className="px-7 pb-8 space-y-6">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {STATS.map((s) => {
+          {stats.map((s) => {
             const Icon = s.icon;
             return (
               <Card key={s.label} className="p-4">
@@ -69,7 +88,7 @@ function Home() {
             aka="(aka Targeted Source Extraction)"
             description="You name the source – SOS, registry, directory, retail site. We classify complexity (Simple / Medium / Complex), reuse existing agents or onboard new ones, and refresh on your schedule."
             bullets={[
-              "Browse 827 onboarded agents across 14 categories",
+              `Browse ${botCount || 827} onboarded agents across 14 categories`,
               "Upload a new site → AI estimates SLA (days)",
               "Frequency: daily, weekly, monthly, quarterly",
             ]}
@@ -90,7 +109,7 @@ function Home() {
               "AI auto-maps your fields to the standard schema",
               "Pre-built workflows: Company, Financial, NAP, Registry, Funding…",
             ]}
-            shows={["Field Mapping", "Workflows", "Review"]}
+            shows={["Dataset Setup", "Workflows", "Review"]}
             cta="Use this"
             onPick={() => pick("openweb")}
           />
@@ -130,7 +149,6 @@ function UseCaseCard({
       <Card className={["p-6 flex flex-col h-full group-hover:border-primary/50 group-hover:shadow-md transition-all duration-200", active ? "ring-2 ring-primary" : ""].join(" ")}>
         <div className="flex items-center gap-2 mb-3">
           <Badge tone={tone}>{badge}</Badge>
-          {active && <Badge tone="success">Active</Badge>}
         </div>
         <div className="flex items-start gap-4">
           <div

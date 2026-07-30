@@ -26,6 +26,7 @@ export type Dataset = {
   category:
     | "Company"
     | "People"
+    | "Education"
     | "Commerce"
     | "Location"
     | "Automotive"
@@ -48,6 +49,7 @@ export type Dataset = {
   /** Number of countries / locales covered by wired sources. */
   countriesCovered?: number;
   inputAttributes: DatasetField[];
+  inputTemplateColumns?: DatasetField[];
   outputAttributes: DatasetField[];
   sources: DatasetSource[]; // system sources wired for this dataset
   workflowId: string; // single embedded workflow (hidden from user)
@@ -79,6 +81,19 @@ export const DATASETS: Dataset[] = [
     inputAttributes: [
       { key: "domain", label: "Company Domain", type: "url", role: "input", required: true, example: "acme.com" },
       { key: "company_name", label: "Company Name", type: "string", role: "input", example: "Acme Inc." },
+    ],
+    inputTemplateColumns: [
+      { key: "company_name", label: "company_name", type: "string", role: "input", required: true },
+      { key: "domain", label: "domain", type: "url", role: "input", required: true },
+      { key: "website", label: "website", type: "url", role: "input" },
+      { key: "linkedin_url", label: "linkedin_url", type: "url", role: "input" },
+      { key: "country", label: "country", type: "string", role: "input" },
+      { key: "hq_city", label: "hq_city", type: "string", role: "input" },
+      { key: "hq_state", label: "hq_state", type: "string", role: "input" },
+      { key: "industry", label: "industry", type: "string", role: "input" },
+      { key: "sub_industry", label: "sub_industry", type: "string", role: "input" },
+      { key: "ticker", label: "ticker", type: "string", role: "input" },
+      { key: "registry_number", label: "registry_number", type: "string", role: "input" },
     ],
     outputAttributes: [
       out("legal_name", "Legal Name", "string", "Identity"),
@@ -290,6 +305,20 @@ export const DATASETS: Dataset[] = [
       { key: "seniority", label: "Seniority Filter", type: "enum", role: "input", example: "C-level, VP, Director" },
       { key: "department", label: "Department Filter", type: "string", role: "input" },
     ],
+    inputTemplateColumns: [
+      { key: "full_name", label: "full_name", type: "string", role: "input", required: true },
+      { key: "company_name", label: "company_name", type: "string", role: "input", required: true },
+      { key: "company_domain", label: "company_domain", type: "url", role: "input", required: true },
+      { key: "title", label: "title", type: "string", role: "input" },
+      { key: "department", label: "department", type: "string", role: "input" },
+      { key: "seniority", label: "seniority", type: "string", role: "input" },
+      { key: "email", label: "email", type: "email", role: "input" },
+      { key: "phone", label: "phone", type: "string", role: "input" },
+      { key: "linkedin_url", label: "linkedin_url", type: "url", role: "input" },
+      { key: "country", label: "country", type: "string", role: "input" },
+      { key: "city", label: "city", type: "string", role: "input" },
+      { key: "state", label: "state", type: "string", role: "input" },
+    ],
     outputAttributes: [
       out("full_name", "Full Name", "string", "Identity"),
       out("first_name", "First Name", "string", "Identity"),
@@ -326,6 +355,120 @@ export const DATASETS: Dataset[] = [
     ],
     workflowId: "wf-contact-enrichment",
     sampleRow: { full_name: "Jane Park", title: "VP Engineering", email: "jane@acme.com", linkedin_url: "linkedin.com/in/janepark" },
+  },
+
+  /* ───────────────── Education / Public Sector Workforce ───────────────── */
+  {
+    id: "ds-us-public-school-district-workforce",
+    name: "US Public School District Workforce",
+    category: "Education",
+    tagline: "K-12 district staff, contacts, and salary schedules",
+    description:
+      "US public K-12 district workforce records covering district identity, school assignments, staff profiles, contacts, and published compensation data when available.",
+    icon: "GraduationCap",
+    refreshDefault: "Quarterly",
+    refreshOptions: FREQ,
+    rowsAvailable: "~4–6.5M staff records",
+    coverage: 84,
+    accuracy: 89,
+    countriesCovered: 1,
+    inputAttributes: [
+      { key: "district_name", label: "District Name", type: "string", role: "input", required: true, example: "Los Angeles Unified School District" },
+      { key: "state", label: "State", type: "string", role: "input", required: true, example: "CA" },
+      { key: "district_website", label: "District Website", type: "url", role: "input", example: "lausd.org" },
+      { key: "school_name", label: "School Name", type: "string", role: "input", example: "Roosevelt High School" },
+      { key: "school_nces_id", label: "School NCES ID", type: "string", role: "input" },
+    ],
+    inputTemplateColumns: [
+      { key: "district_name", label: "district_name", type: "string", role: "input", required: true },
+      { key: "district_nces_id", label: "district_nces_id", type: "string", role: "input" },
+      { key: "state", label: "state", type: "string", role: "input", required: true },
+      { key: "county", label: "county", type: "string", role: "input" },
+      { key: "district_website", label: "district_website", type: "url", role: "input" },
+      { key: "school_name", label: "school_name", type: "string", role: "input" },
+      { key: "school_nces_id", label: "school_nces_id", type: "string", role: "input" },
+      { key: "school_type", label: "school_type", type: "string", role: "input" },
+      { key: "grade_range", label: "grade_range", type: "string", role: "input" },
+      { key: "school_address", label: "school_address", type: "string", role: "input" },
+      { key: "school_website", label: "school_website", type: "url", role: "input" },
+      { key: "full_name", label: "full_name", type: "string", role: "input" },
+      { key: "staff_title", label: "staff_title", type: "string", role: "input" },
+      { key: "role_category", label: "role_category", type: "string", role: "input" },
+      { key: "email_id", label: "email_id", type: "email", role: "input" },
+      { key: "phone", label: "phone", type: "string", role: "input" },
+      { key: "salary_schedule_url", label: "salary_schedule_url", type: "url", role: "input" },
+    ],
+    outputAttributes: [
+      out("district_name", "District Name", "string", "Institutional Identity"),
+      out("district_nces_id", "District NCES ID", "string", "Institutional Identity"),
+      out("state", "State", "string", "Institutional Identity"),
+      out("county", "County", "string", "Institutional Identity"),
+      out("district_website", "District Website", "url", "Institutional Identity"),
+      out("school_name", "School Name", "string", "Institutional Identity"),
+      out("school_nces_id", "School NCES ID", "string", "Institutional Identity"),
+      out("school_type", "School Type", "enum", "Institutional Identity"),
+      out("grade_range", "Grade Range", "string", "Institutional Identity"),
+      out("school_address", "School Address", "string", "Institutional Identity"),
+      out("school_website", "School Website", "url", "Institutional Identity"),
+      out("full_name", "Full Name", "string", "Staff Profile"),
+      out("first_name", "First Name", "string", "Staff Profile"),
+      out("last_name", "Last Name", "string", "Staff Profile"),
+      out("staff_title", "Staff Title", "string", "Staff Profile"),
+      out("role_category", "Role Category", "enum", "Staff Profile"),
+      out("department", "Department", "string", "Staff Profile"),
+      out("subject_taught", "Subject Taught", "string", "Staff Profile"),
+      out("grade_level_taught", "Grade Level Taught", "string", "Staff Profile"),
+      out("qualification", "Qualification / Degree", "string", "Staff Profile"),
+      out("certifications", "Certifications / License IDs", "string", "Staff Profile"),
+      out("years_experience", "Years Experience", "number", "Staff Profile"),
+      out("years_in_district", "Years in District", "number", "Staff Profile"),
+      out("tenure_status", "Tenure Status", "enum", "Staff Profile"),
+      out("employment_type", "Employment Type", "enum", "Staff Profile"),
+      out("email_id", "Email", "email", "Contact"),
+      out("phone", "Phone", "string", "Contact"),
+      out("phone_extension", "Phone Extension", "string", "Contact"),
+      out("office_location", "Office Location", "string", "Contact"),
+      out("salary_schedule_url", "Salary Schedule URL", "url", "Compensation"),
+      out("salary_schedule_year", "Salary Schedule Year", "string", "Compensation"),
+      out("pay_scale_type", "Pay Scale Type", "enum", "Compensation"),
+      out("step", "Step", "string", "Compensation"),
+      out("lane", "Lane", "string", "Compensation"),
+      out("base_salary_annual", "Base Salary Annual", "number", "Compensation"),
+      out("salary_currency", "Salary Currency", "string", "Compensation"),
+      out("salary_min_scale", "Salary Min Scale", "number", "Compensation"),
+      out("salary_max_scale", "Salary Max Scale", "number", "Compensation"),
+      out("stipends_addenda", "Stipends / Addenda", "string", "Compensation"),
+      out("contract_days", "Contract Days", "number", "Compensation"),
+      out("fte", "FTE", "number", "Compensation"),
+      out("reported_salary", "Reported Salary", "number", "Compensation"),
+      out("reported_salary_source", "Reported Salary Source", "string", "Compensation"),
+      out("reported_salary_year", "Reported Salary Year", "string", "Compensation"),
+      out("salary_last_updated", "Salary Last Updated", "date", "Compensation"),
+      out("salary_source_confidence", "Salary Source Confidence", "number", "Compensation"),
+      out("source_url", "Source URL", "url", "Provenance / QA"),
+      out("source_type", "Source Type", "enum", "Provenance / QA"),
+      out("extracted_at", "Extracted At", "date", "Provenance / QA"),
+      out("confidence_score", "Confidence Score", "number", "Provenance / QA"),
+      out("admv_status", "ADMV Status", "string", "Provenance / QA"),
+      out("record_hash", "Record Hash", "string", "Provenance / QA"),
+    ],
+    sources: [
+      { name: "State DOE / Transparency Portals", url: "state education portal", region: "US", attributes: 18 },
+      { name: "District School Websites", url: "district website / staff directory", region: "US", attributes: 20 },
+      { name: "NCES Common Core of Data", url: "nces.ed.gov/ccd", region: "US", attributes: 8 },
+      { name: "State Licensure Databases", url: "state licensure databases", region: "US", attributes: 10 },
+      { name: "OpenGovPay / GovSalaries / Transparent California", url: "opengovpay.com / govsalaries.com / transparentcalifornia.com", region: "US", attributes: 8 },
+    ],
+    workflowId: "wf-us-public-school-district-workforce",
+    sampleRow: {
+      district_name: "Los Angeles Unified School District",
+      state: "CA",
+      school_name: "Roosevelt High School",
+      staff_title: "Teacher",
+      role_category: "Teacher",
+      email_id: "jane.doe@lausd.net",
+      base_salary_annual: 84500,
+    },
   },
 
   /* ───────────────── Funding ───────────────── */
@@ -909,6 +1052,7 @@ export const DATASETS: Dataset[] = [
 export const DATASET_CATEGORIES: Dataset["category"][] = [
   "Company",
   "People",
+  "Education",
   "Financial",
   "Commerce",
   "Competitive",

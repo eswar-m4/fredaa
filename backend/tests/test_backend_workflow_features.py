@@ -697,30 +697,52 @@ def test_company_verification_routes_mca_and_sec_sources(mock_verify, mock_mca, 
         }
 
     mock_verify.side_effect = verify_side_effect
-    mock_mca.return_value = {
-        "source_type": "government_registry",
-        "registry_source": "mca_india",
-        "registry_confidence": 0.92,
-        "extracted_fields": {
-            "company_name": "Infosys",
-            "cin": "L85110KA1981PLC013115",
-            "company_status": "Active",
-            "directors": [{"name": "Nandan Nilekani"}],
-        },
-        "raw_metadata": {"status": "success"},
-    }
-    mock_sec.return_value = {
-        "source_type": "government_registry",
-        "registry_source": "sec_edgar",
-        "registry_confidence": 0.94,
-        "extracted_fields": {
-            "entity_name": "MICROSOFT CORP",
-            "cik": "0000789019",
-            "ticker": "MSFT",
-            "filings": [{"filing_type": "10-K", "filing_date": "2025-07-30"}],
-        },
-        "raw_metadata": {"status": "success"},
-    }
+    async def mca_side_effect(company_name, **kwargs):
+        if company_name == "Infosys":
+            return {
+                "source_type": "government_registry",
+                "registry_source": "mca_india",
+                "registry_confidence": 0.92,
+                "extracted_fields": {
+                    "company_name": "Infosys",
+                    "cin": "L85110KA1981PLC013115",
+                    "company_status": "Active",
+                    "directors": [{"name": "Nandan Nilekani"}],
+                },
+                "raw_metadata": {"status": "success"},
+            }
+        return {
+            "source_type": "government_registry",
+            "registry_source": "mca_india",
+            "registry_confidence": 0.0,
+            "extracted_fields": {},
+            "raw_metadata": {"status": "not_found"},
+        }
+
+    async def sec_side_effect(company_name, **kwargs):
+        if company_name == "Microsoft":
+            return {
+                "source_type": "government_registry",
+                "registry_source": "sec_edgar",
+                "registry_confidence": 0.94,
+                "extracted_fields": {
+                    "entity_name": "MICROSOFT CORP",
+                    "cik": "0000789019",
+                    "ticker": "MSFT",
+                    "filings": [{"filing_type": "10-K", "filing_date": "2025-07-30"}],
+                },
+                "raw_metadata": {"status": "success"},
+            }
+        return {
+            "source_type": "government_registry",
+            "registry_source": "sec_edgar",
+            "registry_confidence": 0.0,
+            "extracted_fields": {},
+            "raw_metadata": {"status": "not_found"},
+        }
+
+    mock_mca.side_effect = mca_side_effect
+    mock_sec.side_effect = sec_side_effect
 
     response = client.post(
         "/api/v1/workflows/run",
@@ -744,14 +766,16 @@ def test_company_verification_routes_mca_and_sec_sources(mock_verify, mock_mca, 
     assert response.status_code == 200
     summary = response.json()["summary"]
     assert summary["workflow_dispatch"]["registry_enrichment"] is True
-    assert mock_mca.await_count == 1
-    assert mock_sec.await_count == 1
-    assert mock_mca.await_args.args[0] == "Infosys"
-    assert mock_sec.await_args.args[0] == "Microsoft"
+    assert mock_mca.await_count == 2
+    assert mock_sec.await_count == 2
+    assert {call.args[0] for call in mock_mca.await_args_list} == {"Infosys", "Microsoft"}
+    assert {call.args[0] for call in mock_sec.await_args_list} == {"Infosys", "Microsoft"}
     infosys = summary["auto_approved_records"][0]
     microsoft = summary["auto_approved_records"][1]
     assert infosys["registry_metadata"]["registry_source"] == "mca_india"
     assert microsoft["registry_metadata"]["registry_source"] == "sec_edgar"
+    assert infosys["registry_metadata"]["registry_sources"] == ["sec_edgar", "mca_india"]
+    assert microsoft["registry_metadata"]["registry_sources"] == ["sec_edgar", "mca_india"]
     assert any(item["field"] == "company_status" and item["suggested_value"] == "Active" for item in infosys["record_comparison"]["comparisons"])
     assert any(item["field"] == "ticker" and item["suggested_value"] == "MSFT" for item in microsoft["record_comparison"]["comparisons"])
     assert summary["processed_dataset"][0]["cin"] == "L85110KA1981PLC013115"

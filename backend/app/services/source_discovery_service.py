@@ -23,7 +23,16 @@ class SourceDiscoveryService:
         self.priority_sources = getattr(
             settings,
             "SOURCE_DISCOVERY_PRIORITIES",
-            ["linkedin", "company_website", "government_registry", "business_directory", "user_defined"],
+            [
+                "linkedin",
+                "company_website",
+                "government_registry",
+                "gleif",
+                "companies_house",
+                "wikidata",
+                "business_directory",
+                "user_defined",
+            ],
         )
 
     def discover(
@@ -75,6 +84,9 @@ class SourceDiscoveryService:
             self._make_source("linkedin", f"{normalized} LinkedIn"),
             self._make_source("company_website", f"{normalized}.com"),
             self._make_source("government_registry", f"{normalized} business registration"),
+            self._make_source("gleif", f"{normalized} LEI registry"),
+            self._make_source("companies_house", f"{normalized} Companies House"),
+            self._make_source("wikidata", f"{normalized} Wikidata"),
             self._make_source("business_directory", f"{normalized} business directory"),
         ]
 
@@ -94,6 +106,12 @@ class SourceDiscoveryService:
             return "linkedin"
         if re.search(r"(gov|registry|government|sec|business\.gov)", text):
             return "government_registry"
+        if re.search(r"(gleif|lei)", text):
+            return "gleif"
+        if re.search(r"(companies house|company house|uk)", text):
+            return "companies_house"
+        if re.search(r"(wikidata|wiki data|knowledge graph)", text):
+            return "wikidata"
         if re.search(r"(directory|list|yellowpages|yelp|dnb|zoominfo)", text):
             return "business_directory"
         if re.match(r"https?://", text) or "." in text:

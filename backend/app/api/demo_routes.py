@@ -7,11 +7,13 @@ import json
 import re
 import random
 import logging
+from datetime import datetime
 from typing import Any, Dict, Optional
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel, Field
 
+from app.services.auth_service import auth_service
 from app.services.scrapers.keysight_scraper import (
     main as run_keysight_scraper,
     scrape_keysight_products
@@ -26,6 +28,152 @@ logger = logging.getLogger(__name__)
 
 # Resolve workspace root directory relative to this file
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+
+def _latest_run_number_for_job(job_id: str, refresh_count: Optional[int] = None) -> int:
+    import glob
+    dataset_dir = os.path.join(BASE_DIR, "datasets")
+    pattern = os.path.join(dataset_dir, f"{job_id}_run_*.json")
+    matching_files = glob.glob(pattern)
+    max_run = 0
+    for filepath in matching_files:
+        basename = os.path.basename(filepath)
+        match = re.search(r"_run_(\d+)\.json$", basename)
+        if match:
+            max_run = max(max_run, int(match.group(1)))
+    if max_run > 0:
+        return max_run
+    if refresh_count is not None and refresh_count > 0:
+        return refresh_count
+    return 1
+
+
+def _load_json_records(path: str) -> list[Dict[str, Any]]:
+    if not os.path.exists(path):
+        return []
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            loaded = json.load(f)
+        return loaded if isinstance(loaded, list) else []
+    except Exception:
+        return []
+
+
+def _load_refresh_baseline_records(job_id: str, run_file_dir: str, current_run_num: int) -> tuple[list[Dict[str, Any]], str]:
+    candidates = []
+    final_path = os.path.join(run_file_dir, f"{job_id}_final.json")
+    if os.path.exists(final_path):
+        candidates.append(final_path)
+    if current_run_num > 1:
+        candidates.append(os.path.join(run_file_dir, f"{job_id}_run_{current_run_num - 1}.json"))
+    input_path = os.path.join(run_file_dir, f"{job_id}_input.json")
+    if os.path.exists(input_path):
+        candidates.append(input_path)
+
+    for candidate in candidates:
+        records = _load_json_records(candidate)
+        if records:
+            return records, os.path.basename(candidate)
+
+    return [], ""
+
+
+def _build_refresh_comparison_log(
+    source: str,
+    baseline_records: list[Dict[str, Any]],
+    records: list[Dict[str, Any]],
+    *,
+    baseline_file: str,
+    current_file: str,
+    execution_metadata: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    if not baseline_records:
+        return {
+            "baseline_file": baseline_file,
+            "current_file": current_file,
+            "records_compared": len(records),
+            "added": len(records),
+            "modified": 0,
+            "deleted": 0,
+            "verified": 0,
+            "change_percentage": 100.0,
+            "entrypoint_file": "run.py",
+            "runtime_type": "python",
+            "entrypoint_function": "run",
+            "bot_execution": execution_metadata if isinstance(execution_metadata, dict) else {},
+        }
+
+    from app.services.wcm_comparison_service import compare_records
+
+    flattened_rows, _ = compare_records(
+        source,
+        baseline_records,
+        records,
+        is_dataset=False,
+    )
+    record_groups: Dict[str, set[str]] = {}
+    for row in flattened_rows:
+        if not isinstance(row, dict):
+            continue
+        record_key = str(row.get("recordKey") or f"record_{row.get('recordIndex', 0)}")
+        record_groups.setdefault(record_key, set()).add(str(row.get("changeType") or "V"))
+
+    records_compared = len(record_groups) or len(records)
+    added = sum(1 for types in record_groups.values() if "A" in types)
+    modified = sum(1 for types in record_groups.values() if "M" in types)
+    deleted = sum(1 for types in record_groups.values() if "D" in types)
+    verified = sum(1 for types in record_groups.values() if types == {"V"})
+    change_percentage = round(
+        (
+            sum(1 for types in record_groups.values() if any(flag in types for flag in ("A", "M", "D")))
+            / records_compared
+        )
+        * 100,
+        2,
+    ) if records_compared else 0.0
+
+    return {
+        "baseline_file": baseline_file,
+        "current_file": current_file,
+        "records_compared": records_compared,
+        "added": added,
+        "modified": modified,
+        "deleted": deleted,
+        "verified": verified,
+        "change_percentage": change_percentage,
+        "entrypoint_file": "run.py",
+        "runtime_type": "python",
+        "entrypoint_function": "run",
+        "bot_execution": execution_metadata if isinstance(execution_metadata, dict) else {},
+    }
+
+def _compute_next_refresh_at(frequency: Optional[str], now: Optional[datetime] = None) -> Optional[datetime]:
+    if not frequency:
+        return None
+    freq = str(frequency).strip().lower()
+    if freq in {"one-time", "one time", "once", "single", "single run"}:
+        return None
+    from datetime import datetime as dt, timedelta
+    now = now or dt.utcnow()
+    if freq in {"hourly", "every hour", "1 hour", "1 hr", "60 minutes"}:
+        next_date = now + timedelta(hours=1)
+    elif freq in {"2 minutes", "2 mins"}:
+        next_date = now + timedelta(minutes=2)
+    elif freq == "daily":
+        next_date = now + timedelta(days=1)
+    elif freq == "monthly":
+        next_date = now + timedelta(days=30)
+    elif freq == "quarterly":
+        next_date = now + timedelta(days=90)
+    else:
+        next_date = now + timedelta(days=7)
+    return next_date
+
+
+def _calculate_next_refresh_str(frequency: Optional[str]) -> Optional[str]:
+    next_refresh_at = _compute_next_refresh_at(frequency)
+    if next_refresh_at is None:
+        return None
+    return next_refresh_at.isoformat() + "Z"
 
 # Keysight paths
 KEYSIGHT_CSV_PATH = os.path.join(BASE_DIR, "sample_keysight.csv")
@@ -689,7 +837,14 @@ def filter_records(records: list, filters: dict) -> list:
 
 
 def _is_partial_scope(scope: Optional[str]) -> bool:
-    return str(scope or "").strip().lower() in {"partial scrape", "partial dump", "custom dump", "custom"}
+    normalized = str(scope or "").strip().lower()
+    return normalized in {
+        "partial scrape",
+        "partial dump",
+        "custom dump",
+        "custom",
+        "custom scrape",
+    }
 
 
 def _planner_payload_to_json(plan_result: Any) -> str:
@@ -836,6 +991,348 @@ def simulate_demo_mutations(source: str, records: list) -> list:
             
     return mutated
 
+
+def _is_gasunie_demand_prod_source(source: str) -> bool:
+    source_lower = str(source or "").strip().lower()
+    return (
+        "gasunie deutschland tso demand prod" in source_lower
+        or "tron-gud.publication.virtimo.cloud" in source_lower
+    )
+
+
+async def _run_gasunie_demand_prod_job(job_id: str, source: str, frequency: Optional[str]) -> None:
+    import importlib.util
+    from pathlib import Path
+
+    gasunie_root = Path(BASE_DIR) / "data" / "bot_packages" / "gasunie_deutschland_tso_demand_prod" / "ICIS_TSO13_GasunieDeutschland_TSO_Demand_Prod"
+    run_py = gasunie_root / "run.py"
+    if not run_py.exists():
+        raise FileNotFoundError(f"Gasunie runner not found at {run_py}")
+
+    spec = importlib.util.spec_from_file_location("gasunie_demand_prod_runner", run_py)
+    if spec is None or spec.loader is None:
+        raise ValueError("Failed to load Gasunie runner")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)  # type: ignore[union-attr]
+
+    execution = module.run(
+        {
+            "job_id": job_id,
+            "source": source,
+            "frequency": frequency or "One-time",
+            "timeout_sec": 5400,
+            "outputs_dir": os.path.join(BASE_DIR, "datasets"),
+            "artifacts_dir": os.path.join(BASE_DIR, "datasets"),
+        }
+    )
+
+    records = execution.get("records") if isinstance(execution, dict) else []
+    execution_metadata = execution.get("execution_metadata") if isinstance(execution, dict) else {}
+    if not isinstance(records, list) or not records:
+        raise ValueError("Gasunie runner did not return any records")
+
+    run_file_dir = os.path.join(BASE_DIR, "datasets")
+    os.makedirs(run_file_dir, exist_ok=True)
+    with get_connection() as conn:
+        row = conn.execute("SELECT refresh_count FROM scraper_jobs WHERE id = ?", (job_id,)).fetchone()
+    current_run_num = _latest_run_number_for_job(job_id, int(row[0]) if row and row[0] is not None else None)
+    next_run_num = max(1, current_run_num + 1)
+    run_file_path = os.path.join(run_file_dir, f"{job_id}_run_{next_run_num}.json")
+    with open(run_file_path, "w", encoding="utf-8") as f_run:
+        json.dump(records, f_run, ensure_ascii=False, indent=2)
+
+    now_str = datetime.utcnow().isoformat() + "Z"
+    next_refresh_str = _calculate_next_refresh_str(frequency)
+    baseline_records, baseline_file = _load_refresh_baseline_records(job_id, run_file_dir, next_run_num)
+    comparison_log = _build_refresh_comparison_log(
+        source,
+        baseline_records,
+        records,
+        baseline_file=baseline_file,
+        current_file=f"{job_id}_run_{next_run_num}.json",
+        execution_metadata=execution_metadata,
+    )
+    with open(os.path.join(run_file_dir, f"{job_id}_comparison.json"), "w", encoding="utf-8") as f_comp:
+        json.dump(comparison_log, f_comp, ensure_ascii=False, indent=2)
+
+    with get_connection() as conn:
+        existing_history_json = conn.execute(
+            "SELECT refresh_history_json FROM scraper_jobs WHERE id = ?",
+            (job_id,)
+        ).fetchone()[0]
+
+    history = json.loads(existing_history_json or "[]")
+    history.append(
+        {
+            "timestamp": now_str,
+            "records_scraped": len(records),
+            "accuracy_rate": 100,
+            "status": "Success",
+            "execution_time_seconds": 0,
+        }
+    )
+
+    with get_connection() as conn:
+        conn.execute(
+            """UPDATE scraper_jobs
+               SET status = 'Review Pending',
+                   records = ?,
+                   fresh = 100,
+                   last_refresh = ?,
+                   next_refresh = ?,
+                   refresh_count = ?,
+                   refresh_history_json = ?,
+                   changes_detected = ?
+               WHERE id = ?""",
+            (len(records), now_str, next_refresh_str, next_run_num, json.dumps(history), len(records), job_id)
+        )
+        conn.commit()
+
+    from app.services.workflow_service import workflow_service
+
+    workflow_service.runs[job_id] = {
+        "run_id": job_id,
+        "dataset_id": job_id,
+        "dataset_name": source,
+        "processed_dataset": records,
+        "comparison_log": comparison_log,
+        "bot_execution": execution_metadata if isinstance(execution_metadata, dict) else {},
+    }
+    try:
+        from app.services.wcm_comparison_service import warm_review_cache
+        asyncio.create_task(warm_review_cache(job_id, 2.0))
+    except Exception:
+        pass
+
+
+def _is_nationalgrid_tso29_source(source: str) -> bool:
+    source_lower = str(source or "").strip().lower()
+    return (
+        "nationalgrid tso29 gasflow sso nomrenom prod dem" in source_lower
+        or "national grid" in source_lower
+        or "national gas" in source_lower
+        or "data.nationalgas.com" in source_lower
+    )
+
+
+def _is_bse_stock_exchange_source(source: str) -> bool:
+    source_lower = str(source or "").strip().lower()
+    return (
+        "bombay stock exchange" in source_lower
+        or "bseindia.com/corporates/historicalannualreport.aspx" in source_lower
+        or "bseindia.com" in source_lower
+    )
+
+
+async def _run_bse_stock_exchange_job(job_id: str, source: str, frequency: Optional[str]) -> None:
+    import importlib.util
+    from pathlib import Path
+
+    bse_root = Path(BASE_DIR) / "data" / "bot_packages" / "bse_stock_exchange" / "Bombay_Stock_Exchange"
+    run_py = bse_root / "run.py"
+    if not run_py.exists():
+        raise FileNotFoundError(f"BSE runner not found at {run_py}")
+
+    spec = importlib.util.spec_from_file_location("bse_stock_exchange_runner", run_py)
+    if spec is None or spec.loader is None:
+        raise ValueError("Failed to load BSE runner")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)  # type: ignore[union-attr]
+
+    execution = module.run(
+        {
+            "job_id": job_id,
+            "source": source,
+            "frequency": frequency or "Weekly",
+            "timeout_sec": 1800,
+            "outputs_dir": os.path.join(BASE_DIR, "datasets"),
+            "artifacts_dir": os.path.join(BASE_DIR, "datasets"),
+        }
+    )
+
+    records = execution.get("records") if isinstance(execution, dict) else []
+    execution_metadata = execution.get("execution_metadata") if isinstance(execution, dict) else {}
+    if not isinstance(records, list) or not records:
+        raise ValueError("BSE runner did not return any records")
+
+    run_file_dir = os.path.join(BASE_DIR, "datasets")
+    os.makedirs(run_file_dir, exist_ok=True)
+    with get_connection() as conn:
+        row = conn.execute("SELECT refresh_count FROM scraper_jobs WHERE id = ?", (job_id,)).fetchone()
+    current_run_num = _latest_run_number_for_job(job_id, int(row[0]) if row and row[0] is not None else None)
+    next_run_num = max(1, current_run_num + 1)
+    run_file_path = os.path.join(run_file_dir, f"{job_id}_run_{next_run_num}.json")
+    with open(run_file_path, "w", encoding="utf-8") as f_run:
+        json.dump(records, f_run, ensure_ascii=False, indent=2)
+
+    now_str = datetime.utcnow().isoformat() + "Z"
+    next_refresh_str = _calculate_next_refresh_str(frequency)
+    baseline_records, baseline_file = _load_refresh_baseline_records(job_id, run_file_dir, next_run_num)
+    comparison_log = _build_refresh_comparison_log(
+        source,
+        baseline_records,
+        records,
+        baseline_file=baseline_file,
+        current_file=f"{job_id}_run_{next_run_num}.json",
+        execution_metadata=execution_metadata,
+    )
+    with open(os.path.join(run_file_dir, f"{job_id}_comparison.json"), "w", encoding="utf-8") as f_comp:
+        json.dump(comparison_log, f_comp, ensure_ascii=False, indent=2)
+
+    with get_connection() as conn:
+        existing_history_json = conn.execute(
+            "SELECT refresh_history_json FROM scraper_jobs WHERE id = ?",
+            (job_id,)
+        ).fetchone()[0]
+
+    history = json.loads(existing_history_json or "[]")
+    history.append(
+        {
+            "timestamp": now_str,
+            "records_scraped": len(records),
+            "accuracy_rate": 100,
+            "status": "Success",
+            "execution_time_seconds": 0,
+        }
+    )
+
+    with get_connection() as conn:
+        conn.execute(
+            """UPDATE scraper_jobs
+               SET status = 'Review Pending',
+                   records = ?,
+                   fresh = 100,
+                   last_refresh = ?,
+                   next_refresh = ?,
+                   refresh_count = ?,
+                   refresh_history_json = ?,
+                   changes_detected = ?
+               WHERE id = ?""",
+            (len(records), now_str, next_refresh_str, next_run_num, json.dumps(history), len(records), job_id)
+        )
+        conn.commit()
+
+    from app.services.workflow_service import workflow_service
+
+    workflow_service.runs[job_id] = {
+        "run_id": job_id,
+        "dataset_id": job_id,
+        "dataset_name": source,
+        "processed_dataset": records,
+        "comparison_log": comparison_log,
+        "bot_execution": execution_metadata if isinstance(execution_metadata, dict) else {},
+    }
+    try:
+        from app.services.wcm_comparison_service import warm_review_cache
+        asyncio.create_task(warm_review_cache(job_id, 2.0))
+    except Exception:
+        pass
+
+
+async def _run_nationalgrid_tso29_job(job_id: str, source: str, frequency: Optional[str]) -> None:
+    import importlib.util
+    from pathlib import Path
+
+    nationalgrid_root = Path(BASE_DIR) / "data" / "bot_packages" / "nationalgrid_tso29_gasflow_sso_nomrenom_prod_dem" / "ICIS_TSO_TSO29_NationalGrid_Gasflow_SSO_Nomrenom_Prod_Dem"
+    run_py = nationalgrid_root / "run.py"
+    if not run_py.exists():
+        raise FileNotFoundError(f"NationalGrid runner not found at {run_py}")
+
+    spec = importlib.util.spec_from_file_location("nationalgrid_tso29_runner", run_py)
+    if spec is None or spec.loader is None:
+        raise ValueError("Failed to load NationalGrid runner")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)  # type: ignore[union-attr]
+
+    execution = module.run(
+        {
+            "job_id": job_id,
+            "source": source,
+            "frequency": frequency or "One-time",
+            "timeout_sec": 1800,
+            "outputs_dir": os.path.join(BASE_DIR, "datasets"),
+            "artifacts_dir": os.path.join(BASE_DIR, "datasets"),
+        }
+    )
+
+    records = execution.get("records") if isinstance(execution, dict) else []
+    execution_metadata = execution.get("execution_metadata") if isinstance(execution, dict) else {}
+    if not isinstance(records, list) or not records:
+        raise ValueError("NationalGrid runner did not return any records")
+
+    run_file_dir = os.path.join(BASE_DIR, "datasets")
+    os.makedirs(run_file_dir, exist_ok=True)
+    with get_connection() as conn:
+        row = conn.execute("SELECT refresh_count FROM scraper_jobs WHERE id = ?", (job_id,)).fetchone()
+    current_run_num = _latest_run_number_for_job(job_id, int(row[0]) if row and row[0] is not None else None)
+    next_run_num = max(1, current_run_num + 1)
+    run_file_path = os.path.join(run_file_dir, f"{job_id}_run_{next_run_num}.json")
+    with open(run_file_path, "w", encoding="utf-8") as f_run:
+        json.dump(records, f_run, ensure_ascii=False, indent=2)
+
+    now_str = datetime.utcnow().isoformat() + "Z"
+    next_refresh_str = _calculate_next_refresh_str(frequency)
+    baseline_records, baseline_file = _load_refresh_baseline_records(job_id, run_file_dir, next_run_num)
+    comparison_log = _build_refresh_comparison_log(
+        source,
+        baseline_records,
+        records,
+        baseline_file=baseline_file,
+        current_file=f"{job_id}_run_{next_run_num}.json",
+        execution_metadata=execution_metadata,
+    )
+    with open(os.path.join(run_file_dir, f"{job_id}_comparison.json"), "w", encoding="utf-8") as f_comp:
+        json.dump(comparison_log, f_comp, ensure_ascii=False, indent=2)
+
+    with get_connection() as conn:
+        existing_history_json = conn.execute(
+            "SELECT refresh_history_json FROM scraper_jobs WHERE id = ?",
+            (job_id,)
+        ).fetchone()[0]
+
+    history = json.loads(existing_history_json or "[]")
+    history.append(
+        {
+            "timestamp": now_str,
+            "records_scraped": len(records),
+            "accuracy_rate": 100,
+            "status": "Success",
+            "execution_time_seconds": 0,
+        }
+    )
+
+    with get_connection() as conn:
+        conn.execute(
+            """UPDATE scraper_jobs
+               SET status = 'Review Pending',
+                   records = ?,
+                   fresh = 100,
+                   last_refresh = ?,
+                   next_refresh = ?,
+                   refresh_count = ?,
+                   refresh_history_json = ?,
+                   changes_detected = ?
+               WHERE id = ?""",
+            (len(records), now_str, next_refresh_str, next_run_num, json.dumps(history), len(records), job_id)
+        )
+        conn.commit()
+
+    from app.services.workflow_service import workflow_service
+
+    workflow_service.runs[job_id] = {
+        "run_id": job_id,
+        "dataset_id": job_id,
+        "dataset_name": source,
+        "processed_dataset": records,
+        "comparison_log": comparison_log,
+        "bot_execution": execution_metadata if isinstance(execution_metadata, dict) else {},
+    }
+    try:
+        from app.services.wcm_comparison_service import warm_review_cache
+        asyncio.create_task(warm_review_cache(job_id, 2.0))
+    except Exception:
+        pass
+
 async def run_scraper_background(job_id: str):
     # 1. Fetch info from DB first to check if custom source onboarding and avoid multiple database queries
     with get_connection() as conn:
@@ -863,8 +1360,8 @@ async def run_scraper_background(job_id: str):
     uploaded_records = job_info_db[11]
     current_status = job_info_db[12]
 
-    # Keep new source onboarding jobs pending until a dedicated onboarding flow updates them.
-    if bool(is_custom) and str(current_status) == "Pending Onboarding":
+    # Keep any onboarding-bound jobs pending until a dedicated onboarding flow updates them.
+    if str(current_status) == "Pending Onboarding":
         return
     
     # Update status to 'Running'
@@ -874,9 +1371,7 @@ async def run_scraper_background(job_id: str):
             (job_id,)
         )
         conn.commit()
-    
 
-    
     # Simulate scraper run time (onboarding duration for first run of custom source, or 5s standard)
     if bool(is_custom) and refresh_count_curr == 0:
         duration = 30
@@ -903,7 +1398,7 @@ async def run_scraper_background(job_id: str):
         await asyncio.sleep(duration)
     else:
         await asyncio.sleep(5)
-    
+
     # Reload job state to get updated filters_str if modified above
     with get_connection() as conn:
         row = conn.execute("SELECT filters, planner_json FROM scraper_jobs WHERE id = ?", (job_id,)).fetchone()
@@ -961,6 +1456,7 @@ async def run_scraper_background(job_id: str):
             from app.services.company_verification_service import company_verification_service
             from app.services.registry_scrapers.sec_scraper import sec_scraper
             from app.services.registry_scrapers.mca_scraper import mca_scraper
+            from app.services.enrichment_service import enrichment_service
             from app.services.workflow_service import workflow_service, parse_employee_count, parse_headquarters
             
             run_website = any("website" in str(s).lower() and "linkedin" not in str(s).lower() for s in picked_sources)
@@ -968,10 +1464,41 @@ async def run_scraper_background(job_id: str):
             run_linkedin = any("linkedin" in str(s).lower() for s in picked_sources)
             run_mca = any("mca" in str(s).lower() for s in picked_sources)
             run_crunchbase = any("crunchbase" in str(s).lower() for s in picked_sources)
-            
-            # Default to running website if picked_sources is empty
+            run_builtwith = any("builtwith" in str(s).lower() for s in picked_sources)
+
+            # By Dataset should always run the core enrichment sources.
+            run_website = True
+            run_sec = True
+            run_mca = True
             if not picked_sources:
-                run_website = True
+                run_builtwith = True
+
+            def _is_present(value: Any) -> bool:
+                if value is None:
+                    return False
+                if isinstance(value, str):
+                    return bool(value.strip()) and value.strip().lower() not in ("n/a", "na", "none", "null", "-", "â€”")
+                if isinstance(value, (list, tuple, set, dict)):
+                    return bool(value)
+                return True
+
+            def _first_present(*values: Any) -> Any:
+                for value in values:
+                    if _is_present(value):
+                        return value
+                return None
+
+            def _strip_internal_keys(row: Dict[str, Any]) -> Dict[str, Any]:
+                return {k: v for k, v in (row or {}).items() if not str(k).startswith("_")}
+
+            def _extract_public_context(row: Dict[str, Any], **context_parts: Dict[str, Any]) -> Dict[str, Any]:
+                context: Dict[str, Any] = {}
+                for ctx_name, ctx_value in context_parts.items():
+                    if isinstance(ctx_value, dict) and ctx_value:
+                        context[ctx_name] = _strip_internal_keys(ctx_value)
+                    elif _is_present(ctx_value):
+                        context[ctx_name] = ctx_value
+                return context
 
             # Concurrency limit and task definition
             sem = asyncio.Semaphore(5)
@@ -1017,14 +1544,15 @@ async def run_scraper_background(job_id: str):
                     
                     scraped_metadata = {}
                     website_resolved = None
+                    website_enrichment = {}
                     sec_fields = {}
                     mca_fields = {}
                     linkedin_metadata = {}
                     
-                    # For demo performance, only do real scraping for the first 5 records
-                    should_scrape = (idx < 5)
+                    # Run the real enrichment stack for every record in the uploaded dataset.
+                    should_scrape = True
                     
-                    if should_scrape and run_website:
+                    if should_scrape and (run_website or run_builtwith):
                         verification_input = {
                             "company": company_val,
                             "website": website_val,
@@ -1039,6 +1567,28 @@ async def run_scraper_background(job_id: str):
                             )
                             scraped_metadata = res.get("scraped_metadata") or {}
                             website_resolved = res.get("website")
+                            try:
+                                enrichment_source = website_resolved or website_val or ""
+                                if enrichment_source:
+                                    website_enrichment = await asyncio.wait_for(
+                                        asyncio.to_thread(
+                                            enrichment_service.enrich,
+                                            [{"url": enrichment_source}],
+                                            [{"result": record}],
+                                        ),
+                                        timeout=4.0,
+                                    )
+                                    if isinstance(website_enrichment, dict) and website_enrichment:
+                                        scraped_metadata = {
+                                            **scraped_metadata,
+                                            **{
+                                                k: v
+                                                for k, v in website_enrichment.items()
+                                                if v not in (None, "", [], {})
+                                            },
+                                        }
+                            except Exception as e:
+                                logger.warning("[By Dataset] Website enrichment merge failed for %s: %s", company_val, e)
                         except Exception as e:
                             logger.warning("[By Dataset] Scraper failed/timed out for %s: %s", company_val, e)
                             
@@ -1116,15 +1666,42 @@ async def run_scraper_background(job_id: str):
                             val = sec_fields.get("website") or linkedin_metadata.get("website") or linkedin_metadata.get("linkedin_website") or scraped_metadata.get("url") or website_resolved or website_val
                             enriched_row[key] = val if val else None
                         elif key == "description":
-                            val = linkedin_metadata.get("description") or linkedin_metadata.get("linkedin_description") or scraped_metadata.get("meta_description") or sec_fields.get("sic_description")
+                            val = (
+                                linkedin_metadata.get("description")
+                                or linkedin_metadata.get("linkedin_description")
+                                or website_enrichment.get("description")
+                                or scraped_metadata.get("description")
+                                or scraped_metadata.get("meta_description")
+                                or sec_fields.get("sic_description")
+                            )
+                            enriched_row[key] = val if val else None
+                        elif key in ("founded_year", "year_founded"):
+                            val = (
+                                sec_fields.get("year_founded")
+                                or mca_fields.get("year_founded")
+                                or linkedin_metadata.get("year_founded")
+                                or scraped_metadata.get("year_founded")
+                                or scraped_metadata.get("founding_year")
+                            )
                             enriched_row[key] = val if val else None
                         elif key in ("phone", "contact_phone"):
                             phones = scraped_metadata.get("phone_numbers") or []
-                            val = sec_fields.get("profile", {}).get("phone") or (phones[0] if phones else None) or phone_val
+                            val = (
+                                sec_fields.get("profile", {}).get("phone")
+                                or website_enrichment.get("possible_phone")
+                                or scraped_metadata.get("possible_phone")
+                                or (phones[0] if phones else None)
+                                or phone_val
+                            )
                             enriched_row[key] = val if val else None
                         elif key in ("email", "contact_email"):
                             emails = scraped_metadata.get("emails") or []
-                            val = (emails[0] if emails else None) or email_val
+                            val = (
+                                website_enrichment.get("possible_email")
+                                or scraped_metadata.get("possible_email")
+                                or (emails[0] if emails else None)
+                                or email_val
+                            )
                             enriched_row[key] = val if val else None
                         elif key in ("linkedin_url", "contact_linkedin"):
                             val = linkedin_metadata.get("linkedin_url") or linkedin_val
@@ -1139,7 +1716,14 @@ async def run_scraper_background(job_id: str):
                             links = [l for l in scraped_metadata.get("social_links", []) if "facebook.com" in l]
                             enriched_row["facebook_url"] = links[0] if links else None
                         elif key == "hq_address":
-                            val = sec_street or mca_fields.get("registered_office_address") or li_hq_str or scraped_metadata.get("hq_address") or scraped_metadata.get("address")
+                            val = (
+                                sec_street
+                                or mca_fields.get("registered_office_address")
+                                or li_hq_str
+                                or website_enrichment.get("address")
+                                or scraped_metadata.get("hq_address")
+                                or scraped_metadata.get("address")
+                            )
                             enriched_row[key] = val if val else None
                         elif key == "hq_city":
                             val = sec_city or mca_hq.get("city") or li_hq.get("city") or scraped_metadata.get("hq_city") or scraped_metadata.get("city")
@@ -1176,17 +1760,118 @@ async def run_scraper_background(job_id: str):
                         elif key == "employee_range":
                             val = linkedin_metadata.get("linkedin_employee_range") or linkedin_metadata.get("company_size") or cb_fields.get("employee_range")
                             enriched_row[key] = val if val else None
-                        elif key in ("funding_total", "latest_round", "latest_round_amount", "valuation", "investors"):
-                            enriched_row[key] = cb_fields.get(key) or None
-                        elif key in ("annual_revenue", "revenue_range"):
-                            enriched_row[key] = cb_fields.get(key) or None
+                        elif key in ("annual_revenue", "revenue", "revenue_range", "net_income", "assets", "liabilities"):
+                            val = (
+                                cb_fields.get(key)
+                                or cb_fields.get("annual_revenue")
+                                or scraped_metadata.get(key)
+                                or website_enrichment.get(key)
+                            )
+                            enriched_row[key] = val if val else None
+                        elif key in ("funding_total", "latest_round", "latest_round_amount", "valuation", "investors", "last_round", "amount_raised"):
+                            val = (
+                                cb_fields.get(key)
+                                or cb_fields.get("funding_total")
+                                or cb_fields.get("latest_round")
+                                or cb_fields.get("latest_round_amount")
+                                or scraped_metadata.get(key)
+                                or website_enrichment.get(key)
+                            )
+                            enriched_row[key] = val if val else None
+                        elif key in ("company_type", "ownership"):
+                            val = sec_fields.get(key) or mca_fields.get(key) or linkedin_metadata.get(key) or scraped_metadata.get(key) or website_enrichment.get(key)
+                            enriched_row[key] = val if val else None
+                        elif key in ("cms", "analytics", "frameworks", "hosting", "tech_stack"):
+                            val = (
+                                website_enrichment.get(key)
+                                or scraped_metadata.get(key)
+                                or sec_fields.get(key)
+                                or mca_fields.get(key)
+                                or linkedin_metadata.get(key)
+                            )
+                            enriched_row[key] = val if val else None
                         else:
                             matched_val = record.get(mapping.get(key) or key)
                             enriched_row[key] = matched_val if matched_val is not None else None
+                    enriched_row["_source_context"] = _extract_public_context(
+                        enriched_row,
+                        scraped_metadata=scraped_metadata,
+                        sec_fields=sec_fields,
+                        mca_fields=mca_fields,
+                        linkedin_metadata=linkedin_metadata,
+                        website_enrichment=website_enrichment,
+                        cb_fields=cb_fields,
+                        source_url=website_resolved or website_val,
+                    )
                     return enriched_row
 
             tasks = [process_record_safe(idx, rec) for idx, rec in enumerate(input_rows)]
-            enriched_records = await asyncio.gather(*tasks)
+            enriched_records = list(await asyncio.gather(*tasks))
+
+            # OpenAI CDE enrichment for BY Dataset Use Case.
+            try:
+                from app.services.openai_cde_service import (
+                    merge_openai_cde_values,
+                    openai_cde_service,
+                )
+
+                target_attrs = selected_outputs if selected_outputs else (
+                    [key for key in enriched_records[0].keys() if not str(key).startswith("_")]
+                    if enriched_records else []
+                )
+
+                workflow_ids = []
+                if isinstance(filters_dict, dict) and filters_dict.get("workflowId"):
+                    wf_id = str(filters_dict["workflowId"])
+                    workflow_aliases = {
+                        "wf-company-extraction": "company_data",
+                        "wf-financial-extraction": "sec_data",
+                        "wf-contact-enrichment": "labor_market",
+                        "wf-funding": "labor_market",
+                        "wf-registry-multi": "registry_data",
+                        "wf-news-signals": "company_data",
+                    }
+                    workflow_ids.append(workflow_aliases.get(wf_id, wf_id))
+                if not workflow_ids:
+                    workflow_ids = ["company_data"]
+
+                openai_results = await openai_cde_service.extract_dataset_data(
+                    records=enriched_records,
+                    requested_fields=target_attrs,
+                    workflow_ids=workflow_ids,
+                )
+
+                ai_rows_with_values = 0
+                ai_fields_filled = 0
+
+                for idx, record in enumerate(enriched_records):
+                    ai_item = openai_results[idx] if idx < len(openai_results) else {}
+                    ai_extracted = ai_item.get("extracted") if isinstance(ai_item, dict) else {}
+                    if not isinstance(ai_extracted, dict) or not ai_extracted:
+                        continue
+                    ai_rows_with_values += 1
+                    ai_fields_filled += sum(1 for value in ai_extracted.values() if value not in (None, "", [], {}))
+                    enriched_records[idx] = merge_openai_cde_values(
+                        record,
+                        ai_extracted,
+                        requested_fields=target_attrs,
+                        source="openai_cde",
+                        confidence=80,
+                    )
+
+                logger.info(
+                    "[OpenAI CDE] job=%s records=%s target_fields=%s rows_with_ai=%s fields_from_ai=%s",
+                    job_id,
+                    len(enriched_records),
+                    len(target_attrs),
+                    ai_rows_with_values,
+                    ai_fields_filled,
+                )
+
+            except Exception as fallback_err:
+                logger.warning(f"[OpenAI CDE] Extraction step in demo_routes failed: {fallback_err}")
+
+            sanitized_records = [_strip_internal_keys(record) for record in enriched_records]
 
             # Wait 5 seconds simulating output file generation & review preparation
             await asyncio.sleep(5)
@@ -1195,17 +1880,7 @@ async def run_scraper_background(job_id: str):
             freshness_val = random.randint(95, 100)
             now_str = datetime.utcnow().isoformat() + "Z"
             
-            from datetime import timedelta
-            now = datetime.utcnow()
-            if frequency == "Daily":
-                next_date = now + timedelta(days=1)
-            elif frequency == "Monthly":
-                next_date = now + timedelta(days=30)
-            elif frequency == "Quarterly":
-                next_date = now + timedelta(days=90)
-            else:
-                next_date = now + timedelta(days=7)
-            next_refresh_str = next_date.isoformat() + "Z"
+            next_refresh_str = _calculate_next_refresh_str(frequency)
 
             history_entry = {
                 "timestamp": now_str,
@@ -1244,15 +1919,20 @@ async def run_scraper_background(job_id: str):
             run_file_dir = os.path.join(BASE_DIR, "datasets")
             run_file_path = os.path.join(run_file_dir, f"{job_id}_run_{refresh_count_curr + 1}.json")
             with open(run_file_path, "w", encoding="utf-8") as f_run:
-                json.dump(enriched_records, f_run, ensure_ascii=False, indent=2)
+                json.dump(sanitized_records, f_run, ensure_ascii=False, indent=2)
 
             from app.services.workflow_service import workflow_service
             workflow_service.runs[job_id] = {
                 "run_id": job_id,
                 "dataset_id": job_id,
                 "dataset_name": source,
-                "processed_dataset": enriched_records
+                "processed_dataset": sanitized_records
             }
+            try:
+                from app.services.wcm_comparison_service import warm_review_cache
+                asyncio.create_task(warm_review_cache(job_id, 2.0))
+            except Exception:
+                pass
             return
 
         if _is_partial_scope(scope) and planner_json:
@@ -1310,6 +1990,15 @@ async def run_scraper_background(job_id: str):
                 if _is_partial_scope(scope):
                     filters = resolved_filters
                     records = filter_records(records, filters)
+        elif _is_nationalgrid_tso29_source(source):
+            await _run_nationalgrid_tso29_job(job_id, source, frequency)
+            return
+        elif _is_gasunie_demand_prod_source(source):
+            await _run_gasunie_demand_prod_job(job_id, source, frequency)
+            return
+        elif _is_bse_stock_exchange_source(source):
+            await _run_bse_stock_exchange_job(job_id, source, frequency)
+            return
                     
         else:
             # Custom source/New Source - run onboarding workflow (analyse_site) then scraper
@@ -1341,124 +2030,42 @@ async def run_scraper_background(job_id: str):
         # Save this clean run dataset to datasets/J-ID_run_N.json
         run_file_dir = os.path.join(BASE_DIR, "datasets")
         os.makedirs(run_file_dir, exist_ok=True)
-        run_file_path = os.path.join(run_file_dir, f"{job_id}_run_{refresh_count_curr + 1}.json")
+        next_run_num = max(1, refresh_count_curr + 1)
+        run_file_path = os.path.join(run_file_dir, f"{job_id}_run_{next_run_num}.json")
         with open(run_file_path, "w", encoding="utf-8") as f_run:
             json.dump(records, f_run, ensure_ascii=False, indent=2)
             
         # Compute comparisons diff
         total_changes = 0
         comparison_log = {}
-        
         if refresh_count_curr == 0:
-            # First run: WCM not run, everything treated as A (Added)
             total_changes = len(records)
             comparison_log = {
                 "baseline_file": "",
-                "current_file": f"{job_id}_run_1.json",
+                "current_file": f"{job_id}_run_{next_run_num}.json",
                 "records_compared": len(records),
                 "added": len(records),
                 "modified": 0,
                 "deleted": 0,
                 "verified": 0,
                 "change_percentage": 100.0,
-                "modified_details": []
+                "modified_details": [],
             }
         else:
-            # Load baseline approved dataset
-            baseline_records = []
-            baseline_path = os.path.join(run_file_dir, f"{job_id}_final.json")
-            if os.path.exists(baseline_path):
-                try:
-                    with open(baseline_path, "r", encoding="utf-8") as f_base:
-                        baseline_records = json.load(f_base)
-                except Exception:
-                    pass
-            
-            # Compare using wcm_comparison_service
-            from app.services.wcm_comparison_service import compare_records
-            flattened_rows, record_change_count = compare_records(
+            baseline_records, baseline_file = _load_refresh_baseline_records(job_id, run_file_dir, next_run_num)
+            comparison_log = _build_refresh_comparison_log(
                 source,
                 baseline_records,
                 records,
-                allowed_attrs=selected_outputs if selected_outputs else None,
-                attr_mapping=mapping if mapping else None,
+                baseline_file=baseline_file,
+                current_file=f"{job_id}_run_{next_run_num}.json",
+                execution_metadata={},
             )
-            total_changes = record_change_count
-            
-            # Calculate comparison metrics
-            from app.api.demo_routes import get_record_key
-            
-            baseline_keys = set()
-            for idx, r in enumerate(baseline_records):
-                key = get_record_key(source, r) or f"idx_{idx}"
-                orig_key = key
-                counter = 1
-                while key in baseline_keys:
-                    key = f"{orig_key}_{counter}"
-                    counter += 1
-                baseline_keys.add(key)
-                
-            current_keys = set()
-            for idx, r in enumerate(records):
-                key = get_record_key(source, r) or f"idx_{idx}"
-                orig_key = key
-                counter = 1
-                while key in current_keys:
-                    key = f"{orig_key}_{counter}"
-                    counter += 1
-                current_keys.add(key)
-                
-            all_keys = baseline_keys.union(current_keys)
-            
-            added_count = 0
-            deleted_count = 0
-            modified_count = 0
-            verified_count = 0
-            modified_details = []
-            
-            # Group flattened comparison rows by recordKey and check for M rows
-            key_changes = {}
-            for row in flattened_rows:
-                k = row["recordKey"]
-                change_type = row["changeType"]
-                if change_type in ("A", "M", "D"):
-                    if k not in key_changes:
-                        key_changes[k] = []
-                    key_changes[k].append(row)
-                    
-            for k in all_keys:
-                if k in current_keys and k not in baseline_keys:
-                    added_count += 1
-                elif k in baseline_keys and k not in current_keys:
-                    deleted_count += 1
-                else:
-                    if k in key_changes:
-                        modified_count += 1
-                        for change in key_changes[k]:
-                            if change["changeType"] == "M":
-                                modified_details.append({
-                                    "record_key": k,
-                                    "attribute": change["attributeKey"],
-                                    "old_value": change["previous"],
-                                    "new_value": change["value"]
-                                })
-                    else:
-                        verified_count += 1
-                        
-            records_compared = len(all_keys)
-            change_percentage = round((added_count + modified_count + deleted_count) / records_compared * 100, 2) if records_compared > 0 else 0.0
-            
-            comparison_log = {
-                "baseline_file": f"{job_id}_final.json",
-                "current_file": f"{job_id}_run_{refresh_count_curr + 1}.json",
-                "records_compared": records_compared,
-                "added": added_count,
-                "modified": modified_count,
-                "deleted": deleted_count,
-                "verified": verified_count,
-                "change_percentage": change_percentage,
-                "modified_details": modified_details
-            }
+            total_changes = int(
+                (comparison_log.get("added", 0) or 0)
+                + (comparison_log.get("modified", 0) or 0)
+                + (comparison_log.get("deleted", 0) or 0)
+            )
             
         # Write comparison audit log
         comparison_log_path = os.path.join(run_file_dir, f"{job_id}_comparison.json")
@@ -1469,19 +2076,7 @@ async def run_scraper_background(job_id: str):
             logger.error("Failed to write comparison log file: %s", e)
 
         # Recalculate next refresh date
-        from datetime import datetime as dt, timedelta
-        now = dt.utcnow()
-        if frequency == "2 Minutes":
-            next_date = now + timedelta(minutes=2)
-        elif frequency == "Daily":
-            next_date = now + timedelta(days=1)
-        elif frequency == "Monthly":
-            next_date = now + timedelta(days=30)
-        elif frequency == "Quarterly":
-            next_date = now + timedelta(days=90)
-        else:
-            next_date = now + timedelta(days=7)
-        next_refresh_str = next_date.isoformat() + "Z"
+        next_refresh_str = _calculate_next_refresh_str(frequency)
         
         history_entry = {
             "timestamp": now_str,
@@ -1508,10 +2103,11 @@ async def run_scraper_background(job_id: str):
                        fresh = 100, 
                        last_refresh = ?, 
                        next_refresh = ?,
+                       refresh_count = ?,
                        refresh_history_json = ?,
                        changes_detected = ?
                    WHERE id = ?""",
-                (len(records), now_str, next_refresh_str, json.dumps(history), total_changes, job_id)
+                (len(records), now_str, next_refresh_str, next_run_num, json.dumps(history), total_changes, job_id)
             )
             conn.commit()
             
@@ -1523,6 +2119,11 @@ async def run_scraper_background(job_id: str):
             "processed_dataset": records,
             "partial_scrape_metadata": partial_scrape_metadata or None,
         }
+        try:
+            from app.services.wcm_comparison_service import warm_review_cache
+            asyncio.create_task(warm_review_cache(job_id, 2.0))
+        except Exception:
+            pass
         return
     except Exception as e:
         import traceback
@@ -1536,8 +2137,10 @@ async def run_scraper_background(job_id: str):
 
 
 @router.post("/jobs/launch")
-async def launch_jobs(request: LaunchJobsRequest, background_tasks: BackgroundTasks):
-    for item in request.jobs:
+async def launch_jobs(request: Request, payload: LaunchJobsRequest, background_tasks: BackgroundTasks):
+    session = auth_service.get_session(request)
+    owner_username = (session or {}).get("username") or "user"
+    for item in payload.jobs:
         raw_partial_request = (item.custom_criteria or "").strip()
         if _is_partial_scope(item.scope) and not raw_partial_request and (item.filters.strip().startswith("{") or "=" in item.filters):
             raw_partial_request = item.filters.strip()
@@ -1590,17 +2193,7 @@ async def launch_jobs(request: LaunchJobsRequest, background_tasks: BackgroundTa
         dataset_path = f"datasets/{clean_src}_sample.csv"
         now_str = datetime.utcnow().isoformat() + "Z"
         
-        from datetime import datetime as dt, timedelta
-        now = dt.utcnow()
-        if item.frequency == "Daily":
-            next_date = now + timedelta(days=1)
-        elif item.frequency == "Monthly":
-            next_date = now + timedelta(days=30)
-        elif item.frequency == "Quarterly":
-            next_date = now + timedelta(days=90)
-        else:
-            next_date = now + timedelta(days=7)
-        next_refresh_str = next_date.isoformat() + "Z"
+        next_refresh_str = _calculate_next_refresh_str(item.frequency)
 
         # Look up complexity and SLA from pending jobs with status = 'Analysis Complete' as a fallback if not passed
         complexity_val = item.complexity
@@ -1620,15 +2213,16 @@ async def launch_jobs(request: LaunchJobsRequest, background_tasks: BackgroundTa
             except Exception:
                 pass
 
-        status_val = "Running"
+        status_val = "Pending Onboarding" if bool(item.isCustomSource) or _is_partial_scope(item.scope) else "Running"
 
         try:
-            with get_connection() as conn:
-                conn.execute(
-                    "UPDATE scraper_jobs SET status = 'Failed' WHERE source = ? AND status = 'Running' AND id != ?",
-                    (item.source, item.id)
-                )
-                conn.commit()
+            if not (_is_nationalgrid_tso29_source(item.source) or _is_gasunie_demand_prod_source(item.source)):
+                with get_connection() as conn:
+                    conn.execute(
+                        "UPDATE scraper_jobs SET status = 'Failed' WHERE source = ? AND status = 'Running' AND id != ?",
+                        (item.source, item.id)
+                    )
+                    conn.commit()
         except Exception:
             pass
 
@@ -1658,6 +2252,16 @@ async def launch_jobs(request: LaunchJobsRequest, background_tasks: BackgroundTa
                      1 if item.isCustomSource else 0, item.mode, complexity_val, sla_val, item.records, planner_json_value)
                 )
                 conn.commit()
+
+        try:
+            with get_connection() as conn:
+                conn.execute(
+                    "UPDATE scraper_jobs SET owner_username = ? WHERE id = ?",
+                    (owner_username, item.id),
+                )
+                conn.commit()
+        except Exception:
+            pass
         
         # Delete pending job to prevent duplicates
         try:
@@ -1672,15 +2276,17 @@ async def launch_jobs(request: LaunchJobsRequest, background_tasks: BackgroundTa
         
         background_tasks.add_task(run_scraper_background, item.id)
         
-    return {"status": "success", "launched_count": len(request.jobs)}
+    return {"status": "success", "launched_count": len(payload.jobs)}
 
 
 @router.post("/jobs/create_pending")
-async def create_pending_job(item: PendingJobItem):
+async def create_pending_job(request: Request, item: PendingJobItem):
     import random
     job_id = f"J-{random.randint(1000, 9999)}"
     now_str = datetime.utcnow().isoformat() + "Z"
     status = "Pending Onboarding"
+    session = auth_service.get_session(request)
+    owner_username = (session or {}).get("username") or "user"
     
     with get_connection() as conn:
         conn.execute(
@@ -1690,19 +2296,31 @@ async def create_pending_job(item: PendingJobItem):
             (job_id, item.website_url, f"datasets/{item.source_name.lower()}_sample.csv", status, now_str, item.complexity, item.estimated_development_effort)
         )
         conn.commit()
+    try:
+        with get_connection() as conn:
+            conn.execute(
+                "UPDATE scraper_jobs SET owner_username = ? WHERE id = ?",
+                (owner_username, job_id),
+            )
+            conn.commit()
+    except Exception:
+        pass
     return {"status": "success", "job_id": job_id}
 
 
 @router.get("/jobs")
-async def get_jobs():
+async def get_jobs(request: Request):
+    session = auth_service.get_session(request)
+    if not session:
+        return []
     with get_connection() as conn:
-        rows = conn.execute(
-            """SELECT id, source, scope, filters, custom_criteria, frequency, delivery, output_format, 
-                      dataset_path, status, records, fresh, created_at, last_refresh, next_refresh, 
-                      refresh_count, is_custom_source, mode, refresh_history_json, changes_detected,
-                      complexity, estimated_onboarding_time
-               FROM scraper_jobs"""
-        ).fetchall()
+        rows = conn.execute("SELECT * FROM scraper_jobs").fetchall()
+    if session.get("role") != "admin":
+        username = session.get("username")
+        rows = [
+            r for r in rows
+            if str(r["owner_username"] or "") == username or (r["owner_username"] is None and username == "user")
+        ]
     
     jobs = []
     for r in rows:
@@ -1763,6 +2381,30 @@ async def get_jobs():
                 except Exception:
                     pass
 
+            # Calculate coverage and review summary dynamically
+            coverage = None
+            try:
+                from app.services.wcm_comparison_service import build_review_coverage
+                coverage = build_review_coverage(
+                    job_id=job_id,
+                    source=r["source"],
+                    mode=r["mode"],
+                    scope=r["scope"],
+                    filters_str=r["filters"],
+                    refresh_count=r["refresh_count"],
+                )
+                from app.services.wcm_comparison_service import compact_review_coverage
+                coverage = compact_review_coverage(coverage)
+            except Exception as e:
+                logger.warning("Failed to compute coverage for job %s: %s", job_id, e)
+
+            review_summary = None
+            try:
+                from app.services.wcm_comparison_service import get_job_review_summary
+                review_summary = get_job_review_summary(job_id)
+            except Exception as e:
+                pass
+
             jobs.append({
                 "id": job_id,
                 "source": as_text(r["source"]),
@@ -1788,6 +2430,9 @@ async def get_jobs():
                 "estimated_onboarding_time": r["estimated_onboarding_time"] if "estimated_onboarding_time" in r.keys() else None,
                 "approved_count": approved_count,
                 "rejected_count": rejected_count,
+                "coverage": coverage,
+                "review_summary": review_summary,
+                "is_urgent": bool(r["is_urgent"]),
             })
         except Exception as e:
             logger.warning("Skipping malformed scraper job row %s: %s", r["id"] if "id" in r.keys() else "unknown", e)
@@ -1846,17 +2491,31 @@ async def edit_value(req: EditValueRequest):
             logger.error("Failed to edit persisted JSON file: %s", e)
             raise HTTPException(status_code=500, detail=f"Failed to update dataset file: {str(e)}")
             
-    return {"status": "success"}
+    coverage = None
+    review_summary = None
+    try:
+        from app.services.wcm_comparison_service import get_review_rows, get_job_review_summary
+
+        coverage = get_review_rows(job_id, 100.0, include_coverage=True).get("coverage")
+        review_summary = get_job_review_summary(job_id)
+    except Exception as exc:
+        logger.warning("Failed to refresh review payload after edit for %s: %s", job_id, exc)
+
+    return {
+        "status": "success",
+        "coverage": coverage,
+        "review_summary": review_summary,
+    }
 
 
 # Confidence report preview route has been removed.
 
 
 @router.get("/jobs/review_data")
-async def get_jobs_review_data(job_id: str, sample_rate: float = 2.0):
+async def get_jobs_review_data(job_id: str, sample_rate: float = 2.0, sample_offset: int = 0):
     from app.services.wcm_comparison_service import get_review_rows
     try:
-        data = get_review_rows(job_id, sample_rate)
+        data = get_review_rows(job_id, sample_rate, sample_offset=sample_offset)
         return data
     except Exception as e:
         logger.error("Failed to get review data: %s", e)
@@ -2012,7 +2671,10 @@ async def submit_review(req: SubmitReviewRequest):
     else:
         # By Source (Site-Specific) Review Submission
         # Load latest run
-        run_file_path = os.path.join(decisions_dir, f"{job_id}_run_{refresh_count + 1}.json")
+        current_run_num = _latest_run_number_for_job(job_id, refresh_count)
+        if current_run_num <= 0:
+            current_run_num = 1
+        run_file_path = os.path.join(decisions_dir, f"{job_id}_run_{current_run_num}.json")
         new_records = []
         if os.path.exists(run_file_path):
             try:
@@ -2022,15 +2684,7 @@ async def submit_review(req: SubmitReviewRequest):
                 pass
 
         # Load baseline
-        baseline_records = []
-        if refresh_count > 0:
-            baseline_path = os.path.join(decisions_dir, f"{job_id}_final.json")
-            if os.path.exists(baseline_path):
-                try:
-                    with open(baseline_path, "r", encoding="utf-8") as f:
-                        baseline_records = json.load(f)
-                except Exception:
-                    pass
+        baseline_records, _ = _load_refresh_baseline_records(job_id, decisions_dir, current_run_num)
 
         # Align records
         from app.api.demo_routes import get_record_key
@@ -2173,3 +2827,47 @@ async def submit_review(req: SubmitReviewRequest):
         raise HTTPException(status_code=500, detail=f"Database update failed: {str(e)}")
 
     return {"status": "success"}
+
+
+@router.get("/jobs/{job_id}/review_summary")
+async def get_job_review_summary_endpoint(job_id: str):
+    from app.services.wcm_comparison_service import get_job_review_summary
+    try:
+        summary = get_job_review_summary(job_id)
+        return summary
+    except Exception as e:
+        logger.error("Failed to get review summary for job %s: %s", job_id, e)
+        raise HTTPException(status_code=500, detail=f"Failed to fetch review summary: {str(e)}")
+
+
+class ToggleUrgentRequest(BaseModel):
+    is_urgent: bool
+
+
+@router.post("/jobs/{job_id}/urgent")
+async def toggle_job_urgent(job_id: str, req: ToggleUrgentRequest):
+    try:
+        val = 1 if req.is_urgent else 0
+        with get_connection() as conn:
+            conn.execute("UPDATE scraper_jobs SET is_urgent = ? WHERE id = ?", (val, job_id))
+            conn.commit()
+        return {"status": "success", "is_urgent": req.is_urgent}
+    except Exception as e:
+        logger.error("Failed to toggle urgent status for job %s: %s", job_id, e)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.delete("/jobs/{job_id}")
+async def delete_job(job_id: str):
+    try:
+        with get_connection() as conn:
+            result = conn.execute("DELETE FROM scraper_jobs WHERE id = ?", (job_id,))
+            conn.commit()
+            if result.rowcount == 0:
+                raise HTTPException(status_code=404, detail="Job not found")
+        return {"status": "success", "job_id": job_id}
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error("Failed to delete job %s: %s", job_id, e)
+        raise HTTPException(status_code=500, detail=str(e))

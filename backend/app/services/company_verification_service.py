@@ -109,6 +109,12 @@ def _discovery_identity(rec: Dict[str, Any]) -> str:
     return ""
 
 
+def resolve_company_identity(record: Any) -> str:
+    """Resolve the best normalized company identity for registry lookups."""
+    rec = normalize_workflow_record(record)
+    return _discovery_identity(rec)
+
+
 def _same_domain(left: str, right: str) -> bool:
     return bool(left and right and _extract_domain(left) == _extract_domain(right))
 

@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { Badge, Card, PageHeader, Select } from "@/components/ui-bits";
-import bots from "@/data/bots.json";
+import { fetchBotCatalog, type BotCatalogEntry } from "@/lib/bot-catalog";
 import { Search } from "lucide-react";
 
 export const Route = createFileRoute("/library")({
@@ -10,15 +10,31 @@ export const Route = createFileRoute("/library")({
   component: Library,
 });
 
-type Bot = (typeof bots)["bots"][number];
-
 function Library() {
-  const all = (bots as any).bots as Bot[];
-  const counts = (bots as any).categoryCounts as Record<string, number>;
+  const [all, setAll] = useState<BotCatalogEntry[]>([]);
+  const [counts, setCounts] = useState<Record<string, number>>({});
   const cats = Object.keys(counts).sort();
   const [q, setQ] = useState("");
   const [cat, setCat] = useState<string>("All");
   const [comp, setComp] = useState<string>("All");
+
+  useEffect(() => {
+    let active = true;
+    fetchBotCatalog()
+      .then((payload) => {
+        if (!active) return;
+        setAll(payload.bots || []);
+        setCounts(payload.categoryCounts || {});
+      })
+      .catch(() => {
+        if (!active) return;
+        setAll([]);
+        setCounts({});
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const filteredBots = useMemo(() => {
     return all.filter((b) => {
@@ -26,7 +42,11 @@ function Library() {
       if (comp !== "All" && b.complexity !== comp) return false;
       if (q) {
         const s = q.toLowerCase();
-        return b.name.toLowerCase().includes(s) || b.url.toLowerCase().includes(s) || b.industry.toLowerCase().includes(s);
+        return (
+          String(b.name || "").toLowerCase().includes(s) ||
+          String(b.url || "").toLowerCase().includes(s) ||
+          String(b.industry || "").toLowerCase().includes(s)
+        );
       }
       return true;
     }).slice(0, 100);
@@ -86,19 +106,19 @@ function Library() {
             <tbody className="divide-y divide-border">
               {filteredBots.map((b) => (
                 <tr key={b.id} className="hover:bg-secondary/60">
-                  <td className="px-4 py-2.5">
-                    <div className="font-medium">{b.name}</div>
-                    <div className="text-[11px] text-muted-foreground truncate max-w-[300px]">{b.url}</div>
+                <td className="px-4 py-2.5">
+                    <div className="font-medium">{b.name || "—"}</div>
+                    <div className="text-[11px] text-muted-foreground truncate max-w-[300px]">{b.url || "—"}</div>
                   </td>
-                  <td className="px-4 py-2.5"><Badge tone="info">{b.category}</Badge></td>
-                  <td className="px-4 py-2.5 text-muted-foreground">{b.country}</td>
-                  <td className="px-4 py-2.5 text-muted-foreground">{b.dataType}</td>
+                  <td className="px-4 py-2.5"><Badge tone="info">{b.category || "Uncategorized"}</Badge></td>
+                  <td className="px-4 py-2.5 text-muted-foreground">{b.country || "—"}</td>
+                  <td className="px-4 py-2.5 text-muted-foreground">{b.dataType || "—"}</td>
                   <td className="px-4 py-2.5">
                     <Badge tone={b.complexity === "Simple" ? "success" : b.complexity === "Medium" ? "warning" : "destructive"}>
-                      {b.complexity}
+                      {b.complexity || "—"}
                     </Badge>
                   </td>
-                  <td className="px-4 py-2.5 text-right font-mono">{b.datapoints}</td>
+                  <td className="px-4 py-2.5 text-right font-mono">{b.datapoints ?? 0}</td>
                 </tr>
               ))}
             </tbody>

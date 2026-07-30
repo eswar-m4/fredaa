@@ -39,13 +39,12 @@ def setup_logger(name: str, log_level: str = "INFO") -> logging.Logger:
         console_handler.setFormatter(formatter)
         logger.addHandler(console_handler)
         
-        # File handler - logs to file with rotation
-        # Creates logs directory if it doesn't exist
-        log_dir = Path("logs")
+        # File handler - keep runtime logs under the backend tree.
+        log_dir = Path(__file__).resolve().parents[2] / "logs"
         log_dir.mkdir(exist_ok=True)
-        
+
         file_handler = RotatingFileHandler(
-            filename=log_dir / "freda.log",
+            filename=log_dir / "freda_runtime.log",
             maxBytes=10_485_760,  # 10MB
             backupCount=5  # Keep 5 backup files
         )

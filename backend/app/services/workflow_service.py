@@ -26,6 +26,7 @@ from app.services.company_verification_service import (
     normalize_workflow_record,
 )
 from app.services.enrichment_service import enrichment_service
+from app.services.gemini_fallback_service import gemini_fallback_service, merge_ai_fallback_values
 from app.services.registry_scrapers.registry_orchestrator import registry_orchestrator
 from app.services.review_service import review_service
 from app.services.website_discovery_service import website_discovery_service
@@ -994,9 +995,9 @@ class WorkflowService:
                     "change_detected": not is_match,
                     "status": status,
                     "source_url": linkedin_url or "Not Found",
-                    "source": "LinkedIn",
-                    "source_label": "LinkedIn",
-                    "priority_source": "LinkedIn",
+                    "source": "LinkedIn Search Result",
+                    "source_label": "LinkedIn Search Result",
+                    "priority_source": "LinkedIn Search Result",
                     "confidence": confidence,
                 }
             )
@@ -1033,7 +1034,7 @@ class WorkflowService:
 
         if not linkedin_url:
             item["linkedin_source"] = {
-                "source": "LinkedIn",
+                "source": "LinkedIn Search Result",
                 "source_type": "linkedin_search_result",
                 "source_url": "Not Found",
                 "status": "not_found",
@@ -1044,7 +1045,7 @@ class WorkflowService:
         metadata["linkedin_url"] = linkedin_url
         if not metadata:
             item["linkedin_source"] = {
-                "source": "LinkedIn",
+                "source": "LinkedIn Search Result",
                 "source_type": "linkedin_search_result",
                 "source_url": "Not Found",
                 "status": "not_found",
@@ -1054,7 +1055,7 @@ class WorkflowService:
         item.setdefault("scraped_metadata", {})
         item["scraped_metadata"]["linkedin_metadata"] = metadata
         item["linkedin_source"] = {
-            "source": "LinkedIn",
+            "source": "LinkedIn Search Result",
             "source_type": "linkedin_search_result",
             "source_url": metadata.get("linkedin_url") or linkedin_url,
             "query": discovery.get("query") or "",
@@ -1064,7 +1065,7 @@ class WorkflowService:
         }
         item.setdefault("matches", []).append(
             {
-                "source": "LinkedIn",
+                "source": "LinkedIn Search Result",
                 "source_type": "linkedin",
                 "confidence": item.get("confidence") or 0,
                 "verified": True,
@@ -1868,6 +1869,88 @@ class WorkflowService:
                     if "SEC/MCA priority source used for mapped fields." not in reasons:
                         reasons.append("SEC/MCA priority source used for mapped fields.")
 
+        # Gemini AI Fallback Enrichment for BY Dataset Use Case
+        try:
+            entities_list = []
+            for rec, item in zip(records, results):
+                cname = ""
+                if isinstance(rec, dict):
+                    cname = rec.get("company_name") or rec.get("company") or rec.get("Company Name") or rec.get("Company") or ""
+                if not cname and isinstance(item, dict):
+                    cname = item.get("company") or ""
+                entities_list.append(str(cname or "Unknown").strip())
+
+            selected_wf_ids = config.get("selectedWorkflowIds") or config.get("workflow_ids") or []
+            if not selected_wf_ids and selected_workflows:
+                name_to_id = {
+                    "Website Verification": "company_data",
+                    "SEC Enrichment": "sec_data",
+                    "Company Verification": "registry_data",
+                    "MCA Enrichment": "registry_data",
+                    "Labor Market Intelligence": "labor_market",
+                }
+                selected_wf_ids = [name_to_id.get(sw, "company_data") for sw in selected_workflows if sw in name_to_id]
+
+            if not selected_wf_ids:
+                selected_wf_ids = ["company_data"]
+
+            api_key = config.get("lovable_api_key") or config.get("apiKey")
+            fallback_data = await gemini_fallback_service.extract_fallback_data(
+                entities=entities_list,
+                attributes=requested_fields if requested_fields else None,
+                workflow_ids=selected_wf_ids,
+                api_key=api_key,
+            )
+
+            fallback_by_entity = {f["entity"].lower(): f["extracted"] for f in fallback_data if isinstance(f, dict)}
+
+            for idx, (rec, item) in enumerate(zip(records, results)):
+                cname = str(entities_list[idx]).lower()
+                extracted_fallback = fallback_by_entity.get(cname, {})
+                if not extracted_fallback:
+                    continue
+
+                results[idx] = merge_ai_fallback_values(
+                    item,
+                    extracted_fallback,
+                    requested_fields=requested_fields,
+                )
+                item = results[idx]
+
+                scraped = item.setdefault("scraped_metadata", {})
+                rec_comp = item.setdefault("record_comparison", {})
+                comparisons = rec_comp.setdefault("comparisons", [])
+                existing_comp_fields = {
+                    str(c.get("field") or "").strip().lower(): c for c in comparisons
+                }
+
+                for attr_key, attr_val in extracted_fallback.items():
+                    if not attr_val or str(attr_val).upper() == "N/A":
+                        continue
+
+                    norm_key = attr_key.lower().replace(" ", "_")
+                    if not scraped.get(norm_key):
+                        scraped[norm_key] = attr_val
+
+                    if norm_key not in existing_comp_fields or existing_comp_fields[norm_key].get("suggested_value") in (None, "", "N/A"):
+                        if norm_key in existing_comp_fields:
+                            existing_comp_fields[norm_key]["suggested_value"] = attr_val
+                            existing_comp_fields[norm_key]["confidence"] = 50
+                            existing_comp_fields[norm_key]["change_detected"] = True
+                        else:
+                            new_cmp = {
+                                "field": norm_key,
+                                "existing_value": rec.get(norm_key) if isinstance(rec, dict) else None,
+                                "suggested_value": attr_val,
+                                "confidence": 50,
+                                "status": "mismatch",
+                                "change_detected": True,
+                            }
+                            comparisons.append(new_cmp)
+                            existing_comp_fields[norm_key] = new_cmp
+        except Exception as fallback_err:
+            logger.warning(f"[Gemini Fallback] Extraction step encountered an error: {fallback_err}")
+
         auto_approved_records: List[Dict[str, Any]] = []
         review_records: List[Dict[str, Any]] = []
         failed_records: List[Dict[str, Any]] = []
@@ -1921,14 +2004,17 @@ class WorkflowService:
                     "careers_page_url",
                 ):
                     processed[field] = contact.get(field) or ""
-            processed_dataset.append(
-                self._apply_existing_field_enrichment(
-                    original,
-                    item,
-                    requested_fields,
-                    populate_website=(website_verification_enabled and company_website_source_enabled),
-                )
+            processed_row = self._apply_existing_field_enrichment(
+                original,
+                item,
+                requested_fields,
+                populate_website=(website_verification_enabled and company_website_source_enabled),
             )
+            if item.get("_ai_enrichment"):
+                processed_row["_ai_enrichment"] = item.get("_ai_enrichment")
+            if item.get("_field_provenance"):
+                processed_row["_field_provenance"] = item.get("_field_provenance")
+            processed_dataset.append(processed_row)
 
             status = item.get("status")
             approval_path = status
