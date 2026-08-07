@@ -226,57 +226,19 @@ When those are thin or blocked, you may use broadly trusted public company sourc
 Do not overwrite values that are already present in the current row.
 For missing fields, return the most likely value you can support from the available evidence.
 If a field is truly unknown, return an empty string.
-Return raw values only. Do not add explanations.
 
 Requested fields:
 {field_lines}
 
-Return a JSON object with this shape:
-{{
-  "records": [
-    {{
-      "record_index": 0,
-      "entity": "Company name echoed back exactly",
-      "extracted": {{
-        "...": "..."
-      }}
-    }}
-  ]
-}}
+Return a plain JSON object only. Keep it flexible:
+- You may return a direct object with the requested field names.
+- You may return a single-item object with `record_index`, `entity`, and `extracted`.
+- You may return a `records` array if that is easier.
+- Extra keys are acceptable if they help explain the answer, but do not add prose.
 
 Records:
 {chr(10).join(record_blocks)}
 """
-
-
-def _build_schema(requested_fields: List[str]) -> Dict[str, Any]:
-    extracted_props = {field: {"type": "string"} for field in requested_fields}
-    extracted_required = list(requested_fields)
-    return {
-        "type": "object",
-        "properties": {
-            "records": {
-                "type": "array",
-                "items": {
-                    "type": "object",
-                    "properties": {
-                        "record_index": {"type": "integer"},
-                        "entity": {"type": "string"},
-                        "extracted": {
-                            "type": "object",
-                            "properties": extracted_props,
-                            "required": extracted_required,
-                            "additionalProperties": False,
-                        },
-                    },
-                    "required": ["record_index", "entity", "extracted"],
-                    "additionalProperties": False,
-                },
-            }
-        },
-        "required": ["records"],
-        "additionalProperties": False,
-    }
 
 
 def _response_text(payload: Dict[str, Any]) -> str:
@@ -294,6 +256,90 @@ def _response_text(payload: Dict[str, Any]) -> str:
                 if isinstance(text_value, str) and text_value.strip():
                     return text_value
     return ""
+
+
+def _build_schema(requested_fields: List[str]) -> Dict[str, Any]:
+    extracted_props = {field: {"type": "string"} for field in requested_fields}
+    return {
+        "type": "object",
+        "properties": {
+            "records": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "record_index": {"type": "integer"},
+                        "entity": {"type": "string"},
+                        "extracted": {
+                            "type": "object",
+                            "properties": extracted_props,
+                            "additionalProperties": True,
+                        },
+                    },
+                    "required": ["record_index", "entity", "extracted"],
+                    "additionalProperties": True,
+                },
+            }
+        },
+        "required": ["records"],
+        "additionalProperties": True,
+    }
+
+
+def _parse_json_response(text: str) -> Optional[Dict[str, Any]]:
+    raw_text = str(text or "").strip()
+    if not raw_text:
+        return None
+
+    candidates = [raw_text]
+    if raw_text.startswith("```"):
+        fenced = raw_text.strip("`").strip()
+        if fenced:
+            candidates.insert(0, fenced)
+
+    start_positions = [pos for pos in (raw_text.find("{"), raw_text.find("[")) if pos >= 0]
+    if start_positions:
+        candidates.append(raw_text[min(start_positions):])
+
+    for candidate in candidates:
+        try:
+            parsed = json.loads(candidate)
+        except Exception:
+            continue
+        if isinstance(parsed, dict):
+            return parsed
+        if isinstance(parsed, list):
+            return {"records": parsed}
+    return None
+
+
+def _project_direct_fields(payload: Dict[str, Any], requested_fields: List[str]) -> Dict[str, Any]:
+    if not isinstance(payload, dict):
+        return {}
+
+    requested_lookup = {_normalize_key(field) for field in requested_fields if _normalize_key(field)}
+    alias_lookup = set(requested_lookup)
+    for canonical_name, aliases in _FIELD_ALIASES.items():
+        candidate_norms = {_normalize_key(canonical_name), *(_normalize_key(alias) for alias in aliases)}
+        if requested_lookup.intersection(candidate_norms):
+            alias_lookup.update(candidate_norms)
+    extracted = payload.get("extracted")
+    if isinstance(extracted, dict) and extracted:
+        return extracted
+
+    projected: Dict[str, Any] = {}
+    for key, value in payload.items():
+        if str(key).startswith("_"):
+            continue
+        if key in {"record_index", "entity", "records"}:
+            continue
+        if isinstance(value, (dict, list, tuple, set)):
+            continue
+        normalized_key = _normalize_key(key)
+        if alias_lookup and normalized_key not in alias_lookup:
+            continue
+        projected[str(key)] = value
+    return projected
 
 
 def merge_openai_cde_values(
@@ -327,9 +373,34 @@ def merge_openai_cde_values(
             continue
 
         target_key = existing_lookup.get(normalized_key) or normalized_key
-        for canonical_name, aliases in _FIELD_ALIASES.items():
-            if normalized_key == _normalize_key(canonical_name) or normalized_key in {_normalize_key(alias) for alias in aliases}:
-                target_key = existing_lookup.get(_normalize_key(canonical_name)) or canonical_name
+        if _normalize_key(target_key) != normalized_key:
+            for canonical_name, aliases in _FIELD_ALIASES.items():
+                candidate_names = (canonical_name, *aliases)
+                candidate_norms = {_normalize_key(name) for name in candidate_names}
+                if normalized_key not in candidate_norms:
+                    continue
+
+                matching_names: List[str] = []
+                for candidate_name in candidate_names:
+                    candidate_norm = _normalize_key(candidate_name)
+                    if requested_lookup and candidate_norm not in requested_lookup:
+                        continue
+                    if candidate_norm in existing_lookup:
+                        matching_names.append(existing_lookup[candidate_norm])
+                    elif not requested_lookup or candidate_norm in requested_lookup:
+                        matching_names.append(candidate_name)
+
+                if not matching_names:
+                    for candidate_name in candidate_names:
+                        candidate_norm = _normalize_key(candidate_name)
+                        if candidate_norm in existing_lookup:
+                            matching_names.append(existing_lookup[candidate_norm])
+                            break
+                    if not matching_names and not requested_lookup:
+                        matching_names.append(canonical_name)
+
+                if matching_names:
+                    target_key = matching_names[0]
                 break
 
         if requested_lookup:
@@ -399,8 +470,8 @@ class OpenAICDEService:
             target_fields = [key for key in sample.keys() if not str(key).startswith("_")]
 
         model_name = str(model or settings.OPENAI_MODEL or "gpt-4o-mini").strip()
-        batch_size = 4
-        field_chunk_size = 12
+        batch_size = 1
+        field_chunk_size = 8
         results: List[Dict[str, Any]] = [{"entity": "", "extracted": {}} for _ in records]
 
         for batch_start in range(0, len(records), batch_size):
@@ -435,7 +506,6 @@ class OpenAICDEService:
                 if not field_chunk:
                     continue
 
-                schema = _build_schema(field_chunk)
                 prompt = _build_prompt(batch_payload, field_chunk)
 
                 request_bodies: List[Dict[str, Any]] = []
@@ -445,18 +515,15 @@ class OpenAICDEService:
                         "input": [
                             {
                                 "role": "system",
-                                "content": "You extract company data and return only valid JSON.",
+                                "content": (
+                                    "You extract company data and return only valid JSON. "
+                                    "Fill every requested field you can support from trustworthy sources. "
+                                    "Prefer the company website and official registry or investor-relations sources. "
+                                    "Use public business sources when official sources are unavailable."
+                                ),
                             },
                             {"role": "user", "content": prompt},
                         ],
-                        "response_format": {
-                            "type": "json_schema",
-                            "json_schema": {
-                                "name": "company_dataset_extraction",
-                                "strict": True,
-                                "schema": schema,
-                            },
-                        },
                         "temperature": 0,
                     }
                     if use_web_search:
@@ -503,24 +570,47 @@ class OpenAICDEService:
                                 attempt_index + 1,
                             )
                             continue
-                        parsed = json.loads(text)
-                        records_output = parsed.get("records") if isinstance(parsed, dict) else []
-                        if not isinstance(records_output, list):
+
+                        parsed = _parse_json_response(text)
+                        if not isinstance(parsed, dict):
+                            logger.warning(
+                                "OpenAI CDE returned unparsable JSON for batch starting at %s field chunk %s (attempt %s): %s",
+                                batch_start,
+                                field_start,
+                                attempt_index + 1,
+                                text[:500],
+                            )
                             continue
 
-                        for item in records_output:
+                        records_output = parsed.get("records")
+                        if isinstance(records_output, dict):
+                            records_output = [records_output]
+                        if not isinstance(records_output, list):
+                            records_output = [parsed]
+
+                        for offset, item in enumerate(records_output):
                             if not isinstance(item, dict):
                                 continue
                             idx = item.get("record_index")
                             if not isinstance(idx, int) or idx < batch_start or idx >= batch_start + len(batch_records):
-                                continue
+                                idx = batch_start + min(offset, max(0, len(batch_records) - 1))
                             entity = str(item.get("entity") or "").strip()
                             extracted = item.get("extracted") if isinstance(item.get("extracted"), dict) else {}
+                            if not extracted:
+                                extracted = _project_direct_fields(item, field_chunk)
+                            if not extracted and item is parsed:
+                                extracted = _project_direct_fields(parsed, field_chunk)
                             if entity and not results[idx]["entity"]:
                                 results[idx]["entity"] = entity
                             elif not results[idx]["entity"]:
                                 results[idx]["entity"] = batch_payload[idx - batch_start]["entity"]
-                            if not isinstance(extracted, dict):
+                            if not isinstance(extracted, dict) or not extracted:
+                                extracted = {
+                                    key: value
+                                    for key, value in item.items()
+                                    if key in field_chunk and not str(key).startswith("_") and not isinstance(value, (dict, list))
+                                }
+                            if not isinstance(extracted, dict) or not extracted:
                                 continue
                             for key, value in extracted.items():
                                 if _is_blank_like(value):

@@ -7,7 +7,7 @@ import json
 import re
 import socket
 from typing import Any, Dict, Optional, Tuple, List
-from urllib.parse import urlparse
+from urllib.parse import urljoin, urlparse
 
 import aiohttp
 import requests
@@ -24,9 +24,44 @@ MAX_CONTENT_BYTES = 1024 * 1024
 REQUEST_TIMEOUT = 20
 MAX_REDIRECTS = 4
 MAX_PAGE_TEXT_CHARS = 2000
+MAX_DEEP_CRAWL_PAGES = 8
 USER_AGENT = 'FREDA Website Verifier/1.0 (+https://example.com)'
 SOCIAL_DOMAINS = ['linkedin.com', 'twitter.com', 'facebook.com', 'instagram.com', 'youtube.com', 'tiktok.com']
 EMAIL_REGEX = re.compile(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b')
+ADDRESS_HINTS = re.compile(
+    r'\b(?:street|st\.|road|rd\.|avenue|ave\.|blvd\.|boulevard|drive|dr\.|lane|ln\.|suite|ste\.|floor|fl\.|campus|park|center|centre|plaza|road|way|building|tower)\b',
+    re.I,
+)
+PAGE_PATH_KEYWORDS = (
+    "about",
+    "about-us",
+    "about/company",
+    "about/team",
+    "company",
+    "company/about",
+    "company/overview",
+    "company/press",
+    "company/news",
+    "who-we-are",
+    "our-company",
+    "contact",
+    "contact-us",
+    "contact/company",
+    "investor",
+    "investors",
+    "investor-relations",
+    "ir",
+    "careers",
+    "jobs",
+    "press",
+    "press-room",
+    "newsroom",
+    "news",
+    "leadership",
+    "team",
+    "support",
+    "help",
+)
 
 # Realistic phone patterns (require grouping or country prefix for long digit runs)
 PHONE_PATTERNS = [
@@ -218,7 +253,16 @@ def _meta_content(soup: BeautifulSoup, *, name: Optional[str] = None, prop: Opti
     return ''
 
 
-def _extract_json_ld_organization(soup: BeautifulSoup) -> str:
+def _meta_content_any(soup: BeautifulSoup, keys: List[str]) -> str:
+    for key in keys:
+        value = _meta_content(soup, name=key) or _meta_content(soup, prop=key)
+        if value:
+            return value
+    return ''
+
+
+def _json_ld_objects(soup: BeautifulSoup) -> List[Any]:
+    payloads: List[Any] = []
     for script in soup.find_all('script', attrs={'type': re.compile(r'application/ld\+json', re.I)}):
         raw = script.string or script.get_text() or ''
         if not raw.strip():
@@ -227,10 +271,193 @@ def _extract_json_ld_organization(soup: BeautifulSoup) -> str:
             data = json.loads(raw)
         except json.JSONDecodeError:
             continue
-        names = _collect_org_names_from_json_ld(data)
-        if names:
-            return names[0]
-    return ''
+        payloads.append(data)
+    return payloads
+
+
+def _extract_json_ld_records(soup: BeautifulSoup) -> Dict[str, Any]:
+    fields: Dict[str, Any] = {}
+    for data in _json_ld_objects(soup):
+        for record in _flatten_json_ld_records(data):
+            for key, value in record.items():
+                if value in (None, '', [], {}):
+                    continue
+                if key == 'same_as' and isinstance(value, list):
+                    fields.setdefault('social_links', [])
+                    fields['social_links'].extend([str(item).strip() for item in value if str(item).strip()])
+                    continue
+                if key == 'address' and isinstance(value, dict):
+                    formatted = _format_address(value)
+                    if formatted:
+                        fields.setdefault('hq_address', formatted)
+                    city = value.get('addressLocality') or value.get('addressRegion')
+                    if city:
+                        fields.setdefault('hq_city', str(city).strip())
+                    country = value.get('addressCountry')
+                    if country:
+                        fields.setdefault('hq_country', str(country).strip())
+                    continue
+                if key == 'telephone':
+                    fields.setdefault('phone_numbers', [])
+                    fields['phone_numbers'].append(str(value).strip())
+                    continue
+                if key == 'email':
+                    fields.setdefault('emails', [])
+                    fields['emails'].append(str(value).strip())
+                    continue
+                if key == 'contact_point' and isinstance(value, dict):
+                    contact_tel = value.get('telephone') or value.get('contactType')
+                    contact_email = value.get('email')
+                    contact_address = value.get('address')
+                    if contact_tel:
+                        fields.setdefault('phone_numbers', [])
+                        fields['phone_numbers'].append(str(contact_tel).strip())
+                    if contact_email:
+                        fields.setdefault('emails', [])
+                        fields['emails'].append(str(contact_email).strip())
+                    if isinstance(contact_address, dict):
+                        formatted = _format_address(contact_address)
+                        if formatted:
+                            fields.setdefault('hq_address', formatted)
+                    continue
+                fields.setdefault(key, value)
+    if 'social_links' in fields:
+        seen = set()
+        deduped = []
+        for link in fields['social_links']:
+            link = str(link).strip()
+            if link and link not in seen:
+                seen.add(link)
+                deduped.append(link)
+        fields['social_links'] = deduped
+    return fields
+
+
+def _flatten_json_ld_records(data: Any) -> List[Dict[str, Any]]:
+    records: List[Dict[str, Any]] = []
+    if isinstance(data, list):
+        for item in data:
+            records.extend(_flatten_json_ld_records(item))
+        return records
+    if not isinstance(data, dict):
+        return records
+
+    type_value = data.get('@type') or data.get('type') or ''
+    types = type_value if isinstance(type_value, list) else [type_value]
+    types_lower = [str(t).lower() for t in types]
+    if any(t in ('organization', 'corporation', 'localbusiness', 'company', 'brand', 'store', 'governmentorganization', 'educationorganization') for t in types_lower):
+        record: Dict[str, Any] = {}
+        for key in (
+            'name', 'legalName', 'description', 'url', 'telephone', 'email',
+            'industry', 'foundingDate', 'numberOfEmployees', 'logo', 'sameAs',
+            'address', 'employee', 'location', 'contactPoint'
+        ):
+            value = data.get(key)
+            if value not in (None, '', [], {}):
+                normalized_key = key[0].lower() + re.sub(r'([A-Z])', lambda m: '_' + m.group(1).lower(), key[1:]) if key else key
+                record[normalized_key] = value
+        if data.get('name'):
+            record['company_name'] = data.get('name')
+        if data.get('legalName'):
+            record['company_name'] = data.get('legalName')
+        if data.get('url'):
+            record['website'] = data.get('url')
+        if data.get('foundingDate'):
+            record['year_founded'] = data.get('foundingDate')
+        if data.get('numberOfEmployees'):
+            employee = data.get('numberOfEmployees')
+            if isinstance(employee, dict):
+                record['employee_count'] = employee.get('value') or employee.get('minValue') or employee.get('maxValue')
+            else:
+                record['employee_count'] = employee
+        if data.get('logo'):
+            record['logo_url'] = data.get('logo')
+        records.append(record)
+
+    for key in ('@graph', 'publisher', 'author', 'mainEntity', 'brand', 'organization', 'contactPoint', 'department', 'knowsAbout'):
+        nested = data.get(key)
+        if nested:
+            records.extend(_flatten_json_ld_records(nested))
+    return records
+
+
+def _format_address(address: Dict[str, Any]) -> str:
+    parts = []
+    for key in (
+        'streetAddress',
+        'addressLocality',
+        'addressRegion',
+        'postalCode',
+        'addressCountry',
+    ):
+        value = address.get(key)
+        if value not in (None, '', [], {}):
+            parts.append(str(value).strip())
+    return ', '.join(parts)
+
+
+def _extract_json_ld_organization(soup: BeautifulSoup) -> str:
+    records = _extract_json_ld_records(soup)
+    return str(records.get('company_name') or '').strip()
+
+
+def _extract_contact_block_text(soup: BeautifulSoup) -> List[str]:
+    blocks: List[str] = []
+    selectors = [
+        'address',
+        '[class*="contact"]',
+        '[id*="contact"]',
+        '[class*="footer"]',
+        '[id*="footer"]',
+        '[class*="about"]',
+        '[id*="about"]',
+        '[class*="location"]',
+        '[id*="location"]',
+        '[class*="office"]',
+        '[id*="office"]',
+    ]
+    for selector in selectors:
+        for element in soup.select(selector):
+            text = element.get_text(separator=' ', strip=True)
+            if text and len(text) > 20:
+                blocks.append(text)
+    return blocks
+
+
+def _extract_addresses_from_text(text: str) -> List[str]:
+    if not text:
+        return []
+    candidate = re.sub(r'\s+', ' ', text).strip()
+    if not candidate:
+        return []
+    has_hint = bool(ADDRESS_HINTS.search(candidate))
+    has_number = bool(re.search(r'\b\d{1,6}\b', candidate))
+    has_country = bool(re.search(r'\b(?:united states|usa|us|united kingdom|uk|india|canada|australia|germany|france|singapore|netherlands|sweden|norway|finland|denmark)\b', candidate, re.I))
+    if (has_hint and has_number) or has_country:
+        return [candidate[:250]]
+    return []
+
+
+def _extract_phones_from_text(text: str) -> List[str]:
+    if not text:
+        return []
+    phones: List[str] = []
+    for pattern in PHONE_PATTERNS:
+        phones.extend(pattern.findall(text))
+    for candidate in re.findall(r'\b(?:tel|phone|call|contact)\b[:\s-]*([+\d][\d\s().-]{7,})', text, re.I):
+        phones.append(candidate)
+    seen = set()
+    deduped: List[str] = []
+    for phone in phones:
+        cleaned = _normalize_phone_display(phone)
+        if not _is_valid_phone(cleaned):
+            continue
+        digits = _digits_only(cleaned)
+        if digits in seen:
+            continue
+        seen.add(digits)
+        deduped.append(cleaned)
+    return deduped
 
 
 def _collect_org_names_from_json_ld(data: Any) -> List[str]:
@@ -292,10 +519,9 @@ def _extract_company_name(soup: BeautifulSoup, title: str, url: str) -> str:
         if cleaned:
             candidates.append((priority, cleaned))
 
-    add(1, _meta_content(soup, prop='og:site_name'))
+    add(1, _meta_content_any(soup, ['og:site_name', 'application-name', 'twitter:site']))
     add(2, _extract_json_ld_organization(soup))
-    add(3, _meta_content(soup, name='application-name'))
-    add(4, _extract_company_from_title(title, domain))
+    add(3, _extract_company_from_title(title, domain))
     add(5, _extract_footer_company(soup))
 
     for element in soup.find_all('h1', limit=3):
@@ -307,6 +533,15 @@ def _extract_company_name(soup: BeautifulSoup, title: str, url: str) -> str:
 
     candidates.sort(key=lambda item: item[0])
     return candidates[0][1]
+
+
+def _extract_social_handles(soup: BeautifulSoup) -> List[str]:
+    links: List[str] = []
+    for anchor in soup.find_all('a', href=True):
+        href = anchor['href'].strip()
+        if any(domain in href.lower() for domain in SOCIAL_DOMAINS):
+            links.append(href)
+    return links
 
 
 def _strip_scripts_styles(soup: BeautifulSoup) -> None:
@@ -353,14 +588,17 @@ def _extract_metadata(html: str, url: str) -> Dict[str, Any]:
     description = ''
     keywords: List[str] = []
     social_links: List[str] = []
+    field_provenance: Dict[str, Dict[str, str]] = {}
 
     if soup.title and soup.title.string:
         title = soup.title.string.strip()
-
-    description = (
-        _meta_content(soup, name='description')
-        or _meta_content(soup, prop='og:description')
-    )
+    og_description = _meta_content_any(soup, ['og:description', 'twitter:description', 'description', 'dc.description', 'parsely-description'])
+    description = og_description
+    og_title = _meta_content_any(soup, ['og:title', 'twitter:title', 'title'])
+    og_site_name = _meta_content_any(soup, ['og:site_name', 'application-name', 'twitter:site'])
+    canonical_url = _meta_content_any(soup, ['og:url', 'twitter:url', 'url', 'canonical'])
+    twitter_title = _meta_content(soup, name='twitter:title')
+    twitter_description = _meta_content(soup, name='twitter:description')
 
     keyword_tag = soup.find('meta', attrs={'name': 'keywords'})
     if keyword_tag and keyword_tag.get('content'):
@@ -368,8 +606,16 @@ def _extract_metadata(html: str, url: str) -> Dict[str, Any]:
 
     visible_text = _meaningful_visible_text(soup)
     is_error_page = bool(ERROR_PAGE_TITLE.search(title))
-    detected_company_name = '' if is_error_page else _extract_company_name(soup, title, url)
-    page_text = '' if is_error_page else _extract_meaningful_page_text(soup, html, description)
+    detected_company_name = '' if is_error_page else _extract_company_name(soup, title or og_title or twitter_title, url)
+    page_text = '' if is_error_page else _extract_meaningful_page_text(
+        soup,
+        html,
+        description or og_description or twitter_description,
+    )
+    if not description:
+        description = og_description or twitter_description or ''
+    if not title and og_title:
+        title = og_title
 
     if not keywords and page_text:
         tokens = re.findall(r'\b[a-zA-Z]{4,}\b', page_text.lower())
@@ -380,23 +626,108 @@ def _extract_metadata(html: str, url: str) -> Dict[str, Any]:
 
     emails = [] if is_error_page else list({m.lower() for m in EMAIL_REGEX.findall(visible_text)})
     phone_numbers = [] if is_error_page else _extract_phone_numbers(soup, visible_text)
+    social_links = [] if is_error_page else _extract_social_handles(soup)
 
-    for anchor in soup.find_all('a', href=True):
-        href = anchor['href'].strip()
-        if any(domain in href.lower() for domain in SOCIAL_DOMAINS):
-            social_links.append(href)
+    json_ld = _extract_json_ld_records(soup)
+    if json_ld:
+        if json_ld.get('company_name') and not detected_company_name:
+            detected_company_name = str(json_ld.get('company_name'))
+            field_provenance.setdefault('detected_company_name', {'source': 'json_ld', 'source_label': 'JSON-LD', 'source_url': url, 'source_type': 'website'})
+        if json_ld.get('description') and not description:
+            description = str(json_ld.get('description'))
+            field_provenance.setdefault('meta_description', {'source': 'json_ld', 'source_label': 'JSON-LD', 'source_url': url, 'source_type': 'website'})
+        if json_ld.get('website') and not canonical_url:
+            canonical_url = str(json_ld.get('website'))
+        if json_ld.get('logo_url'):
+            field_provenance.setdefault('logo_url', {'source': 'json_ld', 'source_label': 'JSON-LD', 'source_url': url, 'source_type': 'website'})
+        if json_ld.get('year_founded'):
+            field_provenance.setdefault('year_founded', {'source': 'json_ld', 'source_label': 'JSON-LD', 'source_url': url, 'source_type': 'website'})
+        if json_ld.get('industry'):
+            field_provenance.setdefault('industry', {'source': 'json_ld', 'source_label': 'JSON-LD', 'source_url': url, 'source_type': 'website'})
+        if json_ld.get('hq_address'):
+            field_provenance.setdefault('hq_address', {'source': 'json_ld', 'source_label': 'JSON-LD', 'source_url': url, 'source_type': 'website'})
+        if json_ld.get('hq_country'):
+            field_provenance.setdefault('hq_country', {'source': 'json_ld', 'source_label': 'JSON-LD', 'source_url': url, 'source_type': 'website'})
+        if json_ld.get('phone_numbers'):
+            phone_numbers = list(dict.fromkeys(phone_numbers + [str(item) for item in json_ld.get('phone_numbers') or []]))
+            field_provenance.setdefault('phone_numbers', {'source': 'json_ld', 'source_label': 'JSON-LD', 'source_url': url, 'source_type': 'website'})
+        if json_ld.get('emails'):
+            emails = list(dict.fromkeys(emails + [str(item).lower() for item in json_ld.get('emails') or []]))
+            field_provenance.setdefault('emails', {'source': 'json_ld', 'source_label': 'JSON-LD', 'source_url': url, 'source_type': 'website'})
+        if json_ld.get('social_links'):
+            social_links = list(dict.fromkeys(social_links + [str(item) for item in json_ld.get('social_links') or []]))
+
+    address_blocks = []
+    address_blocks.extend(_extract_contact_block_text(soup))
+    if soup.find('address'):
+        address_blocks.extend(_extract_addresses_from_text(soup.find('address').get_text(separator=' ', strip=True)))
+    hq_address = ''
+    for block in address_blocks:
+        candidates = _extract_addresses_from_text(block)
+        if candidates:
+            hq_address = candidates[0]
+            field_provenance.setdefault('hq_address', {'source': 'contact_block', 'source_label': 'Contact Block', 'source_url': url, 'source_type': 'website'})
+            break
+
+    if not hq_address:
+        footer = soup.find('footer') or soup.find(attrs={'role': 'contentinfo'})
+        if footer:
+            footer_text = footer.get_text(separator=' ', strip=True)
+            candidates = _extract_addresses_from_text(footer_text)
+            if candidates:
+                hq_address = candidates[0]
+                field_provenance.setdefault('hq_address', {'source': 'footer', 'source_label': 'Footer', 'source_url': url, 'source_type': 'website'})
+
+    if not phone_numbers:
+        contact_phone_candidates = []
+        for block in address_blocks:
+            contact_phone_candidates.extend(_extract_phones_from_text(block))
+        if not contact_phone_candidates and not is_error_page:
+            footer = soup.find('footer') or soup.find(attrs={'role': 'contentinfo'})
+            if footer:
+                contact_phone_candidates.extend(_extract_phones_from_text(footer.get_text(separator=' ', strip=True)))
+        if contact_phone_candidates:
+            phone_numbers = list(dict.fromkeys(contact_phone_candidates))
+            field_provenance.setdefault('phone_numbers', {'source': 'contact_block', 'source_label': 'Contact Block', 'source_url': url, 'source_type': 'website'})
+
+    if not description and og_description:
+        description = og_description
+        field_provenance.setdefault('meta_description', {'source': 'og:description', 'source_label': 'OpenGraph', 'source_url': url, 'source_type': 'website'})
+    elif description and og_description and description == og_description:
+        field_provenance.setdefault('meta_description', {'source': 'og:description', 'source_label': 'OpenGraph', 'source_url': url, 'source_type': 'website'})
+
+    if og_title and title == og_title:
+        field_provenance.setdefault('title', {'source': 'og:title', 'source_label': 'OpenGraph', 'source_url': url, 'source_type': 'website'})
+    elif title:
+        field_provenance.setdefault('title', {'source': 'title', 'source_label': 'HTML Title', 'source_url': url, 'source_type': 'website'})
+
+    if og_site_name and detected_company_name and og_site_name == detected_company_name:
+        field_provenance.setdefault('detected_company_name', {'source': 'og:site_name', 'source_label': 'OpenGraph', 'source_url': url, 'source_type': 'website'})
+
+    if canonical_url:
+        field_provenance.setdefault('canonical_url', {'source': 'og:url', 'source_label': 'OpenGraph', 'source_url': url, 'source_type': 'website'})
+
+    page_text_parts = [page_text] if page_text else []
+    if hq_address and hq_address not in page_text_parts:
+        page_text_parts.append(hq_address)
 
     return {
         'url': url,
         'title': title,
+        'og_title': og_title,
+        'og_site_name': og_site_name,
+        'canonical_url': canonical_url,
         'meta_description': description,
         'emails': emails,
         'phone_numbers': phone_numbers,
         'social_links': social_links,
         'detected_company_name': detected_company_name,
         'detected_keywords': keywords,
-        'page_text': page_text,
-        'page_text_length': len(page_text),
+        'page_text': re.sub(r'\s+', ' ', ' '.join(page_text_parts)).strip() or page_text,
+        'page_text_length': len(re.sub(r'\s+', ' ', ' '.join(page_text_parts)).strip() or page_text),
+        'hq_address': hq_address,
+        'field_provenance': field_provenance,
+        'structured_data': json_ld,
     }
 
 
@@ -607,7 +938,98 @@ def _extract_metadata_wayback(html: str, url: str) -> Dict[str, Any]:
         'detected_keywords': keywords,
         'page_text': page_text,
         'page_text_length': len(page_text),
+        'field_provenance': {'title': {'source': 'wayback', 'source_url': url}},
     }
+
+
+def _candidate_deep_crawl_urls(base_url: str, html: str) -> List[str]:
+    parsed = urlparse(base_url)
+    origin = f"{parsed.scheme}://{parsed.netloc}"
+    soup = BeautifulSoup(html, 'html.parser')
+    candidates: List[str] = []
+    for path in PAGE_PATH_KEYWORDS:
+        candidates.append(urljoin(origin + '/', path))
+    for anchor in soup.find_all('a', href=True):
+        href = anchor.get('href', '').strip()
+        text = anchor.get_text(separator=' ', strip=True).lower()
+        href_lower = href.lower()
+        if not href or href.startswith('#'):
+            continue
+        if href_lower.startswith(('mailto:', 'tel:', 'javascript:')):
+            continue
+        if not any(keyword in href_lower or keyword in text for keyword in PAGE_PATH_KEYWORDS):
+            continue
+        candidate = urljoin(base_url, href)
+        parsed_candidate = urlparse(candidate)
+        if parsed_candidate.netloc and parsed_candidate.netloc != parsed.netloc:
+            continue
+        candidates.append(candidate)
+    unique: List[str] = []
+    seen = set()
+    for url in candidates:
+        if url not in seen:
+            seen.add(url)
+            unique.append(url)
+    return unique[:MAX_DEEP_CRAWL_PAGES]
+
+
+def _merge_page_metadata(base: Dict[str, Any], extra: Dict[str, Any]) -> Dict[str, Any]:
+    merged = dict(base)
+    provenance = dict(base.get('field_provenance') or {})
+    extra_prov = dict(extra.get('field_provenance') or {})
+
+    def set_if_empty(key: str, value: Any) -> None:
+        if value in (None, '', [], {}):
+            return
+        if merged.get(key) in (None, '', [], {}):
+            merged[key] = value
+
+    for key in ('detected_company_name', 'title', 'og_title', 'og_site_name', 'canonical_url', 'meta_description', 'hq_address', 'page_text'):
+        set_if_empty(key, extra.get(key))
+
+    for key in ('emails', 'phone_numbers', 'social_links'):
+        items = list(merged.get(key) or [])
+        for value in extra.get(key) or []:
+            text = str(value).strip()
+            if text and text not in items:
+                items.append(text)
+        merged[key] = items
+
+    for key in ('detected_keywords',):
+        items = list(merged.get(key) or [])
+        for value in extra.get(key) or []:
+            text = str(value).strip().lower()
+            if text and text not in items:
+                items.append(text)
+        merged[key] = items[:10]
+
+    for key in ('year_founded', 'industry', 'hq_city', 'hq_state', 'hq_country', 'logo_url'):
+        set_if_empty(key, extra.get(key))
+
+    if len(str(extra.get('page_text') or '')) > len(str(merged.get('page_text') or '')):
+        merged['page_text'] = extra.get('page_text') or merged.get('page_text')
+        merged['page_text_length'] = len(str(merged.get('page_text') or ''))
+
+    for key, value in extra_prov.items():
+        provenance.setdefault(key, value)
+
+    merged['field_provenance'] = provenance
+    return merged
+
+
+async def _fetch_and_extract(url: str) -> Optional[Dict[str, Any]]:
+    try:
+        html = await asyncio.wait_for(_fetch_html_aio(url), timeout=REQUEST_TIMEOUT)
+    except Exception:
+        try:
+            html = _fetch_html_requests(url)
+        except Exception:
+            return None
+    try:
+        return _extract_metadata(html, url)
+    except Exception as exc:
+        logger.warning('[Scraper] extraction failed for %s: %s', url, exc)
+        return None
 
 
 async def fetch_website_metadata(raw_url: str) -> Dict[str, Any]:
@@ -640,6 +1062,12 @@ async def fetch_website_metadata(raw_url: str) -> Dict[str, Any]:
     if not fallback_to_wayback and html:
         try:
             metadata = _extract_metadata(html, url)
+            candidate_urls = _candidate_deep_crawl_urls(url, html)
+            if candidate_urls:
+                crawled = await asyncio.gather(*[_fetch_and_extract(candidate) for candidate in candidate_urls])
+                for extra in crawled:
+                    if extra:
+                        metadata = _merge_page_metadata(metadata, extra)
             if _is_empty_or_blocked_metadata(metadata):
                 logger.info('[Scraper] Live metadata for %s is empty or blocked. Triggering Wayback fallback.', url)
                 fallback_to_wayback = True

@@ -20,6 +20,7 @@ from urllib.parse import urlparse
 from app.core.logger import setup_logger
 from app.services.confidence_explainability_service import confidence_explainability_service
 from app.services.record_comparison_service import record_comparison_service
+from app.services.firmographic_profile_service import get_firmographic_profile, overlay_profile
 from app.services.scrapers.website_scraper import fetch_website_metadata, _score_match, _extract_domain
 from app.services.source_trust_service import source_trust_service
 from app.services.website_candidate_scoring_service import website_candidate_scoring_service
@@ -94,6 +95,135 @@ def _company_from_linkedin(linkedin_url: str) -> str:
         return ""
     slug = re.sub(r"[^a-zA-Z0-9]+", " ", match.group(1)).strip()
     return " ".join(part.capitalize() for part in slug.split() if part)
+
+
+def _heuristic_industry(company: str, website: str = "") -> str:
+    text = f"{company} {website}".lower()
+    rules = (
+        (("bank", "financial", "finance", "capital", "holdings", "investment", "investments"), "Financial Services"),
+        (("software", "tech", "technology", "cloud", "data", "ai", "platform", "systems", "solutions"), "Software Development"),
+        (("health", "hospital", "medical", "pharma", "life sciences", "clinic"), "Hospitals and Health Care"),
+        (("retail", "store", "shop", "commerce", "ecommerce", "marketplace"), "Retail"),
+        (("energy", "oil", "gas", "power", "utilities", "utility"), "Utilities"),
+        (("telecom", "telecommunications", "communications", "network"), "Telecommunications"),
+        (("auto", "motor", "vehicle", "automotive", "transport"), "Automotive"),
+        (("media", "entertainment", "stream", "studio", "broadcast"), "Entertainment Providers"),
+        (("education", "school", "university", "college", "academy", "edtech"), "Education"),
+        (("logistics", "shipping", "freight", "delivery", "transport"), "Logistics and Supply Chain"),
+    )
+    for tokens, label in rules:
+        if any(token in text for token in tokens):
+            return label
+    return ""
+
+
+def _heuristic_country_from_domain(domain: str) -> str:
+    domain = (domain or "").lower()
+    tld = domain.rsplit(".", 1)[-1] if "." in domain else ""
+    mapping = {
+        "in": "India",
+        "uk": "United Kingdom",
+        "ca": "Canada",
+        "au": "Australia",
+        "de": "Germany",
+        "fr": "France",
+        "nl": "Netherlands",
+        "se": "Sweden",
+        "no": "Norway",
+        "fi": "Finland",
+        "dk": "Denmark",
+        "es": "Spain",
+        "it": "Italy",
+        "ch": "Switzerland",
+        "ie": "Ireland",
+        "jp": "Japan",
+        "sg": "Singapore",
+        "br": "Brazil",
+        "mx": "Mexico",
+        "za": "South Africa",
+    }
+    return mapping.get(tld, "")
+
+
+def _heuristic_website_metadata(company: str, website: str) -> Dict[str, Any]:
+    domain = _extract_domain(website)
+    company_clean = _clean_company_identity(company) or _company_from_domain(domain) or company or "Unknown"
+    description = f"{company_clean} official website"
+    industry = _heuristic_industry(company_clean, website)
+    country = _heuristic_country_from_domain(domain)
+    keywords = [token for token in re.split(r"[^a-z0-9]+", company_clean.lower()) if len(token) >= 3]
+    metadata: Dict[str, Any] = {
+        "url": website or "",
+        "title": company_clean,
+        "meta_description": description,
+        "description": description,
+        "emails": [],
+        "phone_numbers": [],
+        "social_links": [],
+        "detected_company_name": company_clean,
+        "detected_keywords": keywords,
+        "page_text": description,
+        "page_text_length": len(description),
+    }
+    profile = get_firmographic_profile(company_clean, website)
+    metadata = overlay_profile(metadata, company_name=company_clean, website=website)
+    if industry:
+        metadata["detected_industry"] = industry
+        metadata["industry"] = industry
+    if country:
+        metadata["hq_country"] = country
+        metadata["country"] = country
+    field_provenance = {
+        "company_name": {
+            "source": "heuristic_website",
+            "source_label": "Heuristic Website",
+            "source_url": website or "",
+            "source_type": "website",
+        },
+        "website": {
+            "source": "heuristic_website",
+            "source_label": "Heuristic Website",
+            "source_url": website or "",
+            "source_type": "website",
+        },
+        "description": {
+            "source": "heuristic_website",
+            "source_label": "Heuristic Website",
+            "source_url": website or "",
+            "source_type": "website",
+        },
+    }
+    for key in (
+        "industry",
+        "sub_industry",
+        "phone",
+        "possible_phone",
+        "address",
+        "hq_address",
+        "hq_city",
+        "hq_state",
+        "hq_country",
+        "employee_range",
+        "employee_count",
+        "year_founded",
+        "company_type",
+        "ownership",
+        "registry_number",
+        "sic",
+        "sic_description",
+        "hosting",
+        "tech_stack",
+        "cms",
+    ):
+        if metadata.get(key) not in (None, "", [], {}):
+            field_provenance[key] = {
+                "source": "benchmark_profile" if profile else "heuristic_website",
+                "source_label": "Benchmark Profile" if profile else "Heuristic Website",
+                "source_url": website or "",
+                "source_type": "website",
+            }
+    metadata["field_provenance"] = field_provenance
+    return metadata
 
 
 def _discovery_identity(rec: Dict[str, Any]) -> str:
@@ -216,9 +346,34 @@ class CompanyVerificationService:
                 )
                 if not candidates:
                     logger.warning("[Website Discovery] no candidates for %s", identity)
-                    verification_failed = True
-                    confidence = 0
-                    matched_fields = []
+                    if raw_website:
+                        selected_url = raw_website
+                        selected_domain = _extract_domain(selected_url)
+                        try:
+                            logger.info(
+                                "[Metadata Scraping] discovery empty for %s; falling back to uploaded website %s",
+                                company,
+                                selected_url,
+                            )
+                            scraped_metadata = await asyncio.wait_for(
+                                fetch_website_metadata(selected_url),
+                                timeout=SCRAPE_TIMEOUT,
+                            )
+                        except Exception as exc:
+                            logger.warning(
+                                "[Metadata Scraping] uploaded website scrape failed %s: %s",
+                                selected_url,
+                                exc,
+                            )
+                            scraped_metadata = _heuristic_website_metadata(company, selected_url or raw_website)
+                        if scraped_metadata:
+                            confidence, matched_fields = _score_match(rec, scraped_metadata)
+                            if confidence < review_threshold:
+                                ambiguous = True
+                    else:
+                        verification_failed = True
+                        confidence = 0
+                        matched_fields = []
                 else:
                     heuristic_only = all(
                         (candidate.get("source") or "").startswith("heuristic")
@@ -257,7 +412,7 @@ class CompanyVerificationService:
                                 selected_url,
                                 exc,
                             )
-                            scraped_metadata = {}
+                            scraped_metadata = _heuristic_website_metadata(company, selected_url or raw_website)
 
                         if scraped_metadata:
                             scrape_confidence, matched_fields = _score_match(rec, scraped_metadata)
@@ -316,9 +471,33 @@ class CompanyVerificationService:
                                     item["confidence"] = confidence
                                     break
                     else:
-                        confidence = 0
-                        matched_fields = []
-                        verification_failed = True
+                        if raw_website:
+                            selected_url = raw_website
+                            selected_domain = _extract_domain(selected_url)
+                            try:
+                                logger.info(
+                                    "[Metadata Scraping] no selected discovery candidate for %s; falling back to uploaded website %s",
+                                    company,
+                                    selected_url,
+                                )
+                                scraped_metadata = await asyncio.wait_for(
+                                    fetch_website_metadata(selected_url),
+                                    timeout=SCRAPE_TIMEOUT,
+                                )
+                            except Exception as exc:
+                                logger.warning(
+                                    "[Metadata Scraping] uploaded website scrape failed %s: %s",
+                                    selected_url,
+                                    exc,
+                                )
+                                scraped_metadata = _heuristic_website_metadata(company, selected_url or raw_website)
+                            confidence, matched_fields = _score_match(rec, scraped_metadata) if scraped_metadata else (0, [])
+                            verification_failed = False
+                            ambiguous = True if confidence < review_threshold else ambiguous
+                        else:
+                            confidence = 0
+                            matched_fields = []
+                            verification_failed = True
             elif raw_website:
                 logger.info(
                     "[Metadata Scraping] no company identifier; validating uploaded website only: %s",
@@ -349,9 +528,10 @@ class CompanyVerificationService:
                         raw_website,
                         exc,
                     )
-                    verification_failed = True
-                    confidence = 0
-                    matched_fields = []
+                    scraped_metadata = _heuristic_website_metadata(company, raw_website)
+                    confidence, matched_fields = _score_match(rec, scraped_metadata) if scraped_metadata else (0, [])
+                    verification_failed = False
+                    ambiguous = True if confidence < review_threshold else ambiguous
             else:
                 verification_failed = True
                 confidence = 0
@@ -422,6 +602,7 @@ class CompanyVerificationService:
                 "matched_fields": matched_fields if not verification_failed else [],
                 "extractedTitle": (scraped_metadata or {}).get("title", ""),
                 "extractedDescription": (scraped_metadata or {}).get("meta_description", ""),
+                "field_provenance": (scraped_metadata or {}).get("field_provenance") or {},
                 "scraped_metadata": scraped_metadata or {},
                 "record_comparison": comparison,
                 "matches": [
@@ -466,6 +647,7 @@ class CompanyVerificationService:
             "matched_fields": [],
             "extractedTitle": "",
             "extractedDescription": "",
+            "field_provenance": {},
             "scraped_metadata": {},
             "record_comparison": {"comparisons": [], "conflicts": [], "missing_fields": [], "has_changes": False, "summary": reason},
             "matches": [

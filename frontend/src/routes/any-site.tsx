@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { Badge, Button, Card, Input, PageHeader, Select, Steps } from "@/components/ui-bits";
+import { categoryArt } from "@/data/category-art";
 import { readJobsCache, writeJobsCache } from "@/lib/jobs-cache";
 import { DATASETS, DATASET_CATEGORIES, type Dataset } from "@/data/datasets";
 import { WORKFLOWS } from "@/data/workflows";
@@ -547,37 +548,43 @@ function AnySite() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {filtered.map((d) => {
-                const Icon = (Icons as any)[d.icon] || Database;
+                const art = categoryArt(d.category);
+                const Icon = (Icons as any)[art.icon] || (Icons as any)[d.icon] || Database;
                 return (
                   <button
                     key={d.id}
                     onClick={() => pickDataset(d)}
-                    className="text-left p-4 rounded-lg border border-border bg-card hover:bg-secondary/40 hover:border-primary/40 transition"
+                    className="group text-left rounded-lg border border-border bg-card overflow-hidden hover:border-primary/50 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
                   >
-                    <div className="flex items-start gap-3">
-                      <div className="h-10 w-10 rounded-md bg-info-bg text-info inline-flex items-center justify-center shrink-0">
-                        <Icon className="h-5 w-5" />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-1.5">
-                          <h3 className="font-semibold text-[14px] truncate">{d.name}</h3>
-                          <Badge tone="purple">{d.category}</Badge>
-                        </div>
-                        <p className="text-[12px] text-muted-foreground mt-0.5">{d.tagline}</p>
-                      </div>
-                    </div>
-                    <p className="text-[12px] text-muted-foreground mt-3 line-clamp-2">{d.description}</p>
-                    <div className="grid grid-cols-4 gap-1.5 mt-3 text-[11px]">
-                      <Mini label="Data pts" value={d.outputAttributes.length} />
-                      <Mini label="Sources" value={d.sources.length} />
-                      <Mini label="Accuracy" value={d.accuracy ? `${d.accuracy}%` : "—"} />
-                      <Mini label="Countries" value={d.countriesCovered ?? "—"} />
-                    </div>
-                    <div className="mt-3 pt-3 border-t border-border flex items-center justify-between">
-                      <span className="text-[11px] text-muted-foreground">{d.rowsAvailable}{d.coverage ? ` · ${d.coverage}% coverage` : ""}</span>
-                      <span className="inline-flex items-center gap-1 text-[12px] text-info font-medium">
-                        Configure <ChevronRight className="h-3 w-3" />
+                    <div className={`relative h-24 bg-gradient-to-br ${art.gradient}`}>
+                      <div className="absolute inset-0 opacity-25 [background-image:radial-gradient(circle_at_25%_35%,white_1.5px,transparent_1.5px)] [background-size:20px_20px]" />
+                      <Icon className="absolute bottom-3 right-3 h-11 w-11 text-white/90 transition-transform duration-200 group-hover:scale-110" />
+                      <span className={`absolute left-3 top-3 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${art.chip}`}>
+                        {d.category}
                       </span>
+                      <span className="absolute left-3 bottom-3 text-[11px] font-medium text-white/90 pr-16">
+                        {art.blurb}
+                      </span>
+                    </div>
+                    <div className="p-4">
+                      <h3 className="font-semibold text-[14px] truncate">{d.name}</h3>
+                      <p className="text-[12px] text-muted-foreground mt-0.5">{d.tagline}</p>
+                      <p className="text-[12px] text-muted-foreground mt-2 line-clamp-2">{d.description}</p>
+                      <div className="grid grid-cols-4 gap-1.5 mt-3 text-[11px]">
+                        <Mini label="Data pts" value={d.outputAttributes.length} />
+                        <Mini label="Sources" value={d.sources.length} />
+                        <Mini label="Accuracy" value={d.accuracy ? `${d.accuracy}%` : "—"} />
+                        <Mini label="Countries" value={d.countriesCovered ?? "—"} />
+                      </div>
+                      <div className="mt-3 pt-3 border-t border-border flex items-center justify-between">
+                        <span className="text-[11px] text-muted-foreground">
+                          {d.rowsAvailable}
+                          {d.coverage ? ` · ${d.coverage}% coverage` : ""}
+                        </span>
+                        <span className="inline-flex items-center gap-1 text-[12px] text-info font-medium">
+                          Configure <ChevronRight className="h-3 w-3" />
+                        </span>
+                      </div>
                     </div>
                   </button>
                 );

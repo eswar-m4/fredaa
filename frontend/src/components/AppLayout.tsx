@@ -4,6 +4,7 @@ import {
   LayoutDashboard,
   Target,
   Globe2,
+  Compass,
   Library,
   BarChart3,
   Workflow as WorkflowIcon,
@@ -27,7 +28,7 @@ type NavGroup = { group: string; items: NavItem[] };
 
 const BASE: NavGroup = {
   group: "OVERVIEW",
-  items: [{ to: "/", label: "Use Cases", icon: LayoutDashboard }],
+  items: [{ to: "/", label: "Modules", icon: LayoutDashboard }],
 };
 
 const TARGETED: NavGroup = {
@@ -215,7 +216,13 @@ export function AppLayout({ children }: { children: ReactNode }) {
             <div className="text-[10px] uppercase tracking-wider text-white/40 font-semibold mb-1">Active use case</div>
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-1.5 font-semibold text-[12px]">
-                {uc === "targeted" ? <Target className="h-3.5 w-3.5" /> : <Globe2 className="h-3.5 w-3.5" />}
+                {uc === "targeted" ? (
+                  <Target className="h-3.5 w-3.5" />
+                ) : uc === "openweb" ? (
+                  <Globe2 className="h-3.5 w-3.5" />
+                ) : (
+                  <Compass className="h-3.5 w-3.5" />
+                )}
                 <span>{USE_CASES[uc].short}</span>
               </div>
               <button

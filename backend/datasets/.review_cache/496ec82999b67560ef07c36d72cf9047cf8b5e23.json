@@ -1,0 +1,55 @@
+{
+  "signature": "496ec82999b67560ef07c36d72cf9047cf8b5e23",
+  "payload": {
+    "rows": [
+      {
+        "id": "TB-001-Address",
+        "record": "Record 1",
+        "attribute": "Address",
+        "attributeKey": "Address",
+        "recordIndex": 0,
+        "previous": "Ataturk Bulvari No: 12, Ankara",
+        "value": "Ataturk Bulvari No: 12, Ankara",
+        "changeType": "V",
+        "changed": false,
+        "conf": 0.89,
+        "sourceUrl": "https://TurkeyBrokers",
+        "source": "turkeybrokers",
+        "recordKey": "TB-001"
+      },
+      {
+        "id": "TB-001-City",
+        "record": "Record 1",
+        "attribute": "City",
+        "attributeKey": "City",
+        "recordIndex": 0,
+        "previous": "Ankara",
+        "value": "Ankara",
+        "changeType": "V",
+        "changed": false,
+        "conf": 0.89,
+        "sourceUrl": "https://TurkeyBrokers",
+        "source": "turkeybrokers",
+        "recordKey": "TB-001"
+      },
+      {
+        "id": "TB-001-PrimaryKey",
+        "record": "Record 1",
+        "attribute": "Primarykey",
+        "attributeKey": "PrimaryKey",
+        "recordIndex": 0,
+        "previous": "TB-001",
+        "value": "TB-001",
+        "changeType": "V",
+        "changed": false,
+        "conf": 0.89,
+        "sourceUrl": "https://TurkeyBrokers",
+        "source": "turkeybrokers",
+        "recordKey": "TB-001"
+      }
+    ],
+    "totalSampled": 15,
+    "sampledCount": 1,
+    "coverage": null
+  }
+}

@@ -1,11 +1,14 @@
 {
-  "baseline_file": "",
-  "current_file": "J-1785326938504_run_1.json",
+  "baseline_file": "J-1785326938504_run_1.json",
+  "current_file": "J-1785326938504_run_2.json",
   "records_compared": 29,
-  "added": 29,
+  "added": 0,
   "modified": 0,
   "deleted": 0,
-  "verified": 0,
-  "change_percentage": 100.0,
-  "modified_details": []
+  "verified": 29,
+  "change_percentage": 0.0,
+  "entrypoint_file": "run.py",
+  "runtime_type": "python",
+  "entrypoint_function": "run",
+  "bot_execution": {}
 }

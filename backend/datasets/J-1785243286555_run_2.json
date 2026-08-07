@@ -1,0 +1,77 @@
+[
+  {
+    "PrimaryKey": "TB-001",
+    "Address": "Ataturk Bulvari No: 12, Ankara",
+    "City": "Ankara"
+  },
+  {
+    "PrimaryKey": "TB-002",
+    "Address": "Istiklal Caddesi No: 45, Istanbul",
+    "City": "Istanbul"
+  },
+  {
+    "PrimaryKey": "TB-003",
+    "Address": "Cumhuriyet Meydani No: 8, Izmir",
+    "City": "Izmir"
+  },
+  {
+    "PrimaryKey": "TB-004",
+    "Address": "Mevlana Caddesi No: 99, Konya",
+    "City": "Konya"
+  },
+  {
+    "PrimaryKey": "TB-005",
+    "Address": "Talatpasa Bulvari No: 3, Izmir",
+    "City": "Izmir"
+  },
+  {
+    "PrimaryKey": "TB-006",
+    "Address": "Bagdat Caddesi No: 202, Istanbul",
+    "City": "Istanbul"
+  },
+  {
+    "PrimaryKey": "TB-007",
+    "Address": "Barbaros Bulvari No: 88, Istanbul",
+    "City": "Istanbul"
+  },
+  {
+    "PrimaryKey": "TB-008",
+    "Address": "Kenan Evren Bulvari No: 15, Adana",
+    "City": "Adana"
+  },
+  {
+    "PrimaryKey": "TB-009",
+    "Address": "Gazi Mustafa Kemal Bulvari No: 54, Ankara",
+    "City": "Ankara"
+  },
+  {
+    "PrimaryKey": "TB-010",
+    "Address": "Ataturk Caddesi No: 77, Bursa",
+    "City": "Bursa"
+  },
+  {
+    "PrimaryKey": "TB-011",
+    "Address": "Inonu Caddesi No: 120, Izmir",
+    "City": "Izmir"
+  },
+  {
+    "PrimaryKey": "TB-012",
+    "Address": "Halaskargazi Caddesi No: 34, Istanbul",
+    "City": "Istanbul"
+  },
+  {
+    "PrimaryKey": "TB-013",
+    "Address": "Ziya Gokalp Caddesi No: 9, Ankara",
+    "City": "Ankara"
+  },
+  {
+    "PrimaryKey": "TB-014",
+    "Address": "Fevzi Pasa Caddesi No: 150, Istanbul",
+    "City": "Istanbul"
+  },
+  {
+    "PrimaryKey": "TB-015",
+    "Address": "Mithatpasa Caddesi No: 21, Ankara",
+    "City": "Ankara"
+  }
+]

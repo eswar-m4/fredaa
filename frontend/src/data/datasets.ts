@@ -1,3 +1,5 @@
+import { VERTICAL_DATASETS } from "./vertical-datasets";
+
 // Universal dataset schemas for "By Dataset" use case.
 // Each dataset = a standard schema + the system sources we have wired
 // + the workflow that runs behind the scenes + a refresh cadence.
@@ -30,6 +32,10 @@ export type Dataset = {
     | "Commerce"
     | "Location"
     | "Automotive"
+    | "Healthcare"
+    | "Hospitality"
+    | "Legal"
+    | "Insurance"
     | "Real Estate"
     | "Travel"
     | "Jobs"
@@ -1047,6 +1053,7 @@ export const DATASETS: Dataset[] = [
     workflowId: "wf-travel-prices",
     sampleRow: { property: "Hotel Lumière", city: "Paris", nightly_price: 219, review_score: 8.7 },
   },
+  ...VERTICAL_DATASETS,
 ];
 
 export const DATASET_CATEGORIES: Dataset["category"][] = [
@@ -1057,6 +1064,10 @@ export const DATASET_CATEGORIES: Dataset["category"][] = [
   "Commerce",
   "Competitive",
   "Automotive",
+  "Healthcare",
+  "Hospitality",
+  "Legal",
+  "Insurance",
   "Real Estate",
   "Location",
   "Jobs",

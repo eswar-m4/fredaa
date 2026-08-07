@@ -14,12 +14,14 @@ from app.services.registry_scrapers.gleif_scraper import gleif_scraper
 from app.services.registry_scrapers.mca_scraper import mca_scraper
 from app.services.registry_scrapers.registry_capabilities import (
     REGISTRY_CAPABILITIES,
+    REGISTRY_SOURCE_ALIASES,
     classify_registry_source_from_text,
     normalize_registry_source_name,
     registry_source_label,
 )
 from app.services.registry_scrapers.sec_scraper import sec_scraper
 from app.services.registry_scrapers.wikidata_scraper import wikidata_scraper
+from app.services.scrapers.website_scraper import _extract_domain
 
 logger = setup_logger(__name__)
 
@@ -54,10 +56,14 @@ def _source_text(config: Dict[str, Any]) -> str:
 
 def _requested_registry_sources(config: Dict[str, Any]) -> set[str]:
     text = _source_text(config)
+    normalized_text = re.sub(r"[^a-z0-9]+", "", text.lower())
     requested: set[str] = set()
     for key in REGISTRY_CAPABILITIES:
-        if key in text:
+        if key in text or re.sub(r"[^a-z0-9]+", "", key.lower()) in normalized_text:
             requested.add(key)
+    for alias, canonical in REGISTRY_SOURCE_ALIASES.items():
+        if alias in normalized_text:
+            requested.add(canonical)
     if "mca" in text or "india" in text:
         requested.add("mca_india")
     if "sec" in text or "edgar" in text:
@@ -158,6 +164,26 @@ def _country_registry_hint(record: Dict[str, Any], company_name: str, website_re
     if "lei" in text or "legal entity identifier" in text:
         return "gleif"
     return None
+
+
+def _has_strong_registry_identifier(record: Dict[str, Any]) -> bool:
+    identifier_keys = (
+        "lei",
+        "LEI",
+        "lei_number",
+        "cik",
+        "CIK",
+        "ticker",
+        "symbol",
+        "cin",
+        "CIN",
+        "company_number",
+        "company_no",
+        "registration_number",
+        "wikidata_qid",
+        "qid",
+    )
+    return any(_clean(record.get(key)) for key in identifier_keys)
 
 
 def _normalized_fallback(
@@ -315,7 +341,21 @@ class RegistryOrchestrator:
             ordered = _ordered_capabilities(list(requested))
             return [cap.source_key for cap in ordered]
         inferred = self.choose_registry(record, config=config, website_result=website_result)
-        return [inferred] if inferred else []
+        if inferred:
+            if inferred == "gleif" and not _has_strong_registry_identifier(normalize_workflow_record(record)):
+                return ["gleif", "wikidata"]
+            return [inferred]
+        normalized_record = normalize_workflow_record(record)
+        company_name = self._raw_company_name(normalized_record, website_result)
+        website_domain = _extract_domain(
+            (website_result or {}).get("website")
+            or (website_result or {}).get("selected_domain")
+            or normalized_record.get("website")
+            or ""
+        )
+        if company_name and not website_domain and not _has_strong_registry_identifier(normalized_record):
+            return ["gleif", "wikidata"]
+        return []
 
     async def _attempt_registry_source(
         self,
@@ -582,6 +622,26 @@ class RegistryOrchestrator:
             "raw_company_name": registry_result.get("raw_company_name"),
         }
         merged["registry_metadata"] = registry_metadata
+        provenance = dict(merged.get("_field_provenance") or merged.get("field_provenance") or {})
+        for source_result in registry_metadata.get("source_results") or []:
+            source_key = source_result.get("source_key") or registry_metadata.get("registry_source") or "registry"
+            source_label = source_result.get("source_label") or _display_registry_source(source_key)
+            for field in source_result.get("contributed_fields") or []:
+                field_name = str(field or "").strip()
+                if not field_name:
+                    continue
+                provenance.setdefault(
+                    field_name,
+                    {
+                        "source": source_key,
+                        "source_label": source_label,
+                        "source_type": registry_metadata.get("source_type") or "government_registry",
+                        "source_url": (registry_metadata.get("raw_metadata") or {}).get("company_browse_url") or "",
+                    },
+                )
+        if provenance:
+            merged["_field_provenance"] = provenance
+            merged["field_provenance"] = provenance
         logger.info(
             "[Registry] attached metadata company=%s registry=%s confidence=%s",
             merged.get("company") or (merged.get("original_data") or {}).get("company") or "Unknown",
@@ -627,6 +687,15 @@ class RegistryOrchestrator:
         regional_hint = _country_registry_hint(record, company_name, website_result)
         if regional_hint and (not requested or regional_hint in requested):
             return regional_hint
+        if _has_strong_registry_identifier(record):
+            if _clean(record.get("lei") or record.get("LEI") or record.get("lei_number")):
+                return "gleif"
+            if _clean(record.get("cik") or record.get("CIK") or record.get("ticker") or record.get("symbol")):
+                return "sec_edgar"
+            if _clean(record.get("cin") or record.get("CIN")):
+                return "mca_india"
+            if _clean(record.get("company_number") or record.get("company_no") or record.get("registration_number")):
+                return "companies_house"
         if len(requested) == 1:
             requested_source = next(iter(requested))
             if requested_source in self.adapters:
@@ -640,6 +709,23 @@ class RegistryOrchestrator:
             )
             if ordered:
                 return ordered[0].source_key
+        website_domain = _extract_domain((website_result or {}).get("website") or (website_result or {}).get("selected_domain") or record.get("website") or "")
+        if website_domain.endswith(".co.uk") or website_domain.endswith(".uk"):
+            return "companies_house"
+        if website_domain.endswith(".in"):
+            return "mca_india"
+        if website_domain and any(hint in website_domain for hint in ("sec", "investor", "ir.", "investors", "edgar", "filings")):
+            return "sec_edgar"
+        if company_name and website_domain:
+            if any(hint in website_domain for hint in ("official", "corporate", "company", "investor", "relations")):
+                return "gleif"
+            if any(hint in company_name.lower() for hint in ("inc", "corp", "corporation", "company", "limited", "ltd", "plc")):
+                return "gleif"
+            return "wikidata"
+        if company_name:
+            if any(hint in company_name.lower() for hint in ("inc", "corp", "corporation", "company", "limited", "ltd", "plc")):
+                return "gleif"
+            return "gleif"
         inferred = classify_registry_source_from_text(_source_text(config))
         if inferred in self.adapters:
             return inferred

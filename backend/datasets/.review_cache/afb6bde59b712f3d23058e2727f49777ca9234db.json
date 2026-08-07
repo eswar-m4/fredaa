@@ -1,0 +1,85 @@
+{
+  "signature": "afb6bde59b712f3d23058e2727f49777ca9234db",
+  "payload": {
+    "rows": [
+      {
+        "id": "idx_0-full_name",
+        "record": "Record 1",
+        "attribute": "Full Name",
+        "attributeKey": "full_name",
+        "recordIndex": 0,
+        "previous": "—",
+        "value": "—",
+        "changeType": "V",
+        "changed": false,
+        "conf": 0.6,
+        "sourceUrl": "https://People & Contacts",
+        "source": "people & contacts",
+        "recordKey": "idx_0"
+      },
+      {
+        "id": "idx_0-email",
+        "record": "Record 1",
+        "attribute": "Email",
+        "attributeKey": "email",
+        "recordIndex": 0,
+        "previous": "—",
+        "value": "—",
+        "changeType": "V",
+        "changed": false,
+        "conf": 0.6,
+        "sourceUrl": "https://People & Contacts",
+        "source": "people & contacts",
+        "recordKey": "idx_0"
+      }
+    ],
+    "totalSampled": 1,
+    "sampledCount": 1,
+    "coverage": {
+      "job_coverage": 0.0,
+      "source_coverage": 1.0,
+      "record_coverage": 0.0,
+      "weighted_job_coverage": null,
+      "records_in_scope": 1,
+      "expected_attributes": 2,
+      "total_filled_cells": 0,
+      "source_requested": 1,
+      "source_returned": 1,
+      "source_kind": "By Dataset",
+      "source_breakdown": [
+        {
+          "source_key": "linkedin",
+          "source_label": "LinkedIn",
+          "records_requested_from_source": 1,
+          "records_returned_by_source": 0,
+          "source_coverage": 0.0,
+          "filled_fields": []
+        },
+        {
+          "source_key": "company_website_(team_pages)",
+          "source_label": "Company Website (Team pages)",
+          "records_requested_from_source": 1,
+          "records_returned_by_source": 0,
+          "source_coverage": 0.0,
+          "filled_fields": []
+        }
+      ],
+      "attribute_breakdown": [
+        {
+          "attribute_key": "full_name",
+          "attribute_label": "Full Name",
+          "non_null_values": 0,
+          "total_records_in_scope": 1,
+          "attr_coverage": 0.0
+        },
+        {
+          "attribute_key": "email",
+          "attribute_label": "Email",
+          "non_null_values": 0,
+          "total_records_in_scope": 1,
+          "attr_coverage": 0.0
+        }
+      ]
+    }
+  }
+}

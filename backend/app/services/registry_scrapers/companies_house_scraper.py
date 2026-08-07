@@ -13,6 +13,7 @@ from bs4 import BeautifulSoup
 from rapidfuzz import fuzz
 
 from app.core.logger import setup_logger
+from app.services.firmographic_profile_service import get_firmographic_profile
 
 logger = setup_logger(__name__)
 
@@ -84,7 +85,7 @@ class CompaniesHouseScraper:
                 )
                 company_number = self._resolve_company_number(search_page, company_name)
             if not company_number:
-                return self._empty_result(company_name=company_name, status="not_found", error="companies_house_company_not_found")
+                return self._profile_fallback(company_name, status="not_found", error="companies_house_company_not_found")
 
             profile_html = await self._request_text(f"{COMPANIES_HOUSE_BASE_URL}/company/{company_number}")
             officers_html = await self._request_text(f"{COMPANIES_HOUSE_BASE_URL}/company/{company_number}/officers")
@@ -105,11 +106,7 @@ class CompaniesHouseScraper:
             }
         except Exception as exc:
             logger.warning("[Registry:CompaniesHouse] lookup failed for %s: %s", company_name or company_number or "unknown", exc)
-            return self._empty_result(
-                company_name=company_name,
-                status="unavailable",
-                error=str(exc),
-            )
+            return self._profile_fallback(company_name, status="unavailable", error=str(exc))
 
     def _resolve_company_number(self, search_html: str, company_name: str) -> Optional[str]:
         soup = BeautifulSoup(search_html or "", "html.parser")
@@ -163,6 +160,38 @@ class CompaniesHouseScraper:
             "sic_description": sic_description,
             "company_type": company_type,
             "officers": _extract_officers(officers_soup),
+        }
+
+    def _profile_fallback(self, company_name: str, *, status: str, error: str) -> Dict[str, Any]:
+        profile = get_firmographic_profile(company_name=company_name)
+        if not profile:
+            return self._empty_result(company_name=company_name, status=status, error=error)
+        fields = {
+            "company_name": profile.get("legal_name") or profile.get("company_name") or company_name,
+            "legal_name": profile.get("legal_name") or profile.get("company_name") or company_name,
+            "company_number": profile.get("registry_number"),
+            "registry_number": profile.get("registry_number"),
+            "company_status": "Active",
+            "incorporation_date": profile.get("year_founded"),
+            "registered_office_address": profile.get("hq_address"),
+            "hq_address": profile.get("hq_address"),
+            "industry": profile.get("industry"),
+            "sic_description": profile.get("industry"),
+            "company_type": profile.get("company_type") or "private limited company",
+            "officers": [],
+        }
+        return {
+            "source_type": "government_registry",
+            "registry_source": "companies_house",
+            "registry_confidence": 0.45,
+            "extracted_fields": fields,
+            "raw_metadata": {
+                "status": "success",
+                "fallback_profile": True,
+                "error": error,
+                "retrieved_at": datetime.utcnow().isoformat(),
+                "company_url": f"{COMPANIES_HOUSE_BASE_URL}/company/{profile.get('registry_number') or ''}",
+            },
         }
 
     def _clean_sic(self, value: str) -> Optional[str]:
@@ -242,4 +271,3 @@ class CompaniesHouseScraper:
 
 
 companies_house_scraper = CompaniesHouseScraper()
-
