@@ -78,7 +78,7 @@ class Settings(BaseSettings):
     GEMINI_API_KEY: Optional[str] = None
     GEMINI_MODEL: str = "gemini-1.5-flash"
     GROQ_API_KEY: Optional[str] = None
-    GROQ_API_BASE: str = "https://api.groq.ai/v1"
+    GROQ_API_BASE: str = "https://api.groq.com/openai/v1"
     GROQ_MODEL: str = "llama3-70b-8192"
     OPENAI_API_KEY: Optional[str] = None
     OPENAI_MODEL: str = "gpt-4o-mini"
@@ -96,5 +96,53 @@ class Settings(BaseSettings):
         case_sensitive = True
 
 
-# Global settings instance
-settings = Settings()
+def _load_settings() -> Settings:
+    """
+    Load settings, giving .env file values priority over system environment
+    variables for API keys. This prevents stale system-level env vars from
+    overriding the keys configured in .env.
+    """
+    import os
+
+    env_file = Path(__file__).resolve().parents[1] / ".env"
+    env_overrides: dict = {}
+
+    if env_file.exists():
+        with open(env_file, encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if not line or line.startswith("#") or "=" not in line:
+                    continue
+                key, _, value = line.partition("=")
+                key = key.strip()
+                value = value.strip().strip('"').strip("'")
+                # Only override API key fields — don't mess with anything else
+                if key in (
+                    "OPENAI_API_KEY",
+                    "GEMINI_API_KEY",
+                    "GROQ_API_KEY",
+                    "LOVABLE_API_KEY",
+                ):
+                    env_overrides[key] = value
+
+    # Temporarily set the .env values in the process environment so
+    # Pydantic picks them up (they override the system env var for this process)
+    original: dict = {}
+    for key, value in env_overrides.items():
+        original[key] = os.environ.get(key)
+        os.environ[key] = value
+
+    instance = Settings()
+
+    # Restore originals (don't permanently alter the process environment)
+    for key, orig_value in original.items():
+        if orig_value is None:
+            os.environ.pop(key, None)
+        else:
+            os.environ[key] = orig_value
+
+    return instance
+
+
+# Global settings instance — .env API keys take priority over system env vars
+settings = _load_settings()

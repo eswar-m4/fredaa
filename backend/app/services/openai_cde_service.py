@@ -242,6 +242,7 @@ Records:
 
 
 def _response_text(payload: Dict[str, Any]) -> str:
+    # Responses API format: output_text or output[].content[].text
     text = payload.get("output_text")
     if isinstance(text, str) and text.strip():
         return text
@@ -255,6 +256,14 @@ def _response_text(payload: Dict[str, Any]) -> str:
                 text_value = content_item.get("text")
                 if isinstance(text_value, str) and text_value.strip():
                     return text_value
+    # Chat Completions API format: choices[0].message.content
+    for choice in payload.get("choices") or []:
+        if not isinstance(choice, dict):
+            continue
+        message = choice.get("message") or {}
+        content = message.get("content") if isinstance(message, dict) else None
+        if isinstance(content, str) and content.strip():
+            return content
     return ""
 
 
@@ -292,8 +301,13 @@ def _parse_json_response(text: str) -> Optional[Dict[str, Any]]:
         return None
 
     candidates = [raw_text]
+
+    # Strip markdown code fences: ```json ... ``` or ``` ... ```
     if raw_text.startswith("```"):
-        fenced = raw_text.strip("`").strip()
+        # Remove opening fence line (```json or ```)
+        fenced = re.sub(r"^```[a-zA-Z]*\n?", "", raw_text).strip()
+        # Remove closing fence
+        fenced = re.sub(r"```$", "", fenced).strip()
         if fenced:
             candidates.insert(0, fenced)
 
@@ -444,7 +458,8 @@ def merge_openai_cde_values(
 
 class OpenAICDEService:
     def __init__(self) -> None:
-        self.endpoint = "https://api.openai.com/v1/responses"
+        self.responses_endpoint = "https://api.openai.com/v1/responses"
+        self.chat_endpoint = "https://api.openai.com/v1/chat/completions"
         self.default_timeout = max(60, int(getattr(settings, "AI_REQUEST_TIMEOUT_SEC", 30) or 30))
 
     async def extract_dataset_data(
@@ -508,42 +523,46 @@ class OpenAICDEService:
 
                 prompt = _build_prompt(batch_payload, field_chunk)
 
-                request_bodies: List[Dict[str, Any]] = []
-                for use_web_search in (True, False):
-                    request_body: Dict[str, Any] = {
-                        "model": model_name,
-                        "input": [
-                            {
-                                "role": "system",
-                                "content": (
-                                    "You extract company data and return only valid JSON. "
-                                    "Fill every requested field you can support from trustworthy sources. "
-                                    "Prefer the company website and official registry or investor-relations sources. "
-                                    "Use public business sources when official sources are unavailable."
-                                ),
-                            },
-                            {"role": "user", "content": prompt},
-                        ],
-                        "temperature": 0,
-                    }
-                    if use_web_search:
-                        if allowed_domains:
-                            request_body["tools"] = [
-                                {
-                                    "type": "web_search",
-                                    "filters": {"allowed_domains": allowed_domains},
-                                }
-                            ]
-                        else:
-                            request_body["tools"] = [{"type": "web_search"}]
-                    request_bodies.append(request_body)
+                system_content = (
+                    "You extract company data and return only valid JSON. "
+                    "Fill every requested field you can support from trustworthy sources. "
+                    "Prefer the company website and official registry or investor-relations sources. "
+                    "Use public business sources when official sources are unavailable."
+                )
+
+                # Attempt 1: Responses API with web_search (richer, but gated on plan)
+                # temperature is NOT a valid param for the Responses API — omit it.
+                # Note: allowed_domains filter is NOT supported on gpt-4o-mini, use plain web_search
+                responses_body: Dict[str, Any] = {
+                    "model": model_name,
+                    "input": [
+                        {"role": "system", "content": system_content},
+                        {"role": "user", "content": prompt},
+                    ],
+                    "tools": [{"type": "web_search"}],
+                }
+
+                # Attempt 2: Chat Completions API — universally supported, no web_search
+                chat_body: Dict[str, Any] = {
+                    "model": model_name,
+                    "messages": [
+                        {"role": "system", "content": system_content},
+                        {"role": "user", "content": prompt},
+                    ],
+                    "temperature": 0,
+                }
+
+                request_attempts = [
+                    (self.responses_endpoint, responses_body),
+                    (self.chat_endpoint, chat_body),
+                ]
 
                 chunk_succeeded = False
-                for attempt_index, request_body in enumerate(request_bodies):
+                for attempt_index, (endpoint_url, request_body) in enumerate(request_attempts):
                     try:
                         async with httpx.AsyncClient(timeout=self.default_timeout) as client:
                             response = await client.post(
-                                self.endpoint,
+                                endpoint_url,
                                 headers={
                                     "Authorization": f"Bearer {resolved_key}",
                                     "Content-Type": "application/json",

@@ -1560,69 +1560,43 @@ async def run_scraper_background(job_id: str):
                     
                     # Run the real enrichment stack for every record in the uploaded dataset.
                     should_scrape = True
-                    
-                    if should_scrape and (run_website or run_builtwith):
-                        verification_input = {
-                            "company": company_val,
-                            "website": normalized_website_val or website_val,
-                            "email": email_val,
-                            "phone": phone_val,
-                            "linkedin": linkedin_val
-                        }
-                        try:
-                            res = await asyncio.wait_for(
-                                company_verification_service.verify_record(verification_input, {}),
-                                timeout=4.0
-                            )
-                            scraped_metadata = res.get("scraped_metadata") or {}
-                            website_resolved = res.get("website")
-                            try:
-                                enrichment_source = _normalize_http_url(website_resolved or normalized_website_val or website_val or "")
-                                if enrichment_source:
-                                    website_enrichment = await asyncio.wait_for(
-                                        asyncio.to_thread(
-                                            enrichment_service.enrich,
-                                            [{"url": enrichment_source}],
-                                            [{"result": record}],
-                                        ),
-                                        timeout=4.0,
-                                    )
-                                    if isinstance(website_enrichment, dict) and website_enrichment:
-                                        scraped_metadata = {
-                                            **scraped_metadata,
-                                            **{
-                                                k: v
-                                                for k, v in website_enrichment.items()
-                                                if v not in (None, "", [], {})
-                                            },
-                                        }
-                            except Exception as e:
-                                logger.warning("[By Dataset] Website enrichment merge failed for %s: %s", company_val, e)
-                        except Exception as e:
-                            logger.warning("[By Dataset] Scraper failed/timed out for %s: %s", company_val, e)
 
-                    if should_scrape and (run_website or run_builtwith) and not website_enrichment and normalized_website_val:
-                        try:
-                            website_enrichment = await asyncio.wait_for(
-                                asyncio.to_thread(
-                                    enrichment_service.enrich,
-                                    [{"url": normalized_website_val}],
-                                    [{"result": record}],
-                                ),
-                                timeout=4.0,
-                            )
-                            if isinstance(website_enrichment, dict) and website_enrichment:
-                                scraped_metadata = {
-                                    **scraped_metadata,
-                                    **{
-                                        k: v
-                                        for k, v in website_enrichment.items()
-                                        if v not in (None, "", [], {})
-                                    },
-                                }
-                        except Exception as e:
-                            logger.warning("[By Dataset] Website fallback enrichment failed for %s: %s", company_val, e)
-                            
+                    if should_scrape and (run_website or run_builtwith):
+                        scrape_url = normalized_website_val or website_val or ""
+                        if scrape_url:
+                            try:
+                                from app.services.scrapers.website_scraper import fetch_website_metadata
+                                raw_meta = await asyncio.wait_for(
+                                    fetch_website_metadata(scrape_url),
+                                    timeout=60.0,
+                                )
+                                if raw_meta and not raw_meta.get("_blocked"):
+                                    scraped_metadata = raw_meta
+                                    website_resolved = raw_meta.get("url") or scrape_url
+                                    # Merge any enrichment_service overlay on top
+                                    try:
+                                        website_enrichment = await asyncio.wait_for(
+                                            asyncio.to_thread(
+                                                enrichment_service.enrich,
+                                                [{"url": scrape_url}],
+                                                [{"result": record}],
+                                            ),
+                                            timeout=15.0,
+                                        )
+                                        if isinstance(website_enrichment, dict) and website_enrichment:
+                                            scraped_metadata = {
+                                                **scraped_metadata,
+                                                **{
+                                                    k: v
+                                                    for k, v in website_enrichment.items()
+                                                    if v not in (None, "", [], {})
+                                                },
+                                            }
+                                    except Exception as e:
+                                        logger.warning("[By Dataset] Enrichment overlay failed for %s: %s", company_val, e)
+                            except Exception as e:
+                                logger.warning("[By Dataset] Website scrape failed for %s: %s", company_val, e)
+
                     if should_scrape and run_sec:
                         try:
                             res_sec = await asyncio.wait_for(
@@ -1631,7 +1605,7 @@ async def run_scraper_background(job_id: str):
                                     cik=registry_val,
                                     ticker=ticker_val
                                 ),
-                                timeout=3.0
+                                timeout=15.0
                             )
                             if res_sec.get("raw_metadata", {}).get("status") == "success":
                                 sec_fields = res_sec.get("extracted_fields") or {}
@@ -1642,7 +1616,7 @@ async def run_scraper_background(job_id: str):
                         try:
                             res_mca = await asyncio.wait_for(
                                 mca_scraper.lookup_company(company_val),
-                                timeout=3.0
+                                timeout=10.0
                             )
                             if res_mca.get("raw_metadata", {}).get("status") == "success":
                                 mca_fields = res_mca.get("extracted_fields") or {}
@@ -1656,7 +1630,7 @@ async def run_scraper_background(job_id: str):
                                     workflow_service._discover_linkedin_search_evidence,
                                     company_val
                                 ),
-                                timeout=3.0
+                                timeout=10.0
                             )
                             if discovery and "metadata" in discovery:
                                 linkedin_metadata = discovery.get("metadata") or {}
@@ -1751,8 +1725,8 @@ async def run_scraper_background(job_id: str):
                                 sec_street
                                 or mca_fields.get("registered_office_address")
                                 or li_hq_str
-                                or website_enrichment.get("address")
                                 or scraped_metadata.get("hq_address")
+                                or website_enrichment.get("address")
                                 or scraped_metadata.get("address")
                             )
                             enriched_row[key] = val if val else None
@@ -1852,8 +1826,8 @@ async def run_scraper_background(job_id: str):
                 )
 
                 workflow_ids = []
-                if isinstance(filters_dict, dict) and filters_dict.get("workflowId"):
-                    wf_id = str(filters_dict["workflowId"])
+                if isinstance(config_data, dict) and config_data.get("workflowId"):
+                    wf_id = str(config_data["workflowId"])
                     workflow_aliases = {
                         "wf-company-extraction": "company_data",
                         "wf-financial-extraction": "sec_data",
