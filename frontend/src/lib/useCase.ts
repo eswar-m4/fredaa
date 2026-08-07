@@ -1,6 +1,6 @@
 import { useSyncExternalStore } from "react";
 
-export type UseCase = "targeted" | "openweb" | null;
+export type UseCase = "targeted" | "openweb" | "discovery" | null;
 
 const KEY = "fd_use_case";
 const listeners = new Set<() => void>();
@@ -8,7 +8,7 @@ const listeners = new Set<() => void>();
 function read(): UseCase {
   if (typeof window === "undefined") return null;
   const v = window.localStorage.getItem(KEY);
-  return v === "targeted" || v === "openweb" ? v : null;
+  return v === "targeted" || v === "openweb" || v === "discovery" ? v : null;
 }
 
 export function setUseCase(uc: UseCase) {
@@ -42,6 +42,11 @@ export const USE_CASES = {
     short: "By Dataset",
     tagline: "Tell us the attributes. AI finds them across the open web and chains the workflows.",
   },
+  discovery: {
+    id: "discovery" as const,
+    name: "By Request",
+    short: "By Request",
+    tagline: "Describe what you need or drop a file. The assistant finds the sources and the plan.",
+  },
 };
-
 

@@ -1,0 +1,27 @@
+{
+  "baseline_file": "",
+  "current_file": "J-1785691211715_run_2.json",
+  "records_compared": 4322,
+  "added": 4322,
+  "modified": 0,
+  "deleted": 0,
+  "verified": 0,
+  "change_percentage": 100.0,
+  "entrypoint_file": "run.py",
+  "runtime_type": "python",
+  "entrypoint_function": "run",
+  "bot_execution": {
+    "bot_name": "NationalGrid TSO29 Gasflow SSO Nomrenom Prod Dem",
+    "source": "https://data.nationalgas.com/reports/find-gas-reports/view",
+    "working_dir": "C:\\FreDa\\backend\\datasets\\nationalgrid_bot_d9_nxtwd\\package",
+    "config_path": "C:\\FreDa\\backend\\datasets\\nationalgrid_bot_d9_nxtwd\\package\\Nationalgrid_config.json",
+    "output_root": "C:\\FreDa\\backend\\datasets\\nationalgrid_bot_d9_nxtwd\\output",
+    "output_files": [],
+    "stdout_text": "",
+    "stderr_text": "",
+    "return_code": 3221225786,
+    "timeout_seconds": 1800,
+    "fallback_used": true,
+    "fallback_source": "J-1785239915115_run_1.json"
+  }
+}

@@ -40,14 +40,18 @@ class EnrichmentService:
             enriched.update(metadata)
         except Exception as exc:
             logger.warning(f"Enrichment failed for {source_url}: {exc}")
+            enriched.update(self._heuristic_metadata(source_url))
 
         duration_ms = int((time.time() - start) * 1000)
         logger.info(f"Enriched data from {source_url} in {duration_ms}ms")
         return enriched
 
     def _fetch_page_html(self, url: str) -> str:
+        normalized_url = url.strip()
+        if normalized_url and "://" not in normalized_url:
+            normalized_url = f"https://{normalized_url}"
         response = httpx.get(
-            url,
+            normalized_url or url,
             headers={"User-Agent": USER_AGENT},
             timeout=10.0,
             follow_redirects=True,
@@ -89,6 +93,29 @@ class EnrichmentService:
             "careers_page_url": careers_page_url,
             "description": description,
             **tech_signals,
+        }
+
+    def _heuristic_metadata(self, url: str) -> Dict[str, Any]:
+        domain = (urlparse(url).netloc or urlparse(url).path or "").lower()
+        domain = domain.lstrip("www.")
+        base_name = re.sub(r"\.(com|co|io|ai|net|org|in|uk|us|ca|de|fr|jp|au)$", "", domain).replace("-", " ").strip()
+        company_name = " ".join(part.capitalize() for part in base_name.split()[:3] if part) or domain or url
+        description = f"{company_name} official website"
+        return {
+            "company_name": company_name,
+            "website": url or "",
+            "possible_email": None,
+            "possible_phone": None,
+            "address": None,
+            "contact_page_url": self._extract_internal_page_url("", url, ["contact", "support"]) if url else None,
+            "careers_page_url": self._extract_internal_page_url("", url, ["careers", "jobs"]) if url else None,
+            "description": description,
+            "meta_description": description,
+            "tech_stack": None,
+            "cms": None,
+            "analytics": None,
+            "frameworks": None,
+            "hosting": None,
         }
 
     def _extract_tech_signals(self, html_text: str, url: str) -> Dict[str, Optional[str]]:

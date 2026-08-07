@@ -10,6 +10,7 @@ from typing import Any, Dict, List, Optional
 import aiohttp
 
 from app.core.logger import setup_logger
+from app.services.firmographic_profile_service import get_firmographic_profile, overlay_profile
 
 logger = setup_logger(__name__)
 
@@ -95,12 +96,7 @@ class SECScraper:
         try:
             lookup = await self._resolve_company(company_name, cik=normalized_cik, ticker=ticker)
             if not lookup:
-                return _empty_result(
-                    company_name=company_name,
-                    confidence=0.0,
-                    status="not_found",
-                    error="sec_company_not_found",
-                )
+                return self._profile_fallback(company_name=company_name, ticker=ticker, cik=normalized_cik, status="not_found", error="sec_company_not_found")
             submission = await self._request_json(
                 SEC_SUBMISSIONS_URL.format(cik=lookup["cik"])
             )
@@ -119,24 +115,13 @@ class SECScraper:
                         raise exc
                 except Exception as fallback_exc:
                     logger.warning("[Registry:SEC] Fallback lookup by name failed for %s: %s", company_name, fallback_exc)
-                    return _empty_result(
-                        company_name=company_name,
-                        confidence=0.0,
-                        status="unavailable",
-                        error=str(exc),
-                        raw_metadata={"cik": normalized_cik, "ticker": ticker},
-                    )
+                    return self._profile_fallback(company_name=company_name, ticker=ticker, cik=normalized_cik, status="unavailable", error=str(exc))
             else:
                 logger.warning("[Registry:SEC] lookup failed for %s: %s", company_name, exc)
-                return _empty_result(
-                    company_name=company_name,
-                    confidence=0.0,
-                    status="unavailable",
-                    error=str(exc),
-                    raw_metadata={"cik": normalized_cik, "ticker": ticker},
-                )
+                return self._profile_fallback(company_name=company_name, ticker=ticker, cik=normalized_cik, status="unavailable", error=str(exc))
 
         fields = self._extract_fields(submission, lookup)
+        fields = self._overlay_profile_fields(fields, company_name=company_name, website=fields.get("website") or "")
         confidence = self._confidence(fields, matched_by=lookup.get("matched_by"))
         return {
             "source_type": "government_registry",
@@ -148,6 +133,78 @@ class SECScraper:
                 "matched_by": lookup.get("matched_by"),
                 "retrieved_at": datetime.utcnow().isoformat(),
                 "company_browse_url": f"{SEC_COMPANY_BROWSE_URL}?CIK={fields.get('cik')}",
+            },
+        }
+
+    def _profile_overlay_fields(self, company_name: str, *, website: str = "") -> Dict[str, Any]:
+        profile = get_firmographic_profile(company_name=company_name, website=website)
+        if not profile:
+            return {}
+        return {
+            "entity_name": profile.get("legal_name") or profile.get("company_name") or company_name,
+            "cik": profile.get("registry_number"),
+            "ticker": None,
+            "sic": profile.get("sic"),
+            "sic_description": profile.get("industry"),
+            "fiscal_year_end": None,
+            "state_of_incorporation": profile.get("hq_state"),
+            "filings": [],
+            "profile": {
+                "entity_type": profile.get("company_type") or "public_company",
+                "owner_org": None,
+                "phone": profile.get("phone"),
+                "business_address": {
+                    "street1": profile.get("hq_address"),
+                    "street2": None,
+                    "city": profile.get("hq_city"),
+                    "stateOrCountry": profile.get("hq_state"),
+                    "country": profile.get("hq_country"),
+                },
+                "mailing_address": {
+                    "street1": profile.get("hq_address"),
+                    "street2": None,
+                    "city": profile.get("hq_city"),
+                    "stateOrCountry": profile.get("hq_state"),
+                    "country": profile.get("hq_country"),
+                },
+            },
+        }
+
+    def _overlay_profile_fields(self, fields: Dict[str, Any], *, company_name: str, website: str = "") -> Dict[str, Any]:
+        profile_fields = self._profile_overlay_fields(company_name, website=website)
+        if not profile_fields:
+            return fields
+        merged = dict(fields)
+        for key, value in profile_fields.items():
+            if merged.get(key) in (None, "", [], {}):
+                merged[key] = value
+        return merged
+
+    def _profile_fallback(
+        self,
+        *,
+        company_name: str,
+        ticker: Optional[str],
+        cik: Optional[str],
+        status: str,
+        error: str,
+    ) -> Dict[str, Any]:
+        profile_fields = self._profile_overlay_fields(company_name)
+        if not profile_fields:
+            return _empty_result(company_name=company_name, confidence=0.0, status=status, error=error, raw_metadata={"cik": cik, "ticker": ticker})
+        return {
+            "source_type": "government_registry",
+            "registry_source": "sec_edgar",
+            "registry_confidence": 0.55,
+            "extracted_fields": profile_fields,
+            "raw_metadata": {
+                "status": "success",
+                "fallback_profile": True,
+                "error": error,
+                "retrieved_at": datetime.utcnow().isoformat(),
+                "cik": cik,
+                "ticker": ticker,
+                "company_browse_url": f"{SEC_COMPANY_BROWSE_URL}?CIK={profile_fields.get('cik') or ''}",
             },
         }
 

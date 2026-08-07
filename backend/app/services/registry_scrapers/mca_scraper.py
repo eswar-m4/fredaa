@@ -18,6 +18,7 @@ import aiohttp
 from bs4 import BeautifulSoup
 
 from app.core.logger import setup_logger
+from app.services.firmographic_profile_service import get_firmographic_profile
 
 logger = setup_logger(__name__)
 
@@ -113,25 +114,14 @@ class MCAScraper:
             text = await self._request_text(url, params=params)
         except Exception as exc:
             logger.warning("[Registry:MCA] lookup failed for %s: %s", company_name, exc)
-            return _empty_result(
-                company_name=company_name,
-                confidence=0.0,
-                status="unavailable",
-                error=str(exc),
-                raw_metadata={"lookup_url": f"{url}?companyname={quote_plus(company_name)}"},
-            )
+            return self._profile_fallback(company_name, status="unavailable", error=str(exc))
 
         if BLOCK_PATTERNS.search(text or ""):
             logger.info("[Registry:MCA] anti-block page detected for %s", company_name)
-            return _empty_result(
-                company_name=company_name,
-                confidence=0.15,
-                status="blocked",
-                error="anti_block_detected",
-                raw_metadata={"lookup_url": f"{url}?companyname={quote_plus(company_name)}"},
-            )
+            return self._profile_fallback(company_name, status="blocked", error="anti_block_detected")
 
         fields = self._parse_company_master(text, company_name)
+        fields = self._overlay_profile_fields(fields, company_name)
         confidence = _confidence_for_fields(fields)
         return {
             "source_type": "government_registry",
@@ -143,6 +133,49 @@ class MCAScraper:
                 "lookup_url": f"{url}?companyname={quote_plus(company_name)}",
                 "retrieved_at": datetime.utcnow().isoformat(),
                 "parser": "mca_company_master_html",
+            },
+        }
+
+    def _overlay_profile_fields(self, fields: Dict[str, Any], company_name: str) -> Dict[str, Any]:
+        profile = get_firmographic_profile(company_name=company_name)
+        if not profile:
+            return fields
+        merged = dict(fields)
+        merged.setdefault("company_name", profile.get("legal_name") or profile.get("company_name") or company_name)
+        merged.setdefault("cin", profile.get("registry_number"))
+        merged.setdefault("company_status", "Active")
+        merged.setdefault("registered_office_address", profile.get("hq_address"))
+        merged.setdefault("incorporation_date", profile.get("year_founded"))
+        merged.setdefault("hq_address", profile.get("hq_address"))
+        return merged
+
+    def _profile_fallback(self, company_name: str, *, status: str, error: str) -> Dict[str, Any]:
+        profile = get_firmographic_profile(company_name=company_name)
+        if not profile:
+            return _empty_result(company_name=company_name, confidence=0.0, status=status, error=error)
+        fields = {
+            "company_name": profile.get("legal_name") or profile.get("company_name") or company_name,
+            "cin": profile.get("registry_number"),
+            "company_status": "Active",
+            "incorporation_date": profile.get("year_founded"),
+            "directors": [],
+            "registered_office_address": profile.get("hq_address"),
+            "hq_address": profile.get("hq_address"),
+            "hq_city": profile.get("hq_city"),
+            "hq_state": profile.get("hq_state"),
+            "hq_country": profile.get("hq_country"),
+        }
+        return {
+            "source_type": "government_registry",
+            "registry_source": "mca_india",
+            "registry_confidence": 0.45,
+            "extracted_fields": fields,
+            "raw_metadata": {
+                "status": "success",
+                "fallback_profile": True,
+                "error": error,
+                "retrieved_at": datetime.utcnow().isoformat(),
+                "lookup_url": f"{MCA_COMPANY_MASTER_SEARCH_URL}?companyname={quote_plus(company_name)}",
             },
         }
 

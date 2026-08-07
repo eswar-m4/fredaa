@@ -1506,6 +1506,14 @@ async def run_scraper_background(job_id: str):
             def _normalize_uploaded_key(value: Any) -> str:
                 return re.sub(r"[^a-z0-9]+", "", str(value or "").strip().lower())
 
+            def _normalize_http_url(value: Any) -> str:
+                text = str(value or "").strip()
+                if not text:
+                    return ""
+                if "://" not in text:
+                    return f"https://{text}"
+                return text
+
             def _resolve_uploaded_value(record: Dict[str, Any], *field_names: str) -> Any:
                 if not isinstance(record, dict):
                     return None
@@ -1536,6 +1544,7 @@ async def run_scraper_background(job_id: str):
                         return {key: None for key in selected_outputs}
 
                     website_val = _resolve_uploaded_value(record, "website")
+                    normalized_website_val = _normalize_http_url(website_val)
                     email_val = _resolve_uploaded_value(record, "email")
                     phone_val = _resolve_uploaded_value(record, "phone")
                     linkedin_val = _resolve_uploaded_value(record, "linkedin_url")
@@ -1555,7 +1564,7 @@ async def run_scraper_background(job_id: str):
                     if should_scrape and (run_website or run_builtwith):
                         verification_input = {
                             "company": company_val,
-                            "website": website_val,
+                            "website": normalized_website_val or website_val,
                             "email": email_val,
                             "phone": phone_val,
                             "linkedin": linkedin_val
@@ -1568,7 +1577,7 @@ async def run_scraper_background(job_id: str):
                             scraped_metadata = res.get("scraped_metadata") or {}
                             website_resolved = res.get("website")
                             try:
-                                enrichment_source = website_resolved or website_val or ""
+                                enrichment_source = _normalize_http_url(website_resolved or normalized_website_val or website_val or "")
                                 if enrichment_source:
                                     website_enrichment = await asyncio.wait_for(
                                         asyncio.to_thread(
@@ -1591,6 +1600,28 @@ async def run_scraper_background(job_id: str):
                                 logger.warning("[By Dataset] Website enrichment merge failed for %s: %s", company_val, e)
                         except Exception as e:
                             logger.warning("[By Dataset] Scraper failed/timed out for %s: %s", company_val, e)
+
+                    if should_scrape and (run_website or run_builtwith) and not website_enrichment and normalized_website_val:
+                        try:
+                            website_enrichment = await asyncio.wait_for(
+                                asyncio.to_thread(
+                                    enrichment_service.enrich,
+                                    [{"url": normalized_website_val}],
+                                    [{"result": record}],
+                                ),
+                                timeout=4.0,
+                            )
+                            if isinstance(website_enrichment, dict) and website_enrichment:
+                                scraped_metadata = {
+                                    **scraped_metadata,
+                                    **{
+                                        k: v
+                                        for k, v in website_enrichment.items()
+                                        if v not in (None, "", [], {})
+                                    },
+                                }
+                        except Exception as e:
+                            logger.warning("[By Dataset] Website fallback enrichment failed for %s: %s", company_val, e)
                             
                     if should_scrape and run_sec:
                         try:
@@ -1663,7 +1694,7 @@ async def run_scraper_background(job_id: str):
                             val = sec_fields.get("entity_name") or mca_fields.get("company_name") or linkedin_metadata.get("company_name") or linkedin_metadata.get("linkedin_company_name") or scraped_metadata.get("detected_company_name") or company_val
                             enriched_row[key] = val if val else None
                         elif key == "website":
-                            val = sec_fields.get("website") or linkedin_metadata.get("website") or linkedin_metadata.get("linkedin_website") or scraped_metadata.get("url") or website_resolved or website_val
+                            val = sec_fields.get("website") or linkedin_metadata.get("website") or linkedin_metadata.get("linkedin_website") or scraped_metadata.get("url") or website_resolved or normalized_website_val or website_val
                             enriched_row[key] = val if val else None
                         elif key == "description":
                             val = (
@@ -1801,7 +1832,7 @@ async def run_scraper_background(job_id: str):
                         linkedin_metadata=linkedin_metadata,
                         website_enrichment=website_enrichment,
                         cb_fields=cb_fields,
-                        source_url=website_resolved or website_val,
+                        source_url=website_resolved or normalized_website_val or website_val,
                     )
                     return enriched_row
 

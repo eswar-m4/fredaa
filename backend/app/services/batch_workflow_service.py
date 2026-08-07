@@ -101,6 +101,7 @@ def _build_processed_row(
         "discovered_website": result.get("website"),
         "selected_domain": result.get("selected_domain"),
         "scraped_metadata": result.get("scraped_metadata") or {},
+        "field_provenance": result.get("field_provenance") or result.get("_field_provenance") or {},
         "confidence_score": result.get("confidence") or result.get("confidenceScore") or 0,
         "confidence_reasons": result.get("confidence_reasons") or [],
         "trust": result.get("trust") or {},

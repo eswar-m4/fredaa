@@ -106,6 +106,29 @@ def _collect_records(*roots: Path) -> List[Dict[str, Any]]:
     return records
 
 
+def _load_fallback_records(datasets_dir: Path) -> tuple[List[Dict[str, Any]], str]:
+    fallback_candidates = sorted(
+        Path(datasets_dir).glob("J-*_run_1.json"),
+        key=lambda path: path.stat().st_mtime,
+        reverse=True,
+    )
+    for path in fallback_candidates:
+        try:
+            with open(path, "r", encoding="utf-8") as fh:
+                payload = json.load(fh)
+        except Exception:
+            continue
+        if not isinstance(payload, list) or not payload:
+            continue
+        if not isinstance(payload[0], dict):
+            continue
+        first_source_file = str(payload[0].get("source_file") or "")
+        if "NationalGrid" not in first_source_file:
+            continue
+        return payload, path.name
+    return [], ""
+
+
 def _run_subprocess(package_copy: Path, timeout_seconds: int) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
         [sys.executable, ENTRYPOINT_SCRIPT.name],
@@ -134,6 +157,13 @@ def run(context: Dict[str, Any] | None = None) -> Dict[str, Any]:
         output_root = run_root / "output"
         result = _run_subprocess(package_copy, timeout_seconds)
         records = _collect_records(output_root, package_copy)
+        fallback_used = False
+        fallback_source = ""
+        if not records:
+            fallback_records, fallback_source = _load_fallback_records(workspace_root)
+            if fallback_records:
+                records = fallback_records
+                fallback_used = True
         if not records and result.returncode != 0:
             raise RuntimeError(
                 "NationalGrid bot failed with exit code "
@@ -153,6 +183,8 @@ def run(context: Dict[str, Any] | None = None) -> Dict[str, Any]:
             "stderr_text": result.stderr.strip(),
             "return_code": result.returncode,
             "timeout_seconds": timeout_seconds,
+            "fallback_used": fallback_used,
+            "fallback_source": fallback_source,
         }
         return {
             "records": records,

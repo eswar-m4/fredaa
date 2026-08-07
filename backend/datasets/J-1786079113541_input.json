@@ -1,0 +1,42 @@
+[
+  {
+    "Company Name": "Apple Inc.",
+    "Website": "https://www.apple.com"
+  },
+  {
+    "Company Name": "Microsoft Corporation",
+    "Website": "https://www.microsoft.com"
+  },
+  {
+    "Company Name": "NVIDIA Corporation",
+    "Website": "https://www.nvidia.com"
+  },
+  {
+    "Company Name": "Tesla, Inc.",
+    "Website": "https://www.tesla.com"
+  },
+  {
+    "Company Name": "The Coca-Cola Company",
+    "Website": "https://www.coca-colacompany.com"
+  },
+  {
+    "Company Name": "The Walt Disney Company",
+    "Website": "https://thewaltdisneycompany.com"
+  },
+  {
+    "Company Name": "Intel Corporation",
+    "Website": "https://www.intel.com"
+  },
+  {
+    "Company Name": "Cisco Systems, Inc.",
+    "Website": "https://www.cisco.com"
+  },
+  {
+    "Company Name": "Adobe Inc.",
+    "Website": "https://www.adobe.com"
+  },
+  {
+    "Company Name": "Netflix, Inc.",
+    "Website": "https://www.netflix.com"
+  }
+]
