@@ -1019,7 +1019,7 @@ def _merge_page_metadata(base: Dict[str, Any], extra: Dict[str, Any]) -> Dict[st
 
 async def _fetch_and_extract(url: str) -> Optional[Dict[str, Any]]:
     try:
-        html = await asyncio.wait_for(_fetch_html_aio(url), timeout=8.0)
+        html = await asyncio.wait_for(_fetch_html_aio(url), timeout=REQUEST_TIMEOUT)
     except Exception:
         try:
             html = _fetch_html_requests(url)

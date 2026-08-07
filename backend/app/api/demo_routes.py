@@ -1562,40 +1562,66 @@ async def run_scraper_background(job_id: str):
                     should_scrape = True
 
                     if should_scrape and (run_website or run_builtwith):
-                        scrape_url = normalized_website_val or website_val or ""
-                        if scrape_url:
+                        verification_input = {
+                            "company": company_val,
+                            "website": normalized_website_val or website_val,
+                            "email": email_val,
+                            "phone": phone_val,
+                            "linkedin": linkedin_val
+                        }
+                        try:
+                            res = await asyncio.wait_for(
+                                company_verification_service.verify_record(verification_input, {}),
+                                timeout=4.0
+                            )
+                            scraped_metadata = res.get("scraped_metadata") or {}
+                            website_resolved = res.get("website")
                             try:
-                                from app.services.scrapers.website_scraper import fetch_website_metadata
-                                raw_meta = await asyncio.wait_for(
-                                    fetch_website_metadata(scrape_url),
-                                    timeout=60.0,
-                                )
-                                if raw_meta and not raw_meta.get("_blocked"):
-                                    scraped_metadata = raw_meta
-                                    website_resolved = raw_meta.get("url") or scrape_url
-                                    # Merge any enrichment_service overlay on top
-                                    try:
-                                        website_enrichment = await asyncio.wait_for(
-                                            asyncio.to_thread(
-                                                enrichment_service.enrich,
-                                                [{"url": scrape_url}],
-                                                [{"result": record}],
-                                            ),
-                                            timeout=15.0,
-                                        )
-                                        if isinstance(website_enrichment, dict) and website_enrichment:
-                                            scraped_metadata = {
-                                                **scraped_metadata,
-                                                **{
-                                                    k: v
-                                                    for k, v in website_enrichment.items()
-                                                    if v not in (None, "", [], {})
-                                                },
-                                            }
-                                    except Exception as e:
-                                        logger.warning("[By Dataset] Enrichment overlay failed for %s: %s", company_val, e)
+                                enrichment_source = _normalize_http_url(website_resolved or normalized_website_val or website_val or "")
+                                if enrichment_source:
+                                    website_enrichment = await asyncio.wait_for(
+                                        asyncio.to_thread(
+                                            enrichment_service.enrich,
+                                            [{"url": enrichment_source}],
+                                            [{"result": record}],
+                                        ),
+                                        timeout=4.0,
+                                    )
+                                    if isinstance(website_enrichment, dict) and website_enrichment:
+                                        scraped_metadata = {
+                                            **scraped_metadata,
+                                            **{
+                                                k: v
+                                                for k, v in website_enrichment.items()
+                                                if v not in (None, "", [], {})
+                                            },
+                                        }
                             except Exception as e:
-                                logger.warning("[By Dataset] Website scrape failed for %s: %s", company_val, e)
+                                logger.warning("[By Dataset] Website enrichment merge failed for %s: %s", company_val, e)
+                        except Exception as e:
+                            logger.warning("[By Dataset] Scraper failed/timed out for %s: %s", company_val, e)
+
+                    if should_scrape and (run_website or run_builtwith) and not website_enrichment and normalized_website_val:
+                        try:
+                            website_enrichment = await asyncio.wait_for(
+                                asyncio.to_thread(
+                                    enrichment_service.enrich,
+                                    [{"url": normalized_website_val}],
+                                    [{"result": record}],
+                                ),
+                                timeout=4.0,
+                            )
+                            if isinstance(website_enrichment, dict) and website_enrichment:
+                                scraped_metadata = {
+                                    **scraped_metadata,
+                                    **{
+                                        k: v
+                                        for k, v in website_enrichment.items()
+                                        if v not in (None, "", [], {})
+                                    },
+                                }
+                        except Exception as e:
+                            logger.warning("[By Dataset] Website fallback enrichment failed for %s: %s", company_val, e)
 
                     if should_scrape and run_sec:
                         try:

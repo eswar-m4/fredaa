@@ -302,11 +302,8 @@ def _parse_json_response(text: str) -> Optional[Dict[str, Any]]:
 
     candidates = [raw_text]
 
-    # Strip markdown code fences: ```json ... ``` or ``` ... ```
     if raw_text.startswith("```"):
-        # Remove opening fence line (```json or ```)
         fenced = re.sub(r"^```[a-zA-Z]*\n?", "", raw_text).strip()
-        # Remove closing fence
         fenced = re.sub(r"```$", "", fenced).strip()
         if fenced:
             candidates.insert(0, fenced)
