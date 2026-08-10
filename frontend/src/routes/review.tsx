@@ -1570,7 +1570,7 @@ function Review() {
     <AppLayout>
       <PageHeader
         title="Review Queue"
-        subtitle="By Dataset jobs use sampling + A/D/M/V change tracking. By Source jobs are reviewed per source (full dump on schedule, or change monitoring with highlighted deltas)."
+        subtitle="Solutions jobs use sampling + A/D/M/V change tracking. Agents jobs are reviewed per source (full dump on schedule, or change monitoring with highlighted deltas)."
       />
 
       <div className="px-7 pb-8 space-y-4">
@@ -1612,24 +1612,28 @@ function Review() {
         <Card className="p-3">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mr-1">Mode</span>
-            {(["All", "By Dataset", "By Source"] as const).map((m) => (
+            {[
+              { value: "All", label: "All" },
+              { value: "By Dataset", label: "Solutions" },
+              { value: "By Source", label: "Agents" },
+            ].map((m) => (
               <button
-                key={m}
-                onClick={() => setModeFilter(m)}
-                className={`px-3 py-1 rounded-md border text-[12px] ${modeFilter === m ? "bg-primary text-primary-foreground border-primary" : "bg-card border-border hover:bg-secondary"}`}
+                key={m.value}
+                onClick={() => setModeFilter(m.value as JobMode)}
+                className={`px-3 py-1 rounded-md border text-[12px] ${modeFilter === m.value ? "bg-primary text-primary-foreground border-primary" : "bg-card border-border hover:bg-secondary"}`}
               >
-                {m} {m !== "All" && <span className="opacity-70">({allJobs.filter((j) => j.mode === m).length})</span>}
+                {m.label} {m.value !== "All" && <span className="opacity-70">({allJobs.filter((j) => j.mode === m.value).length})</span>}
               </button>
             ))}
             <span className="text-[11px] text-muted-foreground ml-auto">{filteredJobs.length} of {allJobs.length} jobs · {filteredJobs.reduce((s, j) => s + j.rows, 0).toLocaleString()} rows</span>
           </div>
         </Card>
 
-        {/* By Dataset jobs - ADMV sampling table */}
+        {/* Solutions jobs - ADMV sampling table */}
         {(modeFilter === "All" || modeFilter === "By Dataset") && filteredJobs.some((j) => j.mode === "By Dataset") && (
           <Card className="p-0 overflow-hidden">
             <div className="px-4 py-3 border-b border-border">
-              <h3 className="font-semibold text-[14px]">By Dataset - sampling review</h3>
+              <h3 className="font-semibold text-[14px]">Solutions - sampling review</h3>
               <p className="text-[12px] text-muted-foreground">Set sample % per job, then <strong>Review</strong> to open the sampled grid with A/D/M/V change tracking.</p>
             </div>
             <div className="overflow-auto max-h-[500px] pb-32">
@@ -1783,11 +1787,11 @@ function Review() {
         </Card>
         )}
 
-        {/* By Source jobs - source-centric review (full dump w/ schedule + change monitoring) */}
+        {/* Agents jobs - source-centric review (full dump w/ schedule + change monitoring) */}
         {(modeFilter === "All" || modeFilter === "By Source") && filteredJobs.some((j) => j.mode === "By Source") && (
           <Card className="p-0 overflow-hidden">
             <div className="px-4 py-3 border-b border-border">
-              <h3 className="font-semibold text-[14px]">By Source - extraction review</h3>
+              <h3 className="font-semibold text-[14px]">Agents - extraction review</h3>
               <p className="text-[12px] text-muted-foreground">
                 Source-specific full dumps run on a schedule (weekly / monthly). Change-monitoring sources highlight what changed since last run.
               </p>

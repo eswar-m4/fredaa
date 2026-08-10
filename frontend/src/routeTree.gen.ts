@@ -16,6 +16,7 @@ import { Route as MonitoringRouteImport } from './routes/monitoring'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LibraryRouteImport } from './routes/library'
 import { Route as ExportRouteImport } from './routes/export'
+import { Route as DiscoverRouteImport } from './routes/discover'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AnySiteRouteImport } from './routes/any-site'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -56,6 +57,11 @@ const ExportRoute = ExportRouteImport.update({
   path: '/export',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DiscoverRoute = DiscoverRouteImport.update({
+  id: '/discover',
+  path: '/discover',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -82,6 +88,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/any-site': typeof AnySiteRoute
   '/dashboard': typeof DashboardRoute
+  '/discover': typeof DiscoverRoute
   '/export': typeof ExportRoute
   '/library': typeof LibraryRoute
   '/login': typeof LoginRoute
@@ -95,6 +102,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/any-site': typeof AnySiteRoute
   '/dashboard': typeof DashboardRoute
+  '/discover': typeof DiscoverRoute
   '/export': typeof ExportRoute
   '/library': typeof LibraryRoute
   '/login': typeof LoginRoute
@@ -109,6 +117,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/any-site': typeof AnySiteRoute
   '/dashboard': typeof DashboardRoute
+  '/discover': typeof DiscoverRoute
   '/export': typeof ExportRoute
   '/library': typeof LibraryRoute
   '/login': typeof LoginRoute
@@ -124,6 +133,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/any-site'
     | '/dashboard'
+    | '/discover'
     | '/export'
     | '/library'
     | '/login'
@@ -137,6 +147,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/any-site'
     | '/dashboard'
+    | '/discover'
     | '/export'
     | '/library'
     | '/login'
@@ -150,6 +161,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/any-site'
     | '/dashboard'
+    | '/discover'
     | '/export'
     | '/library'
     | '/login'
@@ -164,6 +176,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   AnySiteRoute: typeof AnySiteRoute
   DashboardRoute: typeof DashboardRoute
+  DiscoverRoute: typeof DiscoverRoute
   ExportRoute: typeof ExportRoute
   LibraryRoute: typeof LibraryRoute
   LoginRoute: typeof LoginRoute
@@ -224,6 +237,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExportRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/discover': {
+      id: '/discover'
+      path: '/discover'
+      fullPath: '/discover'
+      preLoaderRoute: typeof DiscoverRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
@@ -260,6 +280,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   AnySiteRoute: AnySiteRoute,
   DashboardRoute: DashboardRoute,
+  DiscoverRoute: DiscoverRoute,
   ExportRoute: ExportRoute,
   LibraryRoute: LibraryRoute,
   LoginRoute: LoginRoute,

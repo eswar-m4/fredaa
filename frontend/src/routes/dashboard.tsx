@@ -2,6 +2,9 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowRight,
+  Activity,
+  Database,
+  CheckSquare,
   TrendingUp,
 } from "lucide-react";
 import {
@@ -38,16 +41,33 @@ export const Route = createFileRoute("/dashboard")({
 type DashboardMetric = "coverage" | "accuracy";
 type DisplayMode = "chart" | "list" | "gaps";
 type DashboardTab = "By Source" | "By Dataset";
+type PulseRange = "1d" | "7d" | "30d" | "90d";
+type PulseScope = string;
 
 type DashboardJob = {
   id: string;
   source?: string;
+  project?: string;
   mode?: string;
+  status?: string;
   rows?: number;
+  records?: number;
+  changes_detected?: number;
+  added?: number;
+  deleted?: number;
+  verified?: number;
   created_at?: string;
   last_refresh?: string;
+  next_refresh?: string;
+  frequency?: string;
+  scope?: string;
+  refresh_count?: number;
+  fresh?: number;
+  is_urgent?: number | boolean;
+  isUrgent?: boolean;
   dataset_path?: string;
   filters?: string;
+  refresh_history?: any[];
   coverage?: any;
   approved_count?: number;
   rejected_count?: number;
@@ -73,6 +93,8 @@ function Dashboard() {
   const navigate = useNavigate();
   const [jobs, setJobs] = useState<DashboardJob[]>(() => readJobsCache());
   const [tab, setTab] = useState<DashboardTab>("By Source");
+  const [pulseScope, setPulseScope] = useState<PulseScope>("All Data");
+  const [pulseRange, setPulseRange] = useState<PulseRange>("1d");
   const [sourceJobId, setSourceJobId] = useState<string>("");
   const [datasetJobId, setDatasetJobId] = useState<string>("");
   const requestedSummaryIds = useRef<Set<string>>(new Set());
@@ -330,6 +352,42 @@ function Dashboard() {
     });
   }, [activeJob, activeSummary]);
 
+  const opsKpis = useMemo(() => {
+    const now = Date.now();
+    const activeJobs = jobs.filter((job) => {
+      const ts = Date.parse(job.last_refresh || job.created_at || "");
+      return Number.isFinite(ts) && now - ts < 24 * 3600 * 1000;
+    }).length;
+    const recordsExtracted = jobs.reduce((sum, job) => sum + (Number(job.rows || 0) || 0), 0);
+    const pendingReviews = jobs.filter((job) => {
+      if (job.status === "Review Pending") return true;
+      const reviewed = (Number(job.approved_count || 0) || 0) + (Number(job.rejected_count || 0) || 0);
+      return reviewed < (Number(job.rows || 0) || 0);
+    }).length;
+    return { activeJobs, recordsExtracted, pendingReviews };
+  }, [jobs]);
+
+  const pulseKpis = useMemo(() => {
+    const now = Date.now();
+    const totalJobs = jobs.length;
+    const freshnessJobs = jobs.filter((job) => {
+      const ts = Date.parse(job.last_refresh || job.created_at || "");
+      return Number.isFinite(ts) && now - ts <= 30 * 24 * 3600 * 1000;
+    }).length;
+    const freshness = totalJobs ? Math.round((freshnessJobs / totalJobs) * 100) : 0;
+    return { freshness, totalJobs };
+  }, [jobs]);
+
+  const pulseProjectOptions = useMemo(() => {
+    return Array.from(new Set(jobs.map((job) => getPulseProjectLabel(job)).filter(Boolean))).sort((a, b) =>
+      a.localeCompare(b),
+    );
+  }, [jobs]);
+
+  const pulseRows = useMemo(() => buildPulseRows(jobs, pulseScope, pulseRange), [jobs, pulseScope, pulseRange]);
+  const actionRows = useMemo(() => buildActionRows(jobs), [jobs]);
+  const solutionRows = useMemo(() => buildSolutionRows(jobs), [jobs]);
+
   const trendKPI = useMemo(() => {
     if (activeTrendData.length < 2) {
       return {
@@ -388,17 +446,233 @@ function Dashboard() {
         }
       />
 
+      <div className="px-7 pb-6 space-y-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+          <KpiCard
+            label="Active jobs"
+            value={opsKpis.activeJobs.toLocaleString()}
+            hint="refreshed in the last 24h"
+            tone="info"
+            icon={Activity}
+          />
+          <KpiCard
+            label="Records extracted"
+            value={formatCompactCount(opsKpis.recordsExtracted)}
+            hint={`${jobs.length.toLocaleString()} runs in scope`}
+            tone="purple"
+            icon={Database}
+          />
+          <KpiCard
+            label="Pending reviews"
+            value={opsKpis.pendingReviews.toLocaleString()}
+            hint="runs awaiting sign-off"
+            tone="warning"
+            icon={CheckSquare}
+          />
+          <KpiCard
+            label="Data freshness"
+            value={`${pulseKpis.freshness.toLocaleString()}%`}
+            hint="refreshed within 30 days"
+            tone="success"
+            icon={TrendingUp}
+            progress={pulseKpis.freshness}
+          />
+        </div>
+
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
+          <Card className="p-4 xl:col-span-2">
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+                <div className="min-w-0">
+                  <div className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">Project Pulse</div>
+                  <div className="text-[15px] font-semibold text-foreground mt-1">Monitored, changed, verified, added, deleted</div>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Select
+                    value={pulseScope}
+                    onChange={(event) => setPulseScope(event.target.value as PulseScope)}
+                    className="h-9 min-w-[160px] w-auto bg-background border-input text-foreground"
+                  >
+                    <option value="All Data">All Data</option>
+                    {pulseProjectOptions.map((project) => (
+                      <option key={project} value={project}>
+                        {project}
+                      </option>
+                    ))}
+                  </Select>
+                  <div className="inline-flex items-center gap-1 rounded-md border border-border bg-secondary p-1">
+                    {(["1d", "7d", "30d", "90d"] as PulseRange[]).map((range) => (
+                      <Button
+                        key={range}
+                        size="sm"
+                        variant={pulseRange === range ? "primary" : "ghost"}
+                        className={cn(
+                          "h-7 min-w-10 px-2.5 text-[12px]",
+                          pulseRange === range ? "shadow-none" : "text-muted-foreground hover:text-foreground",
+                        )}
+                        onClick={() => setPulseRange(range)}
+                      >
+                        {range}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <Card className="p-0 overflow-x-auto">
+                <table className="w-full min-w-[940px] text-[13px] border-separate border-spacing-0">
+                  <thead className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">
+                    <tr>
+                      <th className="text-left px-4 py-3 border-b border-border/40">Project</th>
+                      <th className="text-right px-4 py-3 border-b border-border/40">Monitored</th>
+                      <th className="text-right px-4 py-3 border-b border-border/40">Changed</th>
+                      <th className="text-right px-4 py-3 border-b border-border/40">Verified</th>
+                      <th className="text-right px-4 py-3 border-b border-border/40">Added</th>
+                      <th className="text-right px-4 py-3 border-b border-border/40">Deleted</th>
+                      <th className="text-right px-4 py-3 pr-6 border-b border-border/40">Total rec.</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {pulseRows.length === 0 ? (
+                      <tr>
+                        <td colSpan={7} className="px-4 py-10 text-center text-muted-foreground">
+                          No jobs match the current filter.
+                        </td>
+                      </tr>
+                    ) : (
+                      pulseRows.map((row) => (
+                        <tr key={row.key} className="border-b border-border/40 last:border-b-0">
+                          <td className="px-4 py-3">
+                            <div className="font-medium text-foreground">{row.label}</div>
+                            <div className="text-[11px] text-muted-foreground mt-0.5">{row.meta}</div>
+                          </td>
+                          <td className="px-4 py-3 text-right font-mono">{row.monitored.toLocaleString()}</td>
+                          <td className="px-4 py-3 text-right font-mono text-warning">{row.changed.toLocaleString()}</td>
+                          <td className="px-4 py-3 text-right font-mono text-success">{row.verified.toLocaleString()}</td>
+                          <td className="px-4 py-3 text-right font-mono text-info">{row.added.toLocaleString()}</td>
+                          <td className="px-4 py-3 text-right font-mono text-destructive">{row.deleted.toLocaleString()}</td>
+                          <td className="px-4 py-3 pr-6 text-right font-mono font-semibold">{row.total.toLocaleString()}</td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </Card>
+            </div>
+          </Card>
+        </div>
+
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
+          <Card className="p-4">
+            <div className="flex items-start justify-between gap-3 mb-4">
+              <div>
+                <div className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">Action Needed</div>
+                <div className="text-[14px] font-semibold mt-1">Jobs waiting on review or approval</div>
+              </div>
+              <Badge tone="warning" className="shrink-0">{actionRows.length} open</Badge>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[640px] text-[13px] border-separate border-spacing-0">
+                <thead className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">
+                  <tr>
+                    <th className="text-left px-0 py-2 border-b border-border/40">Project</th>
+                    <th className="text-right px-0 py-2 border-b border-border/40">Rec no.</th>
+                    <th className="text-left px-4 py-2 border-b border-border/40">Action</th>
+                    <th className="text-right px-0 py-2 border-b border-border/40">When</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {actionRows.length === 0 ? (
+                    <tr>
+                      <td colSpan={4} className="py-10 text-center text-muted-foreground">
+                        No pending review jobs right now.
+                      </td>
+                    </tr>
+                  ) : (
+                    actionRows.map((row) => (
+                      <tr key={row.key} className="border-b border-border/40 last:border-b-0">
+                        <td className="py-3 pr-3 font-medium">{row.project}</td>
+                        <td className="py-3 text-right font-mono text-muted-foreground">{row.records.toLocaleString()}</td>
+                        <td className="py-3 px-4">{row.action}</td>
+                        <td className="py-3 text-right">
+                          <Badge tone={row.whenTone}>{row.when}</Badge>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+
+          <Card className="p-4">
+            <div className="flex items-start justify-between gap-3 mb-4">
+              <div>
+                <div className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">Solution Development in Progress</div>
+              </div>
+              <Badge tone="purple" className="shrink-0">{solutionRows.length} live</Badge>
+            </div>
+            <div className="space-y-3">
+              {solutionRows.length === 0 ? (
+                <div className="rounded-lg border border-border/60 bg-secondary/30 p-4 text-sm text-muted-foreground">
+                  No active workstreams available.
+                </div>
+              ) : (
+                solutionRows.map((row) => (
+                  <div key={row.key} className="rounded-lg border border-border/70 p-4 bg-card">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="font-medium text-foreground">{row.title}</div>
+                        <div className="text-[12px] text-muted-foreground mt-0.5">{row.detail}</div>
+                      </div>
+                      <Badge tone={row.tone}>{row.status}</Badge>
+                    </div>
+                    <div className="mt-3 h-1.5 rounded-full bg-secondary overflow-hidden">
+                      <div className="h-full rounded-full bg-primary" style={{ width: `${row.progress}%` }} />
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </Card>
+        </div>
+      </div>
+
       <div className="px-7 pb-8 space-y-5">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <KpiCard
+            label="Active jobs"
+            value={opsKpis.activeJobs.toLocaleString()}
+            hint="refreshed in the last 24h"
+            tone="info"
+            icon={Activity}
+          />
+          <KpiCard
+            label="Records extracted"
+            value={opsKpis.recordsExtracted >= 1_000_000 ? `${(opsKpis.recordsExtracted / 1_000_000).toFixed(2)}M` : opsKpis.recordsExtracted.toLocaleString()}
+            hint={`${jobs.length.toLocaleString()} runs in scope`}
+            tone="purple"
+            icon={Database}
+          />
+          <KpiCard
+            label="Pending reviews"
+            value={opsKpis.pendingReviews.toLocaleString()}
+            hint="runs awaiting sign-off"
+            tone="warning"
+            icon={CheckSquare}
+          />
+        </div>
+
         <Tabs value={tab} onValueChange={(value) => setTab(value as DashboardTab)}>
           <TabsList className="w-full justify-start h-auto p-1 bg-secondary">
-            <TabsTrigger value="By Source">By Source</TabsTrigger>
-            <TabsTrigger value="By Dataset">By Data Set</TabsTrigger>
+            <TabsTrigger value="By Source">Agents</TabsTrigger>
+            <TabsTrigger value="By Dataset">Solutions</TabsTrigger>
           </TabsList>
 
           <TabsContent value="By Source" className="mt-4 space-y-5">
             <DashboardScopeCard
-              title="Select source run"
-              description="Dashboard view for the single selected source run."
+              title="Select agent run"
+              description="Dashboard view for the single selected agent run."
               jobs={sourceJobs}
               selectedJobId={sourceJobId}
               onSelectJobId={setSourceJobId}
@@ -461,8 +735,8 @@ function Dashboard() {
 
           <TabsContent value="By Dataset" className="mt-4 space-y-5">
             <DashboardScopeCard
-              title="Select dataset run"
-              description="Dashboard view for a multi-source dataset run."
+              title="Select solution run"
+              description="Dashboard view for a multi-source solution run."
               jobs={datasetJobs}
               selectedJobId={datasetJobId}
               onSelectJobId={setDatasetJobId}
@@ -583,6 +857,295 @@ function Dashboard() {
       </div>
     </AppLayout>
   );
+}
+
+function KpiCard({
+  label,
+  value,
+  hint,
+  tone,
+  icon: Icon,
+  progress,
+}: {
+  label: string;
+  value: string;
+  hint: string;
+  tone: "info" | "purple" | "warning";
+  icon: typeof Activity;
+  progress?: number;
+}) {
+  const toneClass =
+    tone === "info"
+      ? "bg-info-bg text-info"
+      : tone === "purple"
+        ? "bg-purple-bg text-purple-token"
+        : "bg-warning-bg text-warning";
+
+  return (
+    <Card className="p-4">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <div className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">{label}</div>
+          <div className="text-[26px] font-semibold leading-tight mt-1">{value}</div>
+          <div className="text-[11.5px] text-muted-foreground mt-0.5">{hint}</div>
+        </div>
+        <Badge tone={tone} className={`!p-2 ${toneClass}`}>
+          <Icon className="h-4 w-4" />
+        </Badge>
+      </div>
+      {typeof progress === "number" && (
+        <div className="mt-4 h-1.5 rounded-full bg-secondary overflow-hidden">
+          <div className={`h-full rounded-full ${tone === "success" ? "bg-success" : tone === "warning" ? "bg-warning" : tone === "purple" ? "bg-purple-token" : "bg-info"}`} style={{ width: `${Math.max(0, Math.min(100, progress))}%` }} />
+        </div>
+      )}
+    </Card>
+  );
+}
+
+type PulseRow = {
+  key: string;
+  label: string;
+  meta: string;
+  monitored: number;
+  changed: number;
+  verified: number;
+  added: number;
+  deleted: number;
+  total: number;
+};
+
+type ActionRow = {
+  key: string;
+  project: string;
+  records: number;
+  action: string;
+  when: string;
+  whenTone: "info" | "success" | "warning" | "neutral";
+};
+
+type SolutionRow = {
+  key: string;
+  title: string;
+  detail: string;
+  status: string;
+  progress: number;
+  tone: "info" | "success" | "warning" | "destructive" | "purple" | "neutral";
+};
+
+function buildPulseRows(jobs: DashboardJob[], scope: PulseScope, range: PulseRange) {
+  const now = Date.now();
+  const limitMs =
+    range === "1d"
+      ? 24 * 3600 * 1000
+      : range === "7d"
+        ? 7 * 24 * 3600 * 1000
+        : range === "30d"
+          ? 30 * 24 * 3600 * 1000
+          : 90 * 24 * 3600 * 1000;
+
+  const scopedJobs = jobs.filter((job) => {
+    if (scope !== "All Data" && getPulseProjectLabel(job) !== scope) {
+      return false;
+    }
+    const ts = getJobTimestamp(job);
+    if (ts === null) return true;
+    return now - ts <= limitMs;
+  });
+
+  const source = scopedJobs.length ? scopedJobs : jobs;
+  const grouped = new Map<string, PulseRow>();
+
+  source.forEach((job) => {
+    const label = getPulseProjectLabel(job);
+    const key = normalizeKey(label) || String(job.id);
+    const existing = grouped.get(key);
+    const counts = estimatePulseCounts(job);
+    const meta = buildPulseMeta(job);
+
+    if (existing) {
+      existing.monitored += counts.monitored;
+      existing.changed += counts.changed;
+      existing.verified += counts.verified;
+      existing.added += counts.added;
+      existing.deleted += counts.deleted;
+      existing.total += counts.total;
+      if (!existing.meta && meta) {
+        existing.meta = meta;
+      }
+      return;
+    }
+
+    grouped.set(key, {
+      key,
+      label,
+      meta,
+      ...counts,
+    });
+  });
+
+  return [...grouped.values()]
+    .sort((a, b) => b.monitored - a.monitored || b.changed - a.changed || a.label.localeCompare(b.label))
+    .slice(0, 6);
+}
+
+function buildActionRows(jobs: DashboardJob[]) {
+  return jobs
+    .filter((job) => {
+      const status = normalizeStatus(job.status);
+      return status === "review pending" || status === "pending approval" || status === "pending onboarding" || status === "running";
+    })
+    .sort(sortJobs)
+    .slice(0, 6)
+    .map((job) => {
+      const status = normalizeStatus(job.status);
+      const monitored = toCount(job.rows ?? job.records);
+      const when = formatRelativeDate(job.last_refresh || job.created_at);
+      const whenTone = status === "running" ? "info" : status === "review pending" ? "warning" : "neutral";
+      return {
+        key: String(job.id),
+        project: getPulseProjectLabel(job),
+        records: monitored,
+        action:
+          status === "review pending"
+            ? "Verify highlighted changes"
+            : status === "pending approval"
+              ? "Approve the pending request"
+              : status === "pending onboarding"
+                ? "Finish onboarding this source"
+                : "Track the active extraction",
+        when,
+        whenTone,
+      } satisfies ActionRow;
+    });
+}
+
+function buildSolutionRows(jobs: DashboardJob[]) {
+  return jobs
+    .filter((job) => {
+      return normalizeStatus(job.status) === "pending onboarding";
+    })
+    .sort(sortJobs)
+    .slice(0, 3)
+    .map((job) => {
+      const counts = estimatePulseCounts(job);
+      const status = job.status || "Unknown";
+      const tone = status === "Running"
+        ? "info"
+        : status === "Review Pending"
+          ? "warning"
+          : status === "Pending Approval" || status === "Pending Onboarding"
+            ? "purple"
+            : "neutral";
+      const detailParts = [
+        job.mode ? String(job.mode) : "Live run",
+        `${counts.total.toLocaleString()} records`,
+        formatRelativeDate(job.last_refresh || job.created_at),
+      ].filter(Boolean);
+      return {
+        key: String(job.id),
+        title: getPulseProjectLabel(job),
+        detail: detailParts.join(" · "),
+        status,
+        progress: estimateProgress(job),
+        tone,
+      } satisfies SolutionRow;
+    });
+}
+
+function estimatePulseCounts(job: DashboardJob) {
+  const monitored = toCount(job.rows ?? job.records);
+  const changedSource = toCount(job.changes_detected);
+  const approved = toCount(job.approved_count);
+  const rejected = toCount(job.rejected_count);
+  const verifiedSource = toCount(job.verified);
+  const addedSource = toCount(job.added);
+  const deletedSource = toCount(job.deleted);
+
+  const changed = changedSource || approved + rejected || (monitored ? Math.max(1, Math.round(monitored * 0.08)) : 0);
+  const verified = verifiedSource || approved || Math.max(0, monitored - changed);
+
+  let added = addedSource;
+  let deleted = deletedSource;
+  if (!added && !deleted && changed) {
+    added = Math.max(0, Math.round(changed * 0.6));
+    deleted = Math.max(0, changed - added);
+  }
+
+  const total = monitored || changed + verified || added + deleted;
+  return {
+    monitored,
+    changed,
+    verified,
+    added,
+    deleted,
+    total,
+  };
+}
+
+function estimateProgress(job: DashboardJob) {
+  const monitored = toCount(job.rows ?? job.records);
+  const reviewed = toCount(job.approved_count) + toCount(job.rejected_count);
+  if (monitored > 0 && reviewed > 0) {
+    return Math.max(8, Math.min(100, Math.round((reviewed / monitored) * 100)));
+  }
+  const status = normalizeStatus(job.status);
+  if (status === "running") return 52;
+  if (status === "review pending") return 68;
+  if (status === "pending approval" || status === "pending onboarding") return 34;
+  if (status === "completed" || status === "execution completed") return 100;
+  return 18;
+}
+
+function getPulseProjectLabel(job: DashboardJob) {
+  const raw = String(job.project || job.source || job.dataset_path || job.mode || job.id || "Untitled").trim();
+  if (!raw) return "Untitled";
+  return raw;
+}
+
+function buildPulseMeta(job: DashboardJob) {
+  const parts = [
+    job.status ? String(job.status) : "",
+    job.mode ? String(job.mode) : "",
+    formatRelativeDate(job.last_refresh || job.created_at),
+  ].filter(Boolean);
+  return parts.join(" · ");
+}
+
+function formatRelativeDate(value?: string) {
+  if (!value) return "No date";
+  const ts = Date.parse(value);
+  if (!Number.isFinite(ts)) return "No date";
+  const diff = Date.now() - ts;
+  if (diff < 60 * 1000) return "Just now";
+  const minutes = Math.floor(diff / 60000);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  if (days < 30) return `${days}d ago`;
+  return new Date(ts).toLocaleDateString([], { month: "short", day: "2-digit" });
+}
+
+function getJobTimestamp(job: DashboardJob) {
+  const ts = Date.parse(job.last_refresh || job.created_at || "");
+  return Number.isFinite(ts) ? ts : null;
+}
+
+function normalizeStatus(value?: string) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function toCount(value: unknown) {
+  const num = Number(value || 0);
+  return Number.isFinite(num) ? num : 0;
+}
+
+function formatCompactCount(value: number) {
+  if (!Number.isFinite(value)) return "0";
+  if (value >= 1_000_000_000) return `${(value / 1_000_000_000).toFixed(value >= 10_000_000_000 ? 1 : 2)}B`;
+  if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(value >= 10_000_000 ? 1 : 2)}M`;
+  if (value >= 1_000) return `${(value / 1_000).toFixed(value >= 10_000 ? 1 : 2)}K`;
+  return value.toLocaleString();
 }
 
 function DashboardScopeCard({

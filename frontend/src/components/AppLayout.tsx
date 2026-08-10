@@ -28,11 +28,11 @@ type NavGroup = { group: string; items: NavItem[] };
 
 const BASE: NavGroup = {
   group: "OVERVIEW",
-  items: [{ to: "/", label: "Modules", icon: LayoutDashboard }],
+  items: [{ to: "/", label: "Use Cases", icon: LayoutDashboard }],
 };
 
 const TARGETED: NavGroup = {
-  group: "BY SOURCE",
+  group: "AGENTS",
   items: [
     { to: "/site-specific", label: "Sources & Agents", icon: Library },
   ],
@@ -41,7 +41,7 @@ const TARGETED: NavGroup = {
 
 
 const OPENWEB: NavGroup = {
-  group: "BY DATASET",
+  group: "SOLUTIONS",
   items: [
     { to: "/any-site", label: "Dataset Setup", icon: GitBranch },
   ],
@@ -310,13 +310,13 @@ export function AppLayout({ children }: { children: ReactNode }) {
                   </div>
                   <div className="space-y-2 text-sm">
                     <div>
-                      <div className="font-medium text-foreground">By Dataset</div>
+                      <div className="font-medium text-foreground">Solutions</div>
                       <div className="text-muted-foreground text-xs">
                         Upload data, map fields, launch jobs, then review and save results.
                       </div>
                     </div>
                     <div>
-                      <div className="font-medium text-foreground">By Source</div>
+                      <div className="font-medium text-foreground">Agents</div>
                       <div className="text-muted-foreground text-xs">
                         Choose a source, run a scrape, and inspect the records in Review.
                       </div>

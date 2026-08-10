@@ -439,7 +439,7 @@ function Monitoring() {
                       </td>
                       <td className="px-4 py-3.5 border-b border-border/40 text-left">
                         <Badge tone={(j.mode === "Site-Specific" || j.mode === "By Source") ? "info" : "purple"}>
-                          {(j.mode === "Site-Specific" || j.mode === "By Source") ? "By Source" : "By Dataset"}
+                          {(j.mode === "Site-Specific" || j.mode === "By Source") ? "Agents" : "Solutions"}
                         </Badge>
                       </td>
                       <td className="px-4 py-3.5 text-muted-foreground border-b border-border/40 text-left">
