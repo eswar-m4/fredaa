@@ -15,11 +15,17 @@ __pycache__/
 .env.development
 .env.production
 
-# Backend logs and local database
+# Backend logs and databases (contain user data — never commit)
 backend/logs/*
+backend/app.db
+backend/*.db
 backend/data/freda.db
+backend/data/*.db
+backend/data/backups/
 backend/data/chrome-cdp/
 backend/data/chrome-cdp-live/
+# Runtime bot package artifacts (generated at runtime)
+backend/data/bot_packages/
 
 # IDE / Editor configurations
 .vscode/

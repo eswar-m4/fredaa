@@ -44,8 +44,14 @@ class Settings(BaseSettings):
 
     # Persistence
     FREDA_DB_PATH: str = "../data/freda.db"
+    # Override in .env with a long random string; the default is public and must
+    # not be used in production (changing it invalidates all existing sessions).
     FREDA_AUTH_SALT: str = "freda-auth-salt"
     FREDA_SESSION_TTL_HOURS: int = 72
+    # Initial seeded account passwords — set in .env before first run.
+    # If absent, no default accounts are created and users must be added manually.
+    FREDA_DEFAULT_USER_PASS: Optional[str] = None
+    FREDA_DEFAULT_ADMIN_PASS: Optional[str] = None
 
     # Partial scrape runtime controls
     PARTIAL_SCRAPE_MAX_RESULTS: int = 50
