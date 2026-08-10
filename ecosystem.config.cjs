@@ -27,10 +27,11 @@ module.exports = {
     // ── TanStack Start / Nitro SSR frontend ─────────────────────────────────
     {
       name: 'fredaa-frontend',
-      // Nitro server produced by `npm run build:prod` inside ./frontend.
-      // It serves SSR responses and static assets from dist/client/.
+      // Nitro (build:prod) outputs a Cloudflare-Workers-style module that only
+      // exports a fetch handler — it never binds to a port on its own.
+      // start-nitro.mjs wraps that fetch handler in a real Node.js HTTP server.
       // Rebuild after code changes: cd frontend && npm run build:prod
-      script: './frontend/dist/server/server.js',
+      script: './frontend/start-nitro.mjs',
       cwd: '.',
       interpreter: 'node',
       watch: false,
