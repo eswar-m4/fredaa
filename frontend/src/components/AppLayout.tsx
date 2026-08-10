@@ -63,6 +63,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
   const hash = useRouterState({ select: (s) => s.location.hash });
   const uc = useUseCase();
 
+  const [authLoading, setAuthLoading] = useState(true);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [notifications, setNotifications] = useState<Array<{ id: string; title: string; detail: string; tone: string }>>([]);
@@ -115,12 +116,15 @@ export function AppLayout({ children }: { children: ReactNode }) {
           return;
         }
       }
+      setAuthLoading(false);
     }
     void checkSession();
     return () => {
       active = false;
     };
   }, [navigate]);
+
+  if (authLoading) return null;
 
   const toggleTheme = () => {
     const nextTheme = theme === "dark" ? "light" : "dark";
