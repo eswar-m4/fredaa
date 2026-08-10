@@ -32,21 +32,20 @@ export function useUseCase(): UseCase {
 export const USE_CASES = {
   targeted: {
     id: "targeted" as const,
-    name: "By Source",
-    short: "By Source",
+    name: "Agents",
+    short: "Agents",
     tagline: "Pick from already-onboarded sources, or add a new one. Refresh on schedule.",
   },
   openweb: {
     id: "openweb" as const,
-    name: "By Dataset",
-    short: "By Dataset",
+    name: "Solutions",
+    short: "Solutions",
     tagline: "Tell us the attributes. AI finds them across the open web and chains the workflows.",
   },
   discovery: {
     id: "discovery" as const,
-    name: "By Request",
-    short: "By Request",
+    name: "Freda AI",
+    short: "Freda AI",
     tagline: "Describe what you need or drop a file. The assistant finds the sources and the plan.",
   },
 };
-
