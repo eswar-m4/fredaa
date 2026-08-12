@@ -203,10 +203,10 @@ export function AppLayout({ children }: { children: ReactNode }) {
       >
         <div className="px-4 pt-4 pb-3 border-b border-white/10 whitespace-nowrap">
           <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-md bg-primary flex items-center justify-center font-bold">F</div>
+            <div className="h-8 w-8 rounded-md bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center font-bold text-white shadow-md">F</div>
             <div>
-              <div className="text-[15px] font-semibold leading-tight">FreshData AI</div>
-              <div className="text-[11px] text-white/60">B2B Data Intelligence</div>
+              <div className="text-[15px] font-semibold leading-tight">Freda</div>
+              <div className="text-[10px] text-white/60 leading-tight">B2B Data Intelligence</div>
             </div>
           </div>
         </div>

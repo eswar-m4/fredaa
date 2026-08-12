@@ -1,46 +1,46 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
-import { Badge, Button, Card, PageHeader } from "@/components/ui-bits";
-import { WORKFLOWS } from "@/data/workflows";
+import { Button, Card, PageHeader } from "@/components/ui-bits";
+import { LegalNotice } from "@/components/LegalNotice";
 import {
   Target,
   ArrowRight,
   Sparkles,
-  Database,
-  Workflow as WorkflowIcon,
-  Activity,
   Radar,
   Boxes,
   Bot,
-  Search,
-  FileSpreadsheet,
-  MessageSquare,
   Stethoscope,
   UtensilsCrossed,
   Scale,
   Car,
   ShieldCheck,
   ShoppingBag,
-  ShieldAlert,
+  MessageSquare,
+  FileSpreadsheet,
+  Search,
 } from "lucide-react";
-import { fetchBotCatalog } from "@/lib/bot-catalog";
-import { jobsCacheUpdatedEventName, readJobsCache, writeJobsCache } from "@/lib/jobs-cache";
+import {
+  AGENT_COUNT,
+  AGENT_CATEGORY_COUNT,
+  SOLUTION_COUNT,
+  SOLUTION_CATEGORY_COUNT,
+} from "@/lib/portal-stats";
 import { setUseCase, useUseCase, USE_CASES, type UseCase } from "@/lib/useCase";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Choose your use case - FreshData AI" },
+      { title: "Choose your use case – Freda" },
       {
         name: "description",
         content:
-          "Three ways to get data: run site-specific agents, refresh a dataset category, or let the assistant discover sources on the fly.",
+          "Three ways to get data: run site-specific agents, refresh a solution category, or let Ask Freda design the solution with you.",
       },
-      { property: "og:title", content: "Choose your use case - FreshData AI" },
+      { property: "og:title", content: "Choose your use case – Freda" },
       {
         property: "og:description",
-        content: "Site-specific agents, dataset categories, and on-the-fly AI source discovery in one workspace.",
+        content: "Site-specific agents, solution categories, and Ask Freda's guided solution design in one workspace.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -52,79 +52,44 @@ export const Route = createFileRoute("/")({
 function Home() {
   const uc = useUseCase();
   const navigate = useNavigate();
-  const [botCount, setBotCount] = useState(0);
-  const [activeJobsCount, setActiveJobsCount] = useState(18);
-  const [pendingReviewCount, setPendingReviewCount] = useState(7);
 
-  const baseApiUrl = (() => {
-    if (
-      typeof window !== "undefined" &&
-      (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") &&
-      window.location.port !== "8131"
-    ) {
-      return `http://${window.location.hostname}:8131`;
+  // Only one tile is flipped at a time, and flipping is deliberately slow:
+  // the open tile closes first, then the next one opens after a pause.
+  const [flippedId, setFlippedId] = useState<string | null>(null);
+  const timers = useRef<number[]>([]);
+
+  useEffect(
+    () => () => {
+      timers.current.forEach((t) => window.clearTimeout(t));
+    },
+    [],
+  );
+
+  const clearTimers = () => {
+    timers.current.forEach((t) => window.clearTimeout(t));
+    timers.current = [];
+  };
+
+  const requestFlip = (id: string) => {
+    clearTimers();
+    if (flippedId === id) return;
+    if (flippedId) {
+      // close the open card first, then open the new one after a beat
+      setFlippedId(null);
+      timers.current.push(window.setTimeout(() => setFlippedId(id), 900));
+    } else {
+      timers.current.push(window.setTimeout(() => setFlippedId(id), 400));
     }
-    return "";
-  })();
+  };
 
-  useEffect(() => {
-    let active = true;
-    fetchBotCatalog()
-      .then((payload) => {
-        if (!active) return;
-        const libraryCount = payload.bots?.filter((bot) => bot.catalog_kind === "built_in").length ?? payload.total ?? 0;
-        setBotCount(libraryCount);
-      })
-      .catch(() => {
-        if (!active) return;
-        setBotCount(0);
-      });
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    let active = true;
-
-    const syncPendingReview = () => {
-      if (!active) return;
-      const jobs = readJobsCache();
-      setActiveJobsCount(jobs.filter((job) => job?.status === "Running").length);
-      setPendingReviewCount(jobs.filter((job) => job?.status === "Review Pending").length);
-    };
-
-    const refreshJobs = async () => {
-      try {
-        const response = await fetch(`${baseApiUrl}/api/v1/demo/jobs`, { credentials: "include" });
-        if (!response.ok) return;
-        const data = await response.json();
-        if (!active || !Array.isArray(data)) return;
-        writeJobsCache(data);
-      } catch {
-        // Keep the cached count if the backend is unavailable.
-      } finally {
-        syncPendingReview();
-      }
-    };
-
-    syncPendingReview();
-    void refreshJobs();
-    const timer = window.setInterval(refreshJobs, 3000);
-    window.addEventListener(jobsCacheUpdatedEventName(), syncPendingReview);
-    return () => {
-      active = false;
-      window.clearInterval(timer);
-      window.removeEventListener(jobsCacheUpdatedEventName(), syncPendingReview);
-    };
-  }, [baseApiUrl]);
-
-  const stats = [
-    { label: "Agents in Library", value: botCount, icon: Database, tone: "info" as const },
-    { label: "Workflows", value: WORKFLOWS.length, icon: WorkflowIcon, tone: "purple" as const },
-    { label: "Active Jobs", value: activeJobsCount, icon: Activity, tone: "success" as const },
-    { label: "Pending Review", value: pendingReviewCount, icon: Sparkles, tone: "warning" as const },
-  ];
+  const requestClose = (id: string) => {
+    clearTimers();
+    timers.current.push(
+      window.setTimeout(() => {
+        setFlippedId((cur) => (cur === id ? null : cur));
+      }, 500),
+    );
+  };
 
   const pick = (mode: Exclude<UseCase, null>, to: string) => {
     setUseCase(mode);
@@ -134,28 +99,17 @@ function Home() {
   return (
     <AppLayout>
       <PageHeader
-        title="Choose your use case"
-        subtitle="Pick how you want to source data. The workspace and side navigation adapt to that choice."
+        title="How do you want your data?"
+        subtitle="Three ways in: run agents on sites you trust, pick a ready solution category, or let Freda design one with you."
       />
 
-      <div className="px-7 pb-8 space-y-6">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {stats.map((s) => {
-            const Icon = s.icon;
-            return (
-              <Card key={s.label} className="p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="text-[12px] text-muted-foreground">{s.label}</div>
-                    <div className="text-[24px] font-semibold mt-1">{s.value}</div>
-                  </div>
-                  <Badge tone={s.tone} className="!p-2">
-                    <Icon className="h-4 w-4" />
-                  </Badge>
-                </div>
-              </Card>
-            );
-          })}
+      <div className="relative px-7 pb-8 space-y-6">
+        {/* page backdrop: soft mesh + hairline grid + horizon glow */}
+        <div aria-hidden className="pointer-events-none absolute inset-0 -top-24 overflow-hidden">
+          <div className="absolute inset-0 opacity-[0.05] [background-image:linear-gradient(to_right,currentColor_1px,transparent_1px),linear-gradient(to_bottom,currentColor_1px,transparent_1px)] [background-size:34px_34px] [mask-image:radial-gradient(100%_70%_at_50%_0%,black,transparent)]" />
+          <div className="absolute left-1/2 top-0 h-[420px] w-[900px] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(99,102,241,0.14),transparent)] blur-2xl" />
+          <div className="absolute -left-24 bottom-0 h-[320px] w-[320px] rounded-full bg-[radial-gradient(closest-side,rgba(16,185,129,0.12),transparent)] blur-2xl" />
+          <div className="absolute -right-24 bottom-10 h-[320px] w-[320px] rounded-full bg-[radial-gradient(closest-side,rgba(232,121,249,0.12),transparent)] blur-2xl" />
         </div>
 
         <div className="relative">
@@ -164,101 +118,122 @@ function Home() {
             <div className="fd-aurora absolute left-[42%] top-6 h-56 w-56 rounded-full bg-violet-500/25 blur-3xl [animation-delay:3s]" />
             <div className="fd-aurora absolute right-[6%] top-0 h-56 w-56 rounded-full bg-fuchsia-500/25 blur-3xl [animation-delay:6s]" />
           </div>
-          <div className="relative grid grid-cols-1 md:grid-cols-3 gap-4 items-stretch">
+          <div className="relative grid grid-cols-1 md:grid-cols-3 gap-5 items-stretch">
             <FlipTile
-            active={uc === "targeted"}
-            tone="emerald"
-            tags={["Site-specific", "Scheduled"]}
-            icon={Radar}
-            title="Agents"
-            aka="Trusted sites, tuned agents"
-            art={<TargetedArt />}
-            summary="Point Freda at a site you already trust and let a tuned agent keep it fresh on a schedule."
-            facts={[
-              { k: "Agents onboarded", v: `${botCount || 827}` },
-              { k: "Categories", v: "14" },
-              { k: "New site SLA", v: "2-7 days" },
-              { k: "Refresh", v: "Daily / weekly / monthly" },
-            ]}
-            details={[
-              "Complexity graded Simple / Medium / Complex before onboarding",
-              "Every agent ships with crawl policy, metadata and terms of use",
-              "Unlocks Sources & Agents, Monitoring and Jobs",
-            ]}
-            cta="Open Agents"
-            onPick={() => pick("targeted", "/site-specific")}
+              id="targeted"
+              flipped={flippedId === "targeted"}
+              onOpen={requestFlip}
+              onClose={requestClose}
+              active={uc === "targeted"}
+              tone="emerald"
+              tag="Site-specific"
+              icon={Radar}
+              title={USE_CASES.targeted.name}
+              aka="You already know the websites"
+              art={<TargetedArt />}
+              summary="You bring the sites you trust. We onboard each one as a tuned agent and keep the data fresh on your schedule."
+              facts={[
+                { k: "Agents onboarded", v: `${AGENT_COUNT}` },
+                { k: "Agent categories", v: `${AGENT_CATEGORY_COUNT}` },
+                { k: "New site SLA", v: "2-7 days" },
+                { k: "Refresh", v: "Daily / weekly / monthly" },
+              ]}
+              details={[
+                "Complexity graded Simple / Medium / Complex before onboarding",
+                "Every agent ships with crawl policy, metadata and terms of use",
+                "Unlocks Sources & Agents, Monitoring and Jobs",
+              ]}
+              cta="Open Agents"
+              onPick={() => pick("targeted", "/site-specific")}
+            />
+            <FlipTile
+              id="openweb"
+              flipped={flippedId === "openweb"}
+              onOpen={requestFlip}
+              onClose={requestClose}
+              active={uc === "openweb"}
+              tone="violet"
+              tag="Category-driven"
+              icon={Boxes}
+              title={USE_CASES.openweb.name}
+              aka="You know the data, not the sites"
+              art={<DatasetArt />}
+              summary="Pick the data you want. We source it from official corporate websites plus trusted third-party sources."
+              facts={[
+                { k: "Solutions", v: `${SOLUTION_COUNT}` },
+                { k: "Solution categories", v: `${SOLUTION_CATEGORY_COUNT}` },
+                { k: "Default source", v: "Official company website" },
+                { k: "Third-party sources", v: "10-14 per category" },
+              ]}
+              details={[
+                "Healthcare, hospitality, legal, insurance and automotive verticals",
+                "Marketplaces and directories curated per category",
+                "Unlocks Dataset Setup, Workflows and Review",
+              ]}
+              cta="Open Solutions"
+              onPick={() => pick("openweb", "/any-site")}
+            />
+            <FlipTile
+              id="discovery"
+              flipped={flippedId === "discovery"}
+              onOpen={requestFlip}
+              onClose={requestClose}
+              active={uc === "discovery"}
+              tone="rose"
+              tag="Guided"
+              icon={Bot}
+              title={USE_CASES.discovery.name}
+              aka="Not sure where to start?"
+              art={<DiscoveryArt />}
+              summary="Not sure which agent or solution fits? Answer a short set of questions and Freda will design the agents and solutions for you."
+              facts={[
+                { k: "Chat", v: "Guided" },
+                { k: "Scope", v: "Firmographic" },
+                { k: "You get", v: "Volume & timeline" },
+                { k: "Then", v: "Admin builds it" },
+              ]}
+              details={[
+                "Describe the requirement in your own words - Freda fills the gaps",
+                "Tells you when an agent or solution already covers it",
+                "Otherwise drafts a new agent or solution request for the admin team",
+              ]}
+              cta="Ask Freda"
+              onPick={() => pick("discovery", "/discover")}
+            />
+          </div>
+        </div>
+
+        {/* how it works band */}
+        <div className="relative rounded-2xl border border-border bg-card/70 p-5 overflow-hidden">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 opacity-[0.07] [background-image:radial-gradient(currentColor_1px,transparent_1px)] [background-size:16px_16px]"
           />
-          <FlipTile
-            active={uc === "openweb"}
-            tone="violet"
-            tags={["Category-driven", "Templates"]}
-            icon={Boxes}
-            title="Solutions"
-            aka="Start from a category, not a URL"
-            art={<DatasetArt />}
-            summary="Choose a data category and Freda assembles the company sites plus the third-party sources around it."
-            facts={[
-              { k: "Categories", v: "6+ verticals" },
-              { k: "Sources / category", v: "10-14" },
-              { k: "Default source", v: "Company website" },
-              { k: "Upload", v: "Your file, auto-mapped" },
-            ]}
-            details={[
-              "Healthcare, hospitality, legal, insurance, automotive, commerce",
-              "Marketplaces and directories curated per category",
-              "Unlocks Dataset Setup, Workflows and Review",
-            ]}
-            cta="Open Solutions"
-            onPick={() => pick("openweb", "/any-site")}
-          />
-          <FlipTile
-            active={uc === "discovery"}
-            tone="rose"
-            tags={["New", "Guided"]}
-            icon={Bot}
-            title="Freda AI"
-            aka="Your data solution consultant"
-            art={<DiscoveryArt />}
-            summary="Not sure which agent or category fits? Answer a short set of questions and Freda designs the solution."
-            facts={[
-              { k: "Format", v: "3 question batches" },
-              { k: "Output", v: "Sources + workflow" },
-              { k: "You get", v: "Volume & timeline" },
-              { k: "Then", v: "Admin builds it" },
-            ]}
-            details={[
-              "Multiple-choice interview - no blank chat box",
-              "Recommends sources, attributes and refresh cadence",
-              "Raises a solution request tracked on the dashboard",
-            ]}
-            cta="Ask Freda AI"
-            onPick={() => pick("discovery", "/discover")}
-          />
+          <div className="relative">
+            <div className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">How Freda delivers</div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-3">
+              {[
+                { icon: Search, t: "Source", d: "Official company websites first, then curated third-party sources." },
+                { icon: Boxes, t: "Extract", d: "Tuned agents and LLM extraction pull the fields you asked for." },
+                { icon: ShieldCheck, t: "Validate", d: "Normalised, deduped and cross-checked before it reaches you." },
+                { icon: Radar, t: "Refresh", d: "Daily, weekly or monthly runs with monitoring and change deltas." },
+              ].map((s) => (
+                <div key={s.t} className="rounded-xl border border-border bg-background/60 p-3.5">
+                  <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-secondary text-foreground">
+                    <s.icon className="h-4 w-4" />
+                  </span>
+                  <div className="text-[13px] font-semibold mt-2">{s.t}</div>
+                  <div className="text-[12px] text-muted-foreground mt-0.5 leading-relaxed">{s.d}</div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
 
         <LegalNotice />
-      </div>
+
       </div>
     </AppLayout>
-  );
-}
-
-function LegalNotice() {
-  return (
-    <div className="rounded-lg border border-warning/30 bg-warning-bg/60 px-4 py-3 text-foreground">
-      <div className="flex items-start gap-2">
-        <ShieldAlert className="h-4 w-4 text-warning shrink-0 mt-0.5" />
-        <div className="min-w-0">
-          <div className="text-[12px] font-semibold">Scraping terms - quick heads-up</div>
-          <p className="text-[11.5px] leading-relaxed text-muted-foreground mt-0.5">
-            We only collect publicly accessible pages, honor each site's robots.txt and rate limits, and never
-            touch logged-in or paywalled content or personal data. Extracted values are stored with their source URL
-            and timestamp so every field can be traced back and re-verified. You remain responsible for how the
-            output is used under the source site's terms of use and applicable data-protection law.
-          </p>
-        </div>
-      </div>
-    </div>
   );
 }
 
@@ -274,7 +249,7 @@ function ArtFrame({
 }) {
   return (
     <div
-      className="fd-sheen relative h-24 overflow-hidden rounded-xl ring-1 ring-inset ring-white/15"
+      className="fd-sheen relative h-28 overflow-hidden rounded-xl ring-1 ring-inset ring-white/15"
       style={{
         background: `radial-gradient(120% 140% at 0% 0%, ${glow[0]}, transparent 60%), radial-gradient(120% 140% at 100% 100%, ${glow[1]}, transparent 60%), linear-gradient(135deg,#111a33,#0b1020)`,
       }}
@@ -384,9 +359,13 @@ const TONE_CLASS: Record<"emerald" | "violet" | "rose", { icon: string; chip: st
 };
 
 function FlipTile({
+  id,
+  flipped,
+  onOpen,
+  onClose,
   active,
   tone,
-  tags,
+  tag,
   icon: Icon,
   title,
   aka,
@@ -397,9 +376,13 @@ function FlipTile({
   cta,
   onPick,
 }: {
+  id: string;
+  flipped: boolean;
+  onOpen: (id: string) => void;
+  onClose: (id: string) => void;
   active: boolean;
   tone: "emerald" | "violet" | "rose";
-  tags: string[];
+  tag: string;
   icon: typeof Target;
   title: string;
   aka: string;
@@ -410,23 +393,22 @@ function FlipTile({
   cta: string;
   onPick: () => void;
 }) {
-  const [flipped, setFlipped] = useState(false);
   const t = TONE_CLASS[tone];
 
   return (
     <div
       className="group relative h-[340px] [perspective:1400px]"
-      onMouseEnter={() => setFlipped(true)}
-      onMouseLeave={() => setFlipped(false)}
-      onClick={() => setFlipped((v) => !v)}
+      onMouseEnter={() => onOpen(id)}
+      onMouseLeave={() => onClose(id)}
+      onClick={() => (flipped ? onClose(id) : onOpen(id))}
     >
       <div
         aria-hidden
-        className={`pointer-events-none absolute -inset-1 rounded-2xl bg-gradient-to-br ${t.glow} opacity-0 blur-xl transition-opacity duration-500 group-hover:opacity-60`}
+        className={`pointer-events-none absolute -inset-1 rounded-2xl bg-gradient-to-br ${t.glow} opacity-0 blur-xl transition-opacity duration-700 group-hover:opacity-60`}
       />
       <div
         className={[
-          "relative h-full w-full transition-transform duration-500 [transform-style:preserve-3d]",
+          "relative h-full w-full transition-transform duration-[800ms] ease-in-out [transform-style:preserve-3d]",
           flipped ? "[transform:rotateY(180deg)]" : "",
         ].join(" ")}
       >
@@ -434,47 +416,34 @@ function FlipTile({
         <div className="absolute inset-0 [backface-visibility:hidden]">
           <Card
             className={[
-              "fd-tile relative overflow-hidden p-4 h-full flex flex-col cursor-pointer border-border/70 group-hover:shadow-2xl",
+              "fd-tile relative overflow-hidden p-5 h-full flex flex-col cursor-pointer border-border/70 group-hover:shadow-2xl",
               active ? `ring-2 ${t.ring}` : "",
             ].join(" ")}
           >
             <div aria-hidden className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${t.glow}`} />
             {art}
-            <div className="flex items-start gap-2.5 mt-3">
-              <div className={`fd-float h-10 w-10 shrink-0 rounded-lg inline-flex items-center justify-center shadow-sm ${t.icon}`}>
+            <div className="flex items-start gap-3 mt-4">
+              <div className={`fd-float h-11 w-11 shrink-0 rounded-xl inline-flex items-center justify-center shadow-sm ${t.icon}`}>
                 <Icon className="h-5 w-5" />
               </div>
               <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2">
-                  <h2 className={`fd-gradient-text text-[18px] font-bold leading-tight truncate ${t.text}`}>{title}</h2>
-                  {tags.slice(0, 1).map((tag) => (
-                    <span key={tag} className={`shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-semibold ${t.chip}`}>
-                      {tag}
-                    </span>
-                  ))}
-                </div>
+                <h2 className={`fd-gradient-text text-[19px] font-bold leading-tight truncate ${t.text}`}>{title}</h2>
                 <div className="text-[11.5px] text-muted-foreground mt-0.5 truncate">{aka}</div>
               </div>
             </div>
-            <p className="text-[12.5px] text-muted-foreground mt-2.5 leading-relaxed line-clamp-3">{summary}</p>
-            <div className="grid grid-cols-2 gap-1.5 mt-auto pt-3">
-              {facts.slice(0, 2).map((f) => (
-                <div key={f.k} className="rounded-md bg-secondary px-2 py-1.5">
-                  <div className="text-[9.5px] uppercase tracking-wider text-muted-foreground font-semibold truncate">{f.k}</div>
-                  <div className="text-[12.5px] font-semibold leading-snug truncate">{f.v}</div>
-                </div>
-              ))}
+            <p className="text-[13px] text-muted-foreground mt-3 leading-relaxed">{summary}</p>
+            <div className="mt-auto pt-4">
+              <Button
+                className="w-full"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onPick();
+                }}
+              >
+                {cta} <ArrowRight className="h-4 w-4" />
+              </Button>
             </div>
-            <Button
-              className="w-full mt-2.5"
-              size="sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                onPick();
-              }}
-            >
-              {cta} <ArrowRight className="h-4 w-4" />
-            </Button>
           </Card>
         </div>
 
@@ -486,6 +455,7 @@ function FlipTile({
                 <Icon className="h-4 w-4" />
               </div>
               <h2 className="text-[15px] font-semibold leading-tight">{title}</h2>
+              <span className={`ml-auto shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-semibold ${t.chip}`}>{tag}</span>
             </div>
 
             <div className="grid grid-cols-2 gap-1.5 mt-3">
