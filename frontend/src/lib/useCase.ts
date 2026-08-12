@@ -44,8 +44,8 @@ export const USE_CASES = {
   },
   discovery: {
     id: "discovery" as const,
-    name: "Freda AI",
-    short: "Freda AI",
+    name: "Ask Freda",
+    short: "Ask Freda",
     tagline: "Describe what you need or drop a file. The assistant finds the sources and the plan.",
   },
 };
