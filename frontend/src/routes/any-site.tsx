@@ -1,11 +1,20 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { takeRequestList } from "@/lib/request-handoff";
+import { categoryArt } from "@/data/category-art";
 import { AppLayout } from "@/components/AppLayout";
 import { Badge, Button, Card, Input, PageHeader, Select, Steps } from "@/components/ui-bits";
-import { categoryArt } from "@/data/category-art";
 import { readJobsCache, writeJobsCache } from "@/lib/jobs-cache";
-import { DATASETS, DATASET_CATEGORIES, type Dataset } from "@/data/datasets";
-import { WORKFLOWS } from "@/data/workflows";
+import { DATASETS, DATASET_CATEGORIES, type Dataset } from "@/data/any-site-reference/datasets";
+
+/** Display names used on the setup page (business terminology). */
+const CATEGORY_LABEL: Record<string, string> = {
+  Company: "Firmographic",
+  People: "People & Workforce",
+  Education: "Workforce",
+};
+const catLabel = (c: string) => CATEGORY_LABEL[c] ?? c;
+import { WORKFLOWS } from "@/data/any-site-reference/workflows";
 import {
   ArrowRight,
   Upload,
@@ -22,7 +31,9 @@ import * as Icons from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/any-site")({
-  head: () => ({ meta: [{ title: "By Dataset – Dataset Setup – FreshData AI" }] }),
+  validateSearch: (search: Record<string, unknown>): { dataset?: string } =>
+    typeof search.dataset === "string" ? { dataset: search.dataset } : {},
+  head: () => ({ meta: [{ title: "Solutions – Dataset Setup – Freda" }] }),
   component: AnySite,
 });
 
@@ -30,6 +41,7 @@ const STEPS = ["Pick Dataset", "Select Datapoints", "Schedule & Launch"];
 
 function AnySite() {
   const navigate = useNavigate();
+  const { dataset: datasetParam } = Route.useSearch();
   const [step, setStep] = useState(0);
   const [q, setQ] = useState("");
   const [cat, setCat] = useState<string>("All");
@@ -53,6 +65,37 @@ function AnySite() {
   const [delivery, setDelivery] = useState("S3 bucket");
   const [format, setFormat] = useState("JSON");
 
+  // A list built in "By Request" can be handed over here as a ready-made upload.
+  useEffect(() => {
+    const handoff = takeRequestList();
+    if (!handoff) return;
+    const target = DATASETS.find((d) => d.id === handoff.datasetId);
+    if (!target) return;
+    setDatasetId(target.id);
+    setSelectedOutputs(target.outputAttributes.map((o) => o.key));
+    setFrequency(target.refreshDefault);
+    setPickedSources(defaultSources(target, "Auto"));
+    setSourceMode("upload");
+    setSeedFile(handoff.fileName);
+    setSeedHeaders(handoff.headers);
+    setSeedRecords(handoff.records);
+    setSeedRows(handoff.records.length);
+    setSeedColumnCount(handoff.headers.length);
+    setStep(1);
+    toast.success(`Loaded ${handoff.records.length} rows from Freda AI into the ${target.name} template`);
+  }, []);
+
+  // Ask Freda can deep-link straight into a specific solution's setup.
+  useEffect(() => {
+    if (!datasetParam) return;
+    const target = DATASETS.find((d) => d.id === datasetParam);
+    if (!target) return;
+    pickDataset(target);
+    setStep(1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [datasetParam]);
+
+
   const filtered = DATASETS.filter((d) => {
     if (cat !== "All" && d.category !== cat) return false;
     if (q) {
@@ -61,7 +104,8 @@ function AnySite() {
         d.name.toLowerCase().includes(s) ||
         d.tagline.toLowerCase().includes(s) ||
         d.description.toLowerCase().includes(s) ||
-        d.category.toLowerCase().includes(s)
+        d.category.toLowerCase().includes(s) ||
+        catLabel(d.category).toLowerCase().includes(s)
       );
     }
     return true;
@@ -222,7 +266,7 @@ function AnySite() {
 
     const { default: ExcelJS } = await import("exceljs");
     const workbook = new ExcelJS.Workbook();
-    workbook.creator = "FreshData AI";
+    workbook.creator = "Freda";
     workbook.created = new Date();
 
     const worksheet = workbook.addWorksheet("Template", {
@@ -512,11 +556,11 @@ function AnySite() {
   return (
     <AppLayout>
       <PageHeader
-        title="By Dataset — Dataset Setup"
+        title="Solutions Data Set Up"
         subtitle="Pick a dataset, choose your sources or upload your own data, then select your datapoints. A workflow runs behind the scenes."
         actions={
           <Link to="/site-specific">
-            <Button variant="ghost" size="sm">← Switch to By Source</Button>
+            <Button variant="ghost" size="sm">â† Switch to Agents</Button>
           </Link>
         }
       />
@@ -541,7 +585,7 @@ function AnySite() {
                 </div>
                 <Select value={cat} onChange={(e) => setCat(e.target.value)} className="lg:w-56">
                   <option value="All">All categories</option>
-                  {DATASET_CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+                  {DATASET_CATEGORIES.map((c) => <option key={c} value={c}>{catLabel(c)}</option>)}
                 </Select>
               </div>
             </Card>
@@ -559,8 +603,8 @@ function AnySite() {
                     <div className={`relative h-24 bg-gradient-to-br ${art.gradient}`}>
                       <div className="absolute inset-0 opacity-25 [background-image:radial-gradient(circle_at_25%_35%,white_1.5px,transparent_1.5px)] [background-size:20px_20px]" />
                       <Icon className="absolute bottom-3 right-3 h-11 w-11 text-white/90 transition-transform duration-200 group-hover:scale-110" />
-                      <span className={`absolute left-3 top-3 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${art.chip}`}>
-                        {d.category}
+                      <span className="absolute left-3 top-3 rounded-full bg-black/25 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white">
+                        {catLabel(d.category)}
                       </span>
                       <span className="absolute left-3 bottom-3 text-[11px] font-medium text-white/90 pr-16">
                         {art.blurb}
@@ -577,10 +621,7 @@ function AnySite() {
                         <Mini label="Countries" value={d.countriesCovered ?? "—"} />
                       </div>
                       <div className="mt-3 pt-3 border-t border-border flex items-center justify-between">
-                        <span className="text-[11px] text-muted-foreground">
-                          {d.rowsAvailable}
-                          {d.coverage ? ` · ${d.coverage}% coverage` : ""}
-                        </span>
+                        <span className="text-[11px] text-muted-foreground">{d.rowsAvailable}{d.coverage ? ` · ${d.coverage}% coverage` : ""}</span>
                         <span className="inline-flex items-center gap-1 text-[12px] text-info font-medium">
                           Configure <ChevronRight className="h-3 w-3" />
                         </span>
@@ -774,7 +815,7 @@ function MapStep(p: {
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
                     <h3 className="font-semibold text-[15px]">{ds.name}</h3>
-                    <Badge tone="purple">{ds.category}</Badge>
+                    <Badge tone="purple">{catLabel(ds.category)}</Badge>
                   </div>
                   <p className="text-[12px] text-muted-foreground mt-1">{ds.description}</p>
                 </div>

@@ -1,0 +1,42 @@
+[
+  {
+    "Legal_name": "Amazon.com, Inc.",
+    "Website": "https://www.amazon.com"
+  },
+  {
+    "Legal_name": "JPMorgan Chase & Co.",
+    "Website": "https://www.jpmorganchase.com"
+  },
+  {
+    "Legal_name": "Johnson & Johnson",
+    "Website": "https://www.jnj.com"
+  },
+  {
+    "Legal_name": "Walmart Inc.",
+    "Website": "https://www.walmart.com"
+  },
+  {
+    "Legal_name": "Oracle Corporation",
+    "Website": "https://www.oracle.com"
+  },
+  {
+    "Legal_name": "Salesforce, Inc.",
+    "Website": "https://www.salesforce.com"
+  },
+  {
+    "Legal_name": "PayPal Holdings, Inc.",
+    "Website": "https://www.paypal.com"
+  },
+  {
+    "Legal_name": "McDonald's Corporation",
+    "Website": "https://www.mcdonalds.com"
+  },
+  {
+    "Legal_name": "Nike, Inc.",
+    "Website": "https://www.nike.com"
+  },
+  {
+    "Legal_name": "PepsiCo, Inc.",
+    "Website": "https://www.pepsico.com"
+  }
+]
