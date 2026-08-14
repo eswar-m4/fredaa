@@ -31,13 +31,13 @@ import { setUseCase, useUseCase, USE_CASES, type UseCase } from "@/lib/useCase";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Choose your use case – Freda" },
+      { title: "Choose your playbook – Freda" },
       {
         name: "description",
         content:
-          "Three ways to get data: run site-specific agents, refresh a solution category, or let Ask Freda design the solution with you.",
+          "Three playbooks to get data: run site-specific agents, refresh a solution category, or let Ask Freda design the solution with you.",
       },
-      { property: "og:title", content: "Choose your use case – Freda" },
+      { property: "og:title", content: "Choose your playbook – Freda" },
       {
         property: "og:description",
         content: "Site-specific agents, solution categories, and Ask Freda's guided solution design in one workspace.",
@@ -99,8 +99,8 @@ function Home() {
   return (
     <AppLayout>
       <PageHeader
-        title="How do you want your data?"
-        subtitle="Three ways in: run agents on sites you trust, pick a ready solution category, or let Freda design one with you."
+        title="Choose your playbook"
+        subtitle="Three playbooks: run agents on sites you trust, pick a ready solution category, or let Freda design one with you."
       />
 
       <div className="relative px-7 pb-8 space-y-6">

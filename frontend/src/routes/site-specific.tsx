@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 
 export const Route = createFileRoute("/site-specific")({
-  head: () => ({ meta: [{ title: "Ready-Made Datasets – FreshData AI" }] }),
+  head: () => ({ meta: [{ title: "Sources & Agents - Freda" }] }),
   component: SiteSpecific,
 });
 

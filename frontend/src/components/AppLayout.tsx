@@ -22,13 +22,14 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { setUseCase, useUseCase, USE_CASES } from "@/lib/useCase";
 import { fetchSession, logoutRequest, type SessionInfo } from "@/lib/auth";
+import fredaLogo from "@/assets/freda-mobius-bold.png";
 
 type NavItem = { to: string; label: string; icon: typeof Target; hash?: string };
 type NavGroup = { group: string; items: NavItem[] };
 
 const BASE: NavGroup = {
   group: "OVERVIEW",
-  items: [{ to: "/", label: "Use Cases", icon: LayoutDashboard }],
+  items: [{ to: "/", label: "Playbooks", icon: LayoutDashboard }],
 };
 
 const TARGETED: NavGroup = {
@@ -62,6 +63,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const hash = useRouterState({ select: (s) => s.location.hash });
   const uc = useUseCase();
+  const activeSectionLabel = pathname === "/any-site" ? "Active Playbooks" : "Active use case";
 
   const [authLoading, setAuthLoading] = useState(true);
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -207,17 +209,19 @@ export function AppLayout({ children }: { children: ReactNode }) {
       >
         <div className="px-4 pt-4 pb-3 border-b border-white/10 whitespace-nowrap">
           <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-md bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center font-bold text-white shadow-md">F</div>
+            <span className="h-9 w-9 shrink-0 inline-flex items-center justify-center">
+              <img src={fredaLogo} alt="Freda" width={512} height={512} className="h-9 w-9 object-contain" />
+            </span>
             <div>
               <div className="text-[15px] font-semibold leading-tight">Freda</div>
-              <div className="text-[10px] text-white/60 leading-tight">B2B Data Intelligence</div>
+              <div className="text-[11px] text-white/60">B2B Data Intelligence</div>
             </div>
           </div>
         </div>
 
         {uc && (
           <div className="px-3 py-3 border-b border-white/10 whitespace-nowrap">
-            <div className="text-[10px] uppercase tracking-wider text-white/40 font-semibold mb-1">Active use case</div>
+            <div className="text-[10px] uppercase tracking-wider text-white/40 font-semibold mb-1">{activeSectionLabel}</div>
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-1.5 font-semibold text-[12px]">
                 {uc === "targeted" ? (
