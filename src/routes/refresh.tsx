@@ -147,12 +147,8 @@ function RefreshPage() {
       <PageHeader
         title="Projects"
         subtitle={`${customer.name} · create, manage and schedule extraction projects · ${customer.projects.length} live`}
-        actions={
-          <Button size="sm" variant="outline" onClick={() => setNotice("Full re-extraction queued for all projects.")}>
-            <CalendarClock className="h-3.5 w-3.5" /> Re-run everything
-          </Button>
-        }
       />
+
 
       <div className="px-7 pb-8 space-y-5">
         {notice && (
