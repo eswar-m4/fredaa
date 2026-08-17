@@ -33,12 +33,12 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/monitoring")({
   head: () => ({
     meta: [
-      { title: "Monitoring & Delivery — FreDA" },
+      { title: "Monitoring — FreDA" },
       {
         name: "description",
         content: "Live job automation status, refresh schedule health and delivery destinations for every FreDA dataset.",
       },
-      { property: "og:title", content: "Monitoring & Delivery — FreDA" },
+      { property: "og:title", content: "Monitoring — FreDA" },
       {
         property: "og:description",
         content: "Live job automation status, refresh schedule health and delivery destinations for every FreDA dataset.",
@@ -99,7 +99,7 @@ function MonitoringPage() {
   return (
     <AppLayout>
       <PageHeader
-        title="Monitoring & delivery"
+        title="Monitoring"
         subtitle={`${customer.name} · job automation, schedule health and sync destinations`}
         actions={
           <Button size="sm" onClick={() => scoped.forEach((p) => refresh(p.id))}>

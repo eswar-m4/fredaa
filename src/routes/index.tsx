@@ -9,6 +9,10 @@ import {
   TrendingUp,
   AlertTriangle,
   Clock,
+  PlusCircle,
+  MinusCircle,
+  PencilLine,
+  BadgeCheck,
 } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
 import {
@@ -136,12 +140,12 @@ function DashboardPage() {
           <SectionTitle hint={`${scope === "all" ? "all projects" : active.name} · ${rangeLabel(range)}`}>
             ADMV — change signature
           </SectionTitle>
-          <div className="grid xl:grid-cols-[1.2fr_1fr] gap-6 mt-3 items-start">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              <Admv label="Added" value={admv.added} pct={pct.added} tone="success" />
-              <Admv label="Deleted" value={admv.deleted} pct={pct.deleted} tone="destructive" />
-              <Admv label="Modified" value={admv.modified} pct={pct.modified} tone="warning" />
-              <Admv label="Verified" value={admv.verified} pct={pct.verified} tone="info" />
+          <div className="grid xl:grid-cols-[1fr_1fr] gap-6 mt-3 items-start">
+            <div className="grid grid-cols-2 gap-3.5">
+              <Admv label="Added" value={admv.added} pct={pct.added} tone="success" icon={PlusCircle} />
+              <Admv label="Deleted" value={admv.deleted} pct={pct.deleted} tone="destructive" icon={MinusCircle} />
+              <Admv label="Modified" value={admv.modified} pct={pct.modified} tone="warning" icon={PencilLine} />
+              <Admv label="Verified" value={admv.verified} pct={pct.verified} tone="info" icon={BadgeCheck} />
             </div>
             <div>
               <div className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mb-2">Per project mix</div>
@@ -394,17 +398,40 @@ function Kpi({
   );
 }
 
-function Admv({ label, value, pct, tone }: { label: string; value: number; pct: number; tone: string }) {
+function Admv({
+  label,
+  value,
+  pct,
+  tone,
+  icon: Icon,
+}: {
+  label: string;
+  value: number;
+  pct: number;
+  tone: string;
+  icon: React.ComponentType<{ className?: string }>;
+}) {
   const bar = { success: "bg-success", destructive: "bg-destructive", warning: "bg-warning", info: "bg-primary" }[tone]!;
+  const chip = {
+    success: "bg-success-bg text-success",
+    destructive: "bg-destructive/10 text-destructive",
+    warning: "bg-warning-bg text-warning",
+    info: "bg-info-bg text-info",
+  }[tone]!;
   return (
-    <div className="rounded-lg border border-border p-3.5">
-      <div className="flex items-center justify-between">
-        <span className="text-[12px] font-medium text-muted-foreground">{label}</span>
-        <span className="text-[11px] text-muted-foreground tabular-nums">{pct.toFixed(1)}%</span>
-      </div>
-      <div className="text-[20px] font-semibold tabular-nums mt-1">{fmt(value)}</div>
-      <div className="mt-2 h-1.5 rounded-full bg-secondary overflow-hidden">
-        <div className={cn("h-full rounded-full", bar)} style={{ width: `${Math.max(2, pct)}%` }} />
+    <div className="rounded-lg border border-border p-3.5 flex gap-3 items-start">
+      <span className={cn("h-9 w-9 shrink-0 rounded-md inline-flex items-center justify-center", chip)}>
+        <Icon className="h-4 w-4" />
+      </span>
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-[12px] font-medium text-muted-foreground truncate">{label}</span>
+          <span className="text-[11px] text-muted-foreground tabular-nums">{pct.toFixed(1)}%</span>
+        </div>
+        <div className="text-[20px] font-semibold tabular-nums mt-0.5">{fmt(value)}</div>
+        <div className="mt-2 h-1.5 rounded-full bg-secondary overflow-hidden">
+          <div className={cn("h-full rounded-full", bar)} style={{ width: `${Math.max(2, pct)}%` }} />
+        </div>
       </div>
     </div>
   );
