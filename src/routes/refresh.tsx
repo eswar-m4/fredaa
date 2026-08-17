@@ -28,7 +28,29 @@ export const Route = createFileRoute("/refresh")({
   component: RefreshPage,
 });
 
-type Draft = { name: string; urls: string[]; datapoints: number; frequency: Project["frequency"] };
+type Draft = {
+  name: string;
+  urls: string[];
+  fields: string[];
+  fieldDraft: string;
+  frequency: Project["frequency"];
+  owner: string;
+  format: string;
+  notes: string;
+};
+
+const SUGGESTED_FIELDS = ["Company name", "Website", "HQ country", "Employee count", "Revenue band", "Industry", "Contact email", "Price", "SKU", "Availability"];
+
+const EMPTY_DRAFT: Draft = {
+  name: "",
+  urls: ["", "", ""],
+  fields: ["Company name", "Website", "HQ country"],
+  fieldDraft: "",
+  frequency: "Weekly",
+  owner: "",
+  format: "CSV",
+  notes: "",
+};
 
 function RefreshPage() {
   const customer = useActiveCustomer();
@@ -42,9 +64,10 @@ function RefreshPage() {
   const [notice, setNotice] = useState("");
   const [raised, setRaised] = useState<ChangeRequest[]>([]);
 
-  const [draft, setDraft] = useState<Draft>({ name: "", urls: ["", "", ""], datapoints: 12, frequency: "Weekly" });
+  const [draft, setDraft] = useState<Draft>(EMPTY_DRAFT);
+  const draftDatapoints = Math.max(1, draft.fields.length);
   const draftUrlCount = Math.max(1, draft.urls.filter((u) => u.trim()).length || draft.urls.length);
-  const draftEstimate = estimate(draftUrlCount, draft.datapoints, draft.frequency);
+  const draftEstimate = estimate(draftUrlCount, draftDatapoints, draft.frequency);
 
   const seeded = useMemo(() => requestsFor(customer), [customer.id]);
   const requests = [...raised, ...seeded];
@@ -99,14 +122,20 @@ function RefreshPage() {
     if (!draft.name.trim()) return;
     logRequest(
       "New project",
-      `New project “${draft.name}” · ${draftUrlCount} URLs · ${draft.datapoints} datapoints · ${draft.frequency}`,
+      `New project “${draft.name}” · ${draftUrlCount} URLs · ${draftDatapoints} datapoints · ${draft.frequency}`,
       draftEstimate.setupDays,
       draft.name,
     );
     setNotice(
       `Project “${draft.name}” submitted as ${nextReqId()} — estimate: ${draftEstimate.setupDays} days setup, ~${fmt(draftEstimate.monthlyRecords)} records/month. Admin notified.`,
     );
-    setDraft({ name: "", urls: ["", "", ""], datapoints: 12, frequency: "Weekly" });
+    setDraft(EMPTY_DRAFT);
+  }
+
+  function addField(v: string) {
+    const f = v.trim();
+    if (!f) return;
+    setDraft((d) => (d.fields.includes(f) ? { ...d, fieldDraft: "" } : { ...d, fields: [...d.fields, f], fieldDraft: "" }));
   }
 
   function setUrl(i: number, v: string) {
@@ -132,9 +161,9 @@ function RefreshPage() {
           </div>
         )}
 
-        <div className="grid xl:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)] gap-5 items-start">
+        <div className="grid lg:grid-cols-2 gap-5 items-stretch">
           {/* project list */}
-          <Card className="overflow-hidden flex flex-col min-h-[420px] max-h-[560px]">
+          <Card className="overflow-hidden flex flex-col h-[520px]">
             <div className="px-5 pt-4 pb-3 border-b border-border shrink-0">
               <h3 className="text-[13px] font-semibold uppercase tracking-wider text-muted-foreground">Projects</h3>
               <p className="text-[12px] text-muted-foreground mt-1">Select a project to manage its sources and schedule.</p>
@@ -164,7 +193,7 @@ function RefreshPage() {
           </Card>
 
           {/* manage selected project */}
-          <Card className="p-5 flex flex-col min-h-[420px] max-h-[560px]">
+          <Card className="p-5 flex flex-col h-[520px]">
             <SectionTitle hint={`${sources.length} sources`}>Manage — {project.name}</SectionTitle>
 
             <div className="flex items-center gap-2 mb-3">
@@ -299,18 +328,54 @@ function RefreshPage() {
                 </Button>
               </div>
 
-              <div>
-                <Label>Datapoints per record · {draft.datapoints}</Label>
-                <input
-                  suppressHydrationWarning
-                  type="range"
-                  min={4}
-                  max={40}
-                  value={draft.datapoints}
-                  onChange={(e) => setDraft({ ...draft, datapoints: Number(e.target.value) })}
-                  className="w-full accent-[var(--primary)]"
-                />
+              <div className="sm:col-span-2">
+                <Label>Datapoints to extract · {draftDatapoints}</Label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    className="flex-1 min-w-0"
+                    placeholder="e.g. Employee count"
+                    value={draft.fieldDraft}
+                    onChange={(e) => setDraft({ ...draft, fieldDraft: e.target.value })}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        addField(draft.fieldDraft);
+                      }
+                    }}
+                  />
+                  <Button size="sm" variant="outline" className="shrink-0" onClick={() => addField(draft.fieldDraft)}>
+                    <Plus className="h-3.5 w-3.5" /> Add datapoint
+                  </Button>
+                </div>
+                {draft.fields.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mt-2">
+                    {draft.fields.map((f) => (
+                      <span key={f} className="inline-flex items-center gap-1 rounded-md border border-primary/40 bg-primary/5 pl-2.5 pr-1 h-7 text-[11.5px] font-medium">
+                        {f}
+                        <button
+                          onClick={() => setDraft((d) => ({ ...d, fields: d.fields.filter((x) => x !== f) }))}
+                          className="h-5 w-5 rounded inline-flex items-center justify-center hover:bg-destructive/10 hover:text-destructive transition"
+                          title="Remove datapoint"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  {SUGGESTED_FIELDS.filter((f) => !draft.fields.includes(f)).map((f) => (
+                    <button
+                      key={f}
+                      onClick={() => addField(f)}
+                      className="h-7 px-2.5 rounded-md border border-dashed border-border text-[11.5px] text-muted-foreground hover:bg-secondary transition"
+                    >
+                      + {f}
+                    </button>
+                  ))}
+                </div>
               </div>
+
               <div>
                 <Label>Frequency</Label>
                 <Select value={draft.frequency} onChange={(e) => setDraft({ ...draft, frequency: e.target.value as Project["frequency"] })}>
@@ -319,6 +384,23 @@ function RefreshPage() {
                   <option value="Monthly">Monthly</option>
                 </Select>
               </div>
+              <div>
+                <Label>Delivery format</Label>
+                <Select value={draft.format} onChange={(e) => setDraft({ ...draft, format: e.target.value })}>
+                  <option value="CSV">CSV drop</option>
+                  <option value="JSON API">JSON API</option>
+                  <option value="Snowflake">Snowflake share</option>
+                  <option value="S3">S3 bucket</option>
+                </Select>
+              </div>
+              <div>
+                <Label>Business owner (notified)</Label>
+                <Input placeholder="name@company.com" value={draft.owner} onChange={(e) => setDraft({ ...draft, owner: e.target.value })} />
+              </div>
+              <div>
+                <Label>Notes for delivery team</Label>
+                <Input placeholder="Regions, exclusions, QA rules…" value={draft.notes} onChange={(e) => setDraft({ ...draft, notes: e.target.value })} />
+              </div>
             </div>
 
             <div className="mt-auto pt-4">
@@ -326,7 +408,7 @@ function RefreshPage() {
 
 
               <div className="flex items-center gap-1.5 text-[12px] font-semibold">
-                <Sparkles className="h-3.5 w-3.5 text-primary" /> Live estimate · {draftUrlCount} sources
+                <Sparkles className="h-3.5 w-3.5 text-primary" /> Live estimate · {draftUrlCount} sources · {draftDatapoints} datapoints
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-2">
                 <Est label="Setup" value={`${draftEstimate.setupDays} days`} />
