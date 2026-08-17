@@ -342,8 +342,10 @@ function RefreshPage() {
                   <FolderPlus className="h-3.5 w-3.5" /> Submit for estimate
                 </Button>
               </div>
+              </div>
             </div>
           </Card>
+
 
           <Card className="p-5">
             <SectionTitle hint="add / remove / new build">Change requests</SectionTitle>
