@@ -140,7 +140,7 @@ function DashboardPage() {
           <SectionTitle hint={`${scope === "all" ? "all projects" : active.name} · ${rangeLabel(range)}`}>
             ADMV — change signature
           </SectionTitle>
-          <div className="grid xl:grid-cols-[1fr_1fr] gap-6 mt-3 items-start">
+          <div className="grid xl:grid-cols-[1fr_1fr] gap-6 mt-3 items-stretch">
             <div className="grid grid-cols-2 gap-3.5">
               <Admv label="Added" value={admv.added} pct={pct.added} tone="success" icon={PlusCircle} />
               <Admv label="Deleted" value={admv.deleted} pct={pct.deleted} tone="destructive" icon={MinusCircle} />
@@ -171,8 +171,8 @@ function DashboardPage() {
         </Card>
 
         {/* Review section */}
-        <div className="grid xl:grid-cols-[1.55fr_1fr] gap-5 items-start">
-          <Card className="overflow-hidden">
+        <div className="grid xl:grid-cols-[1.55fr_1fr] gap-5 items-stretch">
+          <Card className="overflow-hidden h-full flex flex-col">
             <div className="px-5 pt-4 pb-3 border-b border-border flex items-center justify-between">
               <div>
                 <h3 className="text-[13px] font-semibold uppercase tracking-wider text-muted-foreground">Review by project</h3>
@@ -180,14 +180,15 @@ function DashboardPage() {
               </div>
               <Badge tone="neutral">{scoped.length} in scope</Badge>
             </div>
-            <table className="w-full text-[12.5px]">
+            <div className="flex-1 overflow-x-auto">
+              <table className="w-full text-[12.5px]">
               <thead>
                 <tr className="text-left text-[11px] uppercase tracking-wider text-muted-foreground border-b border-border">
-                  <th className="px-5 py-2 font-semibold">Project</th>
+                  <th className="px-4 py-2 font-semibold">Project</th>
                   <th className="px-3 py-2 font-semibold">Records</th>
-                  <th className="px-3 py-2 font-semibold w-[190px]">ADMV %</th>
+                  <th className="px-3 py-2 font-semibold w-[150px]">ADMV %</th>
                   <th className="px-3 py-2 font-semibold">Status</th>
-                  <th className="px-5 py-2 font-semibold text-right">Review</th>
+                  <th className="px-4 py-2 font-semibold text-right">Review</th>
                 </tr>
               </thead>
               <tbody>
@@ -200,23 +201,23 @@ function DashboardPage() {
                       onClick={() => setSelected(p.id)}
                       className={cn("border-b border-border/60 cursor-pointer hover:bg-secondary/40", p.id === active.id && "bg-info-bg/60")}
                     >
-                      <td className="px-5 py-3 min-w-[230px]">
+                      <td className="px-4 py-3 min-w-[195px]">
                         <div className="font-medium whitespace-nowrap">{p.name}</div>
-                        <div className="text-[11px] text-muted-foreground">
+                        <div className="text-[11px] text-muted-foreground whitespace-nowrap">
                           {p.sources.length} sources · {p.datapoints.length} datapoints · {p.frequency}
                         </div>
                       </td>
                       <td className="px-3 py-3 tabular-nums">{compact(p.records)}</td>
                       <td className="px-3 py-3">
                         <AdmvBar a={a} />
-                        <div className="text-[10.5px] text-muted-foreground mt-1 tabular-nums">
+                        <div className="text-[9.5px] text-muted-foreground mt-1 tabular-nums whitespace-nowrap">
                           A {ap.added.toFixed(1)} · D {ap.deleted.toFixed(1)} · M {ap.modified.toFixed(1)} · V {ap.verified.toFixed(1)}
                         </div>
                       </td>
-                      <td className="px-3 py-3">
+                      <td className="px-3 py-3 whitespace-nowrap">
                         <Badge tone={statusTone[p.status]}>{p.status}</Badge>
                       </td>
-                      <td className="px-5 py-3 text-right">
+                      <td className="px-4 py-3 text-right">
                         <Button
                           size="sm"
                           className="whitespace-nowrap"
@@ -234,16 +235,17 @@ function DashboardPage() {
                 })}
               </tbody>
             </table>
+            </div>
           </Card>
 
-          <Card className="p-5">
+          <Card className="p-5 h-full flex flex-col">
             <SectionTitle hint={active.frequency}>Review snapshot</SectionTitle>
             <div className="text-[14px] font-semibold mt-1">{active.name}</div>
             <div className="text-[12px] text-muted-foreground">
               {active.source} · last refresh {hrsAgo(active.lastRefreshHrs)} · next {inHrs(active.nextRefreshHrs)}
             </div>
 
-            <div className="flex items-center gap-4 mt-4">
+            <div className="flex items-center justify-around gap-3 mt-4">
               <Donut value={active.accuracy} label="accuracy" tone="success" />
               <Donut value={active.coverage} label="coverage" />
               <Donut value={active.freshness} label="fresh" tone={active.freshness > 80 ? "success" : "warning"} />
@@ -259,7 +261,7 @@ function DashboardPage() {
               <Spark points={active.history.map((h) => h.accuracy)} labels={active.history.map((h) => h.label)} />
             </div>
 
-            <div className="mt-4">
+            <div className="mt-4 mb-5">
               <SectionTitle hint={`${active.datapoints.length} tracked`}>Datapoints</SectionTitle>
               <div className="flex flex-wrap gap-1.5">
                 {active.datapoints.slice(0, 10).map((d) => (
@@ -275,15 +277,15 @@ function DashboardPage() {
               </div>
             </div>
 
-            <Button className="w-full mt-5" onClick={() => setReviewProject(active)}>
+            <Button className="w-full mt-auto pt-0.5" onClick={() => setReviewProject(active)}>
               <CheckSquare className="h-3.5 w-3.5" /> Open record-by-record review
             </Button>
           </Card>
         </div>
 
         {/* Action needed + delivery pipeline */}
-        <div className="grid xl:grid-cols-2 gap-5 items-start">
-          <Card className="p-5">
+        <div className="grid xl:grid-cols-2 gap-5 items-stretch">
+          <Card className="p-5 h-full flex flex-col">
             <SectionTitle hint={`${visibleActions.length} open · ${rangeLabel(range)}`}>Action needed</SectionTitle>
             <div className="space-y-2 mt-2">
               {visibleActions.length === 0 && (
@@ -324,7 +326,7 @@ function DashboardPage() {
             </div>
           </Card>
 
-          <Card className="p-5">
+          <Card className="p-5 h-full flex flex-col">
             <SectionTitle hint="FreDA delivery team">Solution development in progress</SectionTitle>
             <div className="space-y-3 mt-2">
               {pipeline.map((d) => (

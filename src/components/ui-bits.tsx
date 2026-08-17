@@ -265,7 +265,8 @@ export function Donut({ value, label, tone = "primary" }: { value: number; label
   const r = 26;
   const c = 2 * Math.PI * r;
   return (
-    <div className="relative h-[68px] w-[68px] shrink-0">
+    <div className="flex flex-col items-center gap-1 shrink-0">
+    <div className="relative h-[68px] w-[68px]">
       <svg viewBox="0 0 64 64" className="h-full w-full -rotate-90">
         <circle cx="32" cy="32" r={r} fill="none" strokeWidth="7" className="stroke-secondary" />
         <circle
@@ -279,10 +280,11 @@ export function Donut({ value, label, tone = "primary" }: { value: number; label
           strokeDasharray={`${(value / 100) * c} ${c}`}
         />
       </svg>
-      <div className="absolute inset-0 flex flex-col items-center justify-center">
+      <div className="absolute inset-0 flex items-center justify-center">
         <span className="text-[13px] font-semibold tabular-nums">{Math.round(value)}%</span>
-        {label && <span className="text-[9px] text-muted-foreground uppercase tracking-wide">{label}</span>}
       </div>
+    </div>
+    {label && <span className="text-[10px] text-muted-foreground uppercase tracking-wide">{label}</span>}
     </div>
   );
 }

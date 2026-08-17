@@ -266,8 +266,8 @@ function MonitoringPage() {
         </Card>
 
         {/* Delivery + health */}
-        <div className="grid xl:grid-cols-[1.3fr_1fr] gap-5 items-start">
-          <Card className="p-5">
+        <div className="grid xl:grid-cols-[1.3fr_1fr] gap-5 items-stretch">
+          <Card className="p-5 h-full flex flex-col">
             <SectionTitle hint="export & sync">Delivery destinations</SectionTitle>
             <div className="space-y-2 mt-2">
               {destinations.map((d) => (
@@ -289,7 +289,7 @@ function MonitoringPage() {
                 </div>
               ))}
             </div>
-            <div className="flex flex-wrap items-center gap-2 mt-4">
+            <div className="flex flex-wrap items-center gap-2 mt-auto pt-4">
               <Button size="sm" variant="outline">
                 <Download className="h-3.5 w-3.5" /> Download CSV snapshot
               </Button>
@@ -302,7 +302,7 @@ function MonitoringPage() {
             </div>
           </Card>
 
-          <Card className="p-5">
+          <Card className="p-5 h-full flex flex-col">
             <SectionTitle hint="per dataset">Health scores</SectionTitle>
             <div className="space-y-3 mt-2">
               {scoped.map((p) => (
