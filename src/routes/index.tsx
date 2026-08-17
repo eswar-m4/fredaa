@@ -385,17 +385,19 @@ function MixRow({ label, sub, a, emphasis = false }: { label: string; sub: strin
         </div>
       </div>
 
-      {!emphasis && (
-        <div className="flex flex-wrap gap-1.5 justify-start lg:justify-end">
-          {SEGMENTS.map((s) => (
-            <span key={s.key} className={cn("inline-flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-medium tabular-nums", s.chip)}>
-              <span className="opacity-70">{s.label[0]}</span>
-              {fmt(a[s.key])}
-              <span className="opacity-70">· {p[s.key].toFixed(1)}%</span>
-            </span>
-          ))}
-        </div>
-      )}
+      <div className="grid grid-cols-4 gap-1.5 lg:w-[420px] lg:justify-self-end">
+        {SEGMENTS.map((s) => (
+          <span
+            key={s.key}
+            className={cn("flex items-center justify-center gap-1 px-2 py-1 rounded-md text-[11px] font-medium tabular-nums", s.chip)}
+          >
+            <span className="opacity-70">{s.label[0]}</span>
+            {fmt(a[s.key])}
+            <span className="opacity-70">· {p[s.key].toFixed(1)}%</span>
+          </span>
+        ))}
+      </div>
+
     </div>
   );
 }
