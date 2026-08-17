@@ -104,7 +104,7 @@ function RefreshPage() {
 
   function addSource() {
     const url = newSource.trim();
-    if (!url) return;
+    if (!url || sourceAttrs.length === 0) return;
     const id = `${project.id}-new-${Date.now()}`;
     setExtra((e) => ({
       ...e,
@@ -113,10 +113,17 @@ function RefreshPage() {
         { id, label: url.replace(/^https?:\/\//, ""), url, status: "Pending approval", records: 0, addedOn: "Just now" },
       ],
     }));
-    logRequest("Add source", `Add source ${url.replace(/^https?:\/\//, "")}`, sourceEstimate.setupDays);
+    setAttrsBySource((m) => ({ ...m, [id]: sourceAttrs }));
+    logRequest(
+      "Add source",
+      `Add source ${url.replace(/^https?:\/\//, "")} · ${sourceAttrs.length} attributes (${sourceAttrs.slice(0, 3).join(", ")}${sourceAttrs.length > 3 ? "…" : ""})`,
+      sourceEstimate.setupDays,
+    );
     setNewSource("");
-    setNotice(`Source queued as ${nextReqId()} — estimate generated and sent to your FreDA admin for approval.`);
+    setSourceAttrs([]);
+    setNotice(`Source queued as ${nextReqId()} with ${sourceAttrs.length} data attributes — estimate sent to your FreDA admin for approval.`);
   }
+
 
   function removeSource(id: string) {
     const label = sources.find((s) => s.id === id)?.label ?? id;
