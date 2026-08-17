@@ -136,12 +136,12 @@ function DashboardPage() {
           <SectionTitle hint={`${scope === "all" ? "all projects" : active.name} · ${rangeLabel(range)}`}>
             ADMV — change signature
           </SectionTitle>
-          <div className="grid xl:grid-cols-[1.2fr_1fr] gap-6 mt-3 items-start">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              <Admv label="Added" value={admv.added} pct={pct.added} tone="success" />
-              <Admv label="Deleted" value={admv.deleted} pct={pct.deleted} tone="destructive" />
-              <Admv label="Modified" value={admv.modified} pct={pct.modified} tone="warning" />
-              <Admv label="Verified" value={admv.verified} pct={pct.verified} tone="info" />
+          <div className="grid xl:grid-cols-[1fr_1fr] gap-6 mt-3 items-start">
+            <div className="grid grid-cols-2 gap-3.5">
+              <Admv label="Added" value={admv.added} pct={pct.added} tone="success" icon={PlusCircle} />
+              <Admv label="Deleted" value={admv.deleted} pct={pct.deleted} tone="destructive" icon={MinusCircle} />
+              <Admv label="Modified" value={admv.modified} pct={pct.modified} tone="warning" icon={PencilLine} />
+              <Admv label="Verified" value={admv.verified} pct={pct.verified} tone="info" icon={BadgeCheck} />
             </div>
             <div>
               <div className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mb-2">Per project mix</div>
