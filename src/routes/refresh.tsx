@@ -354,7 +354,7 @@ function RefreshPage() {
               Every source you add, retire or modify is logged here with an auto-assigned REQ number (sequential per workspace) that your FreDA admin
               uses to approve and track the build.
             </p>
-            <div className="space-y-2 max-h-[430px] overflow-y-auto pr-1">
+            <div className="space-y-2 flex-1 min-h-0 max-h-[520px] overflow-y-auto pr-1">
               {requests.map((r) => (
                 <div key={r.id} className="rounded-lg border border-border px-3 py-2.5">
                   <div className="flex items-center gap-2">
