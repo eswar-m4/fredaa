@@ -372,6 +372,7 @@ export type ActionItem = {
   action: string;
   records: number;
   priority: "Critical" | "High" | "Medium";
+  ageDays: number;
   age: string;
 };
 
@@ -384,20 +385,31 @@ export function actionsFor(customer: Customer): ActionItem[] {
     "Resolve duplicate entities",
     "Validate newly added records",
     "Re-check low-confidence extractions",
+    "Source returned 403 — re-auth needed",
+    "New field detected on source page",
   ];
   return customer.projects
-    .map((p, i) => ({
-      id: `${p.id}-act`,
-      projectId: p.id,
-      project: p.name,
-      action: templates[hash(p.id + "act") % templates.length]!,
-      records: Math.max(12, Math.round(p.pendingReview * 0.6)),
-      priority: (p.status === "Needs attention" ? "Critical" : p.pendingReview > 400 ? "High" : "Medium") as ActionItem["priority"],
-      age: pick(p.id + "age", ["Today", "Today", "2 days ago", "5 days ago", "Last week"]),
-      _i: i,
-    }))
-    .sort((a, b) => b.records - a.records)
-    .map(({ _i, ...rest }) => rest);
+    .flatMap((p) =>
+      [0, 1].map((k) => {
+        const seed = `${p.id}-act${k}`;
+        const ageDays = int(seed + "ag", 0, 26);
+        return {
+          id: `${p.id}-act-${k}`,
+          projectId: p.id,
+          project: p.name,
+          action: templates[hash(seed) % templates.length]!,
+          records: Math.max(12, Math.round(p.pendingReview * (k === 0 ? 0.6 : 0.25)) + int(seed + "rc", 5, 220)),
+          priority: (p.status === "Needs attention" && k === 0
+            ? "Critical"
+            : p.pendingReview > 400
+              ? "High"
+              : "Medium") as ActionItem["priority"],
+          ageDays,
+          age: ageDays === 0 ? "Today" : ageDays === 1 ? "Yesterday" : `${ageDays} days ago`,
+        };
+      }),
+    )
+    .sort((a, b) => b.records - a.records);
 }
 
 export type DevItem = {
