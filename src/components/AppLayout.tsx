@@ -170,11 +170,8 @@ export function AppLayout({ children }: { children: ReactNode }) {
     }
   }
 
-  const groups: NavGroup[] = [BASE];
-  if (uc === "targeted") groups.push(TARGETED);
-  if (uc === "openweb") groups.push(OPENWEB);
-  if (uc === "discovery") groups.push(DISCOVERY);
-  if (uc) groups.push(OPERATE);
+  const groups: NavGroup[] = [WORKSPACE, ASSIST];
+
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-background text-foreground">
