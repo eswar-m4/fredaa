@@ -97,14 +97,14 @@ function RefreshPage() {
           </div>
         )}
 
-        <div className="grid xl:grid-cols-[1fr_1.35fr] gap-5 items-start">
+        <div className="grid xl:grid-cols-2 gap-5 items-stretch">
           {/* project list */}
-          <Card className="overflow-hidden">
+          <Card className="overflow-hidden flex flex-col">
             <div className="px-5 pt-4 pb-3 border-b border-border">
               <h3 className="text-[13px] font-semibold uppercase tracking-wider text-muted-foreground">Projects</h3>
               <p className="text-[12px] text-muted-foreground mt-1">Select a project to manage its sources and schedule.</p>
             </div>
-            <div className="max-h-[420px] overflow-y-auto">
+            <div className="flex-1 min-h-0 max-h-[520px] overflow-y-auto">
               {customer.projects.map((p) => (
                 <button
                   key={p.id}
@@ -127,10 +127,10 @@ function RefreshPage() {
           </Card>
 
           {/* manage selected project */}
-          <Card className="p-5">
+          <Card className="p-5 flex flex-col">
             <SectionTitle hint={`${sources.length} sources`}>Manage — {project.name}</SectionTitle>
 
-            <div className="space-y-2 mt-2">
+            <div className="space-y-2 mt-2 flex-1 min-h-0 max-h-[300px] overflow-y-auto pr-1">
               {sources.map((s) => (
                 <div key={s.id} className="flex items-center gap-3 rounded-lg border border-border px-3 py-2.5">
                   <span className="h-8 w-8 rounded-md bg-secondary text-muted-foreground inline-flex items-center justify-center shrink-0">
@@ -203,7 +203,7 @@ function RefreshPage() {
         </div>
 
         {/* new project */}
-        <div className="grid xl:grid-cols-[1.15fr_1fr] gap-5 items-start">
+        <div className="grid xl:grid-cols-2 gap-5 items-stretch">
           <Card className="p-5">
             <SectionTitle hint="estimate generated instantly">Create a new project</SectionTitle>
             <div className="grid sm:grid-cols-2 gap-3 mt-2">
