@@ -240,8 +240,8 @@ function RefreshPage() {
         </div>
 
         {/* new project */}
-        <div className="grid xl:grid-cols-2 gap-5 items-start">
-          <Card className="p-5">
+        <div className="grid xl:grid-cols-2 gap-5 items-stretch">
+          <Card className="p-5 flex flex-col">
             <SectionTitle hint="estimate generated instantly">Create a new project</SectionTitle>
             <div className="grid sm:grid-cols-2 gap-3 mt-2">
               <div className="sm:col-span-2">
@@ -251,7 +251,30 @@ function RefreshPage() {
 
               <div className="sm:col-span-2">
                 <Label>Source URLs · {draft.urls.length}</Label>
+                <div className="flex flex-wrap gap-1.5 mb-2">
+                  {[1, 2, 3, 4, 5, 6, 8, 10].map((n) => (
+                    <button
+                      key={n}
+                      suppressHydrationWarning
+                      onClick={() =>
+                        setDraft((d) => ({
+                          ...d,
+                          urls: Array.from({ length: n }, (_, k) => d.urls[k] ?? ""),
+                        }))
+                      }
+                      className={cn(
+                        "h-8 w-9 rounded-md text-[12px] font-medium border transition",
+                        draft.urls.length === n
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-border bg-card text-muted-foreground hover:bg-secondary",
+                      )}
+                    >
+                      {n}
+                    </button>
+                  ))}
+                </div>
                 <div className="space-y-2">
+
                   {draft.urls.map((u, i) => (
                     <div key={i} className="flex items-center gap-2">
                       <span className="text-[11px] text-muted-foreground w-5 tabular-nums shrink-0">{i + 1}.</span>
@@ -298,7 +321,10 @@ function RefreshPage() {
               </div>
             </div>
 
-            <div className="mt-4 rounded-lg border border-border bg-secondary/40 p-4">
+            <div className="mt-auto pt-4">
+              <div className="rounded-lg border border-border bg-secondary/40 p-4">
+
+
               <div className="flex items-center gap-1.5 text-[12px] font-semibold">
                 <Sparkles className="h-3.5 w-3.5 text-primary" /> Live estimate · {draftUrlCount} sources
               </div>
@@ -316,17 +342,19 @@ function RefreshPage() {
                   <FolderPlus className="h-3.5 w-3.5" /> Submit for estimate
                 </Button>
               </div>
+              </div>
             </div>
           </Card>
 
-          <Card className="p-5">
+
+          <Card className="p-5 flex flex-col">
             <SectionTitle hint="add / remove / new build">Change requests</SectionTitle>
             <p className="text-[11.5px] text-muted-foreground -mt-1 mb-2 inline-flex items-start gap-1.5">
               <Info className="h-3.5 w-3.5 mt-[1px] shrink-0" />
               Every source you add, retire or modify is logged here with an auto-assigned REQ number (sequential per workspace) that your FreDA admin
               uses to approve and track the build.
             </p>
-            <div className="space-y-2 max-h-[430px] overflow-y-auto pr-1">
+            <div className="space-y-2 flex-1 min-h-0 max-h-[520px] overflow-y-auto pr-1">
               {requests.map((r) => (
                 <div key={r.id} className="rounded-lg border border-border px-3 py-2.5">
                   <div className="flex items-center gap-2">

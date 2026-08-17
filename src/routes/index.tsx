@@ -11,8 +11,8 @@ import {
 } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
 import {
-  AdmvBar,
   Badge,
+
   Button,
   Card,
   DEFAULT_RANGE,
@@ -99,6 +99,12 @@ function DashboardPage() {
   const actions = useMemo(() => actionsFor(customer), [customer.id]);
   const windowDays = rangeDays(range);
   const visibleActions = actions.filter((a) => (scope === "all" || a.projectId === scope) && a.ageDays < windowDays);
+  const actionByProject = useMemo(() => {
+    const m: Record<string, string> = {};
+    for (const a of actions) if (!m[a.projectId]) m[a.projectId] = a.action;
+    return m;
+  }, [actions]);
+
 
   const pipeline = useMemo(() => devPipeline(customer), [customer.id]);
   const active = scoped.find((p) => p.id === selected) ?? scoped[0] ?? customer.projects[0]!;
@@ -149,18 +155,8 @@ function DashboardPage() {
             ADMV — change signature
           </SectionTitle>
 
-          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mt-1 mb-3">
-            {SEGMENTS.map((s) => (
-              <span key={s.key} className="inline-flex items-center gap-1.5 text-[12px]">
-                <span className={cn("h-2.5 w-2.5 rounded-sm", s.dot)} />
-                <span className="text-muted-foreground">{s.label}</span>
-                <strong className="tabular-nums">{fmt(admv[s.key])}</strong>
-                <span className={cn("px-1.5 py-0.5 rounded text-[10.5px] font-semibold tabular-nums", s.chip)}>
-                  {pct[s.key].toFixed(1)}%
-                </span>
-              </span>
-            ))}
-          </div>
+
+
 
           <div className="rounded-lg border border-border overflow-hidden">
             <MixRow label="All projects in scope" sub={`${scoped.length} projects · ${fmt(totalChanges)} records`} a={admv} emphasis />
@@ -191,11 +187,13 @@ function DashboardPage() {
                   <th className="px-5 py-2 font-semibold">Project</th>
                   <th className="px-3 py-2 font-semibold">Records</th>
                   <th className="px-3 py-2 font-semibold">Pending</th>
-                  <th className="px-3 py-2 font-semibold min-w-[230px]">ADMV %</th>
+                  <th className="px-3 py-2 font-semibold min-w-[300px]">ADMV</th>
                   <th className="px-3 py-2 font-semibold">Accuracy</th>
                   <th className="px-3 py-2 font-semibold">Review status</th>
+                  <th className="px-3 py-2 font-semibold">Action needed</th>
                   <th className="px-5 py-2 font-semibold text-right">Review</th>
                 </tr>
+
               </thead>
               <tbody>
                 {scoped.map((p) => {
@@ -217,15 +215,31 @@ function DashboardPage() {
                       <td className="px-3 py-3 tabular-nums whitespace-nowrap">{fmt(p.records)}</td>
                       <td className="px-3 py-3 tabular-nums whitespace-nowrap">{fmt(p.pendingReview)}</td>
                       <td className="px-3 py-3">
-                        <AdmvBar a={a} />
-                        <div className="text-[10px] text-muted-foreground mt-1 tabular-nums whitespace-nowrap">
-                          A {ap.added.toFixed(1)}% · D {ap.deleted.toFixed(1)}% · M {ap.modified.toFixed(1)}% · V {ap.verified.toFixed(1)}%
+                        <div className="grid grid-cols-4 gap-1.5 min-w-[300px]">
+                          {SEGMENTS.map((s) => (
+                            <div key={s.key} className={cn("rounded-md px-2 py-1.5 text-center", s.chip)}>
+                              <div className="text-[9.5px] uppercase tracking-wider font-semibold opacity-80">{s.label}</div>
+                              <div className="text-[13px] font-bold tabular-nums leading-tight">{fmt(a[s.key])}</div>
+                              <div className="text-[10px] tabular-nums opacity-80">{ap[s.key].toFixed(1)}%</div>
+                            </div>
+                          ))}
                         </div>
                       </td>
                       <td className="px-3 py-3 tabular-nums whitespace-nowrap">{p.accuracy}%</td>
                       <td className="px-3 py-3 whitespace-nowrap">
                         <Badge tone={reviewTone[rs]}>{rs}</Badge>
                       </td>
+                      <td className="px-3 py-3 max-w-[220px]">
+                        {actionByProject[p.id] ? (
+                          <span className="inline-flex items-center gap-1.5 text-[12px] text-destructive">
+                            <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
+                            <span className="truncate">{actionByProject[p.id]}</span>
+                          </span>
+                        ) : (
+                          <span className="text-[12px] text-muted-foreground">—</span>
+                        )}
+                      </td>
+
                       <td className="px-5 py-3 text-right">
                         <Button
                           size="sm"
