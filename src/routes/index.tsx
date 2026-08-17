@@ -225,14 +225,15 @@ function DashboardPage() {
                             <div
                               key={s.key}
                               title={`${s.label} · ${fmt(a[s.key])} (${ap[s.key].toFixed(1)}%)`}
-                              className={cn("rounded-md px-1.5 py-1 text-center", s.chip)}
+                              className={cn("flex items-center justify-center gap-1 rounded-md px-1 py-1", s.chip)}
                             >
-                              <div className="text-[9px] uppercase tracking-wider font-semibold opacity-80">{s.label[0]}</div>
-                              <div className="text-[12.5px] font-bold tabular-nums leading-tight">{fmt(a[s.key])}</div>
+                              <span className="text-[9.5px] uppercase font-bold opacity-70">{s.label[0]}</span>
+                              <span className="text-[11.5px] font-semibold tabular-nums leading-none">{ap[s.key].toFixed(1)}%</span>
                             </div>
                           ))}
                         </div>
                       </td>
+
                       <td className="px-3 py-3 tabular-nums whitespace-nowrap">{p.accuracy}%</td>
                       <td className="px-3 py-3 whitespace-nowrap">
                         <Badge tone={reviewTone[rs]}>{rs}</Badge>
