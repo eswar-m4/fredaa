@@ -47,7 +47,7 @@ const SUGGESTED_FIELDS = ["Company name", "Website", "HQ country", "Employee cou
 
 const EMPTY_DRAFT: Draft = {
   name: "",
-  urls: ["", "", ""],
+  urls: [""],
   fields: ["Company name", "Website", "HQ country"],
   fieldDraft: "",
   frequency: "Weekly",
