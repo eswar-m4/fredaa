@@ -186,7 +186,7 @@ function DashboardPage() {
                 <tr className="text-left text-[11px] uppercase tracking-wider text-muted-foreground border-b border-border">
                   <th className="px-5 py-2 font-semibold">Project</th>
                   <th className="px-3 py-2 font-semibold">Records</th>
-                  <th className="px-3 py-2 font-semibold w-[210px]">ADMV %</th>
+                  <th className="px-3 py-2 font-semibold w-[180px]">ADMV %</th>
                   <th className="px-3 py-2 font-semibold">Status</th>
                   <th className="px-5 py-2 font-semibold text-right">Review</th>
                 </tr>
@@ -201,7 +201,7 @@ function DashboardPage() {
                       onClick={() => setSelected(p.id)}
                       className={cn("border-b border-border/60 cursor-pointer hover:bg-secondary/40", p.id === active.id && "bg-info-bg/60")}
                     >
-                      <td className="px-5 py-3 min-w-[230px]">
+                      <td className="px-5 py-3 min-w-[200px]">
                         <div className="font-medium whitespace-nowrap">{p.name}</div>
                         <div className="text-[11px] text-muted-foreground">
                           {p.sources.length} sources · {p.datapoints.length} datapoints · {p.frequency}
@@ -210,7 +210,7 @@ function DashboardPage() {
                       <td className="px-3 py-3 tabular-nums">{compact(p.records)}</td>
                       <td className="px-3 py-3">
                         <AdmvBar a={a} />
-                        <div className="text-[10.5px] text-muted-foreground mt-1 tabular-nums whitespace-nowrap">
+                        <div className="text-[10px] text-muted-foreground mt-1 tabular-nums whitespace-nowrap">
                           A {ap.added.toFixed(1)} · D {ap.deleted.toFixed(1)} · M {ap.modified.toFixed(1)} · V {ap.verified.toFixed(1)}
                         </div>
                       </td>
