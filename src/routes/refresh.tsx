@@ -320,69 +320,95 @@ function RefreshPage() {
 
         {/* new project */}
         <div className="space-y-5">
-          <Card className="p-5 flex flex-col">
-            <SectionTitle hint="estimate generated instantly">Create a new project</SectionTitle>
-            <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-x-4 gap-y-3 mt-2">
-              <div className="md:col-span-2 xl:col-span-4">
-                <Label>Project name</Label>
-                <Input placeholder="e.g. APAC Competitor Pricing" value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />
+          <Card className="overflow-hidden">
+            <div className="flex flex-wrap items-center gap-3 px-5 py-3 border-b border-border bg-gradient-to-r from-primary/10 via-purple-bg/60 to-transparent">
+              <span className="h-9 w-9 rounded-lg bg-primary text-primary-foreground inline-flex items-center justify-center shrink-0">
+                <FolderPlus className="h-4.5 w-4.5" />
+              </span>
+              <div className="min-w-0">
+                <h3 className="text-[14px] font-semibold leading-tight">Create a new project</h3>
+                <p className="text-[11.5px] text-muted-foreground">Estimate generated instantly · admin notified on submit</p>
               </div>
+              <div className="ml-auto flex items-center gap-2">
+                <Badge tone="info">{draftUrlCount} sources</Badge>
+                <Badge tone="purple">{draftDatapoints} datapoints</Badge>
+              </div>
+            </div>
 
-              <div className="md:col-span-2">
-                <Label>Source URLs · {draft.urls.length}</Label>
-                <div className="flex flex-wrap gap-1.5 mb-2">
-                  {[1, 2, 3, 4, 5, 6, 8, 10].map((n) => (
-                    <button
-                      key={n}
-                      suppressHydrationWarning
-                      onClick={() =>
-                        setDraft((d) => ({
-                          ...d,
-                          urls: Array.from({ length: n }, (_, k) => d.urls[k] ?? ""),
-                        }))
-                      }
-                      className={cn(
-                        "h-8 w-9 rounded-md text-[12px] font-medium border transition",
-                        draft.urls.length === n
-                          ? "border-primary bg-primary text-primary-foreground"
-                          : "border-border bg-card text-muted-foreground hover:bg-secondary",
-                      )}
-                    >
-                      {n}
-                    </button>
-                  ))}
+            <div className="grid lg:grid-cols-3 gap-4 p-5">
+              {/* col 1 — identity + sources */}
+              <div className="space-y-3">
+                <div>
+                  <Label>
+                    <span className="inline-flex items-center gap-1.5">
+                      <Sparkles className="h-3.5 w-3.5 text-primary" /> Project name
+                    </span>
+                  </Label>
+                  <Input placeholder="e.g. APAC Competitor Pricing" value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />
                 </div>
-                <div className="space-y-2">
 
-                  {draft.urls.map((u, i) => (
-                    <div key={i} className="flex items-center gap-2">
-                      <span className="text-[11px] text-muted-foreground w-5 tabular-nums shrink-0">{i + 1}.</span>
-                      <Input
-                        className="flex-1 min-w-0"
-                        placeholder={`https://source-${i + 1}.example.com`}
-                        value={u}
-                        onChange={(e) => setUrl(i, e.target.value)}
-                      />
-                      <button
-                        onClick={() => setDraft((d) => ({ ...d, urls: d.urls.length > 1 ? d.urls.filter((_, k) => k !== i) : d.urls }))}
-                        title="Remove URL"
-                        className="h-9 w-9 shrink-0 rounded-md inline-flex items-center justify-center border border-border hover:bg-destructive/10 hover:text-destructive transition"
-                      >
-                        <X className="h-3.5 w-3.5" />
-                      </button>
+                <div className="rounded-lg border border-info/30 bg-info-bg/40 p-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="inline-flex items-center gap-1.5 text-[11px] uppercase tracking-wider font-semibold text-info">
+                      <Globe className="h-3.5 w-3.5" /> Source URLs · {draft.urls.length}
+                    </span>
+                    <div className="flex gap-1">
+                      {[1, 3, 5, 10].map((n) => (
+                        <button
+                          key={n}
+                          suppressHydrationWarning
+                          onClick={() => setDraft((d) => ({ ...d, urls: Array.from({ length: n }, (_, k) => d.urls[k] ?? "") }))}
+                          className={cn(
+                            "h-6 w-7 rounded-md text-[11px] font-semibold border transition",
+                            draft.urls.length === n
+                              ? "border-primary bg-primary text-primary-foreground"
+                              : "border-border bg-card text-muted-foreground hover:bg-secondary",
+                          )}
+                        >
+                          {n}
+                        </button>
+                      ))}
                     </div>
-                  ))}
+                  </div>
+                  <div className="space-y-1.5 max-h-[150px] overflow-y-auto pr-1">
+                    {draft.urls.map((u, i) => (
+                      <div key={i} className="flex items-center gap-1.5">
+                        <span className="h-6 w-6 shrink-0 rounded-md bg-card border border-border text-[10.5px] font-semibold tabular-nums inline-flex items-center justify-center text-muted-foreground">
+                          {i + 1}
+                        </span>
+                        <Input
+                          className="flex-1 min-w-0 h-8"
+                          placeholder={`https://source-${i + 1}.example.com`}
+                          value={u}
+                          onChange={(e) => setUrl(i, e.target.value)}
+                        />
+                        <button
+                          onClick={() => setDraft((d) => ({ ...d, urls: d.urls.length > 1 ? d.urls.filter((_, k) => k !== i) : d.urls }))}
+                          title="Remove URL"
+                          className="h-8 w-8 shrink-0 rounded-md inline-flex items-center justify-center border border-border bg-card hover:bg-destructive/10 hover:text-destructive transition"
+                        >
+                          <X className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                  <button
+                    onClick={() => setDraft((d) => ({ ...d, urls: [...d.urls, ""] }))}
+                    className="mt-2 inline-flex items-center gap-1 text-[11.5px] font-medium text-primary hover:underline"
+                  >
+                    <Plus className="h-3.5 w-3.5" /> Add another URL
+                  </button>
                 </div>
-                <Button size="sm" variant="outline" className="mt-2" onClick={() => setDraft((d) => ({ ...d, urls: [...d.urls, ""] }))}>
-                  <Plus className="h-3.5 w-3.5" /> Add URL
-                </Button>
               </div>
 
-              <div className="md:col-span-2">
-                <Label>Datapoints to extract · {draftDatapoints}</Label>
-                <div className="flex items-center gap-2">
+              {/* col 2 — datapoints */}
+              <div className="rounded-lg border border-purple-token/30 bg-purple-bg/40 p-3 flex flex-col">
+                <span className="inline-flex items-center gap-1.5 text-[11px] uppercase tracking-wider font-semibold text-purple-token mb-2">
+                  <CheckCircle2 className="h-3.5 w-3.5" /> Datapoints to extract · {draftDatapoints}
+                </span>
+                <div className="flex items-center gap-1.5">
                   <Input
-                    className="flex-1 min-w-0"
+                    className="flex-1 min-w-0 h-8"
                     placeholder="e.g. Employee count"
                     value={draft.fieldDraft}
                     onChange={(e) => setDraft({ ...draft, fieldDraft: e.target.value })}
@@ -394,26 +420,24 @@ function RefreshPage() {
                     }}
                   />
                   <Button size="sm" variant="outline" className="shrink-0" onClick={() => addField(draft.fieldDraft)}>
-                    <Plus className="h-3.5 w-3.5" /> Add datapoint
+                    <Plus className="h-3.5 w-3.5" /> Add
                   </Button>
                 </div>
-                {draft.fields.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5 mt-2">
-                    {draft.fields.map((f) => (
-                      <span key={f} className="inline-flex items-center gap-1 rounded-md border border-primary/40 bg-primary/5 pl-2.5 pr-1 h-7 text-[11.5px] font-medium">
-                        {f}
-                        <button
-                          onClick={() => setDraft((d) => ({ ...d, fields: d.fields.filter((x) => x !== f) }))}
-                          className="h-5 w-5 rounded inline-flex items-center justify-center hover:bg-destructive/10 hover:text-destructive transition"
-                          title="Remove datapoint"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
-                      </span>
-                    ))}
-                  </div>
-                )}
-                <div className="flex flex-wrap gap-1.5 mt-2">
+                <div className="flex flex-wrap gap-1.5 mt-2 max-h-[92px] overflow-y-auto pr-1">
+                  {draft.fields.map((f) => (
+                    <span key={f} className="inline-flex items-center gap-1 rounded-md border border-primary/40 bg-card pl-2.5 pr-1 h-7 text-[11.5px] font-medium">
+                      {f}
+                      <button
+                        onClick={() => setDraft((d) => ({ ...d, fields: d.fields.filter((x) => x !== f) }))}
+                        className="h-5 w-5 rounded inline-flex items-center justify-center hover:bg-destructive/10 hover:text-destructive transition"
+                        title="Remove datapoint"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+                <div className="flex flex-wrap gap-1.5 mt-auto pt-2 max-h-[76px] overflow-y-auto pr-1">
                   {SUGGESTED_FIELDS.filter((f) => !draft.fields.includes(f)).map((f) => (
                     <button
                       key={f}
@@ -426,56 +450,64 @@ function RefreshPage() {
                 </div>
               </div>
 
-              <div>
-                <Label>Frequency</Label>
-                <Select value={draft.frequency} onChange={(e) => setDraft({ ...draft, frequency: e.target.value as Project["frequency"] })}>
-                  <option value="Daily">Daily</option>
-                  <option value="Weekly">Weekly</option>
-                  <option value="Monthly">Monthly</option>
-                </Select>
-              </div>
-              <div>
-                <Label>Delivery format</Label>
-                <Select value={draft.format} onChange={(e) => setDraft({ ...draft, format: e.target.value })}>
-                  <option value="CSV">CSV drop</option>
-                  <option value="JSON API">JSON API</option>
-                  <option value="Snowflake">Snowflake share</option>
-                  <option value="S3">S3 bucket</option>
-                </Select>
-              </div>
-              <div>
-                <Label>Business owner (notified)</Label>
-                <Input placeholder="name@company.com" value={draft.owner} onChange={(e) => setDraft({ ...draft, owner: e.target.value })} />
-              </div>
-              <div>
-                <Label>Notes for delivery team</Label>
-                <Input placeholder="Regions, exclusions, QA rules…" value={draft.notes} onChange={(e) => setDraft({ ...draft, notes: e.target.value })} />
-              </div>
-            </div>
-
-            <div className="mt-auto pt-4">
-              <div className="rounded-lg border border-border bg-secondary/40 p-4">
-
-
-              <div className="flex items-center gap-1.5 text-[12px] font-semibold">
-                <Sparkles className="h-3.5 w-3.5 text-primary" /> Live estimate · {draftUrlCount} sources · {draftDatapoints} datapoints
-              </div>
-              <div className="grid grid-cols-3 gap-3 mt-2">
-                <Est label="Setup" value={`${draftEstimate.setupDays} days`} />
-                <Est label="First run" value={`${draftEstimate.firstRunHrs} hrs`} />
-                <Est label="Records / mo" value={fmt(draftEstimate.monthlyRecords)} />
-              </div>
-              <div className="flex flex-wrap items-center justify-between gap-2 mt-3">
-                <div className="text-[11px] text-muted-foreground inline-flex items-center gap-1">
-                  <Send className="h-3 w-3" /> Submitting notifies your FreDA admin and delivery lead automatically.
+              {/* col 3 — delivery + estimate */}
+              <div className="space-y-3 flex flex-col">
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <Label>
+                      <span className="inline-flex items-center gap-1.5">
+                        <CalendarClock className="h-3.5 w-3.5 text-info" /> Frequency
+                      </span>
+                    </Label>
+                    <Select value={draft.frequency} onChange={(e) => setDraft({ ...draft, frequency: e.target.value as Project["frequency"] })}>
+                      <option value="Daily">Daily</option>
+                      <option value="Weekly">Weekly</option>
+                      <option value="Monthly">Monthly</option>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label>
+                      <span className="inline-flex items-center gap-1.5">
+                        <Send className="h-3.5 w-3.5 text-success" /> Format
+                      </span>
+                    </Label>
+                    <Select value={draft.format} onChange={(e) => setDraft({ ...draft, format: e.target.value })}>
+                      <option value="CSV">CSV drop</option>
+                      <option value="JSON API">JSON API</option>
+                      <option value="Snowflake">Snowflake share</option>
+                      <option value="S3">S3 bucket</option>
+                    </Select>
+                  </div>
                 </div>
-                <Button size="sm" onClick={submitProject} disabled={!draft.name.trim()}>
-                  <FolderPlus className="h-3.5 w-3.5" /> Submit for estimate
-                </Button>
-              </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <Label>Business owner</Label>
+                    <Input placeholder="name@company.com" value={draft.owner} onChange={(e) => setDraft({ ...draft, owner: e.target.value })} />
+                  </div>
+                  <div>
+                    <Label>Notes</Label>
+                    <Input placeholder="Regions, QA rules…" value={draft.notes} onChange={(e) => setDraft({ ...draft, notes: e.target.value })} />
+                  </div>
+                </div>
+
+                <div className="mt-auto rounded-lg border border-primary/30 bg-gradient-to-br from-primary/10 to-transparent p-3">
+                  <div className="flex items-center gap-1.5 text-[12px] font-semibold">
+                    <Sparkles className="h-3.5 w-3.5 text-primary" /> Live estimate
+                  </div>
+                  <div className="grid grid-cols-3 gap-2 mt-2">
+                    <Est label="Setup" value={`${draftEstimate.setupDays} days`} />
+                    <Est label="First run" value={`${draftEstimate.firstRunHrs} hrs`} />
+                    <Est label="Records / mo" value={fmt(draftEstimate.monthlyRecords)} />
+                  </div>
+                  <Button size="sm" className="w-full mt-3" onClick={submitProject} disabled={!draft.name.trim()}>
+                    <FolderPlus className="h-3.5 w-3.5" /> Submit for estimate
+                  </Button>
+                  <p className="text-[10.5px] text-muted-foreground mt-1.5 text-center">Notifies your FreDA admin and delivery lead automatically.</p>
+                </div>
               </div>
             </div>
           </Card>
+
 
 
           <Card className="p-5 flex flex-col">
