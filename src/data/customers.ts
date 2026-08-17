@@ -4,9 +4,20 @@
  * Deterministic (hash based) so server and client render identical values.
  */
 
+export type ProjectStatus = "In sync" | "Review pending" | "Syncing" | "Needs attention";
+
 export type ChangeType = "Added" | "Deleted" | "Modified" | "Verified";
 
 export type AdmvCounts = { added: number; deleted: number; modified: number; verified: number };
+
+export type SourceRef = {
+  id: string;
+  label: string;
+  url: string;
+  status: "Live" | "Paused" | "Pending approval";
+  records: number;
+  addedOn: string;
+};
 
 export type ProjectHistoryPoint = { label: string; records: number; accuracy: number };
 
@@ -17,6 +28,7 @@ export type Project = {
   source: string;
   websiteUrl: string;
   datapoints: string[];
+  sources: SourceRef[];
   records: number;
   admv: AdmvCounts;
   freshness: number;
@@ -25,7 +37,7 @@ export type Project = {
   frequency: "Daily" | "Weekly" | "Monthly";
   lastRefreshHrs: number;
   nextRefreshHrs: number;
-  status: "Healthy" | "Review pending" | "Refreshing" | "Attention";
+  status: ProjectStatus;
   pendingReview: number;
   history: ProjectHistoryPoint[];
 };
@@ -200,6 +212,20 @@ const SPECS: Spec[] = [
   },
 ];
 
+const SOURCE_SUFFIX = ["primary site", "regional mirror", "partner portal", "public registry", "listing directory", "press feed"];
+
+function buildSources(id: string, p: Spec["projects"][number], records: number): SourceRef[] {
+  const n = int(`${id}-nsrc`, 2, 5);
+  return Array.from({ length: n }, (_, i) => ({
+    id: `${id}-s${i + 1}`,
+    label: i === 0 ? p.source : `${p.source} — ${SOURCE_SUFFIX[(hash(id + i) % SOURCE_SUFFIX.length)]}`,
+    url: p.url,
+    status: (i === n - 1 && hash(id + "st" + i) % 4 === 0 ? "Pending approval" : hash(id + "st" + i) % 7 === 0 ? "Paused" : "Live") as SourceRef["status"],
+    records: Math.round(records / n),
+    addedOn: pick(`${id}-add${i}`, ["Jan 2024", "Apr 2024", "Aug 2024", "Nov 2024", "Feb 2025", "Jun 2025"]),
+  }));
+}
+
 function buildProject(spec: Spec, p: Spec["projects"][number], idx: number): Project {
   const id = `${spec.id}-p${idx + 1}`;
   const records = p.records;
@@ -207,7 +233,7 @@ function buildProject(spec: Spec, p: Spec["projects"][number], idx: number): Pro
   const deleted = int(`${id}-d`, records * 0.001, records * 0.006);
   const modified = int(`${id}-m`, records * 0.01, records * 0.05);
   const verified = records - added - deleted - modified;
-  const status = pick(`${id}-s`, ["Healthy", "Review pending", "Refreshing", "Healthy", "Attention", "Review pending"] as Project["status"][]);
+  const status = pick(`${id}-s`, ["In sync", "Review pending", "Syncing", "In sync", "Needs attention", "Review pending"] as ProjectStatus[]);
   const gap = p.freq === "Daily" ? 24 : p.freq === "Weekly" ? 168 : 720;
   const lastRefreshHrs = Number(rnd(`${id}-lr`, 0.4, gap * 0.6).toFixed(1));
 
@@ -224,7 +250,8 @@ function buildProject(spec: Spec, p: Spec["projects"][number], idx: number): Pro
     name: p.name,
     source: p.source,
     websiteUrl: p.url,
-    datapoints: DP_SETS[spec.dpSet]!,
+    datapoints: DP_SETS[spec.dpSet]!.slice(0, int(`${id}-dp`, 8, 20)),
+    sources: buildSources(id, p, records),
     records,
     admv: { added, deleted, modified, verified },
     freshness: Math.max(62, Math.round(100 - (lastRefreshHrs / gap) * 34)),
@@ -234,7 +261,7 @@ function buildProject(spec: Spec, p: Spec["projects"][number], idx: number): Pro
     lastRefreshHrs,
     nextRefreshHrs: Number((gap - lastRefreshHrs).toFixed(1)),
     status,
-    pendingReview: status === "Healthy" ? int(`${id}-pr`, 0, 40) : int(`${id}-pr`, 60, 900),
+    pendingReview: status === "In sync" ? int(`${id}-pr`, 0, 40) : int(`${id}-pr`, 60, 900),
     history,
   };
 }
@@ -365,7 +392,7 @@ export function actionsFor(customer: Customer): ActionItem[] {
       project: p.name,
       action: templates[hash(p.id + "act") % templates.length]!,
       records: Math.max(12, Math.round(p.pendingReview * 0.6)),
-      priority: (p.status === "Attention" ? "Critical" : p.pendingReview > 400 ? "High" : "Medium") as ActionItem["priority"],
+      priority: (p.status === "Needs attention" ? "Critical" : p.pendingReview > 400 ? "High" : "Medium") as ActionItem["priority"],
       age: pick(p.id + "age", ["Today", "Today", "2 days ago", "5 days ago", "Last week"]),
       _i: i,
     }))
