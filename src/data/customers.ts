@@ -62,6 +62,7 @@ export type ReviewRecord = {
   changeType: ChangeType;
   confidence: number;
   source: string;
+  sourceUrl: string;
   detectedHrs: number;
 };
 
@@ -354,6 +355,10 @@ export function reviewRecordsFor(project: Project, count = 24): ReviewRecord[] {
     const seed = `${project.id}-rr-${i}`;
     const datapoint = project.datapoints[hash(seed + "dp") % project.datapoints.length]!;
     const changeType = pick(seed + "ct", ["Modified", "Modified", "Added", "Deleted", "Verified"] as ChangeType[]);
+    const src = project.sources[hash(seed + "src") % Math.max(1, project.sources.length)] ?? {
+      label: project.source,
+      url: `https://${project.source}`,
+    };
     const oldValue = changeType === "Added" ? "—" : valueFor(datapoint, seed + "old");
     const newValue = changeType === "Deleted" ? "—" : valueFor(datapoint, seed + "new");
     return {
@@ -365,7 +370,8 @@ export function reviewRecordsFor(project: Project, count = 24): ReviewRecord[] {
       newValue,
       changeType,
       confidence: Number(rnd(seed + "cf", 71, 99.5).toFixed(1)),
-      source: project.source,
+      source: src.label,
+      sourceUrl: src.url,
       detectedHrs: Number(rnd(seed + "dt", 0.3, 48).toFixed(1)),
     };
   });
