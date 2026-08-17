@@ -134,7 +134,7 @@ function RefreshPage() {
 
         <div className="grid xl:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)] gap-5 items-start">
           {/* project list */}
-          <Card className="overflow-hidden flex flex-col h-[540px]">
+          <Card className="overflow-hidden flex flex-col min-h-[420px] max-h-[560px]">
             <div className="px-5 pt-4 pb-3 border-b border-border shrink-0">
               <h3 className="text-[13px] font-semibold uppercase tracking-wider text-muted-foreground">Projects</h3>
               <p className="text-[12px] text-muted-foreground mt-1">Select a project to manage its sources and schedule.</p>
@@ -164,7 +164,7 @@ function RefreshPage() {
           </Card>
 
           {/* manage selected project */}
-          <Card className="p-5 flex flex-col h-[540px]">
+          <Card className="p-5 flex flex-col min-h-[420px] max-h-[560px]">
             <SectionTitle hint={`${sources.length} sources`}>Manage — {project.name}</SectionTitle>
 
             <div className="flex items-center gap-2 mb-3">
