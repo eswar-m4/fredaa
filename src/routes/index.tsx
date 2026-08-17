@@ -353,7 +353,7 @@ function Mini({ label, value }: { label: string; value: string }) {
 }
 
 function MixRow({ label, sub, a, emphasis = false }: { label: string; sub: string; a: AdmvCounts; emphasis?: boolean }) {
-  const p = admvPct(a);
+  
   const total = a.added + a.deleted + a.modified + a.verified || 1;
   return (
     <div
