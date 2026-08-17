@@ -9,6 +9,10 @@ import {
   TrendingUp,
   AlertTriangle,
   Clock,
+  PlusCircle,
+  MinusCircle,
+  PencilLine,
+  BadgeCheck,
 } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
 import {
