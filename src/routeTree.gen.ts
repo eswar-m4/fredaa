@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AnySiteRouteImport } from './routes/any-site'
+import { Route as AskFredaRouteImport } from './routes/ask-freda'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as DiscoverRouteImport } from './routes/discover'
 import { Route as ExportRouteImport } from './routes/export'
@@ -35,6 +36,11 @@ const AdminRoute = AdminRouteImport.update({
 const AnySiteRoute = AnySiteRouteImport.update({
   id: '/any-site',
   path: '/any-site',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AskFredaRoute = AskFredaRouteImport.update({
+  id: '/ask-freda',
+  path: '/ask-freda',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -87,6 +93,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/any-site': typeof AnySiteRoute
+  '/ask-freda': typeof AskFredaRoute
   '/dashboard': typeof DashboardRoute
   '/discover': typeof DiscoverRoute
   '/export': typeof ExportRoute
@@ -101,6 +108,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/any-site': typeof AnySiteRoute
+  '/ask-freda': typeof AskFredaRoute
   '/dashboard': typeof DashboardRoute
   '/discover': typeof DiscoverRoute
   '/export': typeof ExportRoute
@@ -116,6 +124,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/any-site': typeof AnySiteRoute
+  '/ask-freda': typeof AskFredaRoute
   '/dashboard': typeof DashboardRoute
   '/discover': typeof DiscoverRoute
   '/export': typeof ExportRoute
@@ -132,6 +141,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/any-site'
+    | '/ask-freda'
     | '/dashboard'
     | '/discover'
     | '/export'
@@ -146,6 +156,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/any-site'
+    | '/ask-freda'
     | '/dashboard'
     | '/discover'
     | '/export'
@@ -160,6 +171,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/any-site'
+    | '/ask-freda'
     | '/dashboard'
     | '/discover'
     | '/export'
@@ -175,6 +187,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
   AnySiteRoute: typeof AnySiteRoute
+  AskFredaRoute: typeof AskFredaRoute
   DashboardRoute: typeof DashboardRoute
   DiscoverRoute: typeof DiscoverRoute
   ExportRoute: typeof ExportRoute
@@ -207,6 +220,13 @@ declare module '@tanstack/react-router' {
       path: '/any-site'
       fullPath: '/any-site'
       preLoaderRoute: typeof AnySiteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ask-freda': {
+      id: '/ask-freda'
+      path: '/ask-freda'
+      fullPath: '/ask-freda'
+      preLoaderRoute: typeof AskFredaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -279,6 +299,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   AnySiteRoute: AnySiteRoute,
+  AskFredaRoute: AskFredaRoute,
   DashboardRoute: DashboardRoute,
   DiscoverRoute: DiscoverRoute,
   ExportRoute: ExportRoute,

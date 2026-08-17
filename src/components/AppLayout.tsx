@@ -2,69 +2,39 @@ import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { ReactNode, useState, useEffect } from "react";
 import {
   LayoutDashboard,
-  Target,
-  Globe2,
-  Library,
-  BarChart3,
-  Workflow as WorkflowIcon,
   Activity,
-  CheckSquare,
   Upload,
   Bell,
   HelpCircle,
-  GitBranch,
-  RefreshCw,
+  MessageSquare,
   PanelLeft,
-  Compass,
+  ChevronsUpDown,
   Sun,
   Moon,
 } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { setUseCase, useUseCase, USE_CASES } from "@/lib/useCase";
 import { fetchSession, logoutRequest, type SessionInfo } from "@/lib/auth";
-import { seedDemoJobs } from "@/data/demo-jobs";
+import { CUSTOMERS } from "@/data/customers";
+import { setActiveCustomer, useActiveCustomer } from "@/lib/workspace";
 import fredaLogo from "@/assets/freda-mobius-bold.png";
 
-type NavItem = { to: string; label: string; icon: typeof Target; hash?: string };
+type NavItem = { to: string; label: string; icon: typeof Activity; hash?: string };
 type NavGroup = { group: string; items: NavItem[] };
 
-const BASE: NavGroup = {
-  group: "OVERVIEW",
-  items: [{ to: "/", label: "Playbooks", icon: LayoutDashboard }],
-};
-
-const TARGETED: NavGroup = {
-  group: "AGENTS",
+const WORKSPACE: NavGroup = {
+  group: "WORKSPACE",
   items: [
-    { to: "/site-specific", label: "Sources & Agents", icon: Library },
-  ],
-};
-
-
-
-const OPENWEB: NavGroup = {
-  group: "SOLUTIONS",
-  items: [
-    { to: "/any-site", label: "Dataset Setup", icon: GitBranch },
-  ],
-};
-
-const DISCOVERY: NavGroup = {
-  group: "ASK FREDA",
-  items: [
-    { to: "/discover", label: "Ask Freda", icon: Compass },
-  ],
-};
-
-const OPERATE: NavGroup = {
-  group: "OPERATE",
-  items: [
-    { to: "/monitoring", label: "Monitoring", icon: Activity },
-    { to: "/review", label: "Review", icon: CheckSquare },
-    { to: "/dashboard", label: "Dashboard", icon: BarChart3 },
+    { to: "/", label: "Dashboard & Review", icon: LayoutDashboard },
+    { to: "/monitoring", label: "Monitoring & Refresh", icon: Activity },
     { to: "/export", label: "Export & Sync", icon: Upload },
   ],
 };
+
+const ASSIST: NavGroup = {
+  group: "ASSISTANT",
+  items: [{ to: "/ask-freda", label: "Ask FreDA", icon: MessageSquare }],
+};
+
 
 export function AppLayout({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
