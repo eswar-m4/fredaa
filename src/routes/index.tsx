@@ -97,8 +97,6 @@ function DashboardPage() {
   const pendingScaled = Math.round(stats.pendingReview * Math.min(1.6, factor));
 
   const actions = useMemo(() => actionsFor(customer), [customer.id]);
-  const windowDays = rangeDays(range);
-  const visibleActions = actions.filter((a) => (scope === "all" || a.projectId === scope) && a.ageDays < windowDays);
   const actionByProject = useMemo(() => {
     const m: Record<string, string> = {};
     for (const a of actions) if (!m[a.projectId]) m[a.projectId] = a.action;
@@ -155,8 +153,14 @@ function DashboardPage() {
             ADMV — change signature
           </SectionTitle>
 
-
-
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mb-3">
+            {SEGMENTS.map((s) => (
+              <span key={s.key} className="inline-flex items-center gap-2 text-[12px] text-muted-foreground">
+                <span className={cn("h-2.5 w-2.5 rounded-sm", s.dot)} />
+                {s.label}
+              </span>
+            ))}
+          </div>
 
           <div className="rounded-lg border border-border overflow-hidden">
             <MixRow label="All projects in scope" sub={`${scoped.length} projects · ${fmt(totalChanges)} records`} a={admv} emphasis />
@@ -170,6 +174,7 @@ function DashboardPage() {
             ))}
           </div>
         </Card>
+
 
         {/* Review by project — full width */}
         <Card className="overflow-hidden">
@@ -187,7 +192,7 @@ function DashboardPage() {
                   <th className="px-5 py-2 font-semibold">Project</th>
                   <th className="px-3 py-2 font-semibold">Records</th>
                   <th className="px-3 py-2 font-semibold">Pending</th>
-                  <th className="px-3 py-2 font-semibold min-w-[300px]">ADMV</th>
+                  <th className="px-3 py-2 font-semibold w-[210px]">ADMV</th>
                   <th className="px-3 py-2 font-semibold">Accuracy</th>
                   <th className="px-3 py-2 font-semibold">Review status</th>
                   <th className="px-3 py-2 font-semibold">Action needed</th>
@@ -206,7 +211,7 @@ function DashboardPage() {
                       onClick={() => setSelected(p.id)}
                       className={cn("border-b border-border/60 cursor-pointer hover:bg-secondary/40", p.id === active.id && "bg-info-bg/60")}
                     >
-                      <td className="px-5 py-3 min-w-[220px]">
+                      <td className="px-5 py-3 min-w-[200px]">
                         <div className="font-medium whitespace-nowrap">{p.name}</div>
                         <div className="text-[11px] text-muted-foreground whitespace-nowrap">
                           {p.sources.length} sources · {p.datapoints.length} datapoints · {p.frequency}
@@ -215,12 +220,15 @@ function DashboardPage() {
                       <td className="px-3 py-3 tabular-nums whitespace-nowrap">{fmt(p.records)}</td>
                       <td className="px-3 py-3 tabular-nums whitespace-nowrap">{fmt(p.pendingReview)}</td>
                       <td className="px-3 py-3">
-                        <div className="grid grid-cols-4 gap-1.5 min-w-[300px]">
+                        <div className="grid grid-cols-4 gap-1 w-[200px]">
                           {SEGMENTS.map((s) => (
-                            <div key={s.key} className={cn("rounded-md px-2 py-1.5 text-center", s.chip)}>
-                              <div className="text-[9.5px] uppercase tracking-wider font-semibold opacity-80">{s.label}</div>
-                              <div className="text-[13px] font-bold tabular-nums leading-tight">{fmt(a[s.key])}</div>
-                              <div className="text-[10px] tabular-nums opacity-80">{ap[s.key].toFixed(1)}%</div>
+                            <div
+                              key={s.key}
+                              title={`${s.label} · ${fmt(a[s.key])} (${ap[s.key].toFixed(1)}%)`}
+                              className={cn("rounded-md px-1.5 py-1 text-center", s.chip)}
+                            >
+                              <div className="text-[9px] uppercase tracking-wider font-semibold opacity-80">{s.label[0]}</div>
+                              <div className="text-[12.5px] font-bold tabular-nums leading-tight">{fmt(a[s.key])}</div>
                             </div>
                           ))}
                         </div>
@@ -229,7 +237,7 @@ function DashboardPage() {
                       <td className="px-3 py-3 whitespace-nowrap">
                         <Badge tone={reviewTone[rs]}>{rs}</Badge>
                       </td>
-                      <td className="px-3 py-3 max-w-[220px]">
+                      <td className="px-3 py-3 max-w-[180px]">
                         {actionByProject[p.id] ? (
                           <span className="inline-flex items-center gap-1.5 text-[12px] text-destructive">
                             <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
@@ -250,7 +258,7 @@ function DashboardPage() {
                             setReviewProject(p);
                           }}
                         >
-                          {p.pendingReview > 0 ? `${fmt(p.pendingReview)} to review` : "View records"}
+                          {p.pendingReview > 0 ? `Review ${fmt(p.pendingReview)}` : "View"}
                         </Button>
                       </td>
                     </tr>
@@ -259,78 +267,6 @@ function DashboardPage() {
               </tbody>
             </table>
           </div>
-        </Card>
-
-        {/* Action needed — separate full-width section */}
-        <Card className="overflow-hidden">
-          <div className="px-5 pt-4 pb-3 border-b border-border flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <h3 className="text-[13px] font-semibold uppercase tracking-wider text-muted-foreground">Action needed</h3>
-              <p className="text-[12px] text-muted-foreground mt-1">
-                Attention flags, duplicates and source issues raised in {rangeLabel(range)} — resolve from here.
-              </p>
-            </div>
-            <div className="flex items-center gap-2">
-              <Badge tone="destructive">{visibleActions.filter((a) => a.priority === "Critical").length} critical</Badge>
-              <Badge tone="warning">{visibleActions.length} open</Badge>
-            </div>
-          </div>
-          {visibleActions.length === 0 ? (
-            <div className="p-8 text-center text-[12.5px] text-muted-foreground">Nothing outstanding for this project and time window.</div>
-          ) : (
-            <div className="overflow-x-auto max-h-[360px] overflow-y-auto">
-              <table className="w-full text-[12.5px]">
-                <thead className="sticky top-0 bg-card border-b border-border z-10">
-                  <tr className="text-left text-[11px] uppercase tracking-wider text-muted-foreground">
-                    <th className="px-5 py-2 font-semibold">Action</th>
-                    <th className="px-3 py-2 font-semibold">Project</th>
-                    <th className="px-3 py-2 font-semibold">Records</th>
-                    <th className="px-3 py-2 font-semibold">Attention</th>
-                    <th className="px-3 py-2 font-semibold">Priority</th>
-                    <th className="px-3 py-2 font-semibold">Raised</th>
-                    <th className="px-5 py-2 font-semibold text-right">Resolve</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {visibleActions.map((a) => {
-                    const proj = customer.projects.find((p) => p.id === a.projectId);
-                    const attention = proj?.status === "Needs attention";
-                    return (
-                      <tr key={a.id} className="border-b border-border/60 hover:bg-secondary/40">
-                        <td className="px-5 py-2.5">
-                          <div className="flex items-center gap-2">
-                            <span
-                              className={cn(
-                                "h-7 w-7 rounded-md inline-flex items-center justify-center shrink-0",
-                                a.priority === "Critical" ? "bg-destructive/10 text-destructive" : a.priority === "High" ? "bg-warning-bg text-warning" : "bg-info-bg text-info",
-                              )}
-                            >
-                              <AlertTriangle className="h-3.5 w-3.5" />
-                            </span>
-                            <span className="font-medium">{a.action}</span>
-                          </div>
-                        </td>
-                        <td className="px-3 py-2.5 text-muted-foreground max-w-[240px] truncate">{a.project}</td>
-                        <td className="px-3 py-2.5 tabular-nums">{fmt(a.records)}</td>
-                        <td className="px-3 py-2.5">
-                          <Badge tone={attention ? "destructive" : "neutral"}>{attention ? "Needs attention" : "Monitored"}</Badge>
-                        </td>
-                        <td className="px-3 py-2.5">
-                          <Badge tone={a.priority === "Critical" ? "destructive" : a.priority === "High" ? "warning" : "info"}>{a.priority}</Badge>
-                        </td>
-                        <td className="px-3 py-2.5 text-muted-foreground whitespace-nowrap">{a.age}</td>
-                        <td className="px-5 py-2.5 text-right">
-                          <Button size="sm" variant="outline" onClick={() => setReviewProject(proj ?? null)}>
-                            Resolve
-                          </Button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
         </Card>
 
         {/* Solution development in progress */}
@@ -449,15 +385,17 @@ function MixRow({ label, sub, a, emphasis = false }: { label: string; sub: strin
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-1.5 justify-start lg:justify-end">
-        {SEGMENTS.map((s) => (
-          <span key={s.key} className={cn("inline-flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-medium tabular-nums", s.chip)}>
-            <span className="opacity-70">{s.label[0]}</span>
-            {fmt(a[s.key])}
-            <span className="opacity-70">· {p[s.key].toFixed(1)}%</span>
-          </span>
-        ))}
-      </div>
+      {!emphasis && (
+        <div className="flex flex-wrap gap-1.5 justify-start lg:justify-end">
+          {SEGMENTS.map((s) => (
+            <span key={s.key} className={cn("inline-flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-medium tabular-nums", s.chip)}>
+              <span className="opacity-70">{s.label[0]}</span>
+              {fmt(a[s.key])}
+              <span className="opacity-70">· {p[s.key].toFixed(1)}%</span>
+            </span>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
