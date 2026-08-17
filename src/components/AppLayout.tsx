@@ -25,8 +25,8 @@ const WORKSPACE: NavGroup = {
   group: "WORKSPACE",
   items: [
     { to: "/", label: "Dashboard", icon: LayoutDashboard },
-    { to: "/monitoring", label: "Monitoring & Delivery", icon: Activity },
-    { to: "/refresh", label: "Refresh & Projects", icon: RefreshCw },
+    { to: "/monitoring", label: "Monitoring", icon: Activity },
+    { to: "/refresh", label: "Projects Refresh", icon: RefreshCw },
   ],
 };
 
@@ -305,13 +305,13 @@ export function AppLayout({ children }: { children: ReactNode }) {
                       </div>
                     </div>
                     <div>
-                      <div className="font-medium text-foreground">Monitoring &amp; Delivery</div>
+                      <div className="font-medium text-foreground">Monitoring</div>
                       <div className="text-muted-foreground text-xs">
                         Watch job automation runs and manage export or sync destinations.
                       </div>
                     </div>
                     <div>
-                      <div className="font-medium text-foreground">Refresh &amp; Projects</div>
+                      <div className="font-medium text-foreground">Projects Refresh</div>
                       <div className="text-muted-foreground text-xs">
                         Add or remove sources, create projects, and see build estimates instantly.
                       </div>

@@ -11,12 +11,12 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/refresh")({
   head: () => ({
     meta: [
-      { title: "Refresh & Projects — FreDA" },
+      { title: "Projects Refresh — FreDA" },
       {
         name: "description",
         content: "Create, manage and schedule extraction projects, add or remove sources, and get instant build estimates sent to your FreDA admin.",
       },
-      { property: "og:title", content: "Refresh & Projects — FreDA" },
+      { property: "og:title", content: "Projects Refresh — FreDA" },
       {
         property: "og:description",
         content: "Create, manage and schedule extraction projects, add or remove sources, and get instant build estimates sent to your FreDA admin.",
@@ -81,7 +81,7 @@ function RefreshPage() {
   return (
     <AppLayout>
       <PageHeader
-        title="Refresh & projects"
+        title="Projects Refresh"
         subtitle={`${customer.name} · create, manage and schedule extraction projects · ${customer.projects.length} live`}
         actions={
           <Button size="sm" variant="outline" onClick={() => setNotice("Full re-extraction queued for all projects.")}>
