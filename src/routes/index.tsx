@@ -225,19 +225,20 @@ function DashboardPage() {
                             <div
                               key={s.key}
                               title={`${s.label} · ${fmt(a[s.key])} (${ap[s.key].toFixed(1)}%)`}
-                              className={cn("rounded-md px-1.5 py-1 text-center", s.chip)}
+                              className={cn("flex items-center justify-center gap-1 rounded-md px-1 py-1", s.chip)}
                             >
-                              <div className="text-[9px] uppercase tracking-wider font-semibold opacity-80">{s.label[0]}</div>
-                              <div className="text-[12.5px] font-bold tabular-nums leading-tight">{fmt(a[s.key])}</div>
+                              <span className="text-[9.5px] uppercase font-bold opacity-70">{s.label[0]}</span>
+                              <span className="text-[11.5px] font-semibold tabular-nums leading-none">{ap[s.key].toFixed(1)}%</span>
                             </div>
                           ))}
                         </div>
                       </td>
+
                       <td className="px-3 py-3 tabular-nums whitespace-nowrap">{p.accuracy}%</td>
                       <td className="px-3 py-3 whitespace-nowrap">
                         <Badge tone={reviewTone[rs]}>{rs}</Badge>
                       </td>
-                      <td className="px-3 py-3 max-w-[180px]">
+                      <td className="px-3 py-3 w-[190px] max-w-[190px]">
                         {actionByProject[p.id] ? (
                           <span className="inline-flex items-center gap-1.5 text-[12px] text-destructive">
                             <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
@@ -385,17 +386,19 @@ function MixRow({ label, sub, a, emphasis = false }: { label: string; sub: strin
         </div>
       </div>
 
-      {!emphasis && (
-        <div className="flex flex-wrap gap-1.5 justify-start lg:justify-end">
-          {SEGMENTS.map((s) => (
-            <span key={s.key} className={cn("inline-flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-medium tabular-nums", s.chip)}>
-              <span className="opacity-70">{s.label[0]}</span>
-              {fmt(a[s.key])}
-              <span className="opacity-70">· {p[s.key].toFixed(1)}%</span>
-            </span>
-          ))}
-        </div>
-      )}
+      <div className="grid grid-cols-4 gap-1.5 lg:w-[480px] lg:justify-self-end">
+        {SEGMENTS.map((s) => (
+          <span
+            key={s.key}
+            className={cn("flex items-center justify-center gap-1 px-1.5 py-1 rounded-md text-[10.5px] font-medium tabular-nums whitespace-nowrap", s.chip)}
+          >
+            <span className="opacity-70">{s.label[0]}</span>
+            {fmt(a[s.key])}
+            <span className="opacity-70">· {p[s.key].toFixed(1)}%</span>
+          </span>
+        ))}
+      </div>
+
     </div>
   );
 }

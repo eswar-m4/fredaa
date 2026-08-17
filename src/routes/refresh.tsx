@@ -7,16 +7,20 @@ import { useActiveCustomer } from "@/lib/workspace";
 import { estimate, fmt, requestsFor, type ChangeRequest, type Project, type SourceRef } from "@/data/customers";
 import { statusTone } from "@/routes/index";
 import { cn } from "@/lib/utils";
+import { ATTRIBUTES } from "@/data/attributes";
+
+const ATTRIBUTE_CHOICES: string[] = ATTRIBUTES.map((a) => a.label);
+
 
 export const Route = createFileRoute("/refresh")({
   head: () => ({
     meta: [
-      { title: "Projects Refresh — FreDA" },
+      { title: "Projects — FreDA" },
       {
         name: "description",
         content: "Create, manage and schedule extraction projects, add or remove sources, and get instant build estimates sent to your FreDA admin.",
       },
-      { property: "og:title", content: "Projects Refresh — FreDA" },
+      { property: "og:title", content: "Projects — FreDA" },
       {
         property: "og:description",
         content: "Create, manage and schedule extraction projects, add or remove sources, and get instant build estimates sent to your FreDA admin.",
@@ -60,6 +64,9 @@ function RefreshPage() {
   const [extra, setExtra] = useState<Record<string, SourceRef[]>>({});
   const [removed, setRemoved] = useState<Record<string, string[]>>({});
   const [newSource, setNewSource] = useState("");
+  const [sourceAttrs, setSourceAttrs] = useState<string[]>([]);
+  const [attrsBySource, setAttrsBySource] = useState<Record<string, string[]>>({});
+
   const [schedule, setSchedule] = useState<Record<string, Project["frequency"]>>({});
   const [notice, setNotice] = useState("");
   const [raised, setRaised] = useState<ChangeRequest[]>([]);
@@ -97,7 +104,7 @@ function RefreshPage() {
 
   function addSource() {
     const url = newSource.trim();
-    if (!url) return;
+    if (!url || sourceAttrs.length === 0) return;
     const id = `${project.id}-new-${Date.now()}`;
     setExtra((e) => ({
       ...e,
@@ -106,10 +113,17 @@ function RefreshPage() {
         { id, label: url.replace(/^https?:\/\//, ""), url, status: "Pending approval", records: 0, addedOn: "Just now" },
       ],
     }));
-    logRequest("Add source", `Add source ${url.replace(/^https?:\/\//, "")}`, sourceEstimate.setupDays);
+    setAttrsBySource((m) => ({ ...m, [id]: sourceAttrs }));
+    logRequest(
+      "Add source",
+      `Add source ${url.replace(/^https?:\/\//, "")} · ${sourceAttrs.length} attributes (${sourceAttrs.slice(0, 3).join(", ")}${sourceAttrs.length > 3 ? "…" : ""})`,
+      sourceEstimate.setupDays,
+    );
     setNewSource("");
-    setNotice(`Source queued as ${nextReqId()} — estimate generated and sent to your FreDA admin for approval.`);
+    setSourceAttrs([]);
+    setNotice(`Source queued as ${nextReqId()} with ${sourceAttrs.length} data attributes — estimate sent to your FreDA admin for approval.`);
   }
+
 
   function removeSource(id: string) {
     const label = sources.find((s) => s.id === id)?.label ?? id;
@@ -145,14 +159,10 @@ function RefreshPage() {
   return (
     <AppLayout>
       <PageHeader
-        title="Projects Refresh"
+        title="Projects"
         subtitle={`${customer.name} · create, manage and schedule extraction projects · ${customer.projects.length} live`}
-        actions={
-          <Button size="sm" variant="outline" onClick={() => setNotice("Full re-extraction queued for all projects.")}>
-            <CalendarClock className="h-3.5 w-3.5" /> Re-run everything
-          </Button>
-        }
       />
+
 
       <div className="px-7 pb-8 space-y-5">
         {notice && (
@@ -196,17 +206,50 @@ function RefreshPage() {
           <Card className="p-5 flex flex-col h-[520px]">
             <SectionTitle hint={`${sources.length} sources`}>Manage — {project.name}</SectionTitle>
 
-            <div className="flex items-center gap-2 mb-3">
-              <Input
-                className="flex-1 min-w-0"
-                placeholder="https://new-source.example.com"
-                value={newSource}
-                onChange={(e) => setNewSource(e.target.value)}
-              />
-              <Button size="sm" className="shrink-0" onClick={addSource}>
-                <Plus className="h-3.5 w-3.5" /> Add source
-              </Button>
+            <div className="rounded-lg border border-border p-3 mb-3 shrink-0">
+              <div className="flex items-center gap-2">
+                <Input
+                  className="flex-1 min-w-0"
+                  placeholder="https://new-source.example.com"
+                  value={newSource}
+                  onChange={(e) => setNewSource(e.target.value)}
+                />
+                <Button size="sm" className="shrink-0" onClick={addSource} disabled={!newSource.trim() || sourceAttrs.length === 0}>
+                  <Plus className="h-3.5 w-3.5" /> Add source
+                </Button>
+              </div>
+              <div className="mt-2.5">
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">
+                    Data attributes to extract · {sourceAttrs.length}
+                  </span>
+                  <button
+                    className="text-[11px] text-primary hover:underline"
+                    onClick={() => setSourceAttrs(sourceAttrs.length ? [] : project.datapoints.slice(0, 6))}
+                  >
+                    {sourceAttrs.length ? "Clear" : "Use project defaults"}
+                  </button>
+                </div>
+                <div className="flex flex-wrap gap-1.5 max-h-[92px] overflow-y-auto pr-1">
+                  {ATTRIBUTE_CHOICES.map((a) => {
+                    const on = sourceAttrs.includes(a);
+                    return (
+                      <button
+                        key={a}
+                        onClick={() => setSourceAttrs((s) => (on ? s.filter((x) => x !== a) : [...s, a]))}
+                        className={cn(
+                          "h-7 px-2.5 rounded-md border text-[11.5px] font-medium transition",
+                          on ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-muted-foreground hover:bg-secondary",
+                        )}
+                      >
+                        {a}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
+
 
             <div className="flex-1 min-h-0 overflow-y-auto space-y-2 pr-1">
               {sources.map((s) => (
@@ -219,7 +262,14 @@ function RefreshPage() {
                     <div className="text-[11px] text-muted-foreground truncate">
                       {s.url} · added {s.addedOn} · {fmt(s.records)} records
                     </div>
+                    <div className="text-[11px] text-muted-foreground truncate mt-0.5">
+                      Attributes: {(attrsBySource[s.id] ?? project.datapoints).slice(0, 4).join(", ")}
+                      {(attrsBySource[s.id] ?? project.datapoints).length > 4
+                        ? ` +${(attrsBySource[s.id] ?? project.datapoints).length - 4}`
+                        : ""}
+                    </div>
                   </div>
+
                   <Badge className="whitespace-nowrap" tone={s.status === "Live" ? "success" : s.status === "Paused" ? "warning" : "info"}>
                     {s.status}
                   </Badge>
@@ -269,16 +319,16 @@ function RefreshPage() {
         </div>
 
         {/* new project */}
-        <div className="grid xl:grid-cols-2 gap-5 items-stretch">
+        <div className="space-y-5">
           <Card className="p-5 flex flex-col">
             <SectionTitle hint="estimate generated instantly">Create a new project</SectionTitle>
-            <div className="grid sm:grid-cols-2 gap-3 mt-2">
-              <div className="sm:col-span-2">
+            <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-x-4 gap-y-3 mt-2">
+              <div className="md:col-span-2 xl:col-span-4">
                 <Label>Project name</Label>
                 <Input placeholder="e.g. APAC Competitor Pricing" value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />
               </div>
 
-              <div className="sm:col-span-2">
+              <div className="md:col-span-2">
                 <Label>Source URLs · {draft.urls.length}</Label>
                 <div className="flex flex-wrap gap-1.5 mb-2">
                   {[1, 2, 3, 4, 5, 6, 8, 10].map((n) => (
@@ -328,7 +378,7 @@ function RefreshPage() {
                 </Button>
               </div>
 
-              <div className="sm:col-span-2">
+              <div className="md:col-span-2">
                 <Label>Datapoints to extract · {draftDatapoints}</Label>
                 <div className="flex items-center gap-2">
                   <Input
@@ -436,7 +486,7 @@ function RefreshPage() {
               Every source you add, retire or modify is logged here with an auto-assigned REQ number (sequential per workspace) that your FreDA admin
               uses to approve and track the build.
             </p>
-            <div className="space-y-2 flex-1 min-h-0 max-h-[520px] overflow-y-auto pr-1">
+            <div className="grid md:grid-cols-2 gap-2 flex-1 min-h-0 max-h-[300px] overflow-y-auto pr-1 content-start">
               {requests.map((r) => (
                 <div key={r.id} className="rounded-lg border border-border px-3 py-2.5">
                   <div className="flex items-center gap-2">

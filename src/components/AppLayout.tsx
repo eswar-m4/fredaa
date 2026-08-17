@@ -26,7 +26,7 @@ const WORKSPACE: NavGroup = {
   items: [
     { to: "/", label: "Dashboard", icon: LayoutDashboard },
     { to: "/monitoring", label: "Monitoring", icon: Activity },
-    { to: "/refresh", label: "Projects Refresh", icon: RefreshCw },
+    { to: "/refresh", label: "Projects", icon: RefreshCw },
   ],
 };
 
@@ -311,7 +311,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
                       </div>
                     </div>
                     <div>
-                      <div className="font-medium text-foreground">Projects Refresh</div>
+                      <div className="font-medium text-foreground">Projects</div>
                       <div className="text-muted-foreground text-xs">
                         Add or remove sources, create projects, and see build estimates instantly.
                       </div>

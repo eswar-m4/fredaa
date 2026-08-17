@@ -138,7 +138,7 @@ function MonitoringPage() {
             <p className="text-[12px] text-muted-foreground mt-1">Every crawl, parse and publish run triggered in the selected window.</p>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-[11px] text-muted-foreground">
               <span className="font-semibold uppercase tracking-wider">Trigger legend</span>
-              <span><strong className="text-foreground">Scheduled</strong> — fired by the project run schedule set in Projects Refresh</span>
+              <span><strong className="text-foreground">Scheduled</strong> — fired by the project run schedule set in Projects</span>
               <span><strong className="text-foreground">On demand</strong> — someone pressed “Run now” here</span>
               <span><strong className="text-foreground">Source change</strong> — change watcher detected a page/layout change and auto-queued a run</span>
             </div>
