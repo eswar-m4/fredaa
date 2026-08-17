@@ -398,17 +398,40 @@ function Kpi({
   );
 }
 
-function Admv({ label, value, pct, tone }: { label: string; value: number; pct: number; tone: string }) {
+function Admv({
+  label,
+  value,
+  pct,
+  tone,
+  icon: Icon,
+}: {
+  label: string;
+  value: number;
+  pct: number;
+  tone: string;
+  icon: React.ComponentType<{ className?: string }>;
+}) {
   const bar = { success: "bg-success", destructive: "bg-destructive", warning: "bg-warning", info: "bg-primary" }[tone]!;
+  const chip = {
+    success: "bg-success-bg text-success",
+    destructive: "bg-destructive/10 text-destructive",
+    warning: "bg-warning-bg text-warning",
+    info: "bg-info-bg text-info",
+  }[tone]!;
   return (
-    <div className="rounded-lg border border-border p-3.5">
-      <div className="flex items-center justify-between">
-        <span className="text-[12px] font-medium text-muted-foreground">{label}</span>
-        <span className="text-[11px] text-muted-foreground tabular-nums">{pct.toFixed(1)}%</span>
-      </div>
-      <div className="text-[20px] font-semibold tabular-nums mt-1">{fmt(value)}</div>
-      <div className="mt-2 h-1.5 rounded-full bg-secondary overflow-hidden">
-        <div className={cn("h-full rounded-full", bar)} style={{ width: `${Math.max(2, pct)}%` }} />
+    <div className="rounded-lg border border-border p-3.5 flex gap-3 items-start">
+      <span className={cn("h-9 w-9 shrink-0 rounded-md inline-flex items-center justify-center", chip)}>
+        <Icon className="h-4 w-4" />
+      </span>
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-[12px] font-medium text-muted-foreground truncate">{label}</span>
+          <span className="text-[11px] text-muted-foreground tabular-nums">{pct.toFixed(1)}%</span>
+        </div>
+        <div className="text-[20px] font-semibold tabular-nums mt-0.5">{fmt(value)}</div>
+        <div className="mt-2 h-1.5 rounded-full bg-secondary overflow-hidden">
+          <div className={cn("h-full rounded-full", bar)} style={{ width: `${Math.max(2, pct)}%` }} />
+        </div>
       </div>
     </div>
   );
