@@ -1,19 +1,48 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Activity, RefreshCw, CheckCircle2, AlertTriangle, PlayCircle, Timer } from "lucide-react";
+import {
+  Activity,
+  RefreshCw,
+  CheckCircle2,
+  AlertTriangle,
+  PlayCircle,
+  Timer,
+  Cloud,
+  Download,
+  Pause,
+  Play,
+} from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
-import { Badge, Button, Card, PageHeader, SectionTitle, Select } from "@/components/ui-bits";
+import {
+  Badge,
+  Button,
+  Card,
+  DEFAULT_RANGE,
+  PageHeader,
+  RangeFilter,
+  rangeDays,
+  SectionTitle,
+  Select,
+  type RangeValue,
+} from "@/components/ui-bits";
 import { useActiveCustomer } from "@/lib/workspace";
-import { compact, fmt, hrsAgo, inHrs, rollup } from "@/data/customers";
+import { compact, destinationsFor, fmt, hrsAgo, inHrs, jobsFor, rollupProjects, type JobRun } from "@/data/customers";
+import { statusTone } from "@/routes/index";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/monitoring")({
   head: () => ({
     meta: [
-      { title: "Monitoring & Refresh — FreDA" },
-      { name: "description", content: "Track refresh runs, health and change volume for every FreDA dataset, and trigger an on-demand refresh." },
-      { property: "og:title", content: "Monitoring & Refresh — FreDA" },
-      { property: "og:description", content: "Track refresh runs, health and change volume for every FreDA dataset, and trigger an on-demand refresh." },
+      { title: "Monitoring & Delivery — FreDA" },
+      {
+        name: "description",
+        content: "Live job automation status, refresh schedule health and delivery destinations for every FreDA dataset.",
+      },
+      { property: "og:title", content: "Monitoring & Delivery — FreDA" },
+      {
+        property: "og:description",
+        content: "Live job automation status, refresh schedule health and delivery destinations for every FreDA dataset.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -21,67 +50,156 @@ export const Route = createFileRoute("/monitoring")({
   component: MonitoringPage,
 });
 
-const statusTone = { Healthy: "success", "Review pending": "warning", Refreshing: "info", Attention: "destructive" } as const;
+const jobTone: Record<JobRun["state"], "info" | "neutral" | "success" | "destructive"> = {
+  Running: "info",
+  Queued: "neutral",
+  Succeeded: "success",
+  Failed: "destructive",
+};
 
 function MonitoringPage() {
   const customer = useActiveCustomer();
-  const stats = useMemo(() => rollup(customer), [customer.id]);
+  const [range, setRange] = useState<RangeValue>(DEFAULT_RANGE);
+  const [scope, setScope] = useState("all");
   const [filter, setFilter] = useState("all");
-  const [refreshing, setRefreshing] = useState<Record<string, number>>({});
+  const [running, setRunning] = useState<Record<string, number>>({});
 
-  const projects = customer.projects.filter((p) => filter === "all" || p.status === filter);
+  const scoped = scope === "all" ? customer.projects : customer.projects.filter((p) => p.id === scope);
+  const stats = useMemo(() => rollupProjects(scoped), [customer.id, scope]);
+  const jobs = useMemo(() => jobsFor(customer), [customer.id]);
+  const destinations = useMemo(() => destinationsFor(customer), [customer.id]);
+
+  const days = rangeDays(range);
+  const visibleJobs = jobs.filter((j) => (scope === "all" || j.projectId === scope) && j.startedHrs <= days * 24);
+  const projects = scoped.filter((p) => filter === "all" || p.status === filter);
 
   function refresh(id: string) {
-    setRefreshing((r) => ({ ...r, [id]: 0 }));
+    setRunning((r) => ({ ...r, [id]: 0 }));
     let pct = 0;
     const t = setInterval(() => {
       pct += 12;
-      setRefreshing((r) => ({ ...r, [id]: pct }));
+      setRunning((r) => ({ ...r, [id]: pct }));
       if (pct >= 100) {
         clearInterval(t);
-        setTimeout(() => setRefreshing((r) => {
-          const { [id]: _drop, ...rest } = r;
-          return rest;
-        }), 800);
+        setTimeout(
+          () =>
+            setRunning((r) => {
+              const { [id]: _drop, ...rest } = r;
+              return rest;
+            }),
+          800,
+        );
       }
     }, 260);
   }
 
-  const running = customer.projects.filter((p) => p.status === "Refreshing").length;
-  const attention = customer.projects.filter((p) => p.status === "Attention").length;
+  const live = visibleJobs.filter((j) => j.state === "Running").length;
+  const failed = visibleJobs.filter((j) => j.state === "Failed").length;
 
   return (
     <AppLayout>
       <PageHeader
-        title="Monitoring & refresh"
-        subtitle={`${customer.name} · ${customer.projects.length} datasets · ${fmt(stats.records)} records tracked`}
+        title="Monitoring & delivery"
+        subtitle={`${customer.name} · job automation, schedule health and sync destinations`}
         actions={
-          <Button size="sm" onClick={() => customer.projects.forEach((p) => refresh(p.id))}>
-            <RefreshCw className="h-3.5 w-3.5" /> Refresh all datasets
+          <Button size="sm" onClick={() => scoped.forEach((p) => refresh(p.id))}>
+            <RefreshCw className="h-3.5 w-3.5" /> Run all in scope
           </Button>
         }
       />
 
       <div className="px-7 pb-8 space-y-5">
+        <Card className="px-4 py-3 flex flex-wrap items-center gap-3">
+          <Select className="w-[280px]" value={scope} onChange={(e) => setScope(e.target.value)}>
+            <option value="all">All projects ({customer.projects.length})</option>
+            {customer.projects.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.name}
+              </option>
+            ))}
+          </Select>
+          <RangeFilter value={range} onChange={setRange} />
+          <div className="ml-auto text-[12px] text-muted-foreground">
+            {fmt(stats.records)} records · {stats.sources} sources monitored
+          </div>
+        </Card>
+
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <Tile icon={PlayCircle} label="Refreshing now" value={String(running)} tone="info" />
-          <Tile icon={CheckCircle2} label="Healthy datasets" value={String(customer.projects.filter((p) => p.status === "Healthy").length)} tone="success" />
-          <Tile icon={AlertTriangle} label="Needs attention" value={String(attention)} tone="warning" />
-          <Tile icon={Activity} label="Changes this cycle" value={compact(stats.admv.added + stats.admv.deleted + stats.admv.modified)} tone="purple" />
+          <Tile icon={PlayCircle} label="Automations running" value={String(live)} tone="info" />
+          <Tile icon={CheckCircle2} label="In sync datasets" value={String(scoped.filter((p) => p.status === "In sync").length)} tone="success" />
+          <Tile icon={AlertTriangle} label="Failed runs" value={String(failed)} tone="warning" />
+          <Tile icon={Activity} label="Changes in window" value={compact(stats.admv.added + stats.admv.deleted + stats.admv.modified)} tone="purple" />
         </div>
 
+        {/* Job automation */}
+        <Card className="overflow-hidden">
+          <div className="px-5 pt-4 pb-3 border-b border-border">
+            <h3 className="text-[13px] font-semibold uppercase tracking-wider text-muted-foreground">Job automation status</h3>
+            <p className="text-[12px] text-muted-foreground mt-1">Every crawl, parse and publish run triggered in the selected window.</p>
+          </div>
+          <div className="max-h-[340px] overflow-y-auto">
+            <table className="w-full text-[12.5px]">
+              <thead className="sticky top-0 bg-card border-b border-border">
+                <tr className="text-left text-[11px] uppercase tracking-wider text-muted-foreground">
+                  <th className="px-5 py-2 font-semibold">Run</th>
+                  <th className="px-3 py-2 font-semibold">Project</th>
+                  <th className="px-3 py-2 font-semibold">Trigger</th>
+                  <th className="px-3 py-2 font-semibold">Stage</th>
+                  <th className="px-3 py-2 font-semibold">Started</th>
+                  <th className="px-3 py-2 font-semibold">Records</th>
+                  <th className="px-5 py-2 font-semibold text-right">State</th>
+                </tr>
+              </thead>
+              <tbody>
+                {visibleJobs.length === 0 && (
+                  <tr>
+                    <td colSpan={7} className="px-5 py-8 text-center text-muted-foreground">
+                      No automation runs in this window.
+                    </td>
+                  </tr>
+                )}
+                {visibleJobs.map((j) => (
+                  <tr key={j.id} className="border-b border-border/60 hover:bg-secondary/40">
+                    <td className="px-5 py-2.5 font-mono text-[11.5px]">{j.id}</td>
+                    <td className="px-3 py-2.5 max-w-[240px] truncate">{j.project}</td>
+                    <td className="px-3 py-2.5">
+                      <Badge tone="neutral">{j.trigger}</Badge>
+                    </td>
+                    <td className="px-3 py-2.5 text-muted-foreground">
+                      {j.step}
+                      {j.state === "Running" && (
+                        <div className="mt-1 h-1.5 w-28 rounded-full bg-secondary overflow-hidden">
+                          <div className="h-full bg-primary rounded-full" style={{ width: `${j.progress}%` }} />
+                        </div>
+                      )}
+                    </td>
+                    <td className="px-3 py-2.5 text-muted-foreground">
+                      {hrsAgo(j.startedHrs)} · {j.durationMin}m
+                    </td>
+                    <td className="px-3 py-2.5 tabular-nums">{compact(j.records)}</td>
+                    <td className="px-5 py-2.5 text-right">
+                      <Badge tone={jobTone[j.state]}>{j.state}</Badge>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+
+        {/* Schedule */}
         <Card className="overflow-hidden">
           <div className="px-5 pt-4 pb-3 border-b border-border flex items-center gap-3">
             <div className="flex-1">
               <h3 className="text-[13px] font-semibold uppercase tracking-wider text-muted-foreground">Refresh schedule</h3>
               <p className="text-[12px] text-muted-foreground mt-1">Existing extractions — re-run any dataset on demand.</p>
             </div>
-            <Select className="w-48" value={filter} onChange={(e) => setFilter(e.target.value)}>
+            <Select className="w-52" value={filter} onChange={(e) => setFilter(e.target.value)}>
               <option value="all">All statuses</option>
-              <option value="Healthy">Healthy</option>
+              <option value="In sync">In sync</option>
               <option value="Review pending">Review pending</option>
-              <option value="Refreshing">Refreshing</option>
-              <option value="Attention">Attention</option>
+              <option value="Syncing">Syncing</option>
+              <option value="Needs attention">Needs attention</option>
             </Select>
           </div>
           <table className="w-full text-[12.5px]">
@@ -99,21 +217,23 @@ function MonitoringPage() {
             </thead>
             <tbody>
               {projects.map((p) => {
-                const pct = refreshing[p.id];
+                const pct = running[p.id];
                 return (
                   <tr key={p.id} className="border-b border-border/60 hover:bg-secondary/40">
                     <td className="px-5 py-3">
                       <div className="font-medium">{p.name}</div>
                       <div className="text-[11px] text-muted-foreground">
-                        {p.source} · {p.datapoints.length} datapoints
+                        {p.sources.length} sources · {p.datapoints.length} datapoints
                       </div>
                     </td>
                     <td className="px-3 py-3">
                       <Badge tone="neutral">{p.frequency}</Badge>
                     </td>
                     <td className="px-3 py-3 text-muted-foreground">{hrsAgo(p.lastRefreshHrs)}</td>
-                    <td className="px-3 py-3 text-muted-foreground inline-flex items-center gap-1">
-                      <Timer className="h-3.5 w-3.5" /> {inHrs(p.nextRefreshHrs)}
+                    <td className="px-3 py-3 text-muted-foreground">
+                      <span className="inline-flex items-center gap-1">
+                        <Timer className="h-3.5 w-3.5" /> {inHrs(p.nextRefreshHrs)}
+                      </span>
                     </td>
                     <td className="px-3 py-3 tabular-nums">{compact(p.records)}</td>
                     <td className="px-3 py-3">
@@ -122,12 +242,12 @@ function MonitoringPage() {
                       <span className="text-warning">~{compact(p.admv.modified)}</span>
                     </td>
                     <td className="px-3 py-3">
-                      <Badge tone={statusTone[p.status] as any}>{p.status}</Badge>
+                      <Badge tone={statusTone[p.status]}>{p.status}</Badge>
                     </td>
                     <td className="px-5 py-3 text-right">
                       {pct === undefined ? (
                         <Button size="sm" variant="outline" onClick={() => refresh(p.id)}>
-                          <RefreshCw className="h-3.5 w-3.5" /> Refresh
+                          <RefreshCw className="h-3.5 w-3.5" /> Run now
                         </Button>
                       ) : (
                         <div className="flex items-center gap-2 justify-end">
@@ -145,27 +265,47 @@ function MonitoringPage() {
           </table>
         </Card>
 
-        <div className="grid xl:grid-cols-2 gap-5 items-start">
+        {/* Delivery + health */}
+        <div className="grid xl:grid-cols-[1.3fr_1fr] gap-5 items-start">
           <Card className="p-5">
-            <SectionTitle hint="last runs">Run history</SectionTitle>
+            <SectionTitle hint="export & sync">Delivery destinations</SectionTitle>
             <div className="space-y-2 mt-2">
-              {customer.projects.flatMap((p) =>
-                p.history.slice(-3).map((h) => ({ key: `${p.id}-${h.label}`, name: p.name, ...h })),
-              ).slice(0, 10).map((r) => (
-                <div key={r.key} className="flex items-center gap-3 text-[12.5px] border-b border-border/60 pb-2">
-                  <span className="flex-1 truncate">{r.name}</span>
-                  <span className="text-muted-foreground">{r.label}</span>
-                  <span className="tabular-nums text-muted-foreground">{compact(r.records)} rows</span>
-                  <Badge tone={r.accuracy > 96 ? "success" : r.accuracy > 93 ? "warning" : "destructive"}>{r.accuracy}%</Badge>
+              {destinations.map((d) => (
+                <div key={d.id} className="flex flex-wrap items-center gap-3 rounded-lg border border-border px-3 py-2.5">
+                  <span className="h-8 w-8 rounded-md bg-info-bg text-info inline-flex items-center justify-center shrink-0">
+                    <Cloud className="h-4 w-4" />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-[13px] font-medium truncate">{d.name}</div>
+                    <div className="text-[11px] text-muted-foreground truncate">
+                      {d.kind} · {d.cadence} · last sync {hrsAgo(d.lastSyncHrs)} · {compact(d.rowsLastSync)} rows
+                    </div>
+                  </div>
+                  <Badge tone={d.state === "Connected" ? "success" : d.state === "Paused" ? "warning" : "destructive"}>{d.state}</Badge>
+                  <Button size="sm" variant="outline">
+                    {d.state === "Paused" ? <Play className="h-3.5 w-3.5" /> : <Pause className="h-3.5 w-3.5" />}
+                    {d.state === "Paused" ? "Resume" : "Pause"}
+                  </Button>
                 </div>
               ))}
+            </div>
+            <div className="flex flex-wrap items-center gap-2 mt-4">
+              <Button size="sm" variant="outline">
+                <Download className="h-3.5 w-3.5" /> Download CSV snapshot
+              </Button>
+              <Button size="sm" variant="outline">
+                <Download className="h-3.5 w-3.5" /> Download JSON delta
+              </Button>
+              <Button size="sm">
+                <Cloud className="h-3.5 w-3.5" /> Add destination
+              </Button>
             </div>
           </Card>
 
           <Card className="p-5">
             <SectionTitle hint="per dataset">Health scores</SectionTitle>
             <div className="space-y-3 mt-2">
-              {customer.projects.map((p) => (
+              {scoped.map((p) => (
                 <div key={p.id}>
                   <div className="flex items-center justify-between text-[12.5px]">
                     <span className="truncate">{p.name}</span>
@@ -189,7 +329,17 @@ function MonitoringPage() {
   );
 }
 
-function Tile({ icon: Icon, label, value, tone }: { icon: typeof Activity; label: string; value: string; tone: "info" | "success" | "warning" | "purple" }) {
+function Tile({
+  icon: Icon,
+  label,
+  value,
+  tone,
+}: {
+  icon: typeof Activity;
+  label: string;
+  value: string;
+  tone: "info" | "success" | "warning" | "purple";
+}) {
   const cls = {
     info: "bg-info-bg text-info",
     success: "bg-success-bg text-success",
