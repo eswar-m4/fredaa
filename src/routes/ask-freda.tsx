@@ -55,7 +55,7 @@ function AskFredaPage() {
     if (s.includes("accuracy") || s.includes("quality"))
       return customer.projects.map((p) => `• ${p.name}: ${p.accuracy}% accuracy, ${p.coverage}% coverage`).join("\n");
     if (s.includes("export") || s.includes("sync") || s.includes("download"))
-      return `Go to Export & Sync. Pick the datasets, choose "Approved records only", then either generate a one-time CSV/Parquet export or enable continuous sync to S3, Snowflake or the API.`;
+      return `Go to Monitoring & Delivery. Pick the datasets, choose "Approved records only", then either generate a one-time CSV/Parquet export or enable continuous sync to S3, Snowflake or the API.`;
     if (s.includes("stale") || s.includes("fresh"))
       return `Least fresh dataset is "${stale.name}" at ${stale.freshness}% freshness (last run ${hrsAgo(stale.lastRefreshHrs)}). You can re-run it from Monitoring → Refresh.`;
     if (s.includes("record") || s.includes("how many") || s.includes("volume"))
