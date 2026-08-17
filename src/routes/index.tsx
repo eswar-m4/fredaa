@@ -201,9 +201,9 @@ function DashboardPage() {
                       onClick={() => setSelected(p.id)}
                       className={cn("border-b border-border/60 cursor-pointer hover:bg-secondary/40", p.id === active.id && "bg-info-bg/60")}
                     >
-                      <td className="px-4 py-3 min-w-[170px]">
+                      <td className="px-4 py-3 min-w-[195px]">
                         <div className="font-medium whitespace-nowrap">{p.name}</div>
-                        <div className="text-[11px] text-muted-foreground">
+                        <div className="text-[11px] text-muted-foreground whitespace-nowrap">
                           {p.sources.length} sources · {p.datapoints.length} datapoints · {p.frequency}
                         </div>
                       </td>
