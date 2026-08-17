@@ -3,7 +3,7 @@ import { ReactNode, useState, useEffect } from "react";
 import {
   LayoutDashboard,
   Activity,
-  Upload,
+  RefreshCw,
   Bell,
   HelpCircle,
   MessageSquare,
@@ -24,9 +24,9 @@ type NavGroup = { group: string; items: NavItem[] };
 const WORKSPACE: NavGroup = {
   group: "WORKSPACE",
   items: [
-    { to: "/", label: "Dashboard & Review", icon: LayoutDashboard },
-    { to: "/monitoring", label: "Monitoring & Refresh", icon: Activity },
-    { to: "/export", label: "Export & Sync", icon: Upload },
+    { to: "/", label: "Dashboard", icon: LayoutDashboard },
+    { to: "/monitoring", label: "Monitoring & Delivery", icon: Activity },
+    { to: "/refresh", label: "Refresh & Projects", icon: RefreshCw },
   ],
 };
 
@@ -299,21 +299,21 @@ export function AppLayout({ children }: { children: ReactNode }) {
                   </div>
                   <div className="space-y-2 text-sm">
                     <div>
-                      <div className="font-medium text-foreground">Solutions</div>
+                      <div className="font-medium text-foreground">Dashboard</div>
                       <div className="text-muted-foreground text-xs">
-                        Upload data, map fields, launch jobs, then review and save results.
+                        Filter by project and date range, then open the review workspace to approve changes.
                       </div>
                     </div>
                     <div>
-                      <div className="font-medium text-foreground">Agents</div>
+                      <div className="font-medium text-foreground">Monitoring &amp; Delivery</div>
                       <div className="text-muted-foreground text-xs">
-                        Choose a source, run a scrape, and inspect the records in Review.
+                        Watch job automation runs and manage export or sync destinations.
                       </div>
                     </div>
                     <div>
-                      <div className="font-medium text-foreground">Monitoring</div>
+                      <div className="font-medium text-foreground">Refresh &amp; Projects</div>
                       <div className="text-muted-foreground text-xs">
-                        Track running, failed, and completed jobs from the latest run at the top.
+                        Add or remove sources, create projects, and see build estimates instantly.
                       </div>
                     </div>
                   </div>
