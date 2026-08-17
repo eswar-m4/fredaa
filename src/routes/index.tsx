@@ -1,493 +1,349 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
-import { AppLayout } from "@/components/AppLayout";
-import { Button, Card, PageHeader } from "@/components/ui-bits";
-import { LegalNotice } from "@/components/LegalNotice";
+import { createFileRoute } from "@tanstack/react-router";
+import { useMemo, useState } from "react";
 import {
-  Target,
-  ArrowRight,
-  Sparkles,
-  Radar,
-  Boxes,
-  Bot,
-  Stethoscope,
-  UtensilsCrossed,
-  Scale,
-  Car,
+  ArrowUpRight,
+  CheckSquare,
+  Database,
+  RefreshCw,
   ShieldCheck,
-  ShoppingBag,
-  MessageSquare,
-  FileSpreadsheet,
-  Search,
+  TrendingUp,
+  AlertTriangle,
+  Clock,
 } from "lucide-react";
-import {
-  AGENT_COUNT,
-  AGENT_CATEGORY_COUNT,
-  SOLUTION_COUNT,
-  SOLUTION_CATEGORY_COUNT,
-} from "@/lib/portal-stats";
-import { setUseCase, useUseCase, USE_CASES, type UseCase } from "@/lib/useCase";
+import { AppLayout } from "@/components/AppLayout";
+import { Badge, Button, Card, PageHeader, SectionTitle } from "@/components/ui-bits";
+import { ReviewDialog } from "@/components/ReviewDialog";
+import { useActiveCustomer } from "@/lib/workspace";
+import { actionsFor, compact, devPipeline, fmt, hrsAgo, inHrs, rollup, type Project } from "@/data/customers";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Choose your playbook – Freda" },
-      {
-        name: "description",
-        content:
-          "Three playbooks to get data: run site-specific agents, refresh a solution category, or let Ask Freda design the solution with you.",
-      },
-      { property: "og:title", content: "Choose your playbook – Freda" },
-      {
-        property: "og:description",
-        content: "Site-specific agents, solution categories, and Ask Freda's guided solution design in one workspace.",
-      },
+      { title: "FreDA Dashboard — Data health & review" },
+      { name: "description", content: "Monitor dataset health, ADMV changes and approve record-level updates for your live FreDA data projects." },
+      { property: "og:title", content: "FreDA Dashboard — Data health & review" },
+      { property: "og:description", content: "Monitor dataset health, ADMV changes and approve record-level updates for your live FreDA data projects." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: Home,
+  component: DashboardPage,
 });
 
-function Home() {
-  const uc = useUseCase();
-  const navigate = useNavigate();
+const statusTone = { Healthy: "success", "Review pending": "warning", Refreshing: "info", Attention: "destructive" } as const;
 
-  // Only one tile is flipped at a time, and flipping is deliberately slow:
-  // the open tile closes first, then the next one opens after a pause.
-  const [flippedId, setFlippedId] = useState<string | null>(null);
-  const timers = useRef<number[]>([]);
+function DashboardPage() {
+  const customer = useActiveCustomer();
+  const stats = useMemo(() => rollup(customer), [customer.id]);
+  const actions = useMemo(() => actionsFor(customer), [customer.id]);
+  const pipeline = useMemo(() => devPipeline(customer), [customer.id]);
 
-  useEffect(
-    () => () => {
-      timers.current.forEach((t) => window.clearTimeout(t));
-    },
-    [],
-  );
+  const [reviewProject, setReviewProject] = useState<Project | null>(null);
+  const [selected, setSelected] = useState<string>(customer.projects[0]!.id);
+  const active = customer.projects.find((p) => p.id === selected) ?? customer.projects[0]!;
 
-  const clearTimers = () => {
-    timers.current.forEach((t) => window.clearTimeout(t));
-    timers.current = [];
-  };
-
-  const requestFlip = (id: string) => {
-    clearTimers();
-    if (flippedId === id) return;
-    if (flippedId) {
-      // close the open card first, then open the new one after a beat
-      setFlippedId(null);
-      timers.current.push(window.setTimeout(() => setFlippedId(id), 900));
-    } else {
-      timers.current.push(window.setTimeout(() => setFlippedId(id), 400));
-    }
-  };
-
-  const requestClose = (id: string) => {
-    clearTimers();
-    timers.current.push(
-      window.setTimeout(() => {
-        setFlippedId((cur) => (cur === id ? null : cur));
-      }, 500),
-    );
-  };
-
-  const pick = (mode: Exclude<UseCase, null>, to: string) => {
-    setUseCase(mode);
-    navigate({ to });
-  };
+  const admvTotal = stats.admv.added + stats.admv.deleted + stats.admv.modified + stats.admv.verified;
 
   return (
     <AppLayout>
       <PageHeader
-        title="Choose your playbook"
-        subtitle="Three playbooks: run agents on sites you trust, pick a ready solution category, or let Freda design one with you."
+        title={`${customer.name} · Data workspace`}
+        subtitle={`${stats.projects} live projects · ${fmt(stats.records)} records under management · account since ${customer.since}`}
+        actions={
+          <>
+            <Button variant="outline" size="sm">
+              <RefreshCw className="h-3.5 w-3.5" /> Refresh all
+            </Button>
+            <Button size="sm" onClick={() => setReviewProject(active)}>
+              <CheckSquare className="h-3.5 w-3.5" /> Review {fmt(stats.pendingReview)} changes
+            </Button>
+          </>
+        }
       />
 
-      <div className="relative px-7 pb-8 space-y-6">
-        {/* page backdrop: soft mesh + hairline grid + horizon glow */}
-        <div aria-hidden className="pointer-events-none absolute inset-0 -top-24 overflow-hidden">
-          <div className="absolute inset-0 opacity-[0.05] [background-image:linear-gradient(to_right,currentColor_1px,transparent_1px),linear-gradient(to_bottom,currentColor_1px,transparent_1px)] [background-size:34px_34px] [mask-image:radial-gradient(100%_70%_at_50%_0%,black,transparent)]" />
-          <div className="absolute left-1/2 top-0 h-[420px] w-[900px] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(99,102,241,0.14),transparent)] blur-2xl" />
-          <div className="absolute -left-24 bottom-0 h-[320px] w-[320px] rounded-full bg-[radial-gradient(closest-side,rgba(16,185,129,0.12),transparent)] blur-2xl" />
-          <div className="absolute -right-24 bottom-10 h-[320px] w-[320px] rounded-full bg-[radial-gradient(closest-side,rgba(232,121,249,0.12),transparent)] blur-2xl" />
+      <div className="px-7 pb-8 space-y-5">
+        {/* KPI row */}
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+          <Kpi label="Records managed" value={compact(stats.records)} sub={`${stats.projects} projects`} icon={Database} tone="info" />
+          <Kpi label="Pending review" value={fmt(stats.pendingReview)} sub="record-level changes" icon={CheckSquare} tone="warning" />
+          <Kpi label="Accuracy" value={`${stats.accuracy.toFixed(1)}%`} sub="approved / reviewed" icon={ShieldCheck} tone="success" />
+          <Kpi label="Coverage" value={`${stats.coverage.toFixed(1)}%`} sub="fields populated" icon={TrendingUp} tone="purple" />
+          <Kpi label="Freshness" value={`${Math.round(stats.freshness)}%`} sub="vs refresh schedule" icon={Clock} tone="info" />
         </div>
 
-        <div className="relative">
-          <div aria-hidden className="pointer-events-none absolute -inset-x-6 -inset-y-8 overflow-hidden">
-            <div className="fd-aurora absolute left-[6%] top-0 h-56 w-56 rounded-full bg-emerald-500/25 blur-3xl" />
-            <div className="fd-aurora absolute left-[42%] top-6 h-56 w-56 rounded-full bg-violet-500/25 blur-3xl [animation-delay:3s]" />
-            <div className="fd-aurora absolute right-[6%] top-0 h-56 w-56 rounded-full bg-fuchsia-500/25 blur-3xl [animation-delay:6s]" />
+        {/* ADMV */}
+        <Card className="p-5">
+          <SectionTitle hint="last refresh cycle across all projects">ADMV — change signature</SectionTitle>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-3">
+            <Admv label="Added" value={stats.admv.added} total={admvTotal} tone="success" />
+            <Admv label="Deleted" value={stats.admv.deleted} total={admvTotal} tone="destructive" />
+            <Admv label="Modified" value={stats.admv.modified} total={admvTotal} tone="warning" />
+            <Admv label="Verified" value={stats.admv.verified} total={admvTotal} tone="info" />
           </div>
-          <div className="relative grid grid-cols-1 md:grid-cols-3 gap-5 items-stretch">
-            <FlipTile
-              id="targeted"
-              flipped={flippedId === "targeted"}
-              onOpen={requestFlip}
-              onClose={requestClose}
-              active={uc === "targeted"}
-              tone="emerald"
-              tag="Site-specific"
-              icon={Radar}
-              title={USE_CASES.targeted.name}
-              aka="You already know the websites"
-              art={<TargetedArt />}
-              summary="You bring the sites you trust. We onboard each one as a tuned agent and keep the data fresh on your schedule."
-              facts={[
-                { k: "Agents onboarded", v: `${AGENT_COUNT}` },
-                { k: "Agent categories", v: `${AGENT_CATEGORY_COUNT}` },
-                { k: "New site SLA", v: "2-7 days" },
-                { k: "Refresh", v: "Daily / weekly / monthly" },
-              ]}
-              details={[
-                "Complexity graded Simple / Medium / Complex before onboarding",
-                "Every agent ships with crawl policy, metadata and terms of use",
-                "Unlocks Sources & Agents, Monitoring and Jobs",
-              ]}
-              cta="Open Agents"
-              onPick={() => pick("targeted", "/site-specific")}
-            />
-            <FlipTile
-              id="openweb"
-              flipped={flippedId === "openweb"}
-              onOpen={requestFlip}
-              onClose={requestClose}
-              active={uc === "openweb"}
-              tone="violet"
-              tag="Category-driven"
-              icon={Boxes}
-              title={USE_CASES.openweb.name}
-              aka="You know the data, not the sites"
-              art={<DatasetArt />}
-              summary="Pick the data you want. We source it from official corporate websites plus trusted third-party sources."
-              facts={[
-                { k: "Solutions", v: `${SOLUTION_COUNT}` },
-                { k: "Solution categories", v: `${SOLUTION_CATEGORY_COUNT}` },
-                { k: "Default source", v: "Official company website" },
-                { k: "Third-party sources", v: "10-14 per category" },
-              ]}
-              details={[
-                "Healthcare, hospitality, legal, insurance and automotive verticals",
-                "Marketplaces and directories curated per category",
-                "Unlocks Dataset Setup, Workflows and Review",
-              ]}
-              cta="Open Solutions"
-              onPick={() => pick("openweb", "/any-site")}
-            />
-            <FlipTile
-              id="discovery"
-              flipped={flippedId === "discovery"}
-              onOpen={requestFlip}
-              onClose={requestClose}
-              active={uc === "discovery"}
-              tone="rose"
-              tag="Guided"
-              icon={Bot}
-              title={USE_CASES.discovery.name}
-              aka="Not sure where to start?"
-              art={<DiscoveryArt />}
-              summary="Not sure which agent or solution fits? Answer a short set of questions and Freda will design the agents and solutions for you."
-              facts={[
-                { k: "Chat", v: "Guided" },
-                { k: "Scope", v: "Firmographic" },
-                { k: "You get", v: "Volume & timeline" },
-                { k: "Then", v: "Admin builds it" },
-              ]}
-              details={[
-                "Describe the requirement in your own words - Freda fills the gaps",
-                "Tells you when an agent or solution already covers it",
-                "Otherwise drafts a new agent or solution request for the admin team",
-              ]}
-              cta="Ask Freda"
-              onPick={() => pick("discovery", "/discover")}
-            />
-          </div>
-        </div>
+        </Card>
 
-        {/* how it works band */}
-        <div className="relative rounded-2xl border border-border bg-card/70 p-5 overflow-hidden">
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 opacity-[0.07] [background-image:radial-gradient(currentColor_1px,transparent_1px)] [background-size:16px_16px]"
-          />
-          <div className="relative">
-            <div className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">How Freda delivers</div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-3">
-              {[
-                { icon: Search, t: "Source", d: "Official company websites first, then curated third-party sources." },
-                { icon: Boxes, t: "Extract", d: "Tuned agents and LLM extraction pull the fields you asked for." },
-                { icon: ShieldCheck, t: "Validate", d: "Normalised, deduped and cross-checked before it reaches you." },
-                { icon: Radar, t: "Refresh", d: "Daily, weekly or monthly runs with monitoring and change deltas." },
-              ].map((s) => (
-                <div key={s.t} className="rounded-xl border border-border bg-background/60 p-3.5">
-                  <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-secondary text-foreground">
-                    <s.icon className="h-4 w-4" />
+        {/* Projects + inline review */}
+        <div className="grid xl:grid-cols-[1.55fr_1fr] gap-5 items-start">
+          <Card className="overflow-hidden">
+            <div className="px-5 pt-4 pb-3 border-b border-border flex items-center justify-between">
+              <div>
+                <h3 className="text-[13px] font-semibold uppercase tracking-wider text-muted-foreground">Projects & datasets</h3>
+                <p className="text-[12px] text-muted-foreground mt-1">Click a project to load its review panel.</p>
+              </div>
+              <Badge tone="neutral">{customer.projects.length} datasets</Badge>
+            </div>
+            <table className="w-full text-[12.5px]">
+              <thead>
+                <tr className="text-left text-[11px] uppercase tracking-wider text-muted-foreground border-b border-border">
+                  <th className="px-5 py-2 font-semibold">Project</th>
+                  <th className="px-3 py-2 font-semibold">Records</th>
+                  <th className="px-3 py-2 font-semibold">ADMV</th>
+                  <th className="px-3 py-2 font-semibold">Freshness</th>
+                  <th className="px-3 py-2 font-semibold">Status</th>
+                  <th className="px-5 py-2 font-semibold text-right">Review</th>
+                </tr>
+              </thead>
+              <tbody>
+                {customer.projects.map((p) => (
+                  <tr
+                    key={p.id}
+                    onClick={() => setSelected(p.id)}
+                    className={cn("border-b border-border/60 cursor-pointer hover:bg-secondary/40", p.id === selected && "bg-info-bg/60")}
+                  >
+                    <td className="px-5 py-3 min-w-[240px]">
+                      <div className="font-medium whitespace-nowrap">{p.name}</div>
+                      <div className="text-[11px] text-muted-foreground">
+                        {p.source} · {p.datapoints.length} datapoints · {p.frequency}
+                      </div>
+                    </td>
+                    <td className="px-3 py-3 tabular-nums">{compact(p.records)}</td>
+                    <td className="px-3 py-3">
+                      <div className="flex items-center gap-1 text-[11px]">
+                        <span className="text-success">+{compact(p.admv.added)}</span>
+                        <span className="text-destructive">-{compact(p.admv.deleted)}</span>
+                        <span className="text-warning">~{compact(p.admv.modified)}</span>
+                      </div>
+                    </td>
+                    <td className="px-3 py-3">
+                      <Bar value={p.freshness} />
+                    </td>
+                    <td className="px-3 py-3">
+                      <Badge tone={statusTone[p.status] as any}>{p.status}</Badge>
+                    </td>
+                    <td className="px-5 py-3 text-right">
+                      <Button
+                        size="sm"
+                        className="whitespace-nowrap"
+                        variant={p.pendingReview > 0 ? "primary" : "outline"}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setReviewProject(p);
+                        }}
+                      >
+                        {p.pendingReview > 0 ? `${fmt(p.pendingReview)} to review` : "View records"}
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </Card>
+
+          {/* Review snapshot for selected project */}
+          <Card className="p-5">
+            <SectionTitle hint={active.frequency}>Review snapshot</SectionTitle>
+            <div className="text-[14px] font-semibold mt-1">{active.name}</div>
+            <div className="text-[12px] text-muted-foreground">
+              {active.source} · last refresh {hrsAgo(active.lastRefreshHrs)} · next {inHrs(active.nextRefreshHrs)}
+            </div>
+
+            <div className="grid grid-cols-3 gap-3 mt-4">
+              <MiniStat label="Pending" value={fmt(active.pendingReview)} tone="warning" />
+              <MiniStat label="Accuracy" value={`${active.accuracy}%`} tone="success" />
+              <MiniStat label="Coverage" value={`${active.coverage}%`} tone="info" />
+            </div>
+
+            <div className="mt-5">
+              <SectionTitle>Accuracy trend</SectionTitle>
+              <Spark points={active.history.map((h) => h.accuracy)} labels={active.history.map((h) => h.label)} />
+            </div>
+
+            <div className="mt-5">
+              <SectionTitle hint={`${active.datapoints.length} tracked`}>Datapoints</SectionTitle>
+              <div className="flex flex-wrap gap-1.5">
+                {active.datapoints.slice(0, 12).map((d) => (
+                  <span key={d} className="px-2 py-0.5 rounded-md bg-secondary text-[11px] text-secondary-foreground">
+                    {d}
                   </span>
-                  <div className="text-[13px] font-semibold mt-2">{s.t}</div>
-                  <div className="text-[12px] text-muted-foreground mt-0.5 leading-relaxed">{s.d}</div>
+                ))}
+                <span className="px-2 py-0.5 rounded-md bg-secondary text-[11px] text-muted-foreground">
+                  +{active.datapoints.length - 12} more
+                </span>
+              </div>
+            </div>
+
+            <Button className="w-full mt-5" onClick={() => setReviewProject(active)}>
+              <CheckSquare className="h-3.5 w-3.5" /> Open record-by-record review
+            </Button>
+          </Card>
+        </div>
+
+        {/* Action needed + development pipeline */}
+        <div className="grid xl:grid-cols-2 gap-5 items-start">
+          <Card className="p-5">
+            <SectionTitle hint="sorted by volume">Action needed</SectionTitle>
+            <div className="space-y-2 mt-2">
+              {actions.map((a) => (
+                <div key={a.id} className="flex items-center gap-3 rounded-lg border border-border px-3 py-2.5">
+                  <span
+                    className={cn(
+                      "h-8 w-8 rounded-md inline-flex items-center justify-center shrink-0",
+                      a.priority === "Critical" ? "bg-destructive/10 text-destructive" : a.priority === "High" ? "bg-warning-bg text-warning" : "bg-info-bg text-info",
+                    )}
+                  >
+                    <AlertTriangle className="h-4 w-4" />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-[13px] font-medium truncate">{a.action}</div>
+                    <div className="text-[11px] text-muted-foreground truncate">
+                      {a.project} · {fmt(a.records)} records · {a.age}
+                    </div>
+                  </div>
+                  <Badge tone={a.priority === "Critical" ? "destructive" : a.priority === "High" ? "warning" : "info"}>{a.priority}</Badge>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setReviewProject(customer.projects.find((p) => p.id === a.projectId) ?? null)}
+                  >
+                    Resolve
+                  </Button>
                 </div>
               ))}
             </div>
-          </div>
+          </Card>
+
+          <Card className="p-5">
+            <SectionTitle hint="FreDA delivery team">Solution development in progress</SectionTitle>
+            <div className="space-y-3 mt-2">
+              {pipeline.map((d) => (
+                <div key={d.id} className="rounded-lg border border-border px-3 py-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[13px] font-medium flex-1 truncate">{d.title}</span>
+                    <Badge tone="purple">{d.stage}</Badge>
+                  </div>
+                  <div className="mt-2 h-1.5 rounded-full bg-secondary overflow-hidden">
+                    <div className="h-full rounded-full bg-primary" style={{ width: `${d.progress}%` }} />
+                  </div>
+                  <div className="flex items-center justify-between mt-1.5 text-[11px] text-muted-foreground">
+                    <span>
+                      {d.id} · owner {d.owner}
+                    </span>
+                    <span className="inline-flex items-center gap-1">
+                      ETA {d.eta} <ArrowUpRight className="h-3 w-3" />
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
         </div>
-
-        <LegalNotice />
-
       </div>
+
+      <ReviewDialog project={reviewProject} open={!!reviewProject} onOpenChange={(v) => !v && setReviewProject(null)} />
     </AppLayout>
   );
 }
 
-/* ---------- tile artwork: deep ink base, mesh glow, fine line-art ---------- */
-
-function ArtFrame({
-  glow,
-  children,
+function Kpi({
+  label,
+  value,
+  sub,
+  icon: Icon,
+  tone,
 }: {
-  /** two tint colours for the mesh gradient */
-  glow: [string, string];
-  children: React.ReactNode;
+  label: string;
+  value: string;
+  sub: string;
+  icon: typeof Database;
+  tone: "info" | "success" | "warning" | "purple";
 }) {
+  const toneCls = {
+    info: "bg-info-bg text-info",
+    success: "bg-success-bg text-success",
+    warning: "bg-warning-bg text-warning",
+    purple: "bg-purple-bg text-purple-token",
+  }[tone];
   return (
-    <div
-      className="fd-sheen relative h-28 overflow-hidden rounded-xl ring-1 ring-inset ring-white/15"
-      style={{
-        background: `radial-gradient(120% 140% at 0% 0%, ${glow[0]}, transparent 60%), radial-gradient(120% 140% at 100% 100%, ${glow[1]}, transparent 60%), linear-gradient(135deg,#111a33,#0b1020)`,
-      }}
-    >
-      {/* mesh glow */}
-      <div
-        className="fd-orb absolute -left-8 -top-10 h-32 w-32 rounded-full blur-2xl"
-        style={{ background: `radial-gradient(circle, ${glow[0]}, transparent 70%)` }}
-      />
-      <div
-        className="fd-orb absolute -bottom-12 -right-6 h-32 w-32 rounded-full blur-2xl [animation-delay:1.8s]"
-        style={{ background: `radial-gradient(circle, ${glow[1]}, transparent 70%)` }}
-      />
+    <Card className="p-4">
+      <div className="flex items-start justify-between">
+        <div>
+          <div className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">{label}</div>
+          <div className="text-[24px] font-semibold tracking-tight mt-1 tabular-nums">{value}</div>
+          <div className="text-[11px] text-muted-foreground mt-0.5">{sub}</div>
+        </div>
+        <span className={cn("h-8 w-8 rounded-md inline-flex items-center justify-center", toneCls)}>
+          <Icon className="h-4 w-4" />
+        </span>
+      </div>
+    </Card>
+  );
+}
 
-      {/* hairline grid */}
-      <div className="absolute inset-0 opacity-[0.18] [background-image:linear-gradient(to_right,white_1px,transparent_1px),linear-gradient(to_bottom,white_1px,transparent_1px)] [background-size:22px_22px] [mask-image:radial-gradient(120%_100%_at_50%_0%,black,transparent)]" />
-      {/* top light sweep */}
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent" />
-      {children}
+function Admv({ label, value, total, tone }: { label: string; value: number; total: number; tone: string }) {
+  const pct = total ? (value / total) * 100 : 0;
+  const bar = { success: "bg-success", destructive: "bg-destructive", warning: "bg-warning", info: "bg-primary" }[tone]!;
+  return (
+    <div className="rounded-lg border border-border p-3.5">
+      <div className="flex items-center justify-between">
+        <span className="text-[12px] font-medium text-muted-foreground">{label}</span>
+        <span className="text-[11px] text-muted-foreground tabular-nums">{pct.toFixed(1)}%</span>
+      </div>
+      <div className="text-[20px] font-semibold tabular-nums mt-1">{fmt(value)}</div>
+      <div className="mt-2 h-1.5 rounded-full bg-secondary overflow-hidden">
+        <div className={cn("h-full rounded-full", bar)} style={{ width: `${Math.max(2, pct)}%` }} />
+      </div>
     </div>
   );
 }
 
-function TargetedArt() {
+function MiniStat({ label, value, tone }: { label: string; value: string; tone: "warning" | "success" | "info" }) {
+  const cls = { warning: "text-warning", success: "text-success", info: "text-info" }[tone];
   return (
-    <ArtFrame glow={["rgba(16,185,129,0.95)", "rgba(34,211,238,0.8)"]}>
-      {/* radar rings */}
-      <div className="absolute -right-6 -top-6 h-32 w-32 rounded-full border border-emerald-300/25" />
-      <div className="absolute -right-1 -top-1 h-20 w-20 rounded-full border border-emerald-300/20" />
-      <div className="absolute inset-0 flex items-center gap-2 px-4">
-        {["practo.com", "99acres", "cardekho"].map((s, i) => (
-          <div
-            key={s}
-            className="flex-1 rounded-lg border border-white/10 bg-white/[0.06] px-2 py-1.5 text-[10px] font-medium tracking-wide text-emerald-50/90 shadow-[0_8px_20px_-12px_rgba(0,0,0,0.9)] backdrop-blur-sm"
-            style={{ transform: `translateY(${i * 6 - 6}px)` }}
-          >
-            <div className="mb-1 h-[3px] w-8 rounded-full bg-gradient-to-r from-emerald-300 to-cyan-300" />
-            {s}
-          </div>
-        ))}
-      </div>
-      <Search className="absolute -bottom-3 -right-3 h-14 w-14 text-emerald-200/15" strokeWidth={1.25} />
-    </ArtFrame>
+    <div className="rounded-lg border border-border p-3">
+      <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">{label}</div>
+      <div className={cn("text-[17px] font-semibold tabular-nums mt-0.5", cls)}>{value}</div>
+    </div>
   );
 }
 
-function DatasetArt() {
-  const icons = [Stethoscope, UtensilsCrossed, Scale, Car, ShieldCheck, ShoppingBag];
+function Bar({ value }: { value: number }) {
   return (
-    <ArtFrame glow={["rgba(139,92,246,0.95)", "rgba(59,130,246,0.8)"]}>
-      <div className="absolute inset-0 grid grid-cols-6 gap-1.5 p-3">
-        {icons.map((Icon, i) => (
-          <div
-            key={i}
-            className="inline-flex items-center justify-center rounded-lg border border-white/10 bg-white/[0.06] backdrop-blur-sm transition-colors"
-            style={{ transform: `translateY(${(i % 2 ? 1 : -1) * 3}px)` }}
-          >
-            <Icon className="h-4 w-4 text-indigo-100/80" strokeWidth={1.5} />
-          </div>
-        ))}
+    <div className="flex items-center gap-2">
+      <div className="h-1.5 w-16 rounded-full bg-secondary overflow-hidden">
+        <div className={cn("h-full rounded-full", value > 85 ? "bg-success" : value > 72 ? "bg-warning" : "bg-destructive")} style={{ width: `${value}%` }} />
       </div>
-    </ArtFrame>
+      <span className="text-[11px] text-muted-foreground tabular-nums">{value}%</span>
+    </div>
   );
 }
 
-function DiscoveryArt() {
+export function Spark({ points, labels }: { points: number[]; labels: string[] }) {
+  const min = Math.min(...points) - 1;
+  const max = Math.max(...points) + 1;
+  const w = 100;
+  const h = 40;
+  const d = points
+    .map((p, i) => `${(i / (points.length - 1)) * w},${h - ((p - min) / (max - min)) * h}`)
+    .join(" ");
   return (
-    <ArtFrame glow={["rgba(249,115,22,0.95)", "rgba(217,70,239,0.85)"]}>
-      <div className="absolute inset-0 flex flex-col justify-center gap-1 px-4">
-        <div className="self-start rounded-lg rounded-bl-sm border border-white/10 bg-white/[0.07] px-2.5 py-1 text-[10px] text-rose-50/90 backdrop-blur-sm">
-          Describe the data you need
-        </div>
-        <div className="inline-flex self-end items-center gap-1 rounded-lg rounded-br-sm bg-gradient-to-r from-orange-300 to-fuchsia-300 px-2.5 py-1 text-[10px] font-semibold text-[#2a0d1f] shadow-[0_8px_20px_-10px_rgba(232,121,249,0.9)]">
-          <Sparkles className="h-3 w-3" /> sources · volume · runtime
-        </div>
-        <div className="inline-flex self-start items-center gap-1 rounded-lg rounded-bl-sm border border-white/10 bg-white/[0.07] px-2.5 py-1 text-[10px] text-rose-50/90 backdrop-blur-sm">
-          <FileSpreadsheet className="h-3 w-3" /> or upload a file
-        </div>
-      </div>
-      <MessageSquare className="absolute -bottom-3 -right-3 h-14 w-14 text-fuchsia-200/15" strokeWidth={1.25} />
-    </ArtFrame>
-  );
-}
-
-const TONE_CLASS: Record<"emerald" | "violet" | "rose", { icon: string; chip: string; ring: string; glow: string; text: string }> = {
-  emerald: {
-    icon: "bg-gradient-to-br from-emerald-400 to-teal-600 text-white",
-    chip: "bg-emerald-500/10 text-emerald-500 border-emerald-500/25",
-    ring: "ring-emerald-500/40",
-    glow: "from-emerald-400 via-teal-500 to-cyan-500",
-    text: "[--fd-g1:#34d399] [--fd-g2:#22d3ee]",
-  },
-  violet: {
-    icon: "bg-gradient-to-br from-violet-500 to-blue-600 text-white",
-    chip: "bg-violet-500/10 text-violet-400 border-violet-500/25",
-    ring: "ring-violet-500/40",
-    glow: "from-violet-500 via-indigo-500 to-blue-500",
-    text: "[--fd-g1:#a78bfa] [--fd-g2:#60a5fa]",
-  },
-  rose: {
-    icon: "bg-gradient-to-br from-orange-400 to-fuchsia-600 text-white",
-    chip: "bg-rose-500/10 text-rose-400 border-rose-500/25",
-    ring: "ring-rose-500/40",
-    glow: "from-orange-400 via-rose-500 to-fuchsia-500",
-    text: "[--fd-g1:#fb923c] [--fd-g2:#e879f9]",
-  },
-};
-
-function FlipTile({
-  id,
-  flipped,
-  onOpen,
-  onClose,
-  active,
-  tone,
-  tag,
-  icon: Icon,
-  title,
-  aka,
-  art,
-  summary,
-  facts,
-  details,
-  cta,
-  onPick,
-}: {
-  id: string;
-  flipped: boolean;
-  onOpen: (id: string) => void;
-  onClose: (id: string) => void;
-  active: boolean;
-  tone: "emerald" | "violet" | "rose";
-  tag: string;
-  icon: typeof Target;
-  title: string;
-  aka: string;
-  art: React.ReactNode;
-  summary: string;
-  facts: { k: string; v: string }[];
-  details: string[];
-  cta: string;
-  onPick: () => void;
-}) {
-  const t = TONE_CLASS[tone];
-
-  return (
-    <div
-      className="group relative h-[340px] [perspective:1400px]"
-      onMouseEnter={() => onOpen(id)}
-      onMouseLeave={() => onClose(id)}
-      onClick={() => (flipped ? onClose(id) : onOpen(id))}
-    >
-      <div
-        aria-hidden
-        className={`pointer-events-none absolute -inset-1 rounded-2xl bg-gradient-to-br ${t.glow} opacity-0 blur-xl transition-opacity duration-700 group-hover:opacity-60`}
-      />
-      <div
-        className={[
-          "relative h-full w-full transition-transform duration-[800ms] ease-in-out [transform-style:preserve-3d]",
-          flipped ? "[transform:rotateY(180deg)]" : "",
-        ].join(" ")}
-      >
-        {/* front */}
-        <div className="absolute inset-0 [backface-visibility:hidden]">
-          <Card
-            className={[
-              "fd-tile relative overflow-hidden p-5 h-full flex flex-col cursor-pointer border-border/70 group-hover:shadow-2xl",
-              active ? `ring-2 ${t.ring}` : "",
-            ].join(" ")}
-          >
-            <div aria-hidden className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${t.glow}`} />
-            {art}
-            <div className="flex items-start gap-3 mt-4">
-              <div className={`fd-float h-11 w-11 shrink-0 rounded-xl inline-flex items-center justify-center shadow-sm ${t.icon}`}>
-                <Icon className="h-5 w-5" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <h2 className={`fd-gradient-text text-[19px] font-bold leading-tight truncate ${t.text}`}>{title}</h2>
-                <div className="text-[11.5px] text-muted-foreground mt-0.5 truncate">{aka}</div>
-              </div>
-            </div>
-            <p className="text-[13px] text-muted-foreground mt-3 leading-relaxed">{summary}</p>
-            <div className="mt-auto pt-4">
-              <Button
-                className="w-full"
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onPick();
-                }}
-              >
-                {cta} <ArrowRight className="h-4 w-4" />
-              </Button>
-            </div>
-          </Card>
-        </div>
-
-        {/* back */}
-        <div className="absolute inset-0 [transform:rotateY(180deg)] [backface-visibility:hidden]">
-          <Card className={`p-4 h-full flex flex-col ring-1 ${t.ring}`}>
-            <div className="flex items-center gap-2.5">
-              <div className={`h-8 w-8 shrink-0 rounded-lg inline-flex items-center justify-center ${t.icon}`}>
-                <Icon className="h-4 w-4" />
-              </div>
-              <h2 className="text-[15px] font-semibold leading-tight">{title}</h2>
-              <span className={`ml-auto shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-semibold ${t.chip}`}>{tag}</span>
-            </div>
-
-            <div className="grid grid-cols-2 gap-1.5 mt-3">
-              {facts.map((f) => (
-                <div key={f.k} className="rounded-md border border-border px-2 py-1.5">
-                  <div className="text-[9.5px] uppercase tracking-wider text-muted-foreground font-semibold truncate">{f.k}</div>
-                  <div className="text-[12px] font-semibold mt-0.5 leading-snug">{f.v}</div>
-                </div>
-              ))}
-            </div>
-
-            <ul className="mt-2.5 space-y-1 text-[12px] flex-1">
-              {details.map((d) => (
-                <li key={d} className="flex items-start gap-1.5">
-                  <span className="text-success mt-0.5">✓</span>
-                  <span className="text-muted-foreground leading-snug">{d}</span>
-                </li>
-              ))}
-            </ul>
-
-            <Button
-              className="w-full mt-2"
-              size="sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                onPick();
-              }}
-            >
-              {cta} <ArrowRight className="h-4 w-4" />
-            </Button>
-          </Card>
-        </div>
+    <div>
+      <svg viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" className="w-full h-16">
+        <polyline points={d} fill="none" stroke="currentColor" strokeWidth="1.5" className="text-primary" vectorEffect="non-scaling-stroke" />
+      </svg>
+      <div className="flex justify-between text-[10px] text-muted-foreground">
+        <span>{labels[0]} · {points[0]}%</span>
+        <span>{labels[labels.length - 1]} · {points[points.length - 1]}%</span>
       </div>
     </div>
   );

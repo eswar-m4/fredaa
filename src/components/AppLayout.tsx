@@ -2,75 +2,45 @@ import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { ReactNode, useState, useEffect } from "react";
 import {
   LayoutDashboard,
-  Target,
-  Globe2,
-  Library,
-  BarChart3,
-  Workflow as WorkflowIcon,
   Activity,
-  CheckSquare,
   Upload,
   Bell,
   HelpCircle,
-  GitBranch,
-  RefreshCw,
+  MessageSquare,
   PanelLeft,
-  Compass,
+  ChevronsUpDown,
   Sun,
   Moon,
 } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { setUseCase, useUseCase, USE_CASES } from "@/lib/useCase";
 import { fetchSession, logoutRequest, type SessionInfo } from "@/lib/auth";
-import { seedDemoJobs } from "@/data/demo-jobs";
+import { CUSTOMERS } from "@/data/customers";
+import { setActiveCustomer, useActiveCustomer } from "@/lib/workspace";
 import fredaLogo from "@/assets/freda-mobius-bold.png";
 
-type NavItem = { to: string; label: string; icon: typeof Target; hash?: string };
+type NavItem = { to: string; label: string; icon: typeof Activity; hash?: string };
 type NavGroup = { group: string; items: NavItem[] };
 
-const BASE: NavGroup = {
-  group: "OVERVIEW",
-  items: [{ to: "/", label: "Playbooks", icon: LayoutDashboard }],
-};
-
-const TARGETED: NavGroup = {
-  group: "AGENTS",
+const WORKSPACE: NavGroup = {
+  group: "WORKSPACE",
   items: [
-    { to: "/site-specific", label: "Sources & Agents", icon: Library },
-  ],
-};
-
-
-
-const OPENWEB: NavGroup = {
-  group: "SOLUTIONS",
-  items: [
-    { to: "/any-site", label: "Dataset Setup", icon: GitBranch },
-  ],
-};
-
-const DISCOVERY: NavGroup = {
-  group: "ASK FREDA",
-  items: [
-    { to: "/discover", label: "Ask Freda", icon: Compass },
-  ],
-};
-
-const OPERATE: NavGroup = {
-  group: "OPERATE",
-  items: [
-    { to: "/monitoring", label: "Monitoring", icon: Activity },
-    { to: "/review", label: "Review", icon: CheckSquare },
-    { to: "/dashboard", label: "Dashboard", icon: BarChart3 },
+    { to: "/", label: "Dashboard & Review", icon: LayoutDashboard },
+    { to: "/monitoring", label: "Monitoring & Refresh", icon: Activity },
     { to: "/export", label: "Export & Sync", icon: Upload },
   ],
 };
+
+const ASSIST: NavGroup = {
+  group: "ASSISTANT",
+  items: [{ to: "/ask-freda", label: "Ask FreDA", icon: MessageSquare }],
+};
+
 
 export function AppLayout({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const hash = useRouterState({ select: (s) => s.location.hash });
-  const uc = useUseCase();
+  const customer = useActiveCustomer();
 
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
@@ -93,9 +63,8 @@ export function AppLayout({ children }: { children: ReactNode }) {
     return "";
   })();
 
-  useEffect(() => {
-    seedDemoJobs();
-  }, []);
+
+
 
   useEffect(() => {
     setMounted(true);
@@ -201,11 +170,8 @@ export function AppLayout({ children }: { children: ReactNode }) {
     }
   }
 
-  const groups: NavGroup[] = [BASE];
-  if (uc === "targeted") groups.push(TARGETED);
-  if (uc === "openweb") groups.push(OPENWEB);
-  if (uc === "discovery") groups.push(DISCOVERY);
-  if (uc) groups.push(OPERATE);
+  const groups: NavGroup[] = [WORKSPACE, ASSIST];
+
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-background text-foreground">
@@ -221,30 +187,47 @@ export function AppLayout({ children }: { children: ReactNode }) {
               <img src={fredaLogo} alt="Freda" width={512} height={512} className="h-9 w-9 object-contain" />
             </span>
             <div>
-              <div className="text-[15px] font-semibold leading-tight">Freda</div>
-              <div className="text-[11px] text-white/60">B2B Data Intelligence</div>
+              <div className="text-[15px] font-semibold leading-tight">FreDA</div>
+              <div className="text-[11px] text-white/60">Customer Data Workspace</div>
             </div>
           </div>
         </div>
 
-        {uc && (
-          <div className="px-3 py-3 border-b border-white/10 whitespace-nowrap">
-            <div className="text-[10px] uppercase tracking-wider text-white/40 font-semibold mb-1">Active playbook</div>
-            <div className="flex items-center justify-between gap-2">
-              <div className="flex items-center gap-1.5 font-semibold text-[12px]">
-                {uc === "targeted" ? <Target className="h-3.5 w-3.5" /> : <Globe2 className="h-3.5 w-3.5" />}
-                <span>{USE_CASES[uc].short}</span>
-              </div>
+        <div className="px-3 py-3 border-b border-white/10 whitespace-nowrap">
+          <div className="text-[10px] uppercase tracking-wider text-white/40 font-semibold mb-1.5">Customer</div>
+          <Popover>
+            <PopoverTrigger asChild>
               <button
-                onClick={() => setUseCase(null)}
-                title="Switch playbook"
-                className="inline-flex items-center gap-1 text-[10px] text-white/60 hover:text-white"
+                suppressHydrationWarning
+                className="w-full flex items-center justify-between gap-2 rounded-md bg-white/10 hover:bg-white/15 px-2.5 py-2 text-left transition"
               >
-                <RefreshCw className="h-3 w-3" /> switch
+                <span className="min-w-0">
+                  <span className="block text-[12.5px] font-semibold truncate">{customer.name}</span>
+                  <span className="block text-[10.5px] text-white/55 truncate">{customer.industry}</span>
+                </span>
+                <ChevronsUpDown className="h-3.5 w-3.5 text-white/60 shrink-0" />
               </button>
-            </div>
-          </div>
-        )}
+            </PopoverTrigger>
+            <PopoverContent align="start" className="w-64 p-1">
+              {CUSTOMERS.map((c) => (
+                <button
+                  key={c.id}
+                  onClick={() => setActiveCustomer(c.id)}
+                  className={[
+                    "w-full text-left rounded-md px-3 py-2 hover:bg-secondary transition",
+                    c.id === customer.id ? "bg-secondary" : "",
+                  ].join(" ")}
+                >
+                  <div className="text-[13px] font-medium text-foreground">{c.name}</div>
+                  <div className="text-[11px] text-muted-foreground">
+                    {c.industry} · {c.projects.length} projects
+                  </div>
+                </button>
+              ))}
+            </PopoverContent>
+          </Popover>
+        </div>
+
 
         <nav className="flex-1 overflow-y-auto py-3 px-2 space-y-4">
           {groups.map((g) => (
