@@ -12,7 +12,6 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AskFredaRouteImport } from './routes/ask-freda'
-import { Route as ExportRouteImport } from './routes/export'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MonitoringRouteImport } from './routes/monitoring'
 import { Route as RefreshRouteImport } from './routes/refresh'
@@ -30,11 +29,6 @@ const AdminRoute = AdminRouteImport.update({
 const AskFredaRoute = AskFredaRouteImport.update({
   id: '/ask-freda',
   path: '/ask-freda',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ExportRoute = ExportRouteImport.update({
-  id: '/export',
-  path: '/export',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -57,7 +51,6 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/ask-freda': typeof AskFredaRoute
-  '/export': typeof ExportRoute
   '/login': typeof LoginRoute
   '/monitoring': typeof MonitoringRoute
   '/refresh': typeof RefreshRoute
@@ -66,7 +59,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/ask-freda': typeof AskFredaRoute
-  '/export': typeof ExportRoute
   '/login': typeof LoginRoute
   '/monitoring': typeof MonitoringRoute
   '/refresh': typeof RefreshRoute
@@ -76,7 +68,6 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/ask-freda': typeof AskFredaRoute
-  '/export': typeof ExportRoute
   '/login': typeof LoginRoute
   '/monitoring': typeof MonitoringRoute
   '/refresh': typeof RefreshRoute
@@ -84,28 +75,14 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/'
-    | '/admin'
-    | '/ask-freda'
-    | '/export'
-    | '/login'
-    | '/monitoring'
-    | '/refresh'
+    '/' | '/admin' | '/ask-freda' | '/login' | '/monitoring' | '/refresh'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/admin'
-    | '/ask-freda'
-    | '/export'
-    | '/login'
-    | '/monitoring'
-    | '/refresh'
+  to: '/' | '/admin' | '/ask-freda' | '/login' | '/monitoring' | '/refresh'
   id:
     | '__root__'
     | '/'
     | '/admin'
     | '/ask-freda'
-    | '/export'
     | '/login'
     | '/monitoring'
     | '/refresh'
@@ -115,7 +92,6 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
   AskFredaRoute: typeof AskFredaRoute
-  ExportRoute: typeof ExportRoute
   LoginRoute: typeof LoginRoute
   MonitoringRoute: typeof MonitoringRoute
   RefreshRoute: typeof RefreshRoute
@@ -142,13 +118,6 @@ declare module '@tanstack/react-router' {
       path: '/ask-freda'
       fullPath: '/ask-freda'
       preLoaderRoute: typeof AskFredaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/export': {
-      id: '/export'
-      path: '/export'
-      fullPath: '/export'
-      preLoaderRoute: typeof ExportRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -179,7 +148,6 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   AskFredaRoute: AskFredaRoute,
-  ExportRoute: ExportRoute,
   LoginRoute: LoginRoute,
   MonitoringRoute: MonitoringRoute,
   RefreshRoute: RefreshRoute,
