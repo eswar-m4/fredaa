@@ -293,6 +293,12 @@ function entityPool(customerId: string) {
 
 function valueFor(datapoint: string, seed: string) {
   const dp = datapoint.toLowerCase();
+  if (dp.includes("country")) return pick(seed, ["United States", "United Kingdom", "Germany", "India", "Singapore", "Canada", "Australia"]);
+  if (dp.includes("city")) return pick(seed, ["Boston", "London", "Berlin", "Austin", "Mumbai", "Toronto", "Sydney", "Chicago"]);
+  if (dp.includes("name") || dp.includes("author") || dp.includes("owner") || dp.includes("officer") || dp.includes("brand") || dp.includes("seller") || dp.includes("publisher"))
+    return pick(seed, ["Aldridge Group", "M. Okafor", "Helen Vaz", "Corvus Holdings", "R. Sandhu", "Northgate Ltd", "J. Feldman"]);
+  if (dp.includes("industry") || dp.includes("category") || dp.includes("discipline") || dp.includes("practice"))
+    return pick(seed, ["Software", "Healthcare", "Logistics", "Financial services", "Manufacturing", "Education"]);
   if (dp.includes("price") || dp.includes("fee") || dp.includes("mrp")) return `$${int(seed, 40, 1800).toLocaleString()}`;
   if (dp.includes("count") || dp.includes("size") || dp.includes("hours") || dp.includes("year")) return String(int(seed, 4, 4200));
   if (dp.includes("email")) return `contact${int(seed, 1, 99)}@example.com`;

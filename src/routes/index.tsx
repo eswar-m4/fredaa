@@ -111,8 +111,8 @@ function DashboardPage() {
                     onClick={() => setSelected(p.id)}
                     className={cn("border-b border-border/60 cursor-pointer hover:bg-secondary/40", p.id === selected && "bg-info-bg/60")}
                   >
-                    <td className="px-5 py-3">
-                      <div className="font-medium">{p.name}</div>
+                    <td className="px-5 py-3 min-w-[240px]">
+                      <div className="font-medium whitespace-nowrap">{p.name}</div>
                       <div className="text-[11px] text-muted-foreground">
                         {p.source} · {p.datapoints.length} datapoints · {p.frequency}
                       </div>
@@ -134,6 +134,7 @@ function DashboardPage() {
                     <td className="px-5 py-3 text-right">
                       <Button
                         size="sm"
+                        className="whitespace-nowrap"
                         variant={p.pendingReview > 0 ? "primary" : "outline"}
                         onClick={(e) => {
                           e.stopPropagation();
