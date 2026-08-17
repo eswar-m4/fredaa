@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AdmvBar, Badge, Button, Donut, Input, Select } from "@/components/ui-bits";
 import { cn } from "@/lib/utils";
-import { Check, X, ChevronLeft, ChevronRight, ArrowRight, RotateCcw, Layers, Send, Filter } from "lucide-react";
+import { Check, X, ChevronLeft, ChevronRight, ArrowRight, RotateCcw, Layers, Send, Filter, ExternalLink } from "lucide-react";
 import { reviewRecordsFor, fmt, hrsAgo, type Project, type ReviewRecord, type ChangeType } from "@/data/customers";
 
 type Decision = "approved" | "rejected";
@@ -288,7 +288,16 @@ export function ReviewDialog({
                     <Badge tone={current.confidence > 90 ? "success" : current.confidence > 80 ? "warning" : "destructive"}>
                       {current.confidence}% confidence
                     </Badge>
-                    <span className="text-[11px] text-muted-foreground ml-auto">detected {hrsAgo(current.detectedHrs)}</span>
+                    <a
+                      href={current.sourceUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="ml-auto inline-flex items-center gap-1 text-[11.5px] text-primary hover:underline max-w-[280px] truncate"
+                      title={current.sourceUrl}
+                    >
+                      <ExternalLink className="h-3.5 w-3.5 shrink-0" /> {current.source}
+                    </a>
+                    <span className="text-[11px] text-muted-foreground">detected {hrsAgo(current.detectedHrs)}</span>
                   </div>
                   <div className="grid md:grid-cols-[220px_1fr_auto_1fr] items-center gap-3">
                     <div className="text-[12px] text-muted-foreground">{current.datapoint}</div>
@@ -329,6 +338,7 @@ export function ReviewDialog({
                     <th className="px-3 py-2 font-semibold">Datapoint</th>
                     <th className="px-3 py-2 font-semibold">Change</th>
                     <th className="px-3 py-2 font-semibold">Old → New</th>
+                    <th className="px-3 py-2 font-semibold">Source</th>
                     <th className="px-3 py-2 font-semibold">Conf.</th>
                     <th className="px-6 py-2 font-semibold text-right">Decision</th>
                   </tr>
@@ -353,6 +363,18 @@ export function ReviewDialog({
                         </td>
                         <td className="px-3 py-2 font-mono text-[11.5px] text-muted-foreground truncate max-w-[320px]">
                           {r.oldValue} → <span className="text-foreground">{r.newValue}</span>
+                        </td>
+                        <td className="px-3 py-2">
+                          <a
+                            href={r.sourceUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            title={r.sourceUrl}
+                            className="inline-flex items-center gap-1 text-primary hover:underline max-w-[180px] truncate text-[11.5px]"
+                          >
+                            <ExternalLink className="h-3 w-3 shrink-0" /> {r.source}
+                          </a>
                         </td>
                         <td className="px-3 py-2 tabular-nums">{r.confidence}%</td>
                         <td className="px-6 py-2">
