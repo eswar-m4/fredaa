@@ -76,7 +76,7 @@ function AskFredaPage() {
   return (
     <AppLayout>
       <PageHeader title="Ask FreDA" subtitle="Navigate the workspace and analyse your data — ask in plain English." />
-      <div className="px-7 pb-8 grid xl:grid-cols-[1.6fr_1fr] gap-5 items-start">
+      <div className="px-7 pb-8 grid xl:grid-cols-[1.6fr_1fr] gap-5 items-stretch">
         <Card className="flex flex-col h-[calc(100vh-230px)] min-h-[420px]">
           <div className="flex-1 overflow-y-auto p-5 space-y-3">
             {messages.map((m, i) => (
