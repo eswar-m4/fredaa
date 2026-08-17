@@ -460,11 +460,10 @@ function RefreshPage() {
               <div className="flex items-center gap-1.5 text-[12px] font-semibold">
                 <Sparkles className="h-3.5 w-3.5 text-primary" /> Live estimate · {draftUrlCount} sources · {draftDatapoints} datapoints
               </div>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-2">
+              <div className="grid grid-cols-3 gap-3 mt-2">
                 <Est label="Setup" value={`${draftEstimate.setupDays} days`} />
                 <Est label="First run" value={`${draftEstimate.firstRunHrs} hrs`} />
                 <Est label="Records / mo" value={fmt(draftEstimate.monthlyRecords)} />
-                <Est label="Credits / mo" value={fmt(draftEstimate.credits)} />
               </div>
               <div className="flex flex-wrap items-center justify-between gap-2 mt-3">
                 <div className="text-[11px] text-muted-foreground inline-flex items-center gap-1">
