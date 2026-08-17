@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
 import {
-  AdmvBar,
+  Badge,
   Badge,
   Button,
   Card,

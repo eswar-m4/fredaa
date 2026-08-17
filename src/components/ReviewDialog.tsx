@@ -158,25 +158,26 @@ export function ReviewDialog({
                 <span>Sampling</span>
                 <span className="tabular-nums text-foreground">{sampling}%</span>
               </div>
-              <div className="grid grid-cols-3 gap-1.5">
-                {[2, 5, 10, 25, 50, 100].map((s) => (
-                  <button
-                    key={s}
-                    suppressHydrationWarning
-                    onClick={() => setSampling(s)}
-                    className={cn(
-                      "h-8 rounded-md text-[11.5px] font-medium border transition",
-                      sampling === s ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-muted-foreground hover:bg-secondary",
-                    )}
-                  >
-                    {s}%
-                  </button>
-                ))}
+              <input
+                suppressHydrationWarning
+                type="range"
+                min={1}
+                max={100}
+                step={1}
+                value={sampling}
+                onChange={(e) => setSampling(Number(e.target.value))}
+                className="w-full accent-[var(--primary)]"
+              />
+              <div className="flex justify-between text-[10px] text-muted-foreground tabular-nums mt-0.5">
+                <span>1%</span>
+                <span>50%</span>
+                <span>100%</span>
               </div>
               <p className="text-[11px] text-muted-foreground mt-1.5">
                 {sampling}% sample — reviewing {fmt(records.length)} of {fmt(all.length)} changed records.
               </p>
             </div>
+
 
 
             <div>
