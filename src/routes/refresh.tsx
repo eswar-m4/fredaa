@@ -7,6 +7,10 @@ import { useActiveCustomer } from "@/lib/workspace";
 import { estimate, fmt, requestsFor, type ChangeRequest, type Project, type SourceRef } from "@/data/customers";
 import { statusTone } from "@/routes/index";
 import { cn } from "@/lib/utils";
+import { ATTRIBUTES } from "@/data/attributes";
+
+const ATTRIBUTE_CHOICES: string[] = ATTRIBUTES.map((a) => a.label);
+
 
 export const Route = createFileRoute("/refresh")({
   head: () => ({
