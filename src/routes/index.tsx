@@ -155,8 +155,14 @@ function DashboardPage() {
             ADMV — change signature
           </SectionTitle>
 
-
-
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mb-3">
+            {SEGMENTS.map((s) => (
+              <span key={s.key} className="inline-flex items-center gap-2 text-[12px] text-muted-foreground">
+                <span className={cn("h-2.5 w-2.5 rounded-sm", s.dot)} />
+                {s.label}
+              </span>
+            ))}
+          </div>
 
           <div className="rounded-lg border border-border overflow-hidden">
             <MixRow label="All projects in scope" sub={`${scoped.length} projects · ${fmt(totalChanges)} records`} a={admv} emphasis />
@@ -170,6 +176,7 @@ function DashboardPage() {
             ))}
           </div>
         </Card>
+
 
         {/* Review by project — full width */}
         <Card className="overflow-hidden">
