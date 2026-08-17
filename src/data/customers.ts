@@ -346,7 +346,7 @@ function valueFor(datapoint: string, seed: string) {
   return pick(seed, ["Tier 1", "Amber", "Global", "Regional", "Standard", "Premium", "Grade A", "Category B"]) + " " + int(seed + "x", 10, 99);
 }
 
-}
+
 
 export function reviewRecordsFor(project: Project, count = 24): ReviewRecord[] {
   const pool = entityPool(project.customerId);
