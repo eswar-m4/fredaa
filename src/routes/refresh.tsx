@@ -192,17 +192,50 @@ function RefreshPage() {
           <Card className="p-5 flex flex-col h-[520px]">
             <SectionTitle hint={`${sources.length} sources`}>Manage — {project.name}</SectionTitle>
 
-            <div className="flex items-center gap-2 mb-3">
-              <Input
-                className="flex-1 min-w-0"
-                placeholder="https://new-source.example.com"
-                value={newSource}
-                onChange={(e) => setNewSource(e.target.value)}
-              />
-              <Button size="sm" className="shrink-0" onClick={addSource}>
-                <Plus className="h-3.5 w-3.5" /> Add source
-              </Button>
+            <div className="rounded-lg border border-border p-3 mb-3 shrink-0">
+              <div className="flex items-center gap-2">
+                <Input
+                  className="flex-1 min-w-0"
+                  placeholder="https://new-source.example.com"
+                  value={newSource}
+                  onChange={(e) => setNewSource(e.target.value)}
+                />
+                <Button size="sm" className="shrink-0" onClick={addSource} disabled={!newSource.trim() || sourceAttrs.length === 0}>
+                  <Plus className="h-3.5 w-3.5" /> Add source
+                </Button>
+              </div>
+              <div className="mt-2.5">
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">
+                    Data attributes to extract · {sourceAttrs.length}
+                  </span>
+                  <button
+                    className="text-[11px] text-primary hover:underline"
+                    onClick={() => setSourceAttrs(sourceAttrs.length ? [] : project.datapoints.slice(0, 6))}
+                  >
+                    {sourceAttrs.length ? "Clear" : "Use project defaults"}
+                  </button>
+                </div>
+                <div className="flex flex-wrap gap-1.5 max-h-[92px] overflow-y-auto pr-1">
+                  {ATTRIBUTE_CHOICES.map((a) => {
+                    const on = sourceAttrs.includes(a);
+                    return (
+                      <button
+                        key={a}
+                        onClick={() => setSourceAttrs((s) => (on ? s.filter((x) => x !== a) : [...s, a]))}
+                        className={cn(
+                          "h-7 px-2.5 rounded-md border text-[11.5px] font-medium transition",
+                          on ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-muted-foreground hover:bg-secondary",
+                        )}
+                      >
+                        {a}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
+
 
             <div className="flex-1 min-h-0 overflow-y-auto space-y-2 pr-1">
               {sources.map((s) => (
