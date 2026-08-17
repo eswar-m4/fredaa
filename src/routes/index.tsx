@@ -186,7 +186,7 @@ function DashboardPage() {
                 <tr className="text-left text-[11px] uppercase tracking-wider text-muted-foreground border-b border-border">
                   <th className="px-5 py-2 font-semibold">Project</th>
                   <th className="px-3 py-2 font-semibold">Records</th>
-                  <th className="px-3 py-2 font-semibold w-[190px]">ADMV %</th>
+                  <th className="px-3 py-2 font-semibold w-[210px]">ADMV %</th>
                   <th className="px-3 py-2 font-semibold">Status</th>
                   <th className="px-5 py-2 font-semibold text-right">Review</th>
                 </tr>
@@ -210,11 +210,11 @@ function DashboardPage() {
                       <td className="px-3 py-3 tabular-nums">{compact(p.records)}</td>
                       <td className="px-3 py-3">
                         <AdmvBar a={a} />
-                        <div className="text-[10.5px] text-muted-foreground mt-1 tabular-nums">
+                        <div className="text-[10.5px] text-muted-foreground mt-1 tabular-nums whitespace-nowrap">
                           A {ap.added.toFixed(1)} · D {ap.deleted.toFixed(1)} · M {ap.modified.toFixed(1)} · V {ap.verified.toFixed(1)}
                         </div>
                       </td>
-                      <td className="px-3 py-3">
+                      <td className="px-3 py-3 whitespace-nowrap">
                         <Badge tone={statusTone[p.status]}>{p.status}</Badge>
                       </td>
                       <td className="px-5 py-3 text-right">
@@ -245,7 +245,7 @@ function DashboardPage() {
               {active.source} · last refresh {hrsAgo(active.lastRefreshHrs)} · next {inHrs(active.nextRefreshHrs)}
             </div>
 
-            <div className="flex items-center gap-4 mt-4">
+            <div className="flex items-center justify-around gap-3 mt-4">
               <Donut value={active.accuracy} label="accuracy" tone="success" />
               <Donut value={active.coverage} label="coverage" />
               <Donut value={active.freshness} label="fresh" tone={active.freshness > 80 ? "success" : "warning"} />
