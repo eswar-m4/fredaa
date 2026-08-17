@@ -347,7 +347,7 @@ function RefreshPage() {
           </Card>
 
 
-          <Card className="p-5">
+          <Card className="p-5 flex flex-col">
             <SectionTitle hint="add / remove / new build">Change requests</SectionTitle>
             <p className="text-[11.5px] text-muted-foreground -mt-1 mb-2 inline-flex items-start gap-1.5">
               <Info className="h-3.5 w-3.5 mt-[1px] shrink-0" />
