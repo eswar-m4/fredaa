@@ -60,6 +60,9 @@ function RefreshPage() {
   const [extra, setExtra] = useState<Record<string, SourceRef[]>>({});
   const [removed, setRemoved] = useState<Record<string, string[]>>({});
   const [newSource, setNewSource] = useState("");
+  const [sourceAttrs, setSourceAttrs] = useState<string[]>([]);
+  const [attrsBySource, setAttrsBySource] = useState<Record<string, string[]>>({});
+
   const [schedule, setSchedule] = useState<Record<string, Project["frequency"]>>({});
   const [notice, setNotice] = useState("");
   const [raised, setRaised] = useState<ChangeRequest[]>([]);
