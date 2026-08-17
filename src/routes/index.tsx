@@ -192,7 +192,7 @@ function DashboardPage() {
                   <th className="px-5 py-2 font-semibold">Project</th>
                   <th className="px-3 py-2 font-semibold">Records</th>
                   <th className="px-3 py-2 font-semibold">Pending</th>
-                  <th className="px-3 py-2 font-semibold w-[230px]">ADMV</th>
+                  <th className="px-3 py-2 font-semibold w-[210px]">ADMV</th>
                   <th className="px-3 py-2 font-semibold">Accuracy</th>
                   <th className="px-3 py-2 font-semibold">Review status</th>
                   <th className="px-3 py-2 font-semibold">Action needed</th>
@@ -211,7 +211,7 @@ function DashboardPage() {
                       onClick={() => setSelected(p.id)}
                       className={cn("border-b border-border/60 cursor-pointer hover:bg-secondary/40", p.id === active.id && "bg-info-bg/60")}
                     >
-                      <td className="px-5 py-3 min-w-[220px]">
+                      <td className="px-5 py-3 min-w-[200px]">
                         <div className="font-medium whitespace-nowrap">{p.name}</div>
                         <div className="text-[11px] text-muted-foreground whitespace-nowrap">
                           {p.sources.length} sources · {p.datapoints.length} datapoints · {p.frequency}
@@ -220,7 +220,7 @@ function DashboardPage() {
                       <td className="px-3 py-3 tabular-nums whitespace-nowrap">{fmt(p.records)}</td>
                       <td className="px-3 py-3 tabular-nums whitespace-nowrap">{fmt(p.pendingReview)}</td>
                       <td className="px-3 py-3">
-                        <div className="grid grid-cols-4 gap-1 w-[220px]">
+                        <div className="grid grid-cols-4 gap-1 w-[200px]">
                           {SEGMENTS.map((s) => (
                             <div
                               key={s.key}
@@ -237,7 +237,7 @@ function DashboardPage() {
                       <td className="px-3 py-3 whitespace-nowrap">
                         <Badge tone={reviewTone[rs]}>{rs}</Badge>
                       </td>
-                      <td className="px-3 py-3 max-w-[220px]">
+                      <td className="px-3 py-3 max-w-[180px]">
                         {actionByProject[p.id] ? (
                           <span className="inline-flex items-center gap-1.5 text-[12px] text-destructive">
                             <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
@@ -258,7 +258,7 @@ function DashboardPage() {
                             setReviewProject(p);
                           }}
                         >
-                          {p.pendingReview > 0 ? `${fmt(p.pendingReview)} to review` : "View records"}
+                          {p.pendingReview > 0 ? `Review ${fmt(p.pendingReview)}` : "View"}
                         </Button>
                       </td>
                     </tr>
