@@ -1,10 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Plus, Trash2, CalendarClock, Sparkles, Send, Globe, FolderPlus, CheckCircle2, Clock } from "lucide-react";
+import { Plus, Trash2, CalendarClock, Sparkles, Send, Globe, FolderPlus, CheckCircle2, Clock, Info, X } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
 import { Badge, Button, Card, Input, PageHeader, SectionTitle, Select } from "@/components/ui-bits";
 import { useActiveCustomer } from "@/lib/workspace";
-import { compact, estimate, fmt, requestsFor, type Project, type SourceRef } from "@/data/customers";
+import { estimate, fmt, requestsFor, type ChangeRequest, type Project, type SourceRef } from "@/data/customers";
 import { statusTone } from "@/routes/index";
 import { cn } from "@/lib/utils";
 
@@ -28,7 +28,7 @@ export const Route = createFileRoute("/refresh")({
   component: RefreshPage,
 });
 
-type Draft = { name: string; url: string; sources: number; datapoints: number; frequency: Project["frequency"] };
+type Draft = { name: string; urls: string[]; datapoints: number; frequency: Project["frequency"] };
 
 function RefreshPage() {
   const customer = useActiveCustomer();
@@ -40,15 +40,37 @@ function RefreshPage() {
   const [newSource, setNewSource] = useState("");
   const [schedule, setSchedule] = useState<Record<string, Project["frequency"]>>({});
   const [notice, setNotice] = useState("");
+  const [raised, setRaised] = useState<ChangeRequest[]>([]);
 
-  const [draft, setDraft] = useState<Draft>({ name: "", url: "", sources: 3, datapoints: 12, frequency: "Weekly" });
-  const draftEstimate = estimate(draft.sources, draft.datapoints, draft.frequency);
+  const [draft, setDraft] = useState<Draft>({ name: "", urls: ["", "", ""], datapoints: 12, frequency: "Weekly" });
+  const draftUrlCount = Math.max(1, draft.urls.filter((u) => u.trim()).length || draft.urls.length);
+  const draftEstimate = estimate(draftUrlCount, draft.datapoints, draft.frequency);
 
-  const requests = useMemo(() => requestsFor(customer), [customer.id]);
+  const seeded = useMemo(() => requestsFor(customer), [customer.id]);
+  const requests = [...raised, ...seeded];
 
   const sources = [...project.sources, ...(extra[project.id] ?? [])].filter((s) => !(removed[project.id] ?? []).includes(s.id));
   const pendingSources = (extra[project.id] ?? []).length;
   const sourceEstimate = estimate(Math.max(1, pendingSources), project.datapoints.length, schedule[project.id] ?? project.frequency);
+
+  function nextReqId() {
+    return `REQ-${2400 + raised.length + 1}`;
+  }
+
+  function logRequest(type: ChangeRequest["type"], detail: string, estimateDays: number, projectName = project.name) {
+    setRaised((r) => [
+      {
+        id: `REQ-${2400 + r.length + 1}`,
+        project: projectName,
+        type,
+        detail,
+        submitted: "Just now",
+        status: "Estimating",
+        estimateDays,
+      },
+      ...r,
+    ]);
+  }
 
   function addSource() {
     const url = newSource.trim();
@@ -61,21 +83,34 @@ function RefreshPage() {
         { id, label: url.replace(/^https?:\/\//, ""), url, status: "Pending approval", records: 0, addedOn: "Just now" },
       ],
     }));
+    logRequest("Add source", `Add source ${url.replace(/^https?:\/\//, "")}`, sourceEstimate.setupDays);
     setNewSource("");
-    setNotice(`Source queued — estimate generated and sent to your FreDA admin for approval.`);
+    setNotice(`Source queued as ${nextReqId()} — estimate generated and sent to your FreDA admin for approval.`);
   }
 
   function removeSource(id: string) {
+    const label = sources.find((s) => s.id === id)?.label ?? id;
     setRemoved((r) => ({ ...r, [project.id]: [...(r[project.id] ?? []), id] }));
-    setNotice("Removal request raised — admin notified, data stays live until approved.");
+    logRequest("Remove source", `Retire source ${label}`, 2);
+    setNotice(`Removal request ${nextReqId()} raised — admin notified, data stays live until approved.`);
   }
 
   function submitProject() {
     if (!draft.name.trim()) return;
-    setNotice(
-      `Project “${draft.name}” submitted — estimate: ${draftEstimate.setupDays} days setup, ~${compact(draftEstimate.monthlyRecords)} records/month. Admin notified.`,
+    logRequest(
+      "New project",
+      `New project “${draft.name}” · ${draftUrlCount} URLs · ${draft.datapoints} datapoints · ${draft.frequency}`,
+      draftEstimate.setupDays,
+      draft.name,
     );
-    setDraft({ name: "", url: "", sources: 3, datapoints: 12, frequency: "Weekly" });
+    setNotice(
+      `Project “${draft.name}” submitted as ${nextReqId()} — estimate: ${draftEstimate.setupDays} days setup, ~${fmt(draftEstimate.monthlyRecords)} records/month. Admin notified.`,
+    );
+    setDraft({ name: "", urls: ["", "", ""], datapoints: 12, frequency: "Weekly" });
+  }
+
+  function setUrl(i: number, v: string) {
+    setDraft((d) => ({ ...d, urls: d.urls.map((u, k) => (k === i ? v : u)) }));
   }
 
   return (
@@ -97,14 +132,14 @@ function RefreshPage() {
           </div>
         )}
 
-        <div className="grid xl:grid-cols-2 gap-5 items-stretch">
+        <div className="grid xl:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)] gap-5 items-start">
           {/* project list */}
-          <Card className="overflow-hidden flex flex-col">
-            <div className="px-5 pt-4 pb-3 border-b border-border">
+          <Card className="overflow-hidden flex flex-col min-h-[420px] max-h-[560px]">
+            <div className="px-5 pt-4 pb-3 border-b border-border shrink-0">
               <h3 className="text-[13px] font-semibold uppercase tracking-wider text-muted-foreground">Projects</h3>
               <p className="text-[12px] text-muted-foreground mt-1">Select a project to manage its sources and schedule.</p>
             </div>
-            <div className="flex-1 min-h-0 max-h-[520px] overflow-y-auto">
+            <div className="flex-1 min-h-0 overflow-y-auto">
               {customer.projects.map((p) => (
                 <button
                   key={p.id}
@@ -116,10 +151,12 @@ function RefreshPage() {
                 >
                   <div className="flex items-center gap-2">
                     <span className="text-[13px] font-medium flex-1 truncate">{p.name}</span>
-                    <Badge tone={statusTone[p.status]}>{p.status}</Badge>
+                    <Badge tone={statusTone[p.status]} className="whitespace-nowrap">
+                      {p.status}
+                    </Badge>
                   </div>
-                  <div className="text-[11px] text-muted-foreground mt-0.5">
-                    {p.sources.length} sources · {p.datapoints.length} datapoints · {compact(p.records)} records · {schedule[p.id] ?? p.frequency}
+                  <div className="text-[11px] text-muted-foreground mt-0.5 truncate">
+                    {p.sources.length} sources · {p.datapoints.length} datapoints · {fmt(p.records)} records · {schedule[p.id] ?? p.frequency}
                   </div>
                 </button>
               ))}
@@ -127,10 +164,22 @@ function RefreshPage() {
           </Card>
 
           {/* manage selected project */}
-          <Card className="p-5 flex flex-col">
+          <Card className="p-5 flex flex-col min-h-[420px] max-h-[560px]">
             <SectionTitle hint={`${sources.length} sources`}>Manage — {project.name}</SectionTitle>
 
-            <div className="space-y-2 mt-2 flex-1 min-h-0 max-h-[300px] overflow-y-auto pr-1">
+            <div className="flex items-center gap-2 mb-3">
+              <Input
+                className="flex-1 min-w-0"
+                placeholder="https://new-source.example.com"
+                value={newSource}
+                onChange={(e) => setNewSource(e.target.value)}
+              />
+              <Button size="sm" className="shrink-0" onClick={addSource}>
+                <Plus className="h-3.5 w-3.5" /> Add source
+              </Button>
+            </div>
+
+            <div className="flex-1 min-h-0 overflow-y-auto space-y-2 pr-1">
               {sources.map((s) => (
                 <div key={s.id} className="flex items-center gap-3 rounded-lg border border-border px-3 py-2.5">
                   <span className="h-8 w-8 rounded-md bg-secondary text-muted-foreground inline-flex items-center justify-center shrink-0">
@@ -139,14 +188,16 @@ function RefreshPage() {
                   <div className="min-w-0 flex-1">
                     <div className="text-[13px] font-medium truncate">{s.label}</div>
                     <div className="text-[11px] text-muted-foreground truncate">
-                      {s.url} · added {s.addedOn} · {compact(s.records)} records
+                      {s.url} · added {s.addedOn} · {fmt(s.records)} records
                     </div>
                   </div>
-                  <Badge tone={s.status === "Live" ? "success" : s.status === "Paused" ? "warning" : "info"}>{s.status}</Badge>
+                  <Badge className="whitespace-nowrap" tone={s.status === "Live" ? "success" : s.status === "Paused" ? "warning" : "info"}>
+                    {s.status}
+                  </Badge>
                   <button
                     onClick={() => removeSource(s.id)}
                     title="Remove source"
-                    className="h-8 w-8 rounded-md inline-flex items-center justify-center border border-border hover:bg-destructive/10 hover:text-destructive transition"
+                    className="h-8 w-8 shrink-0 rounded-md inline-flex items-center justify-center border border-border hover:bg-destructive/10 hover:text-destructive transition"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </button>
@@ -154,37 +205,8 @@ function RefreshPage() {
               ))}
             </div>
 
-            <div className="flex flex-wrap items-center gap-2 mt-3">
-              <Input
-                className="flex-1 min-w-[220px]"
-                placeholder="https://new-source.example.com"
-                value={newSource}
-                onChange={(e) => setNewSource(e.target.value)}
-              />
-              <Button size="sm" onClick={addSource}>
-                <Plus className="h-3.5 w-3.5" /> Add source
-              </Button>
-            </div>
-
-            {pendingSources > 0 && (
-              <div className="mt-3 rounded-lg border border-primary/40 bg-primary/5 p-3">
-                <div className="flex items-center gap-1.5 text-[12px] font-semibold">
-                  <Sparkles className="h-3.5 w-3.5 text-primary" /> Modification estimate
-                </div>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-2">
-                  <Est label="Setup" value={`${sourceEstimate.setupDays} days`} />
-                  <Est label="First run" value={`${sourceEstimate.firstRunHrs} hrs`} />
-                  <Est label="New records / mo" value={compact(sourceEstimate.monthlyRecords)} />
-                  <Est label="Credits / mo" value={fmt(sourceEstimate.credits)} />
-                </div>
-                <div className="text-[11px] text-muted-foreground mt-2">
-                  Confidence {sourceEstimate.confidence}% · sent to admin for approval before build starts.
-                </div>
-              </div>
-            )}
-
-            <div className="grid sm:grid-cols-[1fr_auto] gap-3 mt-4 items-end">
-              <div>
+            <div className="mt-3 pt-3 border-t border-border grid grid-cols-[minmax(0,1fr)_auto] gap-3 items-end shrink-0">
+              <div className="min-w-0">
                 <div className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5">Run schedule</div>
                 <Select
                   value={schedule[project.id] ?? project.frequency}
@@ -199,34 +221,61 @@ function RefreshPage() {
                 <CalendarClock className="h-3.5 w-3.5" /> Save schedule
               </Button>
             </div>
+
+            {pendingSources > 0 && (
+              <div className="mt-3 rounded-lg border border-primary/40 bg-primary/5 px-3 py-2.5 shrink-0">
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11.5px]">
+                  <span className="inline-flex items-center gap-1.5 font-semibold">
+                    <Sparkles className="h-3.5 w-3.5 text-primary" /> Modification estimate
+                  </span>
+                  <span>Setup {sourceEstimate.setupDays}d</span>
+                  <span>First run {sourceEstimate.firstRunHrs}h</span>
+                  <span>+{fmt(sourceEstimate.monthlyRecords)} records/mo</span>
+                  <span>{fmt(sourceEstimate.credits)} credits/mo</span>
+                  <span className="text-muted-foreground">Confidence {sourceEstimate.confidence}%</span>
+                </div>
+              </div>
+            )}
           </Card>
         </div>
 
         {/* new project */}
-        <div className="grid xl:grid-cols-2 gap-5 items-stretch">
+        <div className="grid xl:grid-cols-2 gap-5 items-start">
           <Card className="p-5">
             <SectionTitle hint="estimate generated instantly">Create a new project</SectionTitle>
             <div className="grid sm:grid-cols-2 gap-3 mt-2">
-              <div>
+              <div className="sm:col-span-2">
                 <Label>Project name</Label>
                 <Input placeholder="e.g. APAC Competitor Pricing" value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />
               </div>
-              <div>
-                <Label>Primary source URL</Label>
-                <Input placeholder="https://source.example.com" value={draft.url} onChange={(e) => setDraft({ ...draft, url: e.target.value })} />
+
+              <div className="sm:col-span-2">
+                <Label>Source URLs · {draft.urls.length}</Label>
+                <div className="space-y-2">
+                  {draft.urls.map((u, i) => (
+                    <div key={i} className="flex items-center gap-2">
+                      <span className="text-[11px] text-muted-foreground w-5 tabular-nums shrink-0">{i + 1}.</span>
+                      <Input
+                        className="flex-1 min-w-0"
+                        placeholder={`https://source-${i + 1}.example.com`}
+                        value={u}
+                        onChange={(e) => setUrl(i, e.target.value)}
+                      />
+                      <button
+                        onClick={() => setDraft((d) => ({ ...d, urls: d.urls.length > 1 ? d.urls.filter((_, k) => k !== i) : d.urls }))}
+                        title="Remove URL"
+                        className="h-9 w-9 shrink-0 rounded-md inline-flex items-center justify-center border border-border hover:bg-destructive/10 hover:text-destructive transition"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                <Button size="sm" variant="outline" className="mt-2" onClick={() => setDraft((d) => ({ ...d, urls: [...d.urls, ""] }))}>
+                  <Plus className="h-3.5 w-3.5" /> Add URL
+                </Button>
               </div>
-              <div>
-                <Label>Number of sources · {draft.sources}</Label>
-                <input
-                  suppressHydrationWarning
-                  type="range"
-                  min={1}
-                  max={25}
-                  value={draft.sources}
-                  onChange={(e) => setDraft({ ...draft, sources: Number(e.target.value) })}
-                  className="w-full accent-[var(--primary)]"
-                />
-              </div>
+
               <div>
                 <Label>Datapoints per record · {draft.datapoints}</Label>
                 <input
@@ -247,47 +296,54 @@ function RefreshPage() {
                   <option value="Monthly">Monthly</option>
                 </Select>
               </div>
-              <div className="flex items-end">
-                <Button className="w-full" onClick={submitProject} disabled={!draft.name.trim()}>
-                  <FolderPlus className="h-3.5 w-3.5" /> Submit for estimate
-                </Button>
-              </div>
             </div>
 
             <div className="mt-4 rounded-lg border border-border bg-secondary/40 p-4">
               <div className="flex items-center gap-1.5 text-[12px] font-semibold">
-                <Sparkles className="h-3.5 w-3.5 text-primary" /> Live estimate
+                <Sparkles className="h-3.5 w-3.5 text-primary" /> Live estimate · {draftUrlCount} sources
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-2">
                 <Est label="Setup" value={`${draftEstimate.setupDays} days`} />
                 <Est label="First run" value={`${draftEstimate.firstRunHrs} hrs`} />
-                <Est label="Records / mo" value={compact(draftEstimate.monthlyRecords)} />
+                <Est label="Records / mo" value={fmt(draftEstimate.monthlyRecords)} />
                 <Est label="Credits / mo" value={fmt(draftEstimate.credits)} />
               </div>
-              <div className="text-[11px] text-muted-foreground mt-2 inline-flex items-center gap-1">
-                <Send className="h-3 w-3" /> Submitting notifies your FreDA admin and delivery lead automatically.
+              <div className="flex flex-wrap items-center justify-between gap-2 mt-3">
+                <div className="text-[11px] text-muted-foreground inline-flex items-center gap-1">
+                  <Send className="h-3 w-3" /> Submitting notifies your FreDA admin and delivery lead automatically.
+                </div>
+                <Button size="sm" onClick={submitProject} disabled={!draft.name.trim()}>
+                  <FolderPlus className="h-3.5 w-3.5" /> Submit for estimate
+                </Button>
               </div>
             </div>
           </Card>
 
           <Card className="p-5">
             <SectionTitle hint="add / remove / new build">Change requests</SectionTitle>
-            <div className="space-y-2 mt-2">
+            <p className="text-[11.5px] text-muted-foreground -mt-1 mb-2 inline-flex items-start gap-1.5">
+              <Info className="h-3.5 w-3.5 mt-[1px] shrink-0" />
+              Every source you add, retire or modify is logged here with an auto-assigned REQ number (sequential per workspace) that your FreDA admin
+              uses to approve and track the build.
+            </p>
+            <div className="space-y-2 max-h-[430px] overflow-y-auto pr-1">
               {requests.map((r) => (
                 <div key={r.id} className="rounded-lg border border-border px-3 py-2.5">
                   <div className="flex items-center gap-2">
                     <span className="text-[13px] font-medium flex-1 truncate">{r.detail}</span>
-                    <Badge tone={r.type === "New project" ? "purple" : r.type === "Remove source" ? "destructive" : "info"}>{r.type}</Badge>
+                    <Badge className="whitespace-nowrap" tone={r.type === "New project" ? "purple" : r.type === "Remove source" ? "destructive" : "info"}>
+                      {r.type}
+                    </Badge>
                   </div>
                   <div className="flex flex-wrap items-center gap-2 mt-1.5 text-[11px] text-muted-foreground">
-                    <span>{r.id}</span>
+                    <span className="font-mono">{r.id}</span>
                     <span>· {r.project}</span>
                     <span>· submitted {r.submitted}</span>
                     <span className="inline-flex items-center gap-1">
                       <Clock className="h-3 w-3" /> {r.estimateDays} day estimate
                     </span>
                     <Badge
-                      className="ml-auto"
+                      className="ml-auto whitespace-nowrap"
                       tone={r.status === "Approved" ? "success" : r.status === "In build" ? "purple" : r.status === "Estimating" ? "info" : "warning"}
                     >
                       {r.status}

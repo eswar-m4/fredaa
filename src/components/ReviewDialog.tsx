@@ -23,9 +23,9 @@ export function ReviewDialog({
   open: boolean;
   onOpenChange: (v: boolean) => void;
 }) {
-  const all = useMemo(() => (project ? reviewRecordsFor(project, 60) : []), [project?.id]);
+  const all = useMemo(() => (project ? reviewRecordsFor(project, 400) : []), [project?.id]);
 
-  const [sampling, setSampling] = useState(40);
+  const [sampling, setSampling] = useState(2);
   const [types, setTypes] = useState<ChangeType[]>([...CHANGE_TYPES]);
   const [minConf, setMinConf] = useState(0);
   const [datapoint, setDatapoint] = useState("all");
@@ -35,6 +35,7 @@ export function ReviewDialog({
   const [submitted, setSubmitted] = useState(0);
 
   const sampled = useMemo(() => all.slice(0, Math.max(1, Math.round((all.length * sampling) / 100))), [all, sampling]);
+
 
   const records = useMemo(
     () =>
@@ -157,20 +158,26 @@ export function ReviewDialog({
                 <span>Sampling</span>
                 <span className="tabular-nums text-foreground">{sampling}%</span>
               </div>
-              <input
-                suppressHydrationWarning
-                type="range"
-                min={10}
-                max={100}
-                step={10}
-                value={sampling}
-                onChange={(e) => setSampling(Number(e.target.value))}
-                className="w-full accent-[var(--primary)]"
-              />
-              <p className="text-[11px] text-muted-foreground mt-1">
-                Reviewing {records.length} of {all.length} changed records in this sample.
+              <div className="grid grid-cols-3 gap-1.5">
+                {[2, 5, 10, 25, 50, 100].map((s) => (
+                  <button
+                    key={s}
+                    suppressHydrationWarning
+                    onClick={() => setSampling(s)}
+                    className={cn(
+                      "h-8 rounded-md text-[11.5px] font-medium border transition",
+                      sampling === s ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-muted-foreground hover:bg-secondary",
+                    )}
+                  >
+                    {s}%
+                  </button>
+                ))}
+              </div>
+              <p className="text-[11px] text-muted-foreground mt-1.5">
+                {sampling}% sample — reviewing {fmt(records.length)} of {fmt(all.length)} changed records.
               </p>
             </div>
+
 
             <div>
               <div className="flex items-center justify-between text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">

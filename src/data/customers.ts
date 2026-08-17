@@ -665,3 +665,13 @@ export function destinationsFor(customer: Customer): Destination[] {
     };
   });
 }
+
+/* ---------------- review status ---------------- */
+
+export type ReviewStatus = "Review pending" | "In progress" | "Completed";
+
+export function reviewStatusFor(p: Project): ReviewStatus {
+  if (p.pendingReview === 0) return "Completed";
+  if (p.pendingReview < 150) return "In progress";
+  return "Review pending";
+}

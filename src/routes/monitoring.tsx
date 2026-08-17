@@ -26,7 +26,7 @@ import {
   type RangeValue,
 } from "@/components/ui-bits";
 import { useActiveCustomer } from "@/lib/workspace";
-import { compact, destinationsFor, fmt, hrsAgo, inHrs, jobsFor, rollupProjects, type JobRun } from "@/data/customers";
+import { destinationsFor, fmt, hrsAgo, inHrs, jobsFor, rollupProjects, type JobRun } from "@/data/customers";
 import { statusTone } from "@/routes/index";
 import { cn } from "@/lib/utils";
 
@@ -128,7 +128,7 @@ function MonitoringPage() {
           <Tile icon={PlayCircle} label="Automations running" value={String(live)} tone="info" />
           <Tile icon={CheckCircle2} label="In sync datasets" value={String(scoped.filter((p) => p.status === "In sync").length)} tone="success" />
           <Tile icon={AlertTriangle} label="Failed runs" value={String(failed)} tone="warning" />
-          <Tile icon={Activity} label="Changes in window" value={compact(stats.admv.added + stats.admv.deleted + stats.admv.modified)} tone="purple" />
+          <Tile icon={Activity} label="Changes in window" value={fmt(stats.admv.added + stats.admv.deleted + stats.admv.modified)} tone="purple" />
         </div>
 
         {/* Job automation */}
@@ -136,6 +136,12 @@ function MonitoringPage() {
           <div className="px-5 pt-4 pb-3 border-b border-border">
             <h3 className="text-[13px] font-semibold uppercase tracking-wider text-muted-foreground">Job automation status</h3>
             <p className="text-[12px] text-muted-foreground mt-1">Every crawl, parse and publish run triggered in the selected window.</p>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-[11px] text-muted-foreground">
+              <span className="font-semibold uppercase tracking-wider">Trigger legend</span>
+              <span><strong className="text-foreground">Scheduled</strong> — fired by the project run schedule set in Projects Refresh</span>
+              <span><strong className="text-foreground">On demand</strong> — someone pressed “Run now” here</span>
+              <span><strong className="text-foreground">Source change</strong> — change watcher detected a page/layout change and auto-queued a run</span>
+            </div>
           </div>
           <div className="max-h-[340px] overflow-y-auto">
             <table className="w-full text-[12.5px]">
@@ -176,7 +182,7 @@ function MonitoringPage() {
                     <td className="px-3 py-2.5 text-muted-foreground">
                       {hrsAgo(j.startedHrs)} · {j.durationMin}m
                     </td>
-                    <td className="px-3 py-2.5 tabular-nums">{compact(j.records)}</td>
+                    <td className="px-3 py-2.5 tabular-nums">{fmt(j.records)}</td>
                     <td className="px-5 py-2.5 text-right">
                       <Badge tone={jobTone[j.state]}>{j.state}</Badge>
                     </td>
@@ -235,11 +241,11 @@ function MonitoringPage() {
                         <Timer className="h-3.5 w-3.5" /> {inHrs(p.nextRefreshHrs)}
                       </span>
                     </td>
-                    <td className="px-3 py-3 tabular-nums">{compact(p.records)}</td>
+                    <td className="px-3 py-3 tabular-nums">{fmt(p.records)}</td>
                     <td className="px-3 py-3">
-                      <span className="text-success">+{compact(p.admv.added)}</span>{" "}
-                      <span className="text-destructive">-{compact(p.admv.deleted)}</span>{" "}
-                      <span className="text-warning">~{compact(p.admv.modified)}</span>
+                      <span className="text-success">+{fmt(p.admv.added)}</span>{" "}
+                      <span className="text-destructive">-{fmt(p.admv.deleted)}</span>{" "}
+                      <span className="text-warning">~{fmt(p.admv.modified)}</span>
                     </td>
                     <td className="px-3 py-3">
                       <Badge tone={statusTone[p.status]}>{p.status}</Badge>
@@ -278,7 +284,7 @@ function MonitoringPage() {
                   <div className="min-w-0 flex-1">
                     <div className="text-[13px] font-medium truncate">{d.name}</div>
                     <div className="text-[11px] text-muted-foreground truncate">
-                      {d.kind} · {d.cadence} · last sync {hrsAgo(d.lastSyncHrs)} · {compact(d.rowsLastSync)} rows
+                      {d.kind} · {d.cadence} · last sync {hrsAgo(d.lastSyncHrs)} · {fmt(d.rowsLastSync)} rows
                     </div>
                   </div>
                   <Badge tone={d.state === "Connected" ? "success" : d.state === "Paused" ? "warning" : "destructive"}>{d.state}</Badge>
