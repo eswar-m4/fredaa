@@ -112,7 +112,6 @@ export function ReviewDialog({
       }}
     >
       <DialogContent
-        showCloseButton
         className="max-w-none w-[97vw] h-[94vh] p-0 gap-0 overflow-hidden flex flex-col sm:max-w-none"
       >
         <DialogHeader className="px-6 pt-5 pb-4 border-b border-border shrink-0">
