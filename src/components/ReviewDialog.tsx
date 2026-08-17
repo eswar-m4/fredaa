@@ -23,9 +23,9 @@ export function ReviewDialog({
   open: boolean;
   onOpenChange: (v: boolean) => void;
 }) {
-  const all = useMemo(() => (project ? reviewRecordsFor(project, 60) : []), [project?.id]);
+  const all = useMemo(() => (project ? reviewRecordsFor(project, 400) : []), [project?.id]);
 
-  const [sampling, setSampling] = useState(40);
+  const [sampling, setSampling] = useState(2);
   const [types, setTypes] = useState<ChangeType[]>([...CHANGE_TYPES]);
   const [minConf, setMinConf] = useState(0);
   const [datapoint, setDatapoint] = useState("all");
@@ -35,6 +35,7 @@ export function ReviewDialog({
   const [submitted, setSubmitted] = useState(0);
 
   const sampled = useMemo(() => all.slice(0, Math.max(1, Math.round((all.length * sampling) / 100))), [all, sampling]);
+
 
   const records = useMemo(
     () =>
