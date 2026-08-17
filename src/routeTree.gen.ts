@@ -10,33 +10,180 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AnySiteRouteImport } from './routes/any-site'
+import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as DiscoverRouteImport } from './routes/discover'
+import { Route as ExportRouteImport } from './routes/export'
+import { Route as LibraryRouteImport } from './routes/library'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as MonitoringRouteImport } from './routes/monitoring'
+import { Route as ReviewRouteImport } from './routes/review'
+import { Route as SiteSpecificRouteImport } from './routes/site-specific'
+import { Route as WorkflowsRouteImport } from './routes/workflows'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AnySiteRoute = AnySiteRouteImport.update({
+  id: '/any-site',
+  path: '/any-site',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DiscoverRoute = DiscoverRouteImport.update({
+  id: '/discover',
+  path: '/discover',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExportRoute = ExportRouteImport.update({
+  id: '/export',
+  path: '/export',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LibraryRoute = LibraryRouteImport.update({
+  id: '/library',
+  path: '/library',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MonitoringRoute = MonitoringRouteImport.update({
+  id: '/monitoring',
+  path: '/monitoring',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReviewRoute = ReviewRouteImport.update({
+  id: '/review',
+  path: '/review',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SiteSpecificRoute = SiteSpecificRouteImport.update({
+  id: '/site-specific',
+  path: '/site-specific',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WorkflowsRoute = WorkflowsRouteImport.update({
+  id: '/workflows',
+  path: '/workflows',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/any-site': typeof AnySiteRoute
+  '/dashboard': typeof DashboardRoute
+  '/discover': typeof DiscoverRoute
+  '/export': typeof ExportRoute
+  '/library': typeof LibraryRoute
+  '/login': typeof LoginRoute
+  '/monitoring': typeof MonitoringRoute
+  '/review': typeof ReviewRoute
+  '/site-specific': typeof SiteSpecificRoute
+  '/workflows': typeof WorkflowsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/any-site': typeof AnySiteRoute
+  '/dashboard': typeof DashboardRoute
+  '/discover': typeof DiscoverRoute
+  '/export': typeof ExportRoute
+  '/library': typeof LibraryRoute
+  '/login': typeof LoginRoute
+  '/monitoring': typeof MonitoringRoute
+  '/review': typeof ReviewRoute
+  '/site-specific': typeof SiteSpecificRoute
+  '/workflows': typeof WorkflowsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
+  '/any-site': typeof AnySiteRoute
+  '/dashboard': typeof DashboardRoute
+  '/discover': typeof DiscoverRoute
+  '/export': typeof ExportRoute
+  '/library': typeof LibraryRoute
+  '/login': typeof LoginRoute
+  '/monitoring': typeof MonitoringRoute
+  '/review': typeof ReviewRoute
+  '/site-specific': typeof SiteSpecificRoute
+  '/workflows': typeof WorkflowsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/any-site'
+    | '/dashboard'
+    | '/discover'
+    | '/export'
+    | '/library'
+    | '/login'
+    | '/monitoring'
+    | '/review'
+    | '/site-specific'
+    | '/workflows'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/admin'
+    | '/any-site'
+    | '/dashboard'
+    | '/discover'
+    | '/export'
+    | '/library'
+    | '/login'
+    | '/monitoring'
+    | '/review'
+    | '/site-specific'
+    | '/workflows'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/any-site'
+    | '/dashboard'
+    | '/discover'
+    | '/export'
+    | '/library'
+    | '/login'
+    | '/monitoring'
+    | '/review'
+    | '/site-specific'
+    | '/workflows'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRoute
+  AnySiteRoute: typeof AnySiteRoute
+  DashboardRoute: typeof DashboardRoute
+  DiscoverRoute: typeof DiscoverRoute
+  ExportRoute: typeof ExportRoute
+  LibraryRoute: typeof LibraryRoute
+  LoginRoute: typeof LoginRoute
+  MonitoringRoute: typeof MonitoringRoute
+  ReviewRoute: typeof ReviewRoute
+  SiteSpecificRoute: typeof SiteSpecificRoute
+  WorkflowsRoute: typeof WorkflowsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +195,99 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/any-site': {
+      id: '/any-site'
+      path: '/any-site'
+      fullPath: '/any-site'
+      preLoaderRoute: typeof AnySiteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/discover': {
+      id: '/discover'
+      path: '/discover'
+      fullPath: '/discover'
+      preLoaderRoute: typeof DiscoverRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/export': {
+      id: '/export'
+      path: '/export'
+      fullPath: '/export'
+      preLoaderRoute: typeof ExportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/library': {
+      id: '/library'
+      path: '/library'
+      fullPath: '/library'
+      preLoaderRoute: typeof LibraryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/monitoring': {
+      id: '/monitoring'
+      path: '/monitoring'
+      fullPath: '/monitoring'
+      preLoaderRoute: typeof MonitoringRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/review': {
+      id: '/review'
+      path: '/review'
+      fullPath: '/review'
+      preLoaderRoute: typeof ReviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/site-specific': {
+      id: '/site-specific'
+      path: '/site-specific'
+      fullPath: '/site-specific'
+      preLoaderRoute: typeof SiteSpecificRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/workflows': {
+      id: '/workflows'
+      path: '/workflows'
+      fullPath: '/workflows'
+      preLoaderRoute: typeof WorkflowsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRoute,
+  AnySiteRoute: AnySiteRoute,
+  DashboardRoute: DashboardRoute,
+  DiscoverRoute: DiscoverRoute,
+  ExportRoute: ExportRoute,
+  LibraryRoute: LibraryRoute,
+  LoginRoute: LoginRoute,
+  MonitoringRoute: MonitoringRoute,
+  ReviewRoute: ReviewRoute,
+  SiteSpecificRoute: SiteSpecificRoute,
+  WorkflowsRoute: WorkflowsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
