@@ -192,7 +192,7 @@ function DashboardPage() {
                   <th className="px-5 py-2 font-semibold">Project</th>
                   <th className="px-3 py-2 font-semibold">Records</th>
                   <th className="px-3 py-2 font-semibold">Pending</th>
-                  <th className="px-3 py-2 font-semibold w-[210px]">ADMV</th>
+                  <th className="px-3 py-2 font-semibold w-[210px] text-center">ADMV</th>
                   <th className="px-3 py-2 font-semibold">Accuracy</th>
                   <th className="px-3 py-2 font-semibold">Review status</th>
                   <th className="px-3 py-2 font-semibold">Action needed</th>
@@ -209,7 +209,7 @@ function DashboardPage() {
                     <tr
                       key={p.id}
                       onClick={() => setSelected(p.id)}
-                      className={cn("border-b border-border/60 cursor-pointer hover:bg-secondary/40", p.id === active.id && "bg-info-bg/60")}
+                      className="border-b border-border/60 cursor-pointer hover:bg-secondary/40"
                     >
                       <td className="px-5 py-3 min-w-[200px]">
                         <div className="font-medium whitespace-nowrap">{p.name}</div>
@@ -220,7 +220,7 @@ function DashboardPage() {
                       <td className="px-3 py-3 tabular-nums whitespace-nowrap">{fmt(p.records)}</td>
                       <td className="px-3 py-3 tabular-nums whitespace-nowrap">{fmt(p.pendingReview)}</td>
                       <td className="px-3 py-3">
-                        <div className="grid grid-cols-4 gap-1 w-[200px]">
+                        <div className="grid grid-cols-4 gap-1 w-[200px] mx-auto">
                           {SEGMENTS.map((s) => (
                             <div
                               key={s.key}
@@ -353,12 +353,12 @@ function Mini({ label, value }: { label: string; value: string }) {
 }
 
 function MixRow({ label, sub, a, emphasis = false }: { label: string; sub: string; a: AdmvCounts; emphasis?: boolean }) {
-  const p = admvPct(a);
+  
   const total = a.added + a.deleted + a.modified + a.verified || 1;
   return (
     <div
       className={cn(
-        "grid grid-cols-1 lg:grid-cols-[minmax(200px,1.1fr)_minmax(0,2fr)_auto] items-center gap-x-5 gap-y-2 px-4 py-3 border-b border-border/60 last:border-b-0",
+        "grid grid-cols-1 lg:grid-cols-[minmax(190px,0.9fr)_minmax(0,2.8fr)_auto] items-center gap-x-5 gap-y-2 px-4 py-3 border-b border-border/60 last:border-b-0",
         emphasis ? "bg-secondary/50" : "hover:bg-secondary/30",
       )}
     >
@@ -368,7 +368,7 @@ function MixRow({ label, sub, a, emphasis = false }: { label: string; sub: strin
       </div>
 
       <div className="min-w-0">
-        <div className="flex h-6 w-full rounded-md overflow-hidden bg-secondary">
+        <div className="flex h-8 w-full rounded-md overflow-hidden bg-secondary">
           {SEGMENTS.map((s) => {
             const w = (a[s.key] / total) * 100;
             if (w <= 0) return null;
@@ -377,24 +377,23 @@ function MixRow({ label, sub, a, emphasis = false }: { label: string; sub: strin
                 key={s.key}
                 className={cn("flex items-center justify-center", s.bar)}
                 style={{ width: `${w}%` }}
-                title={`${s.label} ${fmt(a[s.key])} (${p[s.key].toFixed(1)}%)`}
+                title={`${s.label} ${fmt(a[s.key])}`}
               >
-                {w > 9 && <span className="text-[10.5px] font-semibold text-white/95 tabular-nums px-1 truncate">{p[s.key].toFixed(1)}%</span>}
+                {w > 9 && <span className="text-[10.5px] font-semibold text-white/95 tabular-nums px-1 truncate">{fmt(a[s.key])}</span>}
               </div>
             );
           })}
         </div>
       </div>
 
-      <div className="grid grid-cols-4 gap-1.5 lg:w-[480px] lg:justify-self-end">
+      <div className="grid grid-cols-4 gap-1.5 lg:w-[360px] lg:justify-self-end">
         {SEGMENTS.map((s) => (
           <span
             key={s.key}
-            className={cn("flex items-center justify-center gap-1 px-1.5 py-1 rounded-md text-[10.5px] font-medium tabular-nums whitespace-nowrap", s.chip)}
+            className={cn("flex flex-col items-center justify-center px-1.5 py-1 rounded-md whitespace-nowrap", s.chip)}
           >
-            <span className="opacity-70">{s.label[0]}</span>
-            {fmt(a[s.key])}
-            <span className="opacity-70">· {p[s.key].toFixed(1)}%</span>
+            <span className="text-[9.5px] uppercase font-semibold opacity-70 leading-none">{s.label}</span>
+            <span className="text-[12px] font-semibold tabular-nums leading-tight mt-0.5">{fmt(a[s.key])}</span>
           </span>
         ))}
       </div>
