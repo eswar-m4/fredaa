@@ -40,7 +40,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const hash = useRouterState({ select: (s) => s.location.hash });
-  const uc = useUseCase();
+  const customer = useActiveCustomer();
 
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
@@ -63,9 +63,8 @@ export function AppLayout({ children }: { children: ReactNode }) {
     return "";
   })();
 
-  useEffect(() => {
-    seedDemoJobs();
-  }, []);
+
+
 
   useEffect(() => {
     setMounted(true);
