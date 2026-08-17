@@ -262,7 +262,14 @@ function RefreshPage() {
                     <div className="text-[11px] text-muted-foreground truncate">
                       {s.url} · added {s.addedOn} · {fmt(s.records)} records
                     </div>
+                    <div className="text-[11px] text-muted-foreground truncate mt-0.5">
+                      Attributes: {(attrsBySource[s.id] ?? project.datapoints).slice(0, 4).join(", ")}
+                      {(attrsBySource[s.id] ?? project.datapoints).length > 4
+                        ? ` +${(attrsBySource[s.id] ?? project.datapoints).length - 4}`
+                        : ""}
+                    </div>
                   </div>
+
                   <Badge className="whitespace-nowrap" tone={s.status === "Live" ? "success" : s.status === "Paused" ? "warning" : "info"}>
                     {s.status}
                   </Badge>
