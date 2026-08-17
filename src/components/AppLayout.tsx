@@ -187,30 +187,47 @@ export function AppLayout({ children }: { children: ReactNode }) {
               <img src={fredaLogo} alt="Freda" width={512} height={512} className="h-9 w-9 object-contain" />
             </span>
             <div>
-              <div className="text-[15px] font-semibold leading-tight">Freda</div>
-              <div className="text-[11px] text-white/60">B2B Data Intelligence</div>
+              <div className="text-[15px] font-semibold leading-tight">FreDA</div>
+              <div className="text-[11px] text-white/60">Customer Data Workspace</div>
             </div>
           </div>
         </div>
 
-        {uc && (
-          <div className="px-3 py-3 border-b border-white/10 whitespace-nowrap">
-            <div className="text-[10px] uppercase tracking-wider text-white/40 font-semibold mb-1">Active playbook</div>
-            <div className="flex items-center justify-between gap-2">
-              <div className="flex items-center gap-1.5 font-semibold text-[12px]">
-                {uc === "targeted" ? <Target className="h-3.5 w-3.5" /> : <Globe2 className="h-3.5 w-3.5" />}
-                <span>{USE_CASES[uc].short}</span>
-              </div>
+        <div className="px-3 py-3 border-b border-white/10 whitespace-nowrap">
+          <div className="text-[10px] uppercase tracking-wider text-white/40 font-semibold mb-1.5">Customer</div>
+          <Popover>
+            <PopoverTrigger asChild>
               <button
-                onClick={() => setUseCase(null)}
-                title="Switch playbook"
-                className="inline-flex items-center gap-1 text-[10px] text-white/60 hover:text-white"
+                suppressHydrationWarning
+                className="w-full flex items-center justify-between gap-2 rounded-md bg-white/10 hover:bg-white/15 px-2.5 py-2 text-left transition"
               >
-                <RefreshCw className="h-3 w-3" /> switch
+                <span className="min-w-0">
+                  <span className="block text-[12.5px] font-semibold truncate">{customer.name}</span>
+                  <span className="block text-[10.5px] text-white/55 truncate">{customer.industry}</span>
+                </span>
+                <ChevronsUpDown className="h-3.5 w-3.5 text-white/60 shrink-0" />
               </button>
-            </div>
-          </div>
-        )}
+            </PopoverTrigger>
+            <PopoverContent align="start" className="w-64 p-1">
+              {CUSTOMERS.map((c) => (
+                <button
+                  key={c.id}
+                  onClick={() => setActiveCustomer(c.id)}
+                  className={[
+                    "w-full text-left rounded-md px-3 py-2 hover:bg-secondary transition",
+                    c.id === customer.id ? "bg-secondary" : "",
+                  ].join(" ")}
+                >
+                  <div className="text-[13px] font-medium text-foreground">{c.name}</div>
+                  <div className="text-[11px] text-muted-foreground">
+                    {c.industry} · {c.projects.length} projects
+                  </div>
+                </button>
+              ))}
+            </PopoverContent>
+          </Popover>
+        </div>
+
 
         <nav className="flex-1 overflow-y-auto py-3 px-2 space-y-4">
           {groups.map((g) => (
