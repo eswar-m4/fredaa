@@ -26,7 +26,7 @@ import {
   type RangeValue,
 } from "@/components/ui-bits";
 import { useActiveCustomer } from "@/lib/workspace";
-import { compact, destinationsFor, fmt, hrsAgo, inHrs, jobsFor, rollupProjects, type JobRun } from "@/data/customers";
+import { destinationsFor, fmt, hrsAgo, inHrs, jobsFor, rollupProjects, type JobRun } from "@/data/customers";
 import { statusTone } from "@/routes/index";
 import { cn } from "@/lib/utils";
 
@@ -136,6 +136,12 @@ function MonitoringPage() {
           <div className="px-5 pt-4 pb-3 border-b border-border">
             <h3 className="text-[13px] font-semibold uppercase tracking-wider text-muted-foreground">Job automation status</h3>
             <p className="text-[12px] text-muted-foreground mt-1">Every crawl, parse and publish run triggered in the selected window.</p>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-[11px] text-muted-foreground">
+              <span className="font-semibold uppercase tracking-wider">Trigger legend</span>
+              <span><strong className="text-foreground">Scheduled</strong> — fired by the project run schedule set in Projects Refresh</span>
+              <span><strong className="text-foreground">On demand</strong> — someone pressed “Run now” here</span>
+              <span><strong className="text-foreground">Source change</strong> — change watcher detected a page/layout change and auto-queued a run</span>
+            </div>
           </div>
           <div className="max-h-[340px] overflow-y-auto">
             <table className="w-full text-[12.5px]">
