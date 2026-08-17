@@ -218,10 +218,11 @@ function buildSources(id: string, p: Spec["projects"][number], records: number):
   const n = int(`${id}-nsrc`, 2, 5);
   return Array.from({ length: n }, (_, i) => ({
     id: `${id}-s${i + 1}`,
-    label: i === 0 ? p.source : `${p.source} — ${SOURCE_SUFFIX[(hash(id + i) % SOURCE_SUFFIX.length)]}`,
-    url: p.url,
+    label: i === 0 ? p.source : `${p.source} — ${SOURCE_SUFFIX[(i + hash(id)) % SOURCE_SUFFIX.length]}`,
+    url: i === 0 ? p.url : `${p.url.replace(/\/$/, "")}/${SOURCE_SUFFIX[(i + hash(id)) % SOURCE_SUFFIX.length]!.split(" ")[0]}`,
     status: (i === n - 1 && hash(id + "st" + i) % 4 === 0 ? "Pending approval" : hash(id + "st" + i) % 7 === 0 ? "Paused" : "Live") as SourceRef["status"],
-    records: Math.round(records / n),
+    records: Math.round((records / n) * (0.7 + ((hash(id + "rc" + i) % 60) / 100))),
+
     addedOn: pick(`${id}-add${i}`, ["Jan 2024", "Apr 2024", "Aug 2024", "Nov 2024", "Feb 2025", "Jun 2025"]),
   }));
 }
