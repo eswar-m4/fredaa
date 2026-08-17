@@ -319,7 +319,7 @@ function RefreshPage() {
         </div>
 
         {/* new project */}
-        <div className="grid xl:grid-cols-2 gap-5 items-stretch">
+        <div className="space-y-5">
           <Card className="p-5 flex flex-col">
             <SectionTitle hint="estimate generated instantly">Create a new project</SectionTitle>
             <div className="grid sm:grid-cols-2 gap-3 mt-2">
