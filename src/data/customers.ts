@@ -321,14 +321,19 @@ function entityPool(customerId: string) {
 
 function valueFor(datapoint: string, seed: string) {
   const dp = datapoint.toLowerCase();
+  if (dp.includes("sic")) return String(int(seed, 1000, 8999));
+  if (dp.includes("founded") || dp.includes("year")) return String(int(seed, 1946, 2024));
   if (dp.includes("country")) return pick(seed, ["United States", "United Kingdom", "Germany", "India", "Singapore", "Canada", "Australia"]);
   if (dp.includes("city")) return pick(seed, ["Boston", "London", "Berlin", "Austin", "Mumbai", "Toronto", "Sydney", "Chicago"]);
+  if (dp.includes("legal name") || dp.includes("company name"))
+    return pick(seed, ["Aldridge Group Ltd", "Corvus Holdings Inc", "Northgate Ltd", "Petra Materials plc", "Skyline Retail Group", "Lumen Robotics Inc"]);
   if (dp.includes("name") || dp.includes("author") || dp.includes("owner") || dp.includes("officer") || dp.includes("brand") || dp.includes("seller") || dp.includes("publisher"))
-    return pick(seed, ["Aldridge Group", "M. Okafor", "Helen Vaz", "Corvus Holdings", "R. Sandhu", "Northgate Ltd", "J. Feldman"]);
+    return pick(seed, ["A. Mehta", "M. Okafor", "Helen Vaz", "T. Brennan", "R. Sandhu", "L. Moreau", "J. Feldman"]);
+  if (dp.includes("revenue")) return pick(seed, ["$1M–$10M", "$10M–$50M", "$50M–$250M", "$250M–$1B", "$1B+"]);
   if (dp.includes("industry") || dp.includes("category") || dp.includes("discipline") || dp.includes("practice"))
     return pick(seed, ["Software", "Healthcare", "Logistics", "Financial services", "Manufacturing", "Education"]);
   if (dp.includes("price") || dp.includes("fee") || dp.includes("mrp")) return `$${int(seed, 40, 1800).toLocaleString()}`;
-  if (dp.includes("count") || dp.includes("size") || dp.includes("hours") || dp.includes("year")) return String(int(seed, 4, 4200));
+  if (dp.includes("count") || dp.includes("size") || dp.includes("hours")) return int(seed, 4, 4200).toLocaleString();
   if (dp.includes("email")) return `contact${int(seed, 1, 99)}@example.com`;
   if (dp.includes("phone")) return `+1 (${int(seed, 200, 989)}) ${int(seed + "b", 200, 989)}-${int(seed + "c", 1000, 9999)}`;
   if (dp.includes("url") || dp.includes("website") || dp.includes("linkedin") || dp.includes("domain") || dp.includes("page"))
@@ -339,6 +344,8 @@ function valueFor(datapoint: string, seed: string) {
     return pick(seed, ["Active", "In stock", "Verified", "Clear", "Under review", "Suspended"]);
   if (dp.includes("%")) return `${int(seed, 2, 88)}%`;
   return pick(seed, ["Tier 1", "Amber", "Global", "Regional", "Standard", "Premium", "Grade A", "Category B"]) + " " + int(seed + "x", 10, 99);
+}
+
 }
 
 export function reviewRecordsFor(project: Project, count = 24): ReviewRecord[] {
