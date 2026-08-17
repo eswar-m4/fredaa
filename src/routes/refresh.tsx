@@ -322,13 +322,13 @@ function RefreshPage() {
         <div className="space-y-5">
           <Card className="p-5 flex flex-col">
             <SectionTitle hint="estimate generated instantly">Create a new project</SectionTitle>
-            <div className="grid sm:grid-cols-2 gap-3 mt-2">
-              <div className="sm:col-span-2">
+            <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-x-4 gap-y-3 mt-2">
+              <div className="md:col-span-2 xl:col-span-4">
                 <Label>Project name</Label>
                 <Input placeholder="e.g. APAC Competitor Pricing" value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />
               </div>
 
-              <div className="sm:col-span-2">
+              <div className="md:col-span-2">
                 <Label>Source URLs · {draft.urls.length}</Label>
                 <div className="flex flex-wrap gap-1.5 mb-2">
                   {[1, 2, 3, 4, 5, 6, 8, 10].map((n) => (
@@ -378,7 +378,7 @@ function RefreshPage() {
                 </Button>
               </div>
 
-              <div className="sm:col-span-2">
+              <div className="md:col-span-2">
                 <Label>Datapoints to extract · {draftDatapoints}</Label>
                 <div className="flex items-center gap-2">
                   <Input
