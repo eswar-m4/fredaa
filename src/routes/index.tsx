@@ -97,8 +97,6 @@ function DashboardPage() {
   const pendingScaled = Math.round(stats.pendingReview * Math.min(1.6, factor));
 
   const actions = useMemo(() => actionsFor(customer), [customer.id]);
-  const windowDays = rangeDays(range);
-  const visibleActions = actions.filter((a) => (scope === "all" || a.projectId === scope) && a.ageDays < windowDays);
   const actionByProject = useMemo(() => {
     const m: Record<string, string> = {};
     for (const a of actions) if (!m[a.projectId]) m[a.projectId] = a.action;
