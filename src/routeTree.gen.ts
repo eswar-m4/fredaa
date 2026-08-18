@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AdminAccessRouteImport } from './routes/admin-access'
+import { Route as AdminSourcesRouteImport } from './routes/admin-sources'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MonitoringRouteImport } from './routes/monitoring'
 import { Route as PlaybooksRouteImport } from './routes/playbooks'
@@ -34,6 +35,11 @@ const AdminRoute = AdminRouteImport.update({
 const AdminAccessRoute = AdminAccessRouteImport.update({
   id: '/admin-access',
   path: '/admin-access',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminSourcesRoute = AdminSourcesRouteImport.update({
+  id: '/admin-sources',
+  path: '/admin-sources',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -81,6 +87,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/admin-access': typeof AdminAccessRoute
+  '/admin-sources': typeof AdminSourcesRoute
   '/login': typeof LoginRoute
   '/monitoring': typeof MonitoringRoute
   '/playbooks': typeof PlaybooksRouteWithChildren
@@ -94,6 +101,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/admin-access': typeof AdminAccessRoute
+  '/admin-sources': typeof AdminSourcesRoute
   '/login': typeof LoginRoute
   '/monitoring': typeof MonitoringRoute
   '/refresh': typeof RefreshRoute
@@ -107,6 +115,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/admin-access': typeof AdminAccessRoute
+  '/admin-sources': typeof AdminSourcesRoute
   '/login': typeof LoginRoute
   '/monitoring': typeof MonitoringRoute
   '/playbooks': typeof PlaybooksRouteWithChildren
@@ -122,6 +131,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/admin-access'
+    | '/admin-sources'
     | '/login'
     | '/monitoring'
     | '/playbooks'
@@ -135,6 +145,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/admin-access'
+    | '/admin-sources'
     | '/login'
     | '/monitoring'
     | '/refresh'
@@ -147,6 +158,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/admin-access'
+    | '/admin-sources'
     | '/login'
     | '/monitoring'
     | '/playbooks'
@@ -161,6 +173,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
   AdminAccessRoute: typeof AdminAccessRoute
+  AdminSourcesRoute: typeof AdminSourcesRoute
   LoginRoute: typeof LoginRoute
   MonitoringRoute: typeof MonitoringRoute
   PlaybooksRoute: typeof PlaybooksRouteWithChildren
@@ -188,6 +201,13 @@ declare module '@tanstack/react-router' {
       path: '/admin-access'
       fullPath: '/admin-access'
       preLoaderRoute: typeof AdminAccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin-sources': {
+      id: '/admin-sources'
+      path: '/admin-sources'
+      fullPath: '/admin-sources'
+      preLoaderRoute: typeof AdminSourcesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -271,6 +291,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   AdminAccessRoute: AdminAccessRoute,
+  AdminSourcesRoute: AdminSourcesRoute,
   LoginRoute: LoginRoute,
   MonitoringRoute: MonitoringRoute,
   PlaybooksRoute: PlaybooksRouteWithChildren,

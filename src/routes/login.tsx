@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
-import { Shield, UserRound, LogIn, Loader2, UserPlus } from "lucide-react";
+import { Shield, UserRound, LogIn, Loader2, UserPlus, Radar, Database, CheckCircle2, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button, Card, Input, Select } from "@/components/ui-bits";
@@ -82,15 +82,39 @@ function LoginPage() {
     <div className="min-h-screen bg-background text-foreground flex items-center justify-center px-4 py-10">
       <div className="w-full max-w-5xl grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
         <div className="space-y-6">
-          <div className="inline-flex items-center gap-3 rounded-full border border-info/20 bg-info-bg px-4 py-2 text-sm text-foreground">
-            <Shield className="h-4 w-4" />
-            Freda
+          <div className="inline-flex items-center gap-3 rounded-full border border-primary/25 bg-primary/10 px-4 py-2 text-sm text-foreground">
+            <Shield className="h-4 w-4 text-primary" />
+            FreDA · Fresh Data Automation
           </div>
           <div className="space-y-3">
-            <h1 className="text-4xl font-semibold tracking-tight">Welcome to Freda</h1>
+            <h1 className="text-4xl font-semibold tracking-tight leading-tight">
+              Your external data, <span className="text-primary">sourced, verified and kept fresh</span>
+            </h1>
             <p className="max-w-xl text-sm text-muted-foreground leading-6">
-              Select your role and sign in to continue.
+              FreDA runs site-specific agents on the sources you trust, extracts the exact datapoints you need, scores every
+              change and hands you a reviewed, delivery-ready dataset — on a daily, weekly or monthly refresh.
             </p>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            {[
+              { icon: Radar, title: "Source", copy: "Agents mapped to each site, directory and registry in your scope." },
+              { icon: Database, title: "Extract", copy: "Only the datapoints in your spec — structured, deduplicated, typed." },
+              { icon: CheckCircle2, title: "Validate", copy: "ADMV change signature with confidence scoring and human review." },
+              { icon: RefreshCw, title: "Refresh", copy: "Scheduled reruns with deltas pushed to CSV, API, S3 or Snowflake." },
+            ].map((s) => (
+              <Card key={s.title} className="border-border bg-card p-4">
+                <div className="flex items-start gap-3">
+                  <div className="h-9 w-9 shrink-0 rounded-xl bg-info-bg border border-info/20 flex items-center justify-center">
+                    <s.icon className="h-4 w-4 text-info" />
+                  </div>
+                  <div>
+                    <div className="text-sm font-semibold">{s.title}</div>
+                    <div className="text-xs text-muted-foreground leading-5 mt-0.5">{s.copy}</div>
+                  </div>
+                </div>
+              </Card>
+            ))}
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
@@ -100,8 +124,9 @@ function LoginPage() {
                   <UserRound className="h-5 w-5 text-info" />
                 </div>
                 <div>
-                  <div className="text-sm font-semibold">User</div>
-                  <div className="text-xs text-muted-foreground">Access data enrichment workflows, monitoring, and exports.</div>
+                  <div className="text-sm font-semibold">Workspace user</div>
+                  <div className="text-xs text-muted-foreground">Dashboard &amp; review, monitoring, projects and playbooks.</div>
+                  <div className="text-[11px] font-mono text-muted-foreground mt-1">user / user123</div>
                 </div>
               </div>
             </Card>
@@ -112,7 +137,8 @@ function LoginPage() {
                 </div>
                 <div>
                   <div className="text-sm font-semibold">Administrator</div>
-                  <div className="text-xs text-muted-foreground">Access the admin console to review requests, onboard sources, and manage workflows.</div>
+                  <div className="text-xs text-muted-foreground">All sources across workspaces, customer tickets and access control.</div>
+                  <div className="text-[11px] font-mono text-muted-foreground mt-1">admin / admin123</div>
                 </div>
               </div>
             </Card>

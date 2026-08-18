@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
-import { Plus, Trash2, CalendarClock, Sparkles, Send, Globe, FolderPlus, CheckCircle2, Clock, Info, X, ChevronDown } from "lucide-react";
+import { useMemo, useRef, useState } from "react";
+import { Plus, Trash2, CalendarClock, Sparkles, Send, Globe, FolderPlus, CheckCircle2, Clock, Info, X, ChevronDown, Upload, FileSpreadsheet } from "lucide-react";
+import { readIntakeFile, type IntakeResult } from "@/lib/ai-intake";
+import { addTicket } from "@/lib/ticket-store";
 import { AppLayout } from "@/components/AppLayout";
 import { Badge, Button, Card, Input, SectionTitle, Select } from "@/components/ui-bits";
 import { useActiveCustomer } from "@/lib/workspace";
@@ -73,6 +75,23 @@ function RefreshPage() {
 
   const [open, setOpen] = useState({ projects: true, create: false, requests: false });
   const [draft, setDraft] = useState<Draft>(EMPTY_DRAFT);
+  const [intake, setIntake] = useState<IntakeResult | null>(null);
+  const intakeRef = useRef<HTMLInputElement>(null);
+
+  async function readFile(file: File) {
+    const text = await file.text();
+    const result = readIntakeFile(file.name, text);
+    setIntake(result);
+    setOpen((o) => ({ ...o, create: true }));
+    setDraft((d) => ({
+      ...d,
+      name: d.name.trim() || result.suggestedName,
+      urls: result.urls.length ? result.urls : d.urls,
+      fields: result.datapoints.length ? result.datapoints : d.fields,
+    }));
+    setNotice(`FreDA AI read “${file.name}” — ${result.urls.length} sources and ${result.datapoints.length} datapoints filled in. Review and submit for estimate.`);
+  }
+
 
   const draftDatapoints = Math.max(1, draft.fields.length);
   const draftUrlCount = Math.max(1, draft.urls.filter((u) => u.trim()).length || draft.urls.length);
@@ -121,9 +140,20 @@ function RefreshPage() {
       `Add source ${url.replace(/^https?:\/\//, "")} · ${sourceAttrs.length} attributes (${sourceAttrs.slice(0, 3).join(", ")}${sourceAttrs.length > 3 ? "…" : ""})`,
       sourceEstimate.setupDays,
     );
+    const ticket = addTicket({
+      workspaceId: customer.id,
+      workspaceName: customer.name,
+      project: project.name,
+      type: "Add source",
+      detail: `Add source ${url.replace(/^https?:\/\//, "")} · ${sourceAttrs.length} attributes`,
+      raisedBy: `${customer.shortName.toLowerCase()} workspace user`,
+      estimateDays: sourceEstimate.setupDays,
+      sources: [url],
+      datapoints: sourceAttrs,
+    });
     setNewSource("");
     setSourceAttrs([]);
-    setNotice(`Source queued as ${nextReqId()} with ${sourceAttrs.length} data attributes — estimate sent to your FreDA admin for approval.`);
+    setNotice(`Source queued as ${ticket.id} with ${sourceAttrs.length} data attributes — estimate sent to your FreDA admin for approval.`);
   }
 
 
@@ -136,16 +166,26 @@ function RefreshPage() {
 
   function submitProject() {
     if (!draft.name.trim()) return;
-    logRequest(
-      "New project",
-      `New project “${draft.name}” · ${draftUrlCount} URLs · ${draftDatapoints} datapoints · ${draft.frequency}`,
-      draftEstimate.setupDays,
-      draft.name,
-    );
+    const detail = `New project “${draft.name}” · ${draftUrlCount} URLs · ${draftDatapoints} datapoints · ${draft.frequency}${intake ? ` · from ${intake.fileName}` : ""}`;
+    logRequest("New project", detail, draftEstimate.setupDays, draft.name);
+    const ticket = addTicket({
+      workspaceId: customer.id,
+      workspaceName: customer.name,
+      project: draft.name,
+      type: "New project",
+      detail,
+      raisedBy: draft.owner.trim() || `${customer.shortName.toLowerCase()} workspace user`,
+      estimateDays: draftEstimate.setupDays,
+      monthlyRecords: draftEstimate.monthlyRecords,
+      sources: draft.urls.filter((u) => u.trim()),
+      datapoints: draft.fields,
+      ...(intake ? { fileName: intake.fileName } : {}),
+    });
     setNotice(
-      `Project “${draft.name}” submitted as ${nextReqId()} — estimate: ${draftEstimate.setupDays} days setup, ~${fmt(draftEstimate.monthlyRecords)} records/month. Admin notified.`,
+      `Project “${draft.name}” submitted as ${ticket.id} — estimate: ${draftEstimate.setupDays} days setup, ~${fmt(draftEstimate.monthlyRecords)} records/month. Admin notified.`,
     );
     setDraft(EMPTY_DRAFT);
+    setIntake(null);
   }
 
   function addField(v: string) {
@@ -357,7 +397,61 @@ function RefreshPage() {
           meta={`${draftUrlCount} sources · ${draftDatapoints} datapoints`}
         >
           <Card className="overflow-hidden">
+            <div className="px-5 pt-5">
+              <div
+                onClick={() => intakeRef.current?.click()}
+                className="rounded-lg border border-dashed border-primary/45 bg-gradient-to-r from-primary/8 to-transparent px-4 py-3.5 flex flex-wrap items-center gap-3 cursor-pointer hover:bg-primary/10 transition"
+              >
+                <span className="h-10 w-10 shrink-0 rounded-lg bg-primary text-primary-foreground inline-flex items-center justify-center">
+                  <Upload className="h-4.5 w-4.5" />
+                </span>
+                <div className="min-w-0">
+                  <div className="text-[13px] font-semibold inline-flex items-center gap-1.5">
+                    <Sparkles className="h-3.5 w-3.5 text-primary" /> Upload your source / datapoint list — FreDA AI fills the form
+                  </div>
+                  <div className="text-[11.5px] text-muted-foreground mt-0.5">
+                    CSV, TSV or TXT with the sites to extract from and the columns you need. We read it, build the estimate and notify admin.
+                  </div>
+                </div>
+                <Button size="sm" variant="outline" className="ml-auto shrink-0" onClick={(e) => { e.stopPropagation(); intakeRef.current?.click(); }}>
+                  <Upload className="h-3.5 w-3.5" /> Choose file
+                </Button>
+                <input
+                  ref={intakeRef}
+                  type="file"
+                  accept=".csv,.tsv,.txt,text/plain,text/csv"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    e.target.value = "";
+                    if (file) void readFile(file);
+                  }}
+                />
+              </div>
 
+              {intake && (
+                <div className="mt-3 rounded-lg border border-success/35 bg-success-bg/60 px-4 py-3">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <FileSpreadsheet className="h-4 w-4 text-success shrink-0" />
+                    <span className="text-[12.5px] font-semibold">{intake.fileName}</span>
+                    <Badge tone="success">{intake.confidence}% read confidence</Badge>
+                    <Badge tone="info">{intake.urls.length} sources</Badge>
+                    <Badge tone="purple">{intake.datapoints.length} datapoints</Badge>
+                    {intake.entityRows > 0 && <Badge tone="neutral">{fmt(intake.entityRows)} rows</Badge>}
+                    <button className="ml-auto text-[11.5px] text-muted-foreground hover:text-destructive" onClick={() => setIntake(null)}>
+                      Clear
+                    </button>
+                  </div>
+                  <ul className="mt-2 space-y-0.5">
+                    {intake.notes.map((n) => (
+                      <li key={n} className="text-[11.5px] text-muted-foreground inline-flex items-start gap-1.5">
+                        <CheckCircle2 className="h-3.5 w-3.5 text-success mt-[1px] shrink-0" /> {n}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
 
             <div className="grid lg:grid-cols-3 gap-4 p-5">
               {/* col 1 — identity + sources */}
