@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import {
   Target,
@@ -48,8 +48,6 @@ export const Route = createFileRoute("/playbooks/")({
   component: PlaybooksPage,
 });
 
-type Mode = "agents" | "solutions" | "ask";
-
 function solutionsFor(customer: Customer) {
   return [
     {
@@ -82,7 +80,7 @@ function solutionsFor(customer: Customer) {
 function PlaybooksPage() {
   const customer = useActiveCustomer();
   const solutions = solutionsFor(customer);
-  const [mode, setMode] = useState<Mode | null>(null);
+  const navigate = useNavigate();
 
   const [flippedId, setFlippedId] = useState<string | null>(null);
   const timers = useRef<number[]>([]);
@@ -156,7 +154,7 @@ function PlaybooksPage() {
               flipped={flippedId === "agents"}
               onOpen={requestFlip}
               onClose={requestClose}
-              active={mode === "agents"}
+              active={false}
               tone="emerald"
               tag="Site-specific"
               icon={Radar}
@@ -176,14 +174,14 @@ function PlaybooksPage() {
                 "Feeds Dashboard review and Monitor jobs",
               ]}
               cta="Open Agents"
-              onPick={() => setMode("agents")}
+              onPick={() => navigate({ to: "/playbooks/agents" })}
             />
             <FlipTile
               id="solutions"
               flipped={flippedId === "solutions"}
               onOpen={requestFlip}
               onClose={requestClose}
-              active={mode === "solutions"}
+              active={false}
               tone="violet"
               tag="Category-driven"
               icon={Boxes}
@@ -203,14 +201,14 @@ function PlaybooksPage() {
                 "Request a solution and the build team scopes it",
               ]}
               cta="Open Solutions"
-              onPick={() => setMode("solutions")}
+              onPick={() => navigate({ to: "/playbooks/solutions" })}
             />
             <FlipTile
               id="ask"
               flipped={flippedId === "ask"}
               onOpen={requestFlip}
               onClose={requestClose}
-              active={mode === "ask"}
+              active={false}
               tone="rose"
               tag="Guided"
               icon={Bot}
