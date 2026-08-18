@@ -271,9 +271,10 @@ function DashboardPage() {
           </div>
         </Card>
 
-        {/* Solution development in progress */}
+        {/* New project development in progress */}
         <Card className="p-5">
-          <SectionTitle hint="FreDA delivery team">Solution development in progress</SectionTitle>
+          <SectionTitle hint="FreDA delivery team">New project development in progress</SectionTitle>
+
 
 
 

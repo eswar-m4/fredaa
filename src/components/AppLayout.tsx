@@ -25,7 +25,7 @@ const WORKSPACE: NavGroup = {
   group: "WORKSPACE",
   items: [
     { to: "/", label: "Dashboard", icon: LayoutDashboard },
-    { to: "/monitoring", label: "Monitoring", icon: Activity },
+    { to: "/monitoring", label: "Monitor & Refresh", icon: Activity },
     { to: "/refresh", label: "Projects", icon: RefreshCw },
   ],
 };
