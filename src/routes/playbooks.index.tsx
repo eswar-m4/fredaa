@@ -94,11 +94,12 @@ function PlaybooksPage() {
         title="Choose your playbook"
         subtitle={`${customer.name} · run agents on the sites you trust, pick a ready solution, or let FreDA design one with you.`}
         actions={
-          <Link to="/refresh">
+          <Link to="/playbooks/agents">
             <Button size="sm" variant="outline">
               <Settings2 className="h-3.5 w-3.5" /> Manage projects
             </Button>
           </Link>
+
         }
       />
 

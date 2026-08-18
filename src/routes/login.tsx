@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
-import { UserRound, LogIn, Loader2, UserPlus, Radar, Database, CheckCircle2, RefreshCw } from "lucide-react";
+import { UserRound, LogIn, Loader2, UserPlus, Radar, Database, CheckCircle2, RefreshCw, Shield } from "lucide-react";
 import { toast } from "sonner";
 
 import fredaLogo from "@/assets/freda-mobius-bold.png";
@@ -85,21 +85,28 @@ function LoginPage() {
         <div className="space-y-6">
           <div className="flex items-center gap-4">
             <img src={fredaLogo} alt="Freda logo" className="h-14 w-14 object-contain" />
-            <h1 className="text-5xl font-bold tracking-tight text-foreground">FreDA</h1>
+            <div>
+              <h1 className="text-5xl font-bold tracking-tight text-foreground">FreDA</h1>
+              <div className="text-lg font-semibold text-primary tracking-tight">Fresh Data Automation</div>
+            </div>
           </div>
 
-          <p className="max-w-lg text-lg font-medium text-muted-foreground leading-relaxed">
-            Data, sourced and verified — kept fresh on a schedule you control.
+          <p className="max-w-lg text-[15px] text-muted-foreground leading-relaxed">
+            FreDA runs agents on the web sources your business depends on, extracts the exact datapoints you asked for,
+            scores every change, and puts the doubtful ones in front of a human before delivery — on a schedule you control.
           </p>
 
 
           <div className="grid gap-3 sm:grid-cols-2">
             {[
-              { icon: Radar, title: "Source", copy: "Agents mapped to the sites and directories you trust." },
-              { icon: Database, title: "Extract", copy: "The exact datapoints you need — structured and deduplicated." },
-              { icon: CheckCircle2, title: "Validate", copy: "ADMV change scoring with human-in-the-loop review." },
-              { icon: RefreshCw, title: "Refresh", copy: "Scheduled reruns that keep your dataset current." },
+              { icon: Radar, title: "Source", copy: "Agents mapped to the sites, portals and directories you trust." },
+              { icon: Database, title: "Extract", copy: "Only the datapoints you specify — structured and deduplicated." },
+              { icon: CheckCircle2, title: "Validate", copy: "Every record scored Added / Deleted / Modified / Verified." },
+              { icon: RefreshCw, title: "Refresh", copy: "Daily, weekly, monthly or a custom cadence you set." },
+              { icon: Shield, title: "Review", copy: "Sampled batches with confidence gates and group approval." },
+              { icon: Radar, title: "Deliver", copy: "Approved data exported or synced straight to your systems." },
             ].map((s) => (
+
               <Card key={s.title} className="border-border bg-card p-4">
                 <div className="flex items-start gap-3">
                   <div className="h-9 w-9 shrink-0 rounded-xl bg-info-bg border border-info/20 flex items-center justify-center">

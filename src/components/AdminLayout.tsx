@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { ReactNode, useEffect, useState } from "react";
-import { LogOut, Shield, Users, Activity, RefreshCw, Database } from "lucide-react";
+import { LogOut, Shield, Users, Activity, RefreshCw, Database, Ticket } from "lucide-react";
 
 import { Badge, Button } from "@/components/ui-bits";
 import { fetchSession, logoutRequest, type SessionInfo } from "@/lib/auth";
@@ -8,10 +8,12 @@ import { fetchSession, logoutRequest, type SessionInfo } from "@/lib/auth";
 type AdminNavItem = { to: string; label: string; icon: typeof Users };
 
 const NAV_ITEMS: AdminNavItem[] = [
-  { to: "/admin", label: "Requests", icon: Users },
-  { to: "/admin-sources", label: "Sources & tickets", icon: Database },
+  { to: "/admin", label: "Overview", icon: Users },
+  { to: "/admin-tickets", label: "Ticket queue", icon: Ticket },
+  { to: "/admin-sources", label: "Sources", icon: Database },
   { to: "/admin-access", label: "Accounts & access", icon: Shield },
 ];
+
 
 
 export function AdminLayout({ children }: { children: ReactNode }) {

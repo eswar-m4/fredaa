@@ -22,7 +22,7 @@ export const Route = createFileRoute("/playbooks/ask")({
 const NAV = [
   { to: "/", label: "Dashboard & review", desc: "See ADMV changes and approve records", icon: LayoutDashboard },
   { to: "/monitoring", label: "Monitor", desc: "Job runs, automation status and delivery", icon: Activity },
-  { to: "/refresh", label: "Projects", desc: "Add sources or create a new project", icon: FolderPlus },
+  { to: "/playbooks/solutions", label: "Solutions", desc: "Pick a packaged dataset or create a new project", icon: FolderPlus },
   { to: "/playbooks/agents", label: "Agents", desc: "Every source agent running for you", icon: Bot },
 ] as const;
 
