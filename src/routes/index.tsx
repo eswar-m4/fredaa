@@ -49,15 +49,15 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Customer Dashboard — FreDA data workspace" },
+      { title: "Workspace Dashboard — FreDA data workspace" },
       {
         name: "description",
-        content: "Customer-specific dashboard with ADMV signature, action needed by project and date, and an expanded record-level review workspace.",
+        content: "Workspace-specific dashboard with ADMV signature, action needed by project and date, and an expanded record-level review workspace.",
       },
-      { property: "og:title", content: "Customer Dashboard — FreDA data workspace" },
+      { property: "og:title", content: "Workspace Dashboard — FreDA data workspace" },
       {
         property: "og:description",
-        content: "Customer-specific dashboard with ADMV signature, action needed by project and date, and an expanded record-level review workspace.",
+        content: "Workspace-specific dashboard with ADMV signature, action needed by project and date, and an expanded record-level review workspace.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
