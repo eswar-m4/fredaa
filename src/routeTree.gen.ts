@@ -14,6 +14,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AskFredaRouteImport } from './routes/ask-freda'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MonitoringRouteImport } from './routes/monitoring'
+import { Route as PlaybooksRouteImport } from './routes/playbooks'
 import { Route as RefreshRouteImport } from './routes/refresh'
 
 const IndexRoute = IndexRouteImport.update({
@@ -41,6 +42,11 @@ const MonitoringRoute = MonitoringRouteImport.update({
   path: '/monitoring',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PlaybooksRoute = PlaybooksRouteImport.update({
+  id: '/playbooks',
+  path: '/playbooks',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RefreshRoute = RefreshRouteImport.update({
   id: '/refresh',
   path: '/refresh',
@@ -53,6 +59,7 @@ export interface FileRoutesByFullPath {
   '/ask-freda': typeof AskFredaRoute
   '/login': typeof LoginRoute
   '/monitoring': typeof MonitoringRoute
+  '/playbooks': typeof PlaybooksRoute
   '/refresh': typeof RefreshRoute
 }
 export interface FileRoutesByTo {
@@ -61,6 +68,7 @@ export interface FileRoutesByTo {
   '/ask-freda': typeof AskFredaRoute
   '/login': typeof LoginRoute
   '/monitoring': typeof MonitoringRoute
+  '/playbooks': typeof PlaybooksRoute
   '/refresh': typeof RefreshRoute
 }
 export interface FileRoutesById {
@@ -70,14 +78,28 @@ export interface FileRoutesById {
   '/ask-freda': typeof AskFredaRoute
   '/login': typeof LoginRoute
   '/monitoring': typeof MonitoringRoute
+  '/playbooks': typeof PlaybooksRoute
   '/refresh': typeof RefreshRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/admin' | '/ask-freda' | '/login' | '/monitoring' | '/refresh'
+    | '/'
+    | '/admin'
+    | '/ask-freda'
+    | '/login'
+    | '/monitoring'
+    | '/playbooks'
+    | '/refresh'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admin' | '/ask-freda' | '/login' | '/monitoring' | '/refresh'
+  to:
+    | '/'
+    | '/admin'
+    | '/ask-freda'
+    | '/login'
+    | '/monitoring'
+    | '/playbooks'
+    | '/refresh'
   id:
     | '__root__'
     | '/'
@@ -85,6 +107,7 @@ export interface FileRouteTypes {
     | '/ask-freda'
     | '/login'
     | '/monitoring'
+    | '/playbooks'
     | '/refresh'
   fileRoutesById: FileRoutesById
 }
@@ -94,6 +117,7 @@ export interface RootRouteChildren {
   AskFredaRoute: typeof AskFredaRoute
   LoginRoute: typeof LoginRoute
   MonitoringRoute: typeof MonitoringRoute
+  PlaybooksRoute: typeof PlaybooksRoute
   RefreshRoute: typeof RefreshRoute
 }
 
@@ -134,6 +158,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MonitoringRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/playbooks': {
+      id: '/playbooks'
+      path: '/playbooks'
+      fullPath: '/playbooks'
+      preLoaderRoute: typeof PlaybooksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/refresh': {
       id: '/refresh'
       path: '/refresh'
@@ -150,6 +181,7 @@ const rootRouteChildren: RootRouteChildren = {
   AskFredaRoute: AskFredaRoute,
   LoginRoute: LoginRoute,
   MonitoringRoute: MonitoringRoute,
+  PlaybooksRoute: PlaybooksRoute,
   RefreshRoute: RefreshRoute,
 }
 export const routeTree = rootRouteImport
