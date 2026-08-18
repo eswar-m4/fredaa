@@ -74,6 +74,13 @@ export const reviewTone: Record<ReviewStatus, "success" | "warning" | "info"> = 
   "Review pending": "warning",
 };
 
+const REVIEW_LABEL: Record<ReviewStatus, string> = {
+  Completed: "Review completed",
+  "In progress": "Review in progress",
+  "Review pending": "Review pending",
+};
+
+
 const SEGMENTS = [
   { key: "added", label: "Added", bar: "bg-success", chip: "bg-success-bg text-success", dot: "bg-success" },
   { key: "deleted", label: "Deleted", bar: "bg-destructive", chip: "bg-destructive/10 text-destructive", dot: "bg-destructive" },
