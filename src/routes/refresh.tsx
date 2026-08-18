@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Plus, Trash2, CalendarClock, Sparkles, Send, Globe, FolderPlus, CheckCircle2, Clock, Info, X } from "lucide-react";
+import { Plus, Trash2, CalendarClock, Sparkles, Send, Globe, FolderPlus, CheckCircle2, Clock, Info, X, ChevronDown } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
-import { Badge, Button, Card, Input, PageHeader, SectionTitle, Select } from "@/components/ui-bits";
+import { Badge, Button, Card, Input, SectionTitle, Select } from "@/components/ui-bits";
 import { useActiveCustomer } from "@/lib/workspace";
 import { estimate, fmt, requestsFor, type ChangeRequest, type Project, type SourceRef } from "@/data/customers";
 import { statusTone } from "@/routes/index";
@@ -71,7 +71,9 @@ function RefreshPage() {
   const [notice, setNotice] = useState("");
   const [raised, setRaised] = useState<ChangeRequest[]>([]);
 
+  const [open, setOpen] = useState({ projects: true, create: false, requests: false });
   const [draft, setDraft] = useState<Draft>(EMPTY_DRAFT);
+
   const draftDatapoints = Math.max(1, draft.fields.length);
   const draftUrlCount = Math.max(1, draft.urls.filter((u) => u.trim()).length || draft.urls.length);
   const draftEstimate = estimate(draftUrlCount, draftDatapoints, draft.frequency);
@@ -158,22 +160,47 @@ function RefreshPage() {
 
   return (
     <AppLayout>
-      <PageHeader
-        title="Projects"
-        subtitle={`${customer.name} · create, manage and schedule extraction projects · ${customer.projects.length} live`}
-      />
+      <div className="px-7 pt-6 pb-4">
+        <div className="relative overflow-hidden rounded-2xl border border-border bg-gradient-to-r from-primary/12 via-purple-bg/50 to-transparent px-6 py-5">
+          <div className="flex flex-wrap items-center gap-4">
+            <span className="h-12 w-12 rounded-xl bg-primary text-primary-foreground inline-flex items-center justify-center shrink-0">
+              <FolderPlus className="h-6 w-6" />
+            </span>
+            <div className="min-w-0">
+              <div className="text-[11px] uppercase tracking-[0.22em] text-primary font-semibold">Projects &amp; manage</div>
+              <h1 className="text-[26px] leading-tight font-bold tracking-tight">{customer.name}</h1>
+              <p className="text-[12.5px] text-muted-foreground mt-0.5">
+                Create, manage and schedule extraction projects · {customer.projects.length} live projects
+              </p>
+            </div>
+            <div className="ml-auto flex items-center gap-2">
+              <Badge tone="info">{customer.projects.reduce((n, p) => n + p.sources.length, 0)} sources</Badge>
+              <Badge tone="purple">{requests.length} open requests</Badge>
+            </div>
+          </div>
+        </div>
+      </div>
 
-
-      <div className="px-7 pb-8 space-y-5">
+      <div className="px-7 pb-8 space-y-4">
         {notice && (
           <div className="rounded-lg border border-success/40 bg-success-bg px-4 py-2.5 text-[12.5px] text-success flex items-center gap-2">
             <CheckCircle2 className="h-4 w-4 shrink-0" /> {notice}
           </div>
         )}
 
-        <div className="grid lg:grid-cols-2 gap-5 items-stretch">
-          {/* project list */}
-          <Card className="overflow-hidden flex flex-col h-[520px]">
+        <Panel
+          id="projects"
+          open={open.projects}
+          onToggle={() => setOpen((o) => ({ ...o, projects: !o.projects }))}
+          icon={<Globe className="h-4 w-4" />}
+          title="Projects & sources"
+          subtitle="Select a project to manage sources, attributes and schedule"
+          meta={`${customer.projects.length} projects`}
+        >
+          <div className="grid lg:grid-cols-2 gap-5 items-stretch">
+            {/* project list */}
+            <Card className="overflow-hidden flex flex-col h-[520px]">
+
             <div className="px-5 pt-4 pb-3 border-b border-border shrink-0">
               <h3 className="text-[13px] font-semibold uppercase tracking-wider text-muted-foreground">Projects</h3>
               <p className="text-[12px] text-muted-foreground mt-1">Select a project to manage its sources and schedule.</p>
@@ -317,10 +344,20 @@ function RefreshPage() {
             )}
           </Card>
         </div>
+        </Panel>
 
         {/* new project */}
-        <div className="space-y-5">
+        <Panel
+          id="create"
+          open={open.create}
+          onToggle={() => setOpen((o) => ({ ...o, create: !o.create }))}
+          icon={<FolderPlus className="h-4 w-4" />}
+          title="Create a new project"
+          subtitle="Instant estimate · admin notified on submit"
+          meta={`${draftUrlCount} sources · ${draftDatapoints} datapoints`}
+        >
           <Card className="overflow-hidden">
+
             <div className="flex flex-wrap items-center gap-3 px-5 py-3 border-b border-border bg-gradient-to-r from-primary/10 via-purple-bg/60 to-transparent">
               <span className="h-9 w-9 rounded-lg bg-primary text-primary-foreground inline-flex items-center justify-center shrink-0">
                 <FolderPlus className="h-4.5 w-4.5" />
@@ -507,11 +544,20 @@ function RefreshPage() {
               </div>
             </div>
           </Card>
+        </Panel>
 
-
-
+        <Panel
+          id="requests"
+          open={open.requests}
+          onToggle={() => setOpen((o) => ({ ...o, requests: !o.requests }))}
+          icon={<Clock className="h-4 w-4" />}
+          title="Build request tracker"
+          subtitle="Every add, retire or new build with its REQ number and status"
+          meta={`${requests.length} requests`}
+        >
           <Card className="p-5 flex flex-col">
-            <SectionTitle hint="add / remove / new build">Change requests</SectionTitle>
+            <SectionTitle hint="add / remove / new build">Requests raised</SectionTitle>
+
             <p className="text-[11.5px] text-muted-foreground -mt-1 mb-2 inline-flex items-start gap-1.5">
               <Info className="h-3.5 w-3.5 mt-[1px] shrink-0" />
               Every source you add, retire or modify is logged here with an auto-assigned REQ number (sequential per workspace) that your FreDA admin
@@ -544,7 +590,8 @@ function RefreshPage() {
               ))}
             </div>
           </Card>
-        </div>
+        </Panel>
+
       </div>
     </AppLayout>
   );
@@ -560,5 +607,48 @@ function Est({ label, value }: { label: string; value: string }) {
       <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">{label}</div>
       <div className="text-[15px] font-semibold tabular-nums mt-0.5">{value}</div>
     </div>
+  );
+}
+
+function Panel({
+  open,
+  onToggle,
+  icon,
+  title,
+  subtitle,
+  meta,
+  children,
+}: {
+  id: string;
+  open: boolean;
+  onToggle: () => void;
+  icon: React.ReactNode;
+  title: string;
+  subtitle: string;
+  meta: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className={cn("rounded-xl border transition", open ? "border-primary/40 bg-secondary/20" : "border-border bg-card")}>
+      <button onClick={onToggle} className="w-full flex items-center gap-3 px-5 py-3.5 text-left">
+        <span
+          className={cn(
+            "h-9 w-9 rounded-lg inline-flex items-center justify-center shrink-0 transition",
+            open ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground",
+          )}
+        >
+          {icon}
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block text-[14px] font-semibold leading-tight">{title}</span>
+          <span className="block text-[11.5px] text-muted-foreground truncate">{subtitle}</span>
+        </span>
+        <Badge className="whitespace-nowrap" tone={open ? "info" : "neutral"}>
+          {meta}
+        </Badge>
+        <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform", open && "rotate-180")} />
+      </button>
+      {open && <div className="px-4 pb-4">{children}</div>}
+    </section>
   );
 }
