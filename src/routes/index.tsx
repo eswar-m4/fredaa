@@ -237,11 +237,10 @@ function DashboardPage() {
                         <Badge tone={st === "Still running" ? "info" : reviewTone[rs]}>{st}</Badge>
                       </td>
                       <td className="px-5 py-3 text-right">
-                        <div className="flex items-center justify-end gap-2">
-
+                        <div className="flex items-center justify-end">
                           <Button
                             size="sm"
-                            className="whitespace-nowrap"
+                            className="w-[150px] justify-center whitespace-nowrap"
                             variant={action ? "primary" : p.pendingReview > 0 ? "primary" : "outline"}
                             title={action || "Open review workspace"}
                             onClick={(e) => {
@@ -254,6 +253,7 @@ function DashboardPage() {
                           </Button>
                         </div>
                       </td>
+
                     </tr>
                   );
                 })}
