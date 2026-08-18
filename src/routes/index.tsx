@@ -188,7 +188,7 @@ function DashboardPage() {
                   <th className="px-3 py-2 font-semibold">Freshness</th>
                   <th className="px-3 py-2 font-semibold">Accuracy</th>
                   <th className="px-3 py-2 font-semibold">Review status</th>
-                  <th className="px-5 py-2 font-semibold text-right w-[210px]">Action needed</th>
+                  <th className="px-5 py-2 font-semibold text-center w-[210px]">Action needed</th>
 
                 </tr>
 
@@ -236,8 +236,8 @@ function DashboardPage() {
                       <td className="px-3 py-3 whitespace-nowrap">
                         <Badge tone={st === "Still running" ? "info" : reviewTone[rs]}>{st}</Badge>
                       </td>
-                      <td className="px-5 py-3 text-right">
-                        <div className="flex items-center justify-end">
+                      <td className="px-5 py-3 text-center">
+                        <div className="flex items-center justify-center">
                           <Button
                             size="sm"
                             className="w-[150px] justify-center whitespace-nowrap"
