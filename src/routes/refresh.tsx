@@ -71,7 +71,9 @@ function RefreshPage() {
   const [notice, setNotice] = useState("");
   const [raised, setRaised] = useState<ChangeRequest[]>([]);
 
+  const [open, setOpen] = useState({ projects: true, create: false, requests: false });
   const [draft, setDraft] = useState<Draft>(EMPTY_DRAFT);
+
   const draftDatapoints = Math.max(1, draft.fields.length);
   const draftUrlCount = Math.max(1, draft.urls.filter((u) => u.trim()).length || draft.urls.length);
   const draftEstimate = estimate(draftUrlCount, draftDatapoints, draft.frequency);
