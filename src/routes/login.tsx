@@ -18,8 +18,8 @@ function LoginPage() {
   const navigate = useNavigate();
   const { next } = Route.useSearch();
   const [role, setRole] = useState<"user" | "admin">("user");
-  const [username, setUsername] = useState("user");
-  const [password, setPassword] = useState("user123");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [loading, setLoading] = useState(false);
   const [checking, setChecking] = useState(true);
@@ -42,9 +42,9 @@ function LoginPage() {
   }, [navigate]);
 
   const hint = useMemo(() => {
-    if (mode === "signup") return "Create a new user account.\nUse your own username and password.";
-    if (role === "admin") return "Demo Credentials\nUsername: admin\nPassword: admin123";
-    return "Demo Credentials\nUsername: user\nPassword: user123";
+    if (mode === "signup") return "Create a new account with your own username and password.";
+    if (role === "admin") return "Administrator access — all workspaces, sources and tickets.";
+    return "Workspace access — your projects, review, monitoring and playbooks.";
   }, [mode, role]);
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -84,11 +84,15 @@ function LoginPage() {
         <div className="space-y-6">
           <div className="inline-flex items-center gap-3 rounded-full border border-primary/25 bg-primary/10 px-4 py-2 text-sm text-foreground">
             <Shield className="h-4 w-4 text-primary" />
-            FreDA · Fresh Data Automation
+            <span className="font-bold">FreDA</span>
+            <span className="text-muted-foreground">Fresh Data Automation</span>
           </div>
           <div className="space-y-3">
-            <h1 className="text-4xl font-semibold tracking-tight leading-tight">
-              Your external data, <span className="text-primary">sourced, verified and kept fresh</span>
+            <div className="text-2xl font-extrabold tracking-tight">
+              FreDA <span className="text-primary">— Fresh Data Automation</span>
+            </div>
+            <h1 className="text-4xl font-bold tracking-tight leading-tight">
+              Data, <span className="text-primary">sourced, verified and kept fresh</span>
             </h1>
             <p className="max-w-xl text-sm text-muted-foreground leading-6">
               FreDA runs site-specific agents on the sources you trust, extracts the exact datapoints you need, scores every
@@ -126,7 +130,6 @@ function LoginPage() {
                 <div>
                   <div className="text-sm font-semibold">Workspace user</div>
                   <div className="text-xs text-muted-foreground">Dashboard &amp; review, monitoring, projects and playbooks.</div>
-                  <div className="text-[11px] font-mono text-muted-foreground mt-1">user / user123</div>
                 </div>
               </div>
             </Card>
@@ -138,7 +141,6 @@ function LoginPage() {
                 <div>
                   <div className="text-sm font-semibold">Administrator</div>
                   <div className="text-xs text-muted-foreground">All sources across workspaces, customer tickets and access control.</div>
-                  <div className="text-[11px] font-mono text-muted-foreground mt-1">admin / admin123</div>
                 </div>
               </div>
             </Card>
@@ -162,8 +164,8 @@ function LoginPage() {
                 <Select value={role} onChange={(e) => {
                   const nextRole = e.target.value as "user" | "admin";
                   setRole(nextRole);
-                  setUsername(nextRole === "admin" ? "admin" : "user");
-                  setPassword(nextRole === "admin" ? "admin123" : "user123");
+                  setUsername("");
+                  setPassword("");
                 }} className="h-11 bg-background border-input text-foreground">
                   <option value="user">User</option>
                   <option value="admin">Admin</option>
@@ -213,8 +215,8 @@ function LoginPage() {
                 setMode((prev) => (prev === "signin" ? "signup" : "signin"));
                 clearStoredSession();
                 setRole("user");
-                setUsername("user");
-                setPassword("user123");
+                setUsername("");
+                setPassword("");
               }}
             >
               <UserPlus className="h-4 w-4" />
