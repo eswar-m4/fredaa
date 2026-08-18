@@ -23,7 +23,12 @@ export function ReviewDialog({
   open: boolean;
   onOpenChange: (v: boolean) => void;
 }) {
-  const all = useMemo(() => (project ? reviewRecordsFor(project, 400) : []), [project?.id]);
+  const all = useMemo(
+    () => (project ? reviewRecordsFor(project, Math.min(POOL, Math.max(1200, project.pendingReview))) : []),
+    [project?.id],
+  );
+  const [batchSize, setBatchSize] = useState(25);
+
 
   const [sampling, setSampling] = useState(2);
   const [admvFilter, setAdmvFilter] = useState<"all" | ChangeType>("all");
