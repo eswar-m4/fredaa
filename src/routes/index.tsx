@@ -185,9 +185,12 @@ function DashboardPage() {
                   <th className="px-5 py-2 font-semibold">Project</th>
                   <th className="px-3 py-2 font-semibold">Records</th>
                   <th className="px-3 py-2 font-semibold w-[230px] text-center">ADMV %</th>
+                  <th className="px-3 py-2 font-semibold">Coverage</th>
+                  <th className="px-3 py-2 font-semibold">Freshness</th>
                   <th className="px-3 py-2 font-semibold">Accuracy</th>
                   <th className="px-3 py-2 font-semibold">Review status</th>
                   <th className="px-5 py-2 font-semibold text-right w-[210px]">Action needed</th>
+
                 </tr>
 
               </thead>
