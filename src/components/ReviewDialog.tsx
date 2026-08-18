@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AdmvBar, Badge, Button, Donut, Input, Select } from "@/components/ui-bits";
 import { cn } from "@/lib/utils";
-import { Check, X, ChevronLeft, ChevronRight, RotateCcw, Layers, Send, ExternalLink } from "lucide-react";
+import { Check, X, ChevronLeft, ChevronRight, RotateCcw, Layers, Send, ExternalLink, Download } from "lucide-react";
+import { downloadCsv } from "@/lib/download";
 import { reviewRecordsFor, fmt, hrsAgo, type Project, type ReviewRecord, type ChangeType } from "@/data/customers";
 
 type Decision = "approved" | "rejected";
@@ -38,6 +39,7 @@ export function ReviewDialog({
   const [decisions, setDecisions] = useState<Record<string, Decision>>({});
   const [batchIdx, setBatchIdx] = useState(0);
   const [submitted, setSubmitted] = useState(0);
+  const [completedFile, setCompletedFile] = useState<Array<Record<string, string | number>>>([]);
 
   const sampled = useMemo(() => all.slice(0, Math.max(1, Math.round((all.length * sampling) / 100))), [all, sampling]);
 
@@ -100,6 +102,20 @@ export function ReviewDialog({
   }
 
   function submit() {
+    setCompletedFile(
+      records
+        .filter((r) => decisions[r.id])
+        .map((r) => ({
+          entity: r.entity,
+          datapoint: r.datapoint,
+          change: r.changeType,
+          old_value: r.oldValue,
+          new_value: r.newValue,
+          confidence: r.confidence,
+          source: r.sourceUrl,
+          decision: decisions[r.id] === "approved" ? "Approved" : "Rejected",
+        })),
+    );
     setSubmitted(decided);
     setDecisions({});
     setBatchIdx(0);
@@ -115,6 +131,7 @@ export function ReviewDialog({
         onOpenChange(v);
         if (!v) {
           setSubmitted(0);
+          setCompletedFile([]);
           reset();
         }
       }}
@@ -389,6 +406,17 @@ export function ReviewDialog({
             {submitted > 0 && <span className="ml-2 text-success">✓ {submitted} decisions submitted</span>}
           </div>
           <div className="ml-auto flex flex-wrap items-center gap-2">
+            {submitted > 0 && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  downloadCsv(`${project.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-reviewed.csv`, completedFile)
+                }
+              >
+                <Download className="h-3.5 w-3.5" /> Download reviewed file
+              </Button>
+            )}
             <Button variant="ghost" size="sm" onClick={reset}>
               <RotateCcw className="h-3.5 w-3.5" /> Reset
             </Button>
