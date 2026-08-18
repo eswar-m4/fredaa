@@ -17,7 +17,6 @@ import { Route as AdminTicketsRouteImport } from './routes/admin-tickets'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MonitoringRouteImport } from './routes/monitoring'
 import { Route as PlaybooksRouteImport } from './routes/playbooks'
-import { Route as RefreshRouteImport } from './routes/refresh'
 import { Route as RequestsRouteImport } from './routes/requests'
 import { Route as PlaybooksIndexRouteImport } from './routes/playbooks.index'
 import { Route as PlaybooksAgentsRouteImport } from './routes/playbooks.agents'
@@ -64,11 +63,6 @@ const PlaybooksRoute = PlaybooksRouteImport.update({
   path: '/playbooks',
   getParentRoute: () => rootRouteImport,
 } as any)
-const RefreshRoute = RefreshRouteImport.update({
-  id: '/refresh',
-  path: '/refresh',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const RequestsRoute = RequestsRouteImport.update({
   id: '/requests',
   path: '/requests',
@@ -104,7 +98,6 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/monitoring': typeof MonitoringRoute
   '/playbooks': typeof PlaybooksRouteWithChildren
-  '/refresh': typeof RefreshRoute
   '/requests': typeof RequestsRoute
   '/playbooks/agents': typeof PlaybooksAgentsRoute
   '/playbooks/ask': typeof PlaybooksAskRoute
@@ -119,7 +112,6 @@ export interface FileRoutesByTo {
   '/admin-tickets': typeof AdminTicketsRoute
   '/login': typeof LoginRoute
   '/monitoring': typeof MonitoringRoute
-  '/refresh': typeof RefreshRoute
   '/requests': typeof RequestsRoute
   '/playbooks/agents': typeof PlaybooksAgentsRoute
   '/playbooks/ask': typeof PlaybooksAskRoute
@@ -136,7 +128,6 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/monitoring': typeof MonitoringRoute
   '/playbooks': typeof PlaybooksRouteWithChildren
-  '/refresh': typeof RefreshRoute
   '/requests': typeof RequestsRoute
   '/playbooks/agents': typeof PlaybooksAgentsRoute
   '/playbooks/ask': typeof PlaybooksAskRoute
@@ -154,7 +145,6 @@ export interface FileRouteTypes {
     | '/login'
     | '/monitoring'
     | '/playbooks'
-    | '/refresh'
     | '/requests'
     | '/playbooks/agents'
     | '/playbooks/ask'
@@ -169,7 +159,6 @@ export interface FileRouteTypes {
     | '/admin-tickets'
     | '/login'
     | '/monitoring'
-    | '/refresh'
     | '/requests'
     | '/playbooks/agents'
     | '/playbooks/ask'
@@ -185,7 +174,6 @@ export interface FileRouteTypes {
     | '/login'
     | '/monitoring'
     | '/playbooks'
-    | '/refresh'
     | '/requests'
     | '/playbooks/agents'
     | '/playbooks/ask'
@@ -202,7 +190,6 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   MonitoringRoute: typeof MonitoringRoute
   PlaybooksRoute: typeof PlaybooksRouteWithChildren
-  RefreshRoute: typeof RefreshRoute
   RequestsRoute: typeof RequestsRoute
 }
 
@@ -262,13 +249,6 @@ declare module '@tanstack/react-router' {
       path: '/playbooks'
       fullPath: '/playbooks'
       preLoaderRoute: typeof PlaybooksRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/refresh': {
-      id: '/refresh'
-      path: '/refresh'
-      fullPath: '/refresh'
-      preLoaderRoute: typeof RefreshRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/requests': {
@@ -336,7 +316,6 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   MonitoringRoute: MonitoringRoute,
   PlaybooksRoute: PlaybooksRouteWithChildren,
-  RefreshRoute: RefreshRoute,
   RequestsRoute: RequestsRoute,
 }
 export const routeTree = rootRouteImport
