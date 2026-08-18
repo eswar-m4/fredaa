@@ -33,12 +33,12 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/monitoring")({
   head: () => ({
     meta: [
-      { title: "Monitoring — FreDA" },
+      { title: "Monitor & Refresh — FreDA" },
       {
         name: "description",
         content: "Live job automation status, refresh schedule health and delivery destinations for every FreDA dataset.",
       },
-      { property: "og:title", content: "Monitoring — FreDA" },
+      { property: "og:title", content: "Monitor & Refresh — FreDA" },
       {
         property: "og:description",
         content: "Live job automation status, refresh schedule health and delivery destinations for every FreDA dataset.",
