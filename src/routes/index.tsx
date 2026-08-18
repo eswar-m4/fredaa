@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import {
   CheckSquare,
@@ -7,8 +7,13 @@ import {
   TrendingUp,
   Clock,
   Rocket,
+  FolderPlus,
+  BookOpen,
+  Download,
 } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
+import { NewProjectDialog } from "@/components/NewProjectDialog";
+import { downloadCsv } from "@/lib/download";
 import {
   Badge,
 
@@ -30,6 +35,7 @@ import {
   devPipeline,
   fmt,
   rangeFactor,
+  reviewRecordsFor,
   reviewStatusFor,
   rollupProjects,
   scaleAdmv,
@@ -102,6 +108,7 @@ function DashboardPage() {
   const [range, setRange] = useState<RangeValue>(DEFAULT_RANGE);
   const [scope, setScope] = useState<string>("all");
   const [reviewProject, setReviewProject] = useState<Project | null>(null);
+  const [newProjectOpen, setNewProjectOpen] = useState(false);
   const [selected, setSelected] = useState<string>(customer.projects[0]!.id);
 
   const scoped = scope === "all" ? customer.projects : customer.projects.filter((p) => p.id === scope);
@@ -131,9 +138,16 @@ function DashboardPage() {
         title="Dashboard"
         subtitle={`${customer.name} · ${customer.projects.length} projects · ${fmt(rollupProjects(customer.projects).records)} records under management · account since ${customer.since}`}
         actions={
-          <Button size="sm" onClick={() => setReviewProject(active)}>
-            <CheckSquare className="h-3.5 w-3.5" /> Open review workspace
-          </Button>
+          <div className="flex items-center gap-2">
+            <Link to="/playbooks">
+              <Button size="sm" variant="outline">
+                <BookOpen className="h-3.5 w-3.5" /> Playbooks
+              </Button>
+            </Link>
+            <Button size="sm" onClick={() => setNewProjectOpen(true)}>
+              <FolderPlus className="h-3.5 w-3.5" /> New project
+            </Button>
+          </div>
         }
       />
 
@@ -238,6 +252,32 @@ function DashboardPage() {
                       </td>
                       <td className="px-5 py-3 text-center">
                         <div className="flex items-center justify-center">
+                          {rs === "Completed" ? (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="w-[150px] justify-center whitespace-nowrap"
+                            title="Download reviewed file"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              downloadCsv(
+                                `${p.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-reviewed.csv`,
+                                reviewRecordsFor(p, 200).map((r) => ({
+                                  entity: r.entity,
+                                  datapoint: r.datapoint,
+                                  change: r.changeType,
+                                  old_value: r.oldValue,
+                                  new_value: r.newValue,
+                                  confidence: r.confidence,
+                                  source: r.sourceUrl,
+                                  status: "Approved",
+                                })),
+                              );
+                            }}
+                          >
+                            <Download className="h-3.5 w-3.5" /> Download file
+                          </Button>
+                          ) : (
                           <Button
                             size="sm"
                             className="w-[150px] justify-center whitespace-nowrap"
@@ -251,6 +291,7 @@ function DashboardPage() {
                             <CheckSquare className="h-3.5 w-3.5" />
                             {p.pendingReview > 0 ? `Review ${fmt(p.pendingReview)}` : "Review"}
                           </Button>
+                          )}
                         </div>
                       </td>
 
@@ -266,7 +307,7 @@ function DashboardPage() {
 
         {/* New project development in progress */}
         <Card className="p-5">
-          <SectionTitle hint="FreDA delivery team">New project development in progress</SectionTitle>
+          <SectionTitle hint="FreDA delivery team">New project development</SectionTitle>
 
 
 
@@ -316,6 +357,7 @@ function DashboardPage() {
         </Card>
       </div>
 
+      <NewProjectDialog open={newProjectOpen} onOpenChange={setNewProjectOpen} />
       <ReviewDialog project={reviewProject} open={!!reviewProject} onOpenChange={(v) => !v && setReviewProject(null)} />
     </AppLayout>
   );
