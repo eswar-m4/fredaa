@@ -74,10 +74,11 @@ export function ReviewDialog({
     return c;
   }, [records]);
 
-  const batchCount = Math.max(1, Math.ceil(records.length / BATCH));
+  const batchCount = Math.max(1, Math.ceil(records.length / batchSize));
   const clampedBatch = Math.min(batchIdx, batchCount - 1);
-  const batchStart = clampedBatch * BATCH;
-  const batch = records.slice(batchStart, batchStart + BATCH);
+  const batchStart = clampedBatch * batchSize;
+  const batch = records.slice(batchStart, batchStart + batchSize);
+
   const batchDecided = batch.filter((r) => decisions[r.id]).length;
 
   function decide(ids: string[], d: Decision) {
