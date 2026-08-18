@@ -231,13 +231,8 @@ export function ReviewDialog({
                       </button>
                     );
                   })}
-                  <button
-                    disabled={datapoint === "all" || records.length === 0}
-                    onClick={() => decide(records.map((r) => r.id), "approved")}
-                    className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-2.5 h-7 text-[11.5px] hover:bg-secondary disabled:opacity-40 transition"
-                  >
-                    Datapoint group <span className="tabular-nums text-muted-foreground">{datapoint === "all" ? "—" : records.length}</span>
-                  </button>
+
+
                 </div>
               </div>
 
