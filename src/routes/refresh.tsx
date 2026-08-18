@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Plus, Trash2, CalendarClock, Sparkles, Send, Globe, FolderPlus, CheckCircle2, Clock, Info, X } from "lucide-react";
+import { Plus, Trash2, CalendarClock, Sparkles, Send, Globe, FolderPlus, CheckCircle2, Clock, Info, X, ChevronDown } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
 import { Badge, Button, Card, Input, PageHeader, SectionTitle, Select } from "@/components/ui-bits";
 import { useActiveCustomer } from "@/lib/workspace";
@@ -607,5 +607,48 @@ function Est({ label, value }: { label: string; value: string }) {
       <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">{label}</div>
       <div className="text-[15px] font-semibold tabular-nums mt-0.5">{value}</div>
     </div>
+  );
+}
+
+function Panel({
+  open,
+  onToggle,
+  icon,
+  title,
+  subtitle,
+  meta,
+  children,
+}: {
+  id: string;
+  open: boolean;
+  onToggle: () => void;
+  icon: React.ReactNode;
+  title: string;
+  subtitle: string;
+  meta: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className={cn("rounded-xl border transition", open ? "border-primary/40 bg-secondary/20" : "border-border bg-card")}>
+      <button onClick={onToggle} className="w-full flex items-center gap-3 px-5 py-3.5 text-left">
+        <span
+          className={cn(
+            "h-9 w-9 rounded-lg inline-flex items-center justify-center shrink-0 transition",
+            open ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground",
+          )}
+        >
+          {icon}
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block text-[14px] font-semibold leading-tight">{title}</span>
+          <span className="block text-[11.5px] text-muted-foreground truncate">{subtitle}</span>
+        </span>
+        <Badge className="whitespace-nowrap" tone={open ? "info" : "neutral"}>
+          {meta}
+        </Badge>
+        <ChevronDown className={cn("h-4 w-4 text-muted-foreground transition-transform", open && "rotate-180")} />
+      </button>
+      {open && <div className="px-4 pb-4">{children}</div>}
+    </section>
   );
 }
