@@ -81,6 +81,16 @@ const SEGMENTS = [
   { key: "verified", label: "Verified", bar: "bg-primary/60", chip: "bg-info-bg text-info", dot: "bg-primary/60" },
 ] as const;
 
+const CRITICAL_ACTIONS = [
+  "Source returned 403 — re-auth needed",
+  "Layout change — re-map 3 fields",
+  "Resolve duplicate entities",
+  "Verify price movement > 30%",
+  "Re-check low-confidence extractions",
+  "New field detected on source page",
+];
+
+
 function DashboardPage() {
   const customer = useActiveCustomer();
   const [range, setRange] = useState<RangeValue>(DEFAULT_RANGE);
