@@ -196,7 +196,19 @@ export function ReviewDialog({
               <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">Search entity</div>
               <Input placeholder="Search…" value={query} onChange={(e) => setQuery(e.target.value)} />
             </div>
+
+            {/* review contour — left rail bottom */}
+            <div className="mt-auto pt-4 rounded-lg border border-border bg-card p-3 flex items-center gap-3">
+              <Donut value={coverage} label="reviewed" tone={coverage > 66 ? "success" : coverage > 33 ? "warning" : "primary"} />
+              <div className="text-[11.5px] text-muted-foreground leading-relaxed">
+                <div className="text-foreground font-semibold text-[13px]">Review contour</div>
+                {decided} of {records.length} decided
+                <br />
+                <span className="text-success">{approved} approved</span> · <span className="text-destructive">{rejected} rejected</span>
+              </div>
+            </div>
           </aside>
+
 
           {/* batch queue */}
           <div className="flex flex-col min-h-0">
