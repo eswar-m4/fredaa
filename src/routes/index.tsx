@@ -5,7 +5,6 @@ import {
   Database,
   ShieldCheck,
   TrendingUp,
-  AlertTriangle,
   Clock,
   Rocket,
 } from "lucide-react";
