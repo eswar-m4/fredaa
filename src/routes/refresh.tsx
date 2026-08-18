@@ -342,10 +342,20 @@ function RefreshPage() {
             )}
           </Card>
         </div>
+        </Panel>
 
         {/* new project */}
-        <div className="space-y-5">
+        <Panel
+          id="create"
+          open={open.create}
+          onToggle={() => setOpen((o) => ({ ...o, create: !o.create }))}
+          icon={<FolderPlus className="h-4 w-4" />}
+          title="Create a new project"
+          subtitle="Instant estimate · admin notified on submit"
+          meta={`${draftUrlCount} sources · ${draftDatapoints} datapoints`}
+        >
           <Card className="overflow-hidden">
+
             <div className="flex flex-wrap items-center gap-3 px-5 py-3 border-b border-border bg-gradient-to-r from-primary/10 via-purple-bg/60 to-transparent">
               <span className="h-9 w-9 rounded-lg bg-primary text-primary-foreground inline-flex items-center justify-center shrink-0">
                 <FolderPlus className="h-4.5 w-4.5" />
