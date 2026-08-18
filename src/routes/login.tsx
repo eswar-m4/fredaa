@@ -4,7 +4,6 @@ import { UserRound, LogIn, Loader2, UserPlus, Radar, Database, CheckCircle2, Ref
 import { toast } from "sonner";
 
 import fredaLogo from "@/assets/freda-mobius-bold.png";
-import loginHero from "@/assets/login-hero.png.asset.json";
 import { Button, Card, Input, Select } from "@/components/ui-bits";
 import { clearStoredSession, fetchSession, loginRequest, setStoredSession, signupRequest } from "@/lib/auth";
 
