@@ -13,10 +13,12 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AdminAccessRouteImport } from './routes/admin-access'
 import { Route as AdminSourcesRouteImport } from './routes/admin-sources'
+import { Route as AdminTicketsRouteImport } from './routes/admin-tickets'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MonitoringRouteImport } from './routes/monitoring'
 import { Route as PlaybooksRouteImport } from './routes/playbooks'
 import { Route as RefreshRouteImport } from './routes/refresh'
+import { Route as RequestsRouteImport } from './routes/requests'
 import { Route as PlaybooksIndexRouteImport } from './routes/playbooks.index'
 import { Route as PlaybooksAgentsRouteImport } from './routes/playbooks.agents'
 import { Route as PlaybooksAskRouteImport } from './routes/playbooks.ask'
@@ -42,6 +44,11 @@ const AdminSourcesRoute = AdminSourcesRouteImport.update({
   path: '/admin-sources',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminTicketsRoute = AdminTicketsRouteImport.update({
+  id: '/admin-tickets',
+  path: '/admin-tickets',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -60,6 +67,11 @@ const PlaybooksRoute = PlaybooksRouteImport.update({
 const RefreshRoute = RefreshRouteImport.update({
   id: '/refresh',
   path: '/refresh',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RequestsRoute = RequestsRouteImport.update({
+  id: '/requests',
+  path: '/requests',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PlaybooksIndexRoute = PlaybooksIndexRouteImport.update({
@@ -88,10 +100,12 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/admin-access': typeof AdminAccessRoute
   '/admin-sources': typeof AdminSourcesRoute
+  '/admin-tickets': typeof AdminTicketsRoute
   '/login': typeof LoginRoute
   '/monitoring': typeof MonitoringRoute
   '/playbooks': typeof PlaybooksRouteWithChildren
   '/refresh': typeof RefreshRoute
+  '/requests': typeof RequestsRoute
   '/playbooks/agents': typeof PlaybooksAgentsRoute
   '/playbooks/ask': typeof PlaybooksAskRoute
   '/playbooks/solutions': typeof PlaybooksSolutionsRoute
@@ -102,9 +116,11 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/admin-access': typeof AdminAccessRoute
   '/admin-sources': typeof AdminSourcesRoute
+  '/admin-tickets': typeof AdminTicketsRoute
   '/login': typeof LoginRoute
   '/monitoring': typeof MonitoringRoute
   '/refresh': typeof RefreshRoute
+  '/requests': typeof RequestsRoute
   '/playbooks/agents': typeof PlaybooksAgentsRoute
   '/playbooks/ask': typeof PlaybooksAskRoute
   '/playbooks/solutions': typeof PlaybooksSolutionsRoute
@@ -116,10 +132,12 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/admin-access': typeof AdminAccessRoute
   '/admin-sources': typeof AdminSourcesRoute
+  '/admin-tickets': typeof AdminTicketsRoute
   '/login': typeof LoginRoute
   '/monitoring': typeof MonitoringRoute
   '/playbooks': typeof PlaybooksRouteWithChildren
   '/refresh': typeof RefreshRoute
+  '/requests': typeof RequestsRoute
   '/playbooks/agents': typeof PlaybooksAgentsRoute
   '/playbooks/ask': typeof PlaybooksAskRoute
   '/playbooks/solutions': typeof PlaybooksSolutionsRoute
@@ -132,10 +150,12 @@ export interface FileRouteTypes {
     | '/admin'
     | '/admin-access'
     | '/admin-sources'
+    | '/admin-tickets'
     | '/login'
     | '/monitoring'
     | '/playbooks'
     | '/refresh'
+    | '/requests'
     | '/playbooks/agents'
     | '/playbooks/ask'
     | '/playbooks/solutions'
@@ -146,9 +166,11 @@ export interface FileRouteTypes {
     | '/admin'
     | '/admin-access'
     | '/admin-sources'
+    | '/admin-tickets'
     | '/login'
     | '/monitoring'
     | '/refresh'
+    | '/requests'
     | '/playbooks/agents'
     | '/playbooks/ask'
     | '/playbooks/solutions'
@@ -159,10 +181,12 @@ export interface FileRouteTypes {
     | '/admin'
     | '/admin-access'
     | '/admin-sources'
+    | '/admin-tickets'
     | '/login'
     | '/monitoring'
     | '/playbooks'
     | '/refresh'
+    | '/requests'
     | '/playbooks/agents'
     | '/playbooks/ask'
     | '/playbooks/solutions'
@@ -174,10 +198,12 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   AdminAccessRoute: typeof AdminAccessRoute
   AdminSourcesRoute: typeof AdminSourcesRoute
+  AdminTicketsRoute: typeof AdminTicketsRoute
   LoginRoute: typeof LoginRoute
   MonitoringRoute: typeof MonitoringRoute
   PlaybooksRoute: typeof PlaybooksRouteWithChildren
   RefreshRoute: typeof RefreshRoute
+  RequestsRoute: typeof RequestsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -210,6 +236,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminSourcesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin-tickets': {
+      id: '/admin-tickets'
+      path: '/admin-tickets'
+      fullPath: '/admin-tickets'
+      preLoaderRoute: typeof AdminTicketsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -236,6 +269,13 @@ declare module '@tanstack/react-router' {
       path: '/refresh'
       fullPath: '/refresh'
       preLoaderRoute: typeof RefreshRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/requests': {
+      id: '/requests'
+      path: '/requests'
+      fullPath: '/requests'
+      preLoaderRoute: typeof RequestsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/playbooks/': {
@@ -292,10 +332,12 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   AdminAccessRoute: AdminAccessRoute,
   AdminSourcesRoute: AdminSourcesRoute,
+  AdminTicketsRoute: AdminTicketsRoute,
   LoginRoute: LoginRoute,
   MonitoringRoute: MonitoringRoute,
   PlaybooksRoute: PlaybooksRouteWithChildren,
   RefreshRoute: RefreshRoute,
+  RequestsRoute: RequestsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -2,8 +2,8 @@
 // Persisted in localStorage so the admin console can see what users submitted.
 import { useSyncExternalStore } from "react";
 
-export type TicketType = "New project" | "Add source" | "Remove source" | "Datapoint change";
-export type TicketStatus = "Estimating" | "Awaiting admin approval" | "Approved" | "In build" | "Rejected";
+export type TicketType = "New project" | "Add source" | "Remove source" | "Datapoint change" | "Schedule change";
+export type TicketStatus = "Estimating" | "Awaiting admin approval" | "Approved" | "In build" | "Delivered" | "Rejected";
 
 export type Ticket = {
   id: string;
@@ -20,6 +20,8 @@ export type Ticket = {
   sources: string[];
   datapoints: string[];
   fileName?: string;
+  frequency?: string;
+  adminNote?: string;
 };
 
 const KEY = "freda_tickets_v1";
@@ -77,4 +79,8 @@ export function setTicketStatus(id: string, status: TicketStatus) {
 
 export function clearTickets() {
   persist([]);
+}
+
+export function setTicketNote(id: string, adminNote: string) {
+  persist(read().map((t) => (t.id === id ? { ...t, adminNote } : t)));
 }

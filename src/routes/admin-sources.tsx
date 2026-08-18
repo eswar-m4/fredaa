@@ -26,6 +26,7 @@ const STATUS_TONE: Record<TicketStatus, "info" | "warning" | "success" | "purple
   "Awaiting admin approval": "warning",
   Approved: "success",
   "In build": "purple",
+  Delivered: "success",
   Rejected: "destructive",
 };
 

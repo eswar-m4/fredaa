@@ -4,6 +4,8 @@ import {
   LayoutDashboard,
   Activity,
   BookOpen,
+  Ticket,
+
   Bell,
   HelpCircle,
   PanelLeft,
@@ -26,8 +28,10 @@ const WORKSPACE: NavGroup = {
     { to: "/", label: "Dashboard", icon: LayoutDashboard },
     { to: "/monitoring", label: "Monitor", icon: Activity },
     { to: "/playbooks", label: "Playbooks", icon: BookOpen },
+    { to: "/requests", label: "Request tracker", icon: Ticket },
   ],
 };
+
 
 
 
