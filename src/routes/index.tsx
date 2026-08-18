@@ -92,21 +92,22 @@ function DashboardPage() {
   const factor = rangeFactor(range.key, rangeDays(range));
 
   const stats = useMemo(() => rollupProjects(scoped), [customer.id, scope]);
-  const admv = scaleAdmv(stats.admv, factor);
-  const pct = admvPct(admv);
   const pendingScaled = Math.round(stats.pendingReview * Math.min(1.6, factor));
 
   const actions = useMemo(() => actionsFor(customer), [customer.id]);
   const actionByProject = useMemo(() => {
     const m: Record<string, string> = {};
-    for (const a of actions) if (!m[a.projectId]) m[a.projectId] = a.action;
+    for (const a of actions) {
+      if (!CRITICAL_ACTIONS.includes(a.action)) continue;
+      if (!m[a.projectId]) m[a.projectId] = a.action;
+    }
     return m;
   }, [actions]);
 
 
   const pipeline = useMemo(() => devPipeline(customer), [customer.id]);
   const active = scoped.find((p) => p.id === selected) ?? scoped[0] ?? customer.projects[0]!;
-  const totalChanges = admv.added + admv.deleted + admv.modified + admv.verified;
+
 
   return (
     <AppLayout>
