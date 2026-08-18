@@ -193,7 +193,7 @@ function RefreshPage() {
           open={open.projects}
           onToggle={() => setOpen((o) => ({ ...o, projects: !o.projects }))}
           icon={<Globe className="h-4 w-4" />}
-          title="Projects &amp; sources"
+          title="Projects & sources"
           subtitle="Select a project to manage sources, attributes and schedule"
           meta={`${customer.projects.length} projects`}
         >
