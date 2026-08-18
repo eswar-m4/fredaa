@@ -588,7 +588,8 @@ function RefreshPage() {
               ))}
             </div>
           </Card>
-        </div>
+        </Panel>
+
       </div>
     </AppLayout>
   );
