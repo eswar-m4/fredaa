@@ -199,7 +199,7 @@ function RefreshPage() {
         >
           <div className="grid lg:grid-cols-2 gap-5 items-stretch">
             {/* project list */}
-            <Card className="overflow-hidden flex flex-col h-[520px]">
+            <Card className="overflow-hidden flex flex-col min-h-[420px]">
 
             <div className="px-5 pt-4 pb-3 border-b border-border shrink-0">
               <h3 className="text-[13px] font-semibold uppercase tracking-wider text-muted-foreground">Projects</h3>
@@ -230,7 +230,7 @@ function RefreshPage() {
           </Card>
 
           {/* manage selected project */}
-          <Card className="p-5 flex flex-col h-[520px]">
+          <Card className="p-5 flex flex-col min-h-[420px]">
             <SectionTitle hint={`${sources.length} sources`}>Manage — {project.name}</SectionTitle>
 
             <div className="rounded-lg border border-border p-3 mb-3 shrink-0">
