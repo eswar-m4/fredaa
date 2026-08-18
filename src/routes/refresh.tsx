@@ -542,11 +542,20 @@ function RefreshPage() {
               </div>
             </div>
           </Card>
+        </Panel>
 
-
-
+        <Panel
+          id="requests"
+          open={open.requests}
+          onToggle={() => setOpen((o) => ({ ...o, requests: !o.requests }))}
+          icon={<Clock className="h-4 w-4" />}
+          title="Build request tracker"
+          subtitle="Every add, retire or new build with its REQ number and status"
+          meta={`${requests.length} requests`}
+        >
           <Card className="p-5 flex flex-col">
-            <SectionTitle hint="add / remove / new build">Change requests</SectionTitle>
+            <SectionTitle hint="add / remove / new build">Requests raised</SectionTitle>
+
             <p className="text-[11.5px] text-muted-foreground -mt-1 mb-2 inline-flex items-start gap-1.5">
               <Info className="h-3.5 w-3.5 mt-[1px] shrink-0" />
               Every source you add, retire or modify is logged here with an auto-assigned REQ number (sequential per workspace) that your FreDA admin
