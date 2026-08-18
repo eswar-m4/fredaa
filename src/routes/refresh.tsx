@@ -538,7 +538,7 @@ function RefreshPage() {
           open={open.requests}
           onToggle={() => setOpen((o) => ({ ...o, requests: !o.requests }))}
           icon={<Clock className="h-4 w-4" />}
-          title="Build request tracker"
+          title="Request tracker"
           subtitle="Every add, retire or new build with its REQ number and status"
           meta={`${requests.length} requests`}
         >
