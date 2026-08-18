@@ -11,7 +11,6 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
-import { Route as AskFredaRouteImport } from './routes/ask-freda'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MonitoringRouteImport } from './routes/monitoring'
 import { Route as PlaybooksRouteImport } from './routes/playbooks'
@@ -25,11 +24,6 @@ const IndexRoute = IndexRouteImport.update({
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AskFredaRoute = AskFredaRouteImport.update({
-  id: '/ask-freda',
-  path: '/ask-freda',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -56,7 +50,6 @@ const RefreshRoute = RefreshRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
-  '/ask-freda': typeof AskFredaRoute
   '/login': typeof LoginRoute
   '/monitoring': typeof MonitoringRoute
   '/playbooks': typeof PlaybooksRoute
@@ -65,7 +58,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
-  '/ask-freda': typeof AskFredaRoute
   '/login': typeof LoginRoute
   '/monitoring': typeof MonitoringRoute
   '/playbooks': typeof PlaybooksRoute
@@ -75,7 +67,6 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
-  '/ask-freda': typeof AskFredaRoute
   '/login': typeof LoginRoute
   '/monitoring': typeof MonitoringRoute
   '/playbooks': typeof PlaybooksRoute
@@ -84,27 +75,13 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/'
-    | '/admin'
-    | '/ask-freda'
-    | '/login'
-    | '/monitoring'
-    | '/playbooks'
-    | '/refresh'
+    '/' | '/admin' | '/login' | '/monitoring' | '/playbooks' | '/refresh'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/admin'
-    | '/ask-freda'
-    | '/login'
-    | '/monitoring'
-    | '/playbooks'
-    | '/refresh'
+  to: '/' | '/admin' | '/login' | '/monitoring' | '/playbooks' | '/refresh'
   id:
     | '__root__'
     | '/'
     | '/admin'
-    | '/ask-freda'
     | '/login'
     | '/monitoring'
     | '/playbooks'
@@ -114,7 +91,6 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
-  AskFredaRoute: typeof AskFredaRoute
   LoginRoute: typeof LoginRoute
   MonitoringRoute: typeof MonitoringRoute
   PlaybooksRoute: typeof PlaybooksRoute
@@ -135,13 +111,6 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof AdminRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/ask-freda': {
-      id: '/ask-freda'
-      path: '/ask-freda'
-      fullPath: '/ask-freda'
-      preLoaderRoute: typeof AskFredaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -178,7 +147,6 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
-  AskFredaRoute: AskFredaRoute,
   LoginRoute: LoginRoute,
   MonitoringRoute: MonitoringRoute,
   PlaybooksRoute: PlaybooksRoute,
