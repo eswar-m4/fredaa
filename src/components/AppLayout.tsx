@@ -3,10 +3,9 @@ import { ReactNode, useState, useEffect } from "react";
 import {
   LayoutDashboard,
   Activity,
-  RefreshCw,
+  BookOpen,
   Bell,
   HelpCircle,
-  MessageSquare,
   PanelLeft,
   ChevronsUpDown,
   Sun,
@@ -25,15 +24,11 @@ const WORKSPACE: NavGroup = {
   group: "WORKSPACE",
   items: [
     { to: "/", label: "Dashboard", icon: LayoutDashboard },
-    { to: "/monitoring", label: "Monitor & Refresh", icon: Activity },
-    { to: "/refresh", label: "Projects", icon: RefreshCw },
+    { to: "/monitoring", label: "Monitor", icon: Activity },
+    { to: "/playbooks", label: "Playbooks", icon: BookOpen },
   ],
 };
 
-const ASSIST: NavGroup = {
-  group: "ASSISTANT",
-  items: [{ to: "/ask-freda", label: "Ask FreDA", icon: MessageSquare }],
-};
 
 
 export function AppLayout({ children }: { children: ReactNode }) {
@@ -170,7 +165,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
     }
   }
 
-  const groups: NavGroup[] = [WORKSPACE, ASSIST];
+  const groups: NavGroup[] = [WORKSPACE];
 
 
   return (
@@ -188,13 +183,13 @@ export function AppLayout({ children }: { children: ReactNode }) {
             </span>
             <div>
               <div className="text-[15px] font-semibold leading-tight">FreDA</div>
-              <div className="text-[11px] text-white/60">Customer Data Workspace</div>
+              <div className="text-[11px] text-white/60">Workspace data console</div>
             </div>
           </div>
         </div>
 
         <div className="px-3 py-3 border-b border-white/10 whitespace-nowrap">
-          <div className="text-[10px] uppercase tracking-wider text-white/40 font-semibold mb-1.5">Customer</div>
+          <div className="text-[10px] uppercase tracking-wider text-white/40 font-semibold mb-1.5">Workspace</div>
           <Popover>
             <PopoverTrigger asChild>
               <button
@@ -311,9 +306,9 @@ export function AppLayout({ children }: { children: ReactNode }) {
                       </div>
                     </div>
                     <div>
-                      <div className="font-medium text-foreground">Projects</div>
+                      <div className="font-medium text-foreground">Playbooks</div>
                       <div className="text-muted-foreground text-xs">
-                        Add or remove sources, create projects, and see build estimates instantly.
+                        Agents running on your sources, packaged solutions, and the FreDA assistant.
                       </div>
                     </div>
                   </div>
