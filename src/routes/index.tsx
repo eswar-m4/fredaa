@@ -229,26 +229,17 @@ function DashboardPage() {
                         </div>
                       </td>
 
+                      <td className="px-3 py-3 tabular-nums whitespace-nowrap">{p.coverage}%</td>
+                      <td className="px-3 py-3 tabular-nums whitespace-nowrap">{p.freshness}%</td>
                       <td className="px-3 py-3 tabular-nums whitespace-nowrap">
-                        {rs === "Completed" ? (
-                          `${p.accuracy}%`
-                        ) : (
-                          <span className="text-[11.5px] text-muted-foreground">after review</span>
-                        )}
+                        {rs === "Completed" ? `${p.accuracy}%` : <span className="text-muted-foreground">—</span>}
                       </td>
                       <td className="px-3 py-3 whitespace-nowrap">
                         <Badge tone={st === "Still running" ? "info" : reviewTone[rs]}>{st}</Badge>
                       </td>
                       <td className="px-5 py-3 text-right">
                         <div className="flex items-center justify-end gap-2">
-                          {action && (
-                            <span
-                              title={action}
-                              className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-destructive/10 text-destructive"
-                            >
-                              <AlertTriangle className="h-3.5 w-3.5" />
-                            </span>
-                          )}
+
                           <Button
                             size="sm"
                             className="whitespace-nowrap"
