@@ -158,22 +158,47 @@ function RefreshPage() {
 
   return (
     <AppLayout>
-      <PageHeader
-        title="Projects"
-        subtitle={`${customer.name} · create, manage and schedule extraction projects · ${customer.projects.length} live`}
-      />
+      <div className="px-7 pt-6 pb-4">
+        <div className="relative overflow-hidden rounded-2xl border border-border bg-gradient-to-r from-primary/12 via-purple-bg/50 to-transparent px-6 py-5">
+          <div className="flex flex-wrap items-center gap-4">
+            <span className="h-12 w-12 rounded-xl bg-primary text-primary-foreground inline-flex items-center justify-center shrink-0">
+              <FolderPlus className="h-6 w-6" />
+            </span>
+            <div className="min-w-0">
+              <div className="text-[11px] uppercase tracking-[0.22em] text-primary font-semibold">Projects &amp; manage</div>
+              <h1 className="text-[26px] leading-tight font-bold tracking-tight">{customer.name}</h1>
+              <p className="text-[12.5px] text-muted-foreground mt-0.5">
+                Create, manage and schedule extraction projects · {customer.projects.length} live projects
+              </p>
+            </div>
+            <div className="ml-auto flex items-center gap-2">
+              <Badge tone="info">{customer.projects.reduce((n, p) => n + p.sources.length, 0)} sources</Badge>
+              <Badge tone="purple">{requests.length} open requests</Badge>
+            </div>
+          </div>
+        </div>
+      </div>
 
-
-      <div className="px-7 pb-8 space-y-5">
+      <div className="px-7 pb-8 space-y-4">
         {notice && (
           <div className="rounded-lg border border-success/40 bg-success-bg px-4 py-2.5 text-[12.5px] text-success flex items-center gap-2">
             <CheckCircle2 className="h-4 w-4 shrink-0" /> {notice}
           </div>
         )}
 
-        <div className="grid lg:grid-cols-2 gap-5 items-stretch">
-          {/* project list */}
-          <Card className="overflow-hidden flex flex-col h-[520px]">
+        <Panel
+          id="projects"
+          open={open.projects}
+          onToggle={() => setOpen((o) => ({ ...o, projects: !o.projects }))}
+          icon={<Globe className="h-4 w-4" />}
+          title="Projects &amp; sources"
+          subtitle="Select a project to manage sources, attributes and schedule"
+          meta={`${customer.projects.length} projects`}
+        >
+          <div className="grid lg:grid-cols-2 gap-5 items-stretch">
+            {/* project list */}
+            <Card className="overflow-hidden flex flex-col h-[520px]">
+
             <div className="px-5 pt-4 pb-3 border-b border-border shrink-0">
               <h3 className="text-[13px] font-semibold uppercase tracking-wider text-muted-foreground">Projects</h3>
               <p className="text-[12px] text-muted-foreground mt-1">Select a project to manage its sources and schedule.</p>
