@@ -130,7 +130,6 @@ function LoginPage() {
                 <div>
                   <div className="text-sm font-semibold">Workspace user</div>
                   <div className="text-xs text-muted-foreground">Dashboard &amp; review, monitoring, projects and playbooks.</div>
-                  <div className="text-[11px] font-mono text-muted-foreground mt-1">user / user123</div>
                 </div>
               </div>
             </Card>
@@ -142,7 +141,6 @@ function LoginPage() {
                 <div>
                   <div className="text-sm font-semibold">Administrator</div>
                   <div className="text-xs text-muted-foreground">All sources across workspaces, customer tickets and access control.</div>
-                  <div className="text-[11px] font-mono text-muted-foreground mt-1">admin / admin123</div>
                 </div>
               </div>
             </Card>
@@ -166,8 +164,8 @@ function LoginPage() {
                 <Select value={role} onChange={(e) => {
                   const nextRole = e.target.value as "user" | "admin";
                   setRole(nextRole);
-                  setUsername(nextRole === "admin" ? "admin" : "user");
-                  setPassword(nextRole === "admin" ? "admin123" : "user123");
+                  setUsername("");
+                  setPassword("");
                 }} className="h-11 bg-background border-input text-foreground">
                   <option value="user">User</option>
                   <option value="admin">Admin</option>
@@ -217,8 +215,8 @@ function LoginPage() {
                 setMode((prev) => (prev === "signin" ? "signup" : "signin"));
                 clearStoredSession();
                 setRole("user");
-                setUsername("user");
-                setPassword("user123");
+                setUsername("");
+                setPassword("");
               }}
             >
               <UserPlus className="h-4 w-4" />
