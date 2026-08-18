@@ -230,7 +230,7 @@ function PlaybooksPage() {
                 "Points you to review, monitor or download next",
               ]}
               cta="Ask FreDA"
-              onPick={() => setMode("ask")}
+              onPick={() => navigate({ to: "/playbooks/ask" })}
             />
           </div>
         </div>
