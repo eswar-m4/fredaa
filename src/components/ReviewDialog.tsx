@@ -12,7 +12,7 @@ const CHANGE_TYPES: ChangeType[] = ["Added", "Deleted", "Modified", "Verified"];
 const toneFor = (t: ChangeType) =>
   t === "Added" ? "success" : t === "Deleted" ? "destructive" : t === "Modified" ? "warning" : "info";
 
-const BATCH = 10;
+const POOL = 6000;
 
 export function ReviewDialog({
   project,
@@ -23,7 +23,12 @@ export function ReviewDialog({
   open: boolean;
   onOpenChange: (v: boolean) => void;
 }) {
-  const all = useMemo(() => (project ? reviewRecordsFor(project, 400) : []), [project?.id]);
+  const all = useMemo(
+    () => (project ? reviewRecordsFor(project, Math.min(POOL, Math.max(1200, project.pendingReview))) : []),
+    [project?.id],
+  );
+  const [batchSize, setBatchSize] = useState(25);
+
 
   const [sampling, setSampling] = useState(2);
   const [admvFilter, setAdmvFilter] = useState<"all" | ChangeType>("all");
@@ -69,10 +74,11 @@ export function ReviewDialog({
     return c;
   }, [records]);
 
-  const batchCount = Math.max(1, Math.ceil(records.length / BATCH));
+  const batchCount = Math.max(1, Math.ceil(records.length / batchSize));
   const clampedBatch = Math.min(batchIdx, batchCount - 1);
-  const batchStart = clampedBatch * BATCH;
-  const batch = records.slice(batchStart, batchStart + BATCH);
+  const batchStart = clampedBatch * batchSize;
+  const batch = records.slice(batchStart, batchStart + batchSize);
+
   const batchDecided = batch.filter((r) => decisions[r.id]).length;
 
   function decide(ids: string[], d: Decision) {
@@ -231,21 +237,47 @@ export function ReviewDialog({
                       </button>
                     );
                   })}
-                  <button
-                    disabled={datapoint === "all" || records.length === 0}
-                    onClick={() => decide(records.map((r) => r.id), "approved")}
-                    className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-2.5 h-7 text-[11.5px] hover:bg-secondary disabled:opacity-40 transition"
-                  >
-                    Datapoint group <span className="tabular-nums text-muted-foreground">{datapoint === "all" ? "—" : records.length}</span>
-                  </button>
+
+
                 </div>
               </div>
 
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <div className="text-[12px] font-semibold uppercase tracking-wider text-muted-foreground">
-                  Batch {records.length ? clampedBatch + 1 : 0} of {records.length ? batchCount : 0} · {batch.length} records ·{" "}
-                  {batchDecided} decided
+                <div className="flex flex-wrap items-center gap-2 text-[12px] text-muted-foreground">
+                  <span className="font-semibold uppercase tracking-wider">
+                    Batch {records.length ? clampedBatch + 1 : 0} of {records.length ? batchCount : 0}
+                  </span>
+                  <span>· {batch.length} records · {batchDecided} decided · {fmt(records.length)} in queue</span>
+                  <span className="flex items-center gap-1">
+                    <span className="uppercase tracking-wider text-[11px]">rows</span>
+                    <select
+                      value={batchSize}
+                      onChange={(e) => {
+                        setBatchSize(Number(e.target.value));
+                        setBatchIdx(0);
+                      }}
+                      className="h-7 rounded-md border border-border bg-card px-1.5 text-[11.5px]"
+                    >
+                      {[10, 25, 50, 100].map((n) => (
+                        <option key={n} value={n}>
+                          {n}
+                        </option>
+                      ))}
+                    </select>
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <span className="uppercase tracking-wider text-[11px]">jump</span>
+                    <input
+                      type="number"
+                      min={1}
+                      max={batchCount}
+                      value={clampedBatch + 1}
+                      onChange={(e) => setBatchIdx(Math.min(batchCount - 1, Math.max(0, Number(e.target.value) - 1)))}
+                      className="h-7 w-16 rounded-md border border-border bg-card px-1.5 text-[11.5px] tabular-nums"
+                    />
+                  </span>
                 </div>
+
                 <div className="flex items-center gap-1.5">
                   <Button size="sm" variant="outline" onClick={() => setBatchIdx((b) => Math.max(0, b - 1))} disabled={clampedBatch === 0}>
                     <ChevronLeft className="h-3.5 w-3.5" /> Prev batch
