@@ -18,6 +18,7 @@ import { Route as PlaybooksRouteImport } from './routes/playbooks'
 import { Route as RefreshRouteImport } from './routes/refresh'
 import { Route as PlaybooksIndexRouteImport } from './routes/playbooks.index'
 import { Route as PlaybooksAgentsRouteImport } from './routes/playbooks.agents'
+import { Route as PlaybooksAskRouteImport } from './routes/playbooks.ask'
 import { Route as PlaybooksSolutionsRouteImport } from './routes/playbooks.solutions'
 
 const IndexRoute = IndexRouteImport.update({
@@ -65,6 +66,11 @@ const PlaybooksAgentsRoute = PlaybooksAgentsRouteImport.update({
   path: '/agents',
   getParentRoute: () => PlaybooksRoute,
 } as any)
+const PlaybooksAskRoute = PlaybooksAskRouteImport.update({
+  id: '/ask',
+  path: '/ask',
+  getParentRoute: () => PlaybooksRoute,
+} as any)
 const PlaybooksSolutionsRoute = PlaybooksSolutionsRouteImport.update({
   id: '/solutions',
   path: '/solutions',
@@ -80,6 +86,7 @@ export interface FileRoutesByFullPath {
   '/playbooks': typeof PlaybooksRouteWithChildren
   '/refresh': typeof RefreshRoute
   '/playbooks/agents': typeof PlaybooksAgentsRoute
+  '/playbooks/ask': typeof PlaybooksAskRoute
   '/playbooks/solutions': typeof PlaybooksSolutionsRoute
   '/playbooks/': typeof PlaybooksIndexRoute
 }
@@ -91,6 +98,7 @@ export interface FileRoutesByTo {
   '/monitoring': typeof MonitoringRoute
   '/refresh': typeof RefreshRoute
   '/playbooks/agents': typeof PlaybooksAgentsRoute
+  '/playbooks/ask': typeof PlaybooksAskRoute
   '/playbooks/solutions': typeof PlaybooksSolutionsRoute
   '/playbooks': typeof PlaybooksIndexRoute
 }
@@ -104,6 +112,7 @@ export interface FileRoutesById {
   '/playbooks': typeof PlaybooksRouteWithChildren
   '/refresh': typeof RefreshRoute
   '/playbooks/agents': typeof PlaybooksAgentsRoute
+  '/playbooks/ask': typeof PlaybooksAskRoute
   '/playbooks/solutions': typeof PlaybooksSolutionsRoute
   '/playbooks/': typeof PlaybooksIndexRoute
 }
@@ -118,6 +127,7 @@ export interface FileRouteTypes {
     | '/playbooks'
     | '/refresh'
     | '/playbooks/agents'
+    | '/playbooks/ask'
     | '/playbooks/solutions'
     | '/playbooks/'
   fileRoutesByTo: FileRoutesByTo
@@ -129,6 +139,7 @@ export interface FileRouteTypes {
     | '/monitoring'
     | '/refresh'
     | '/playbooks/agents'
+    | '/playbooks/ask'
     | '/playbooks/solutions'
     | '/playbooks'
   id:
@@ -141,6 +152,7 @@ export interface FileRouteTypes {
     | '/playbooks'
     | '/refresh'
     | '/playbooks/agents'
+    | '/playbooks/ask'
     | '/playbooks/solutions'
     | '/playbooks/'
   fileRoutesById: FileRoutesById
@@ -220,6 +232,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PlaybooksAgentsRouteImport
       parentRoute: typeof PlaybooksRoute
     }
+    '/playbooks/ask': {
+      id: '/playbooks/ask'
+      path: '/ask'
+      fullPath: '/playbooks/ask'
+      preLoaderRoute: typeof PlaybooksAskRouteImport
+      parentRoute: typeof PlaybooksRoute
+    }
     '/playbooks/solutions': {
       id: '/playbooks/solutions'
       path: '/solutions'
@@ -232,12 +251,14 @@ declare module '@tanstack/react-router' {
 
 interface PlaybooksRouteChildren {
   PlaybooksAgentsRoute: typeof PlaybooksAgentsRoute
+  PlaybooksAskRoute: typeof PlaybooksAskRoute
   PlaybooksSolutionsRoute: typeof PlaybooksSolutionsRoute
   PlaybooksIndexRoute: typeof PlaybooksIndexRoute
 }
 
 const PlaybooksRouteChildren: PlaybooksRouteChildren = {
   PlaybooksAgentsRoute: PlaybooksAgentsRoute,
+  PlaybooksAskRoute: PlaybooksAskRoute,
   PlaybooksSolutionsRoute: PlaybooksSolutionsRoute,
   PlaybooksIndexRoute: PlaybooksIndexRoute,
 }
