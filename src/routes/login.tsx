@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
-import { UserRound, LogIn, Loader2, UserPlus, Radar, Database, CheckCircle2, RefreshCw } from "lucide-react";
+import { UserRound, LogIn, Loader2, UserPlus, Radar, Database, CheckCircle2, RefreshCw, Shield } from "lucide-react";
 import { toast } from "sonner";
 
 import fredaLogo from "@/assets/freda-mobius-bold.png";
