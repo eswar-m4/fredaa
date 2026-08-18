@@ -34,7 +34,7 @@ import {
   reviewStatusFor,
   rollupProjects,
   scaleAdmv,
-  type AdmvCounts,
+  
   type Project,
   type ProjectStatus,
   type ReviewStatus,
@@ -81,6 +81,16 @@ const SEGMENTS = [
   { key: "verified", label: "Verified", bar: "bg-primary/60", chip: "bg-info-bg text-info", dot: "bg-primary/60" },
 ] as const;
 
+const CRITICAL_ACTIONS = [
+  "Source returned 403 — re-auth needed",
+  "Layout change — re-map 3 fields",
+  "Resolve duplicate entities",
+  "Verify price movement > 30%",
+  "Re-check low-confidence extractions",
+  "New field detected on source page",
+];
+
+
 function DashboardPage() {
   const customer = useActiveCustomer();
   const [range, setRange] = useState<RangeValue>(DEFAULT_RANGE);
@@ -92,21 +102,22 @@ function DashboardPage() {
   const factor = rangeFactor(range.key, rangeDays(range));
 
   const stats = useMemo(() => rollupProjects(scoped), [customer.id, scope]);
-  const admv = scaleAdmv(stats.admv, factor);
-  const pct = admvPct(admv);
   const pendingScaled = Math.round(stats.pendingReview * Math.min(1.6, factor));
 
   const actions = useMemo(() => actionsFor(customer), [customer.id]);
   const actionByProject = useMemo(() => {
     const m: Record<string, string> = {};
-    for (const a of actions) if (!m[a.projectId]) m[a.projectId] = a.action;
+    for (const a of actions) {
+      if (!CRITICAL_ACTIONS.includes(a.action)) continue;
+      if (!m[a.projectId]) m[a.projectId] = a.action;
+    }
     return m;
   }, [actions]);
 
 
   const pipeline = useMemo(() => devPipeline(customer), [customer.id]);
   const active = scoped.find((p) => p.id === selected) ?? scoped[0] ?? customer.projects[0]!;
-  const totalChanges = admv.added + admv.deleted + admv.modified + admv.verified;
+
 
   return (
     <AppLayout>
@@ -147,33 +158,8 @@ function DashboardPage() {
           <Kpi label="Freshness" value={`${Math.round(stats.freshness)}%`} sub="vs refresh schedule" icon={Clock} tone="info" />
         </div>
 
-        {/* ADMV signature — full width per project chart */}
-        <Card className="p-5">
-          <SectionTitle hint={`${scope === "all" ? "all projects" : active.name} · ${rangeLabel(range)} · ${fmt(totalChanges)} records evaluated`}>
-            ADMV — change signature
-          </SectionTitle>
 
-          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mb-3">
-            {SEGMENTS.map((s) => (
-              <span key={s.key} className="inline-flex items-center gap-2 text-[12px] text-muted-foreground">
-                <span className={cn("h-2.5 w-2.5 rounded-sm", s.dot)} />
-                {s.label}
-              </span>
-            ))}
-          </div>
 
-          <div className="rounded-lg border border-border overflow-hidden">
-            <MixRow label="All projects in scope" sub={`${scoped.length} projects · ${fmt(totalChanges)} records`} a={admv} emphasis />
-            {scoped.map((p) => (
-              <MixRow
-                key={p.id}
-                label={p.name}
-                sub={`${p.sources.length} sources · ${p.datapoints.length} datapoints · ${p.frequency}`}
-                a={scaleAdmv(p.admv, factor)}
-              />
-            ))}
-          </div>
-        </Card>
 
 
         {/* Review by project — full width */}
@@ -191,10 +177,9 @@ function DashboardPage() {
                 <tr className="text-left text-[11px] uppercase tracking-wider text-muted-foreground border-b border-border">
                   <th className="px-5 py-2 font-semibold">Project</th>
                   <th className="px-3 py-2 font-semibold">Records</th>
-                  <th className="px-3 py-2 font-semibold">Pending</th>
                   <th className="px-3 py-2 font-semibold w-[210px] text-center">ADMV</th>
                   <th className="px-3 py-2 font-semibold">Accuracy</th>
-                  <th className="px-3 py-2 font-semibold">Review status</th>
+                  <th className="px-3 py-2 font-semibold">Status</th>
                   <th className="px-3 py-2 font-semibold">Action needed</th>
                   <th className="px-5 py-2 font-semibold text-right">Review</th>
                 </tr>
@@ -205,6 +190,7 @@ function DashboardPage() {
                   const a = scaleAdmv(p.admv, factor);
                   const ap = admvPct(a);
                   const rs = reviewStatusFor(p);
+                  const st = p.status === "Syncing" ? "Still running" : rs;
                   return (
                     <tr
                       key={p.id}
@@ -218,7 +204,6 @@ function DashboardPage() {
                         </div>
                       </td>
                       <td className="px-3 py-3 tabular-nums whitespace-nowrap">{fmt(p.records)}</td>
-                      <td className="px-3 py-3 tabular-nums whitespace-nowrap">{fmt(p.pendingReview)}</td>
                       <td className="px-3 py-3">
                         <div className="grid grid-cols-4 gap-1 w-[200px] mx-auto">
                           {SEGMENTS.map((s) => (
@@ -228,21 +213,27 @@ function DashboardPage() {
                               className={cn("flex items-center justify-center gap-1 rounded-md px-1 py-1", s.chip)}
                             >
                               <span className="text-[9.5px] uppercase font-bold opacity-70">{s.label[0]}</span>
-                              <span className="text-[11.5px] font-semibold tabular-nums leading-none">{ap[s.key].toFixed(1)}%</span>
+                              <span className="text-[11.5px] font-semibold tabular-nums leading-none">{fmt(a[s.key])}</span>
                             </div>
                           ))}
                         </div>
                       </td>
 
-                      <td className="px-3 py-3 tabular-nums whitespace-nowrap">{p.accuracy}%</td>
+                      <td className="px-3 py-3 tabular-nums whitespace-nowrap">
+                        {rs === "Completed" ? (
+                          `${p.accuracy}%`
+                        ) : (
+                          <span className="text-[11.5px] text-muted-foreground">after review</span>
+                        )}
+                      </td>
                       <td className="px-3 py-3 whitespace-nowrap">
-                        <Badge tone={reviewTone[rs]}>{rs}</Badge>
+                        <Badge tone={st === "Still running" ? "info" : reviewTone[rs]}>{st}</Badge>
                       </td>
                       <td className="px-3 py-3 w-[190px] max-w-[190px]">
                         {actionByProject[p.id] ? (
                           <span className="inline-flex items-center gap-1.5 text-[12px] text-destructive">
                             <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
-                            <span className="truncate">{actionByProject[p.id]}</span>
+                            <span className="truncate" title={actionByProject[p.id]}>{actionByProject[p.id]}</span>
                           </span>
                         ) : (
                           <span className="text-[12px] text-muted-foreground">—</span>
@@ -267,6 +258,7 @@ function DashboardPage() {
                 })}
               </tbody>
             </table>
+
           </div>
         </Card>
 
@@ -274,23 +266,8 @@ function DashboardPage() {
         <Card className="p-5">
           <SectionTitle hint="FreDA delivery team">Solution development in progress</SectionTitle>
 
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 mt-1">
-            {STAGES.map((st) => {
-              const items = pipeline.filter((d) => d.stage === st);
-              return (
-                <div
-                  key={st}
-                  className={cn(
-                    "rounded-lg border px-3 py-2.5",
-                    items.length ? "border-primary/40 bg-primary/5" : "border-border bg-secondary/30",
-                  )}
-                >
-                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold leading-tight">{st}</div>
-                  <div className="text-[18px] font-semibold tabular-nums mt-1">{items.length}</div>
-                </div>
-              );
-            })}
-          </div>
+
+
 
           <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-3 mt-4">
             {pipeline.map((d) => {
@@ -352,62 +329,8 @@ function Mini({ label, value }: { label: string; value: string }) {
   );
 }
 
-function MixRow({ label, sub, a, emphasis = false }: { label: string; sub: string; a: AdmvCounts; emphasis?: boolean }) {
-  
-  const total = a.added + a.deleted + a.modified + a.verified || 1;
-  return (
-    <div
-      className={cn(
-        "grid grid-cols-1 lg:grid-cols-[minmax(190px,0.9fr)_minmax(0,2.8fr)_auto] items-center gap-x-5 gap-y-2 px-4 py-3 border-b border-border/60 last:border-b-0",
-        emphasis ? "bg-secondary/50" : "hover:bg-secondary/30",
-      )}
-    >
-      <div className="min-w-0">
-        <div className={cn("truncate text-[13px]", emphasis ? "font-semibold" : "font-medium")}>{label}</div>
-        <div className="text-[11px] text-muted-foreground truncate">{sub}</div>
-      </div>
 
-      <div className="min-w-0">
-        <div className="flex h-8 w-full rounded-md overflow-hidden bg-secondary">
-          {SEGMENTS.map((s) => {
-            const w = (a[s.key] / total) * 100;
-            if (w <= 0) return null;
-            return (
-              <div
-                key={s.key}
-                className={cn("flex items-center justify-center", s.bar)}
-                style={{ width: `${w}%` }}
-                title={`${s.label} ${fmt(a[s.key])}`}
-              >
-                {w > 9 && <span className="text-[10.5px] font-semibold text-white/95 tabular-nums px-1 truncate">{fmt(a[s.key])}</span>}
-              </div>
-            );
-          })}
-        </div>
-      </div>
 
-      <div className="grid grid-cols-4 gap-1.5 lg:w-[360px] lg:justify-self-end">
-        {SEGMENTS.map((s) => (
-          <span
-            key={s.key}
-            className={cn("flex flex-col items-center justify-center px-1.5 py-1 rounded-md whitespace-nowrap", s.chip)}
-          >
-            <span className="text-[9.5px] uppercase font-semibold opacity-70 leading-none">{s.label}</span>
-            <span className="text-[12px] font-semibold tabular-nums leading-tight mt-0.5">{fmt(a[s.key])}</span>
-          </span>
-        ))}
-      </div>
-
-    </div>
-  );
-}
-
-function rangeLabel(r: RangeValue) {
-  if (r.key === "today") return "today";
-  if (r.key === "7d") return "last week";
-  if (r.key === "30d") return "last month";
-  return r.from && r.to ? `${r.from} → ${r.to}` : "custom range";
-}
 
 function Kpi({
   label,
