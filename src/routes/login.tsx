@@ -84,11 +84,15 @@ function LoginPage() {
         <div className="space-y-6">
           <div className="inline-flex items-center gap-3 rounded-full border border-primary/25 bg-primary/10 px-4 py-2 text-sm text-foreground">
             <Shield className="h-4 w-4 text-primary" />
-            FreDA · Fresh Data Automation
+            <span className="font-bold">FreDA</span>
+            <span className="text-muted-foreground">Fresh Data Automation</span>
           </div>
           <div className="space-y-3">
-            <h1 className="text-4xl font-semibold tracking-tight leading-tight">
-              Your external data, <span className="text-primary">sourced, verified and kept fresh</span>
+            <div className="text-2xl font-extrabold tracking-tight">
+              FreDA <span className="text-primary">— Fresh Data Automation</span>
+            </div>
+            <h1 className="text-4xl font-bold tracking-tight leading-tight">
+              Data, <span className="text-primary">sourced, verified and kept fresh</span>
             </h1>
             <p className="max-w-xl text-sm text-muted-foreground leading-6">
               FreDA runs site-specific agents on the sources you trust, extracts the exact datapoints you need, scores every
