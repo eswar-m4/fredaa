@@ -25,15 +25,11 @@ const WORKSPACE: NavGroup = {
   group: "WORKSPACE",
   items: [
     { to: "/", label: "Dashboard", icon: LayoutDashboard },
-    { to: "/monitoring", label: "Monitor & Refresh", icon: Activity },
-    { to: "/refresh", label: "Projects", icon: RefreshCw },
+    { to: "/monitoring", label: "Monitor", icon: Activity },
+    { to: "/playbooks", label: "Playbooks", icon: BookOpen },
   ],
 };
 
-const ASSIST: NavGroup = {
-  group: "ASSISTANT",
-  items: [{ to: "/ask-freda", label: "Ask FreDA", icon: MessageSquare }],
-};
 
 
 export function AppLayout({ children }: { children: ReactNode }) {
