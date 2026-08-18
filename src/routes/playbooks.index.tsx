@@ -27,7 +27,7 @@ import { AskFredaPanel } from "@/components/AskFredaPanel";
 import { useActiveCustomer } from "@/lib/workspace";
 import { fmt, hrsAgo, type Customer } from "@/data/customers";
 
-export const Route = createFileRoute("/playbooks")({
+export const Route = createFileRoute("/playbooks/")({
   head: () => ({
     meta: [
       { title: "Choose your playbook — FreDA" },
