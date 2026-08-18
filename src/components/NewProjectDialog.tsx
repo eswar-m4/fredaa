@@ -127,9 +127,9 @@ export function NewProjectDialog({ open, onOpenChange }: { open: boolean; onOpen
             <div className="rounded-lg border border-border bg-secondary/30 p-4">
               <div className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">Instant estimate</div>
               <div className="grid grid-cols-3 gap-3 mt-3 text-center">
-                <Est label="Build" value={est.buildDays + "d"} />
-                <Est label="Setup" value={est.setup} />
-                <Est label="Records / run" value={est.recordsPerRun} />
+                <Est label="Setup" value={`${est.setupDays}d`} />
+                <Est label="First run" value={`${est.firstRunHrs}h`} />
+                <Est label="Records / mo" value={est.monthlyRecords.toLocaleString()} />
               </div>
               <div className="text-[11px] text-muted-foreground mt-3">
                 {dpCount} datapoints · {urls.filter((u) => u.trim()).length || 1} sources · {frequency.toLowerCase()} refresh
