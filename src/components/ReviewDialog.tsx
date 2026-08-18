@@ -212,8 +212,36 @@ export function ReviewDialog({
 
           {/* batch queue */}
           <div className="flex flex-col min-h-0">
-            <div className="px-6 py-3.5 border-b border-border bg-secondary/20 shrink-0">
-              <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
+            <div className="px-6 py-3.5 border-b border-border bg-secondary/20 shrink-0 space-y-3">
+              {/* group approval — top right */}
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Group approval</span>
+                <div className="ml-auto flex flex-wrap items-center gap-1.5">
+                  {CHANGE_TYPES.map((t) => {
+                    const ids = records.filter((r) => r.changeType === t).map((r) => r.id);
+                    return (
+                      <button
+                        key={t}
+                        disabled={ids.length === 0}
+                        onClick={() => decide(ids, "approved")}
+                        className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-2.5 h-7 text-[11.5px] hover:bg-secondary disabled:opacity-40 transition"
+                      >
+                        <Check className="h-3 w-3" /> {t}
+                        <span className="tabular-nums text-muted-foreground">{ids.length}</span>
+                      </button>
+                    );
+                  })}
+                  <button
+                    disabled={datapoint === "all" || records.length === 0}
+                    onClick={() => decide(records.map((r) => r.id), "approved")}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-2.5 h-7 text-[11.5px] hover:bg-secondary disabled:opacity-40 transition"
+                  >
+                    Datapoint group <span className="tabular-nums text-muted-foreground">{datapoint === "all" ? "—" : records.length}</span>
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="text-[12px] font-semibold uppercase tracking-wider text-muted-foreground">
                   Batch {records.length ? clampedBatch + 1 : 0} of {records.length ? batchCount : 0} · {batch.length} records ·{" "}
                   {batchDecided} decided
@@ -237,6 +265,7 @@ export function ReviewDialog({
               </div>
               <AdmvBar a={admv} showLegend />
             </div>
+
 
             <div className="flex-1 min-h-0 overflow-y-auto">
               {batch.length === 0 ? (
