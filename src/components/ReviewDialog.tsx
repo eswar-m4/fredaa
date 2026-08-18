@@ -127,9 +127,10 @@ export function ReviewDialog({
           </div>
         </DialogHeader>
 
-        <div className="flex-1 min-h-0 grid lg:grid-cols-[260px_1fr_260px]">
+        <div className="flex-1 min-h-0 grid lg:grid-cols-[250px_1fr]">
           {/* filters rail */}
-          <aside className="border-r border-border bg-secondary/30 p-5 space-y-5 overflow-y-auto">
+          <aside className="border-r border-border bg-secondary/30 p-5 flex flex-col gap-5 overflow-y-auto">
+
             <div>
               <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">ADMV filter</div>
               <Select value={admvFilter} onChange={(e) => setAdmvFilter(e.target.value as "all" | ChangeType)}>
