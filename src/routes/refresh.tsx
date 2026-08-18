@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Plus, Trash2, CalendarClock, Sparkles, Send, Globe, FolderPlus, CheckCircle2, Clock, Info, X, ChevronDown } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
-import { Badge, Button, Card, Input, PageHeader, SectionTitle, Select } from "@/components/ui-bits";
+import { Badge, Button, Card, Input, SectionTitle, Select } from "@/components/ui-bits";
 import { useActiveCustomer } from "@/lib/workspace";
 import { estimate, fmt, requestsFor, type ChangeRequest, type Project, type SourceRef } from "@/data/customers";
 import { statusTone } from "@/routes/index";
