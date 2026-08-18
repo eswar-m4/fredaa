@@ -177,11 +177,10 @@ function DashboardPage() {
                 <tr className="text-left text-[11px] uppercase tracking-wider text-muted-foreground border-b border-border">
                   <th className="px-5 py-2 font-semibold">Project</th>
                   <th className="px-3 py-2 font-semibold">Records</th>
-                  <th className="px-3 py-2 font-semibold w-[210px] text-center">ADMV</th>
+                  <th className="px-3 py-2 font-semibold w-[230px] text-center">ADMV %</th>
                   <th className="px-3 py-2 font-semibold">Accuracy</th>
-                  <th className="px-3 py-2 font-semibold">Status</th>
-                  <th className="px-3 py-2 font-semibold">Action needed</th>
-                  <th className="px-5 py-2 font-semibold text-right">Review</th>
+                  <th className="px-3 py-2 font-semibold">Review status</th>
+                  <th className="px-5 py-2 font-semibold text-right w-[210px]">Action needed</th>
                 </tr>
 
               </thead>
@@ -190,7 +189,8 @@ function DashboardPage() {
                   const a = scaleAdmv(p.admv, factor);
                   const ap = admvPct(a);
                   const rs = reviewStatusFor(p);
-                  const st = p.status === "Syncing" ? "Still running" : rs;
+                  const st = p.status === "Syncing" ? "Still running" : REVIEW_LABEL[rs];
+                  const action = actionByProject[p.id];
                   return (
                     <tr
                       key={p.id}
@@ -205,15 +205,15 @@ function DashboardPage() {
                       </td>
                       <td className="px-3 py-3 tabular-nums whitespace-nowrap">{fmt(p.records)}</td>
                       <td className="px-3 py-3">
-                        <div className="grid grid-cols-4 gap-1 w-[200px] mx-auto">
+                        <div className="grid grid-cols-4 gap-1 w-[215px] mx-auto">
                           {SEGMENTS.map((s) => (
                             <div
                               key={s.key}
-                              title={`${s.label} · ${fmt(a[s.key])} (${ap[s.key].toFixed(1)}%)`}
+                              title={`${s.label} · ${ap[s.key].toFixed(1)}% (${fmt(a[s.key])} records)`}
                               className={cn("flex items-center justify-center gap-1 rounded-md px-1 py-1", s.chip)}
                             >
                               <span className="text-[9.5px] uppercase font-bold opacity-70">{s.label[0]}</span>
-                              <span className="text-[11.5px] font-semibold tabular-nums leading-none">{fmt(a[s.key])}</span>
+                              <span className="text-[11.5px] font-semibold tabular-nums leading-none">{ap[s.key].toFixed(1)}%</span>
                             </div>
                           ))}
                         </div>
@@ -229,33 +229,35 @@ function DashboardPage() {
                       <td className="px-3 py-3 whitespace-nowrap">
                         <Badge tone={st === "Still running" ? "info" : reviewTone[rs]}>{st}</Badge>
                       </td>
-                      <td className="px-3 py-3 w-[190px] max-w-[190px]">
-                        {actionByProject[p.id] ? (
-                          <span className="inline-flex items-center gap-1.5 text-[12px] text-destructive">
-                            <AlertTriangle className="h-3.5 w-3.5 shrink-0" />
-                            <span className="truncate" title={actionByProject[p.id]}>{actionByProject[p.id]}</span>
-                          </span>
-                        ) : (
-                          <span className="text-[12px] text-muted-foreground">—</span>
-                        )}
-                      </td>
-
                       <td className="px-5 py-3 text-right">
-                        <Button
-                          size="sm"
-                          className="whitespace-nowrap"
-                          variant={p.pendingReview > 0 ? "primary" : "outline"}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setReviewProject(p);
-                          }}
-                        >
-                          {p.pendingReview > 0 ? `Review ${fmt(p.pendingReview)}` : "View"}
-                        </Button>
+                        <div className="flex items-center justify-end gap-2">
+                          {action && (
+                            <span
+                              title={action}
+                              className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-destructive/10 text-destructive"
+                            >
+                              <AlertTriangle className="h-3.5 w-3.5" />
+                            </span>
+                          )}
+                          <Button
+                            size="sm"
+                            className="whitespace-nowrap"
+                            variant={action ? "primary" : p.pendingReview > 0 ? "primary" : "outline"}
+                            title={action || "Open review workspace"}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setReviewProject(p);
+                            }}
+                          >
+                            <CheckSquare className="h-3.5 w-3.5" />
+                            {p.pendingReview > 0 ? `Review ${fmt(p.pendingReview)}` : "Review"}
+                          </Button>
+                        </div>
                       </td>
                     </tr>
                   );
                 })}
+
               </tbody>
             </table>
 
