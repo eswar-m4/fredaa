@@ -86,24 +86,13 @@ function LoginPage() {
         <div className="space-y-6">
           <div className="flex items-center gap-4">
             <img src={fredaLogo} alt="Freda logo" className="h-14 w-14 object-contain" />
-            <h1 className="text-5xl font-bold tracking-tight text-foreground">
-              Freda <span className="text-primary">Fresh Data Automation</span>
-            </h1>
+            <h1 className="text-5xl font-bold tracking-tight text-foreground">FreDA</h1>
           </div>
 
           <p className="max-w-lg text-lg font-medium text-muted-foreground leading-relaxed">
-            Automated data sourcing, validation, and refresh — delivered fresh to your workspace.
+            Data, sourced and verified — kept fresh on a schedule you control.
           </p>
 
-          <div className="rounded-2xl border border-border bg-card overflow-hidden shadow-sm">
-            <img
-              src={loginHero.url}
-              alt="Freda data pipeline"
-              className="w-full h-56 object-cover"
-              width={1024}
-              height={768}
-            />
-          </div>
 
           <div className="grid gap-3 sm:grid-cols-2">
             {[
