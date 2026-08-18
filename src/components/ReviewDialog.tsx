@@ -12,7 +12,7 @@ const CHANGE_TYPES: ChangeType[] = ["Added", "Deleted", "Modified", "Verified"];
 const toneFor = (t: ChangeType) =>
   t === "Added" ? "success" : t === "Deleted" ? "destructive" : t === "Modified" ? "warning" : "info";
 
-const BATCH = 10;
+const POOL = 6000;
 
 export function ReviewDialog({
   project,
