@@ -33,12 +33,12 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/monitoring")({
   head: () => ({
     meta: [
-      { title: "Monitoring — FreDA" },
+      { title: "Monitor & Refresh — FreDA" },
       {
         name: "description",
         content: "Live job automation status, refresh schedule health and delivery destinations for every FreDA dataset.",
       },
-      { property: "og:title", content: "Monitoring — FreDA" },
+      { property: "og:title", content: "Monitor & Refresh — FreDA" },
       {
         property: "og:description",
         content: "Live job automation status, refresh schedule health and delivery destinations for every FreDA dataset.",
@@ -99,14 +99,15 @@ function MonitoringPage() {
   return (
     <AppLayout>
       <PageHeader
-        title="Monitoring"
+        title="Monitor & Refresh"
         subtitle={`${customer.name} · job automation, schedule health and sync destinations`}
         actions={
-          <Button size="sm" onClick={() => scoped.forEach((p) => refresh(p.id))}>
+          <Button size="sm" className="whitespace-nowrap" onClick={() => scoped.forEach((p) => refresh(p.id))}>
             <RefreshCw className="h-3.5 w-3.5" /> Run all in scope
           </Button>
         }
       />
+
 
       <div className="px-7 pb-8 space-y-5">
         <Card className="px-4 py-3 flex flex-wrap items-center gap-3">

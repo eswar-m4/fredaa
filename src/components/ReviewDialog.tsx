@@ -127,9 +127,10 @@ export function ReviewDialog({
           </div>
         </DialogHeader>
 
-        <div className="flex-1 min-h-0 grid lg:grid-cols-[260px_1fr_260px]">
+        <div className="flex-1 min-h-0 grid lg:grid-cols-[250px_1fr]">
           {/* filters rail */}
-          <aside className="border-r border-border bg-secondary/30 p-5 space-y-5 overflow-y-auto">
+          <aside className="border-r border-border bg-secondary/30 p-5 flex flex-col gap-5 overflow-y-auto">
+
             <div>
               <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">ADMV filter</div>
               <Select value={admvFilter} onChange={(e) => setAdmvFilter(e.target.value as "all" | ChangeType)}>
@@ -195,12 +196,52 @@ export function ReviewDialog({
               <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">Search entity</div>
               <Input placeholder="Search…" value={query} onChange={(e) => setQuery(e.target.value)} />
             </div>
+
+            {/* review contour — left rail bottom */}
+            <div className="mt-auto pt-4 rounded-lg border border-border bg-card p-3 flex items-center gap-3">
+              <Donut value={coverage} label="reviewed" tone={coverage > 66 ? "success" : coverage > 33 ? "warning" : "primary"} />
+              <div className="text-[11.5px] text-muted-foreground leading-relaxed">
+                <div className="text-foreground font-semibold text-[13px]">Review contour</div>
+                {decided} of {records.length} decided
+                <br />
+                <span className="text-success">{approved} approved</span> · <span className="text-destructive">{rejected} rejected</span>
+              </div>
+            </div>
           </aside>
+
 
           {/* batch queue */}
           <div className="flex flex-col min-h-0">
-            <div className="px-6 py-3.5 border-b border-border bg-secondary/20 shrink-0">
-              <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
+            <div className="px-6 py-3.5 border-b border-border bg-secondary/20 shrink-0 space-y-3">
+              {/* group approval — top right */}
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Group approval</span>
+                <div className="ml-auto flex flex-wrap items-center gap-1.5">
+                  {CHANGE_TYPES.map((t) => {
+                    const ids = records.filter((r) => r.changeType === t).map((r) => r.id);
+                    return (
+                      <button
+                        key={t}
+                        disabled={ids.length === 0}
+                        onClick={() => decide(ids, "approved")}
+                        className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-2.5 h-7 text-[11.5px] hover:bg-secondary disabled:opacity-40 transition"
+                      >
+                        <Check className="h-3 w-3" /> {t}
+                        <span className="tabular-nums text-muted-foreground">{ids.length}</span>
+                      </button>
+                    );
+                  })}
+                  <button
+                    disabled={datapoint === "all" || records.length === 0}
+                    onClick={() => decide(records.map((r) => r.id), "approved")}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-2.5 h-7 text-[11.5px] hover:bg-secondary disabled:opacity-40 transition"
+                  >
+                    Datapoint group <span className="tabular-nums text-muted-foreground">{datapoint === "all" ? "—" : records.length}</span>
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="text-[12px] font-semibold uppercase tracking-wider text-muted-foreground">
                   Batch {records.length ? clampedBatch + 1 : 0} of {records.length ? batchCount : 0} · {batch.length} records ·{" "}
                   {batchDecided} decided
@@ -224,6 +265,7 @@ export function ReviewDialog({
               </div>
               <AdmvBar a={admv} showLegend />
             </div>
+
 
             <div className="flex-1 min-h-0 overflow-y-auto">
               {batch.length === 0 ? (
@@ -305,54 +347,6 @@ export function ReviewDialog({
             </div>
           </div>
 
-          {/* group approval rail (right) */}
-          <aside className="border-l border-border bg-secondary/30 p-5 space-y-4 overflow-y-auto">
-            <div className="rounded-lg border border-border bg-card p-3">
-              <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">Group approval</div>
-              <div className="space-y-1.5">
-                {CHANGE_TYPES.map((t) => {
-                  const ids = records.filter((r) => r.changeType === t).map((r) => r.id);
-                  return (
-                    <button
-                      key={t}
-                      disabled={ids.length === 0}
-                      onClick={() => decide(ids, "approved")}
-                      className="w-full flex items-center justify-between rounded-md border border-border px-2.5 h-8 text-[12px] hover:bg-secondary disabled:opacity-40 transition"
-                    >
-                      <span>Approve all {t.toLowerCase()}</span>
-                      <span className="tabular-nums text-muted-foreground">{ids.length}</span>
-                    </button>
-                  );
-                })}
-                <button
-                  disabled={datapoint === "all" || records.length === 0}
-                  onClick={() => decide(records.map((r) => r.id), "approved")}
-                  className="w-full flex items-center justify-between rounded-md border border-border px-2.5 h-8 text-[12px] hover:bg-secondary disabled:opacity-40 transition"
-                >
-                  <span>Approve datapoint group</span>
-                  <span className="tabular-nums text-muted-foreground">{datapoint === "all" ? "—" : records.length}</span>
-                </button>
-                <button
-                  disabled={batch.length === 0}
-                  onClick={() => decide(batch.map((r) => r.id), "approved")}
-                  className="w-full flex items-center justify-between rounded-md border border-border px-2.5 h-8 text-[12px] hover:bg-secondary disabled:opacity-40 transition"
-                >
-                  <span>Approve this batch</span>
-                  <span className="tabular-nums text-muted-foreground">{batch.length}</span>
-                </button>
-              </div>
-            </div>
-
-            <div className="rounded-lg border border-border bg-card p-3 flex items-center gap-3">
-              <Donut value={coverage} label="reviewed" tone={coverage > 66 ? "success" : coverage > 33 ? "warning" : "primary"} />
-              <div className="text-[11.5px] text-muted-foreground leading-relaxed">
-                <div className="text-foreground font-semibold text-[13px]">Review contour</div>
-                {decided} of {records.length} decided
-                <br />
-                {approved} approved · {rejected} rejected
-              </div>
-            </div>
-          </aside>
         </div>
 
         <div className="border-t border-border px-6 py-3 flex flex-wrap items-center gap-3 bg-card shrink-0">
