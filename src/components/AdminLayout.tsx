@@ -9,7 +9,9 @@ type AdminNavItem = { to: string; label: string; icon: typeof Users };
 
 const NAV_ITEMS: AdminNavItem[] = [
   { to: "/admin", label: "Requests", icon: Users },
+  { to: "/admin-access", label: "Accounts & access", icon: Shield },
 ];
+
 
 export function AdminLayout({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
