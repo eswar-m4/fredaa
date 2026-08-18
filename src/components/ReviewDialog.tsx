@@ -237,10 +237,41 @@ export function ReviewDialog({
               </div>
 
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <div className="text-[12px] font-semibold uppercase tracking-wider text-muted-foreground">
-                  Batch {records.length ? clampedBatch + 1 : 0} of {records.length ? batchCount : 0} · {batch.length} records ·{" "}
-                  {batchDecided} decided
+                <div className="flex flex-wrap items-center gap-2 text-[12px] text-muted-foreground">
+                  <span className="font-semibold uppercase tracking-wider">
+                    Batch {records.length ? clampedBatch + 1 : 0} of {records.length ? batchCount : 0}
+                  </span>
+                  <span>· {batch.length} records · {batchDecided} decided · {fmt(records.length)} in queue</span>
+                  <span className="flex items-center gap-1">
+                    <span className="uppercase tracking-wider text-[11px]">rows</span>
+                    <select
+                      value={batchSize}
+                      onChange={(e) => {
+                        setBatchSize(Number(e.target.value));
+                        setBatchIdx(0);
+                      }}
+                      className="h-7 rounded-md border border-border bg-card px-1.5 text-[11.5px]"
+                    >
+                      {[10, 25, 50, 100].map((n) => (
+                        <option key={n} value={n}>
+                          {n}
+                        </option>
+                      ))}
+                    </select>
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <span className="uppercase tracking-wider text-[11px]">jump</span>
+                    <input
+                      type="number"
+                      min={1}
+                      max={batchCount}
+                      value={clampedBatch + 1}
+                      onChange={(e) => setBatchIdx(Math.min(batchCount - 1, Math.max(0, Number(e.target.value) - 1)))}
+                      className="h-7 w-16 rounded-md border border-border bg-card px-1.5 text-[11.5px] tabular-nums"
+                    />
+                  </span>
                 </div>
+
                 <div className="flex items-center gap-1.5">
                   <Button size="sm" variant="outline" onClick={() => setBatchIdx((b) => Math.max(0, b - 1))} disabled={clampedBatch === 0}>
                     <ChevronLeft className="h-3.5 w-3.5" /> Prev batch
