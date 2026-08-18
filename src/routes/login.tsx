@@ -84,30 +84,33 @@ function LoginPage() {
     <div className="min-h-screen bg-background text-foreground flex items-center justify-center px-4 py-10">
       <div className="w-full max-w-5xl grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
         <div className="space-y-6">
-          <div className="inline-flex items-center gap-3 rounded-full border border-primary/25 bg-primary/10 px-4 py-2 text-sm text-foreground">
-            <Shield className="h-4 w-4 text-primary" />
-            <span className="font-bold">FreDA</span>
-            <span className="text-muted-foreground">Fresh Data Automation</span>
-          </div>
-          <div className="space-y-3">
-            <div className="text-2xl font-extrabold tracking-tight">
-              FreDA <span className="text-primary">— Fresh Data Automation</span>
-            </div>
-            <h1 className="text-4xl font-bold tracking-tight leading-tight">
-              Data, <span className="text-primary">sourced, verified and kept fresh</span>
+          <div className="flex items-center gap-4">
+            <img src={fredaLogo} alt="Freda logo" className="h-14 w-14 object-contain" />
+            <h1 className="text-5xl font-bold tracking-tight text-foreground">
+              Freda <span className="text-primary">Fresh Data Automation</span>
             </h1>
-            <p className="max-w-xl text-sm text-muted-foreground leading-6">
-              FreDA runs site-specific agents on the sources you trust, extracts the exact datapoints you need, scores every
-              change and hands you a reviewed, delivery-ready dataset — on a daily, weekly or monthly refresh.
-            </p>
+          </div>
+
+          <p className="max-w-lg text-lg font-medium text-muted-foreground leading-relaxed">
+            Automated data sourcing, validation, and refresh — delivered fresh to your workspace.
+          </p>
+
+          <div className="rounded-2xl border border-border bg-card overflow-hidden shadow-sm">
+            <img
+              src={loginHero.url}
+              alt="Freda data pipeline"
+              className="w-full h-56 object-cover"
+              width={1024}
+              height={768}
+            />
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2">
             {[
-              { icon: Radar, title: "Source", copy: "Agents mapped to each site, directory and registry in your scope." },
-              { icon: Database, title: "Extract", copy: "Only the datapoints in your spec — structured, deduplicated, typed." },
-              { icon: CheckCircle2, title: "Validate", copy: "ADMV change signature with confidence scoring and human review." },
-              { icon: RefreshCw, title: "Refresh", copy: "Scheduled reruns with deltas pushed to CSV, API, S3 or Snowflake." },
+              { icon: Radar, title: "Source", copy: "Agents mapped to the sites and directories you trust." },
+              { icon: Database, title: "Extract", copy: "The exact datapoints you need — structured and deduplicated." },
+              { icon: CheckCircle2, title: "Validate", copy: "ADMV change scoring with human-in-the-loop review." },
+              { icon: RefreshCw, title: "Refresh", copy: "Scheduled reruns that keep your dataset current." },
             ].map((s) => (
               <Card key={s.title} className="border-border bg-card p-4">
                 <div className="flex items-start gap-3">
@@ -131,18 +134,18 @@ function LoginPage() {
                 </div>
                 <div>
                   <div className="text-sm font-semibold">Workspace user</div>
-                  <div className="text-xs text-muted-foreground">Dashboard &amp; review, monitoring, projects and playbooks.</div>
+                  <div className="text-xs text-muted-foreground">Dashboard, review, monitoring and playbooks.</div>
                 </div>
               </div>
             </Card>
             <Card className="border-border bg-card p-4">
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-xl bg-info-bg border border-info/20 flex items-center justify-center">
-                  <Shield className="h-5 w-5 text-primary" />
+                <div className="h-10 w-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center">
+                  <Database className="h-5 w-5 text-primary" />
                 </div>
                 <div>
                   <div className="text-sm font-semibold">Administrator</div>
-                  <div className="text-xs text-muted-foreground">All sources across workspaces, customer tickets and access control.</div>
+                  <div className="text-xs text-muted-foreground">All sources across workspaces, tickets and access control.</div>
                 </div>
               </div>
             </Card>
