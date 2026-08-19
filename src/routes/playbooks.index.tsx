@@ -16,7 +16,6 @@ import {
   MessageSquare,
   FileSpreadsheet,
   Search,
-  Settings2,
 } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
 import { Button, Card, PageHeader } from "@/components/ui-bits";
