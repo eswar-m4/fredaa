@@ -95,3 +95,18 @@ export function clearTickets() {
 export function setTicketNote(id: string, adminNote: string) {
   persist(read().map((t) => (t.id === id ? { ...t, adminNote } : t)));
 }
+
+export function setTicketAssignee(id: string, assignee: string) {
+  persist(read().map((t) => (t.id === id ? { ...t, assignee } : t)));
+}
+
+export function toggleOnboardingStep(id: string, step: string) {
+  persist(
+    read().map((t) => {
+      if (t.id !== id) return t;
+      const done = t.onboarding ?? [];
+      const next = done.includes(step) ? done.filter((s) => s !== step) : [...done, step];
+      return { ...t, onboarding: next };
+    }),
+  );
+}
