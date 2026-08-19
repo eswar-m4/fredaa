@@ -123,17 +123,14 @@ const WIZARD_STEPS = ["Configure", "Upload dataset", "Wired sources", "Attribute
 type Cadence = "Daily" | "Weekly" | "Monthly" | "Custom";
 
 function SolutionsPage() {
-  const customer = useActiveCustomer();
-  const industrySolutions = useMemo(() => solutionsFor(customer).map((s) => fromSolution(s, customer.industry)), [customer]);
   const datasets = useMemo(() => DATASETS.map(fromDataset), []);
 
-  const [tab, setTab] = useState<"datasets" | "industry">("datasets");
   const [q, setQ] = useState("");
   const [cat, setCat] = useState<string>("All");
   const [active, setActive] = useState<SetupItem | null>(null);
 
-  const pool = tab === "datasets" ? datasets : industrySolutions;
-  const cats = tab === "datasets" ? (DATASET_CATEGORIES as string[]) : SOLUTION_GROUPS;
+  const pool = datasets;
+  const cats = DATASET_CATEGORIES as string[];
 
   const list = useMemo(
     () =>
