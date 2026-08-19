@@ -172,20 +172,9 @@ function SolutionsPage() {
         </Card>
 
         <div className="flex flex-wrap items-center gap-2">
-          <div className="inline-flex rounded-md border border-border overflow-hidden">
-            {(["datasets", "industry"] as const).map((t) => (
-              <button
-                key={t}
-                onClick={() => {
-                  setTab(t);
-                  setCat("All");
-                }}
-                className={cn("h-8 px-3.5 text-[11.5px] font-medium transition", tab === t ? "bg-primary text-primary-foreground" : "bg-card text-muted-foreground hover:bg-secondary")}
-              >
-                {t === "datasets" ? `Standard datasets · ${datasets.length}` : `${customer.industry} solutions · ${industrySolutions.length}`}
-              </button>
-            ))}
-          </div>
+          <span className="h-8 px-3.5 inline-flex items-center rounded-md bg-primary text-primary-foreground text-[11.5px] font-medium">
+            Standard datasets · {datasets.length}
+          </span>
           <div className="relative w-full max-w-[280px]">
             <Search className="h-3.5 w-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <Input className="pl-8" placeholder="Search datasets…" value={q} onChange={(e) => setQ(e.target.value)} />
