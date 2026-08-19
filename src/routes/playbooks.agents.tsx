@@ -171,28 +171,27 @@ function AgentsPage() {
               </div>
             </div>
 
-            <div className="flex-1 min-h-0 overflow-y-auto space-y-2 pr-1">
-              {sources.map((s) => (
-                <div key={s.id} className="flex items-center gap-3 rounded-lg border border-border px-3 py-2.5">
-                  <span className="h-8 w-8 rounded-md bg-secondary text-muted-foreground inline-flex items-center justify-center shrink-0">
-                    <Globe className="h-4 w-4" />
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <div className="text-[13px] font-medium truncate">{s.label}</div>
-                    <div className="text-[11px] text-muted-foreground truncate">
-                      added {s.addedOn} · {fmt(s.records)} records
-                    </div>
+            <div className="flex-1 min-h-0 overflow-y-auto grid sm:grid-cols-2 gap-2 content-start pr-1">
+              {sources.map((s, i) => (
+                <div key={s.id} className={cn("rounded-lg border p-0 overflow-hidden flex flex-col", SOURCE_ART[i % SOURCE_ART.length]!.border)}>
+                  <div className={cn("flex items-center gap-2 px-3 py-2 bg-gradient-to-r text-white", SOURCE_ART[i % SOURCE_ART.length]!.gradient)}>
+                    <Globe className="h-3.5 w-3.5 shrink-0" />
+                    <span className="text-[12.5px] font-semibold truncate">{s.label}</span>
+                    <span className="ml-auto text-[10px] uppercase tracking-wider font-semibold bg-white/20 rounded px-1.5 py-0.5 whitespace-nowrap">{s.status}</span>
                   </div>
-                  <Badge className="whitespace-nowrap" tone={s.status === "Live" ? "success" : s.status === "Paused" ? "warning" : "info"}>
-                    {s.status}
-                  </Badge>
-                  <button
-                    onClick={() => removeSource(s.id)}
-                    title="Retire source"
-                    className="h-8 w-8 shrink-0 rounded-md inline-flex items-center justify-center border border-border hover:bg-destructive/10 hover:text-destructive transition"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </button>
+                  <div className="px-3 py-2 flex items-center gap-2">
+                    <div className="min-w-0 flex-1">
+                      <div className="text-[11px] text-muted-foreground truncate">added {s.addedOn}</div>
+                      <div className="text-[13px] font-semibold tabular-nums">{fmt(s.records)} <span className="text-[11px] font-normal text-muted-foreground">records</span></div>
+                    </div>
+                    <button
+                      onClick={() => removeSource(s.id)}
+                      title="Retire source"
+                      className="h-8 w-8 shrink-0 rounded-md inline-flex items-center justify-center border border-border hover:bg-destructive/10 hover:text-destructive transition"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
