@@ -116,24 +116,24 @@ function PlaybooksPage() {
               onClose={requestClose}
               active={false}
               tone="emerald"
-              tag="Site-specific"
+              tag="Sources you own"
               icon={Radar}
               title="Agents"
-              aka="You already know the websites"
+              aka="Manage the websites already working for you"
               art={<TargetedArt sources={customer.projects.flatMap((p) => p.sources).slice(0, 3).map((s) => s.label)} />}
-              summary="Your trusted sites onboarded as tuned extraction agents, kept fresh on the schedule you set."
+              summary="Add or retire a source, pick the attributes to extract, and set how often each project re-runs — daily, weekly, monthly or your own rule."
               facts={[
-                { k: "Agents running", v: `${customer.projects.length}` },
-                { k: "Sources", v: `${totalSources}` },
-                { k: "Datapoints", v: `${totalDatapoints}` },
-                { k: "Refresh", v: "Daily / weekly / monthly" },
+                { k: "Projects live", v: `${customer.projects.length}` },
+                { k: "Sources onboarded", v: `${totalSources}` },
+                { k: "Datapoints tracked", v: `${totalDatapoints}` },
+                { k: "Cadence", v: "You control it" },
               ]}
               details={[
-                "Every agent ships with crawl policy, metadata and terms of use",
-                "Change deltas (ADMV) captured on every run",
-                "Feeds Dashboard review and Monitor jobs",
+                "Add a URL, choose attributes — FreDA builds and onboards the bot",
+                "Retire a source or change its run window in a click",
+                "Every run feeds Dashboard review and Monitor jobs",
               ]}
-              cta="Open Agents"
+              cta="Manage sources & schedules"
               onPick={() => navigate({ to: "/playbooks/agents" })}
             />
             <FlipTile
@@ -143,24 +143,24 @@ function PlaybooksPage() {
               onClose={requestClose}
               active={false}
               tone="violet"
-              tag="Category-driven"
+              tag="Ready to launch"
               icon={Boxes}
               title="Solutions"
-              aka="You know the data, not the sites"
+              aka="Start a new dataset without naming the sites"
               art={<DatasetArt />}
-              summary={`Packaged ${customer.industry.toLowerCase()} datasets sourced from official websites plus trusted third-party sources.`}
+              summary={`Pick a packaged ${customer.industry.toLowerCase()} dataset, wire sources, choose attributes and a schedule — FreDA's team builds and onboards it.`}
               facts={[
-                { k: "Solutions", v: `${solutions.length}` },
-                { k: "Domain", v: customer.industry },
-                { k: "Default source", v: "Official website" },
-                { k: "Third-party", v: "10-14 per category" },
+                { k: "Ready datasets", v: `${solutions.length}` },
+                { k: "Setup", v: "6 guided steps" },
+                { k: "Upload", v: "Your own source list" },
+                { k: "Output", v: "Estimate + build request" },
               ]}
               details={[
-                "Curated marketplaces and directories per category",
-                "Normalised, deduped and confidence scored",
-                "Request a solution and the build team scopes it",
+                "Configure → upload → wired sources → attributes → schedule → launch",
+                "Live estimate of setup days, first run and monthly volume",
+                "Launch files a request tracked all the way to onboarding",
               ]}
-              cta="Open Solutions"
+              cta="Set up a dataset"
               onPick={() => navigate({ to: "/playbooks/solutions" })}
             />
             <FlipTile
@@ -170,26 +170,27 @@ function PlaybooksPage() {
               onClose={requestClose}
               active={false}
               tone="rose"
-              tag="Guided"
+              tag="Guided by FreDA"
               icon={Bot}
               title="Ask FreDA"
-              aka="Not sure where to start?"
+              aka="Understand your data, or just ask where to go"
               art={<DiscoveryArt />}
-              summary="Ask about what changed, which dataset to review first, source health or how to download approved records."
+              summary="Ask how FreDA works, what changed this cycle, what to review first — or describe a new project and FreDA raises the request for you."
               facts={[
-                { k: "Chat", v: "Guided" },
-                { k: "Scope", v: customer.industry },
-                { k: "You get", v: "Answers on your data" },
-                { k: "Then", v: "Jump to the screen" },
+                { k: "Knows", v: "Every screen & dataset" },
+                { k: "Analyses", v: "ADMV, quality, freshness" },
+                { k: "Navigates", v: "One-click to the screen" },
+                { k: "Can raise", v: "New project requests" },
               ]}
               details={[
-                "Knows this workspace's datasets and their status",
-                "Explains ADMV deltas, coverage and freshness",
-                "Points you to review, monitor or download next",
+                "Explains ADMV, sampling, confidence and review flow",
+                "Flags the stalest dataset and the biggest review backlog",
+                "Walks you to review, monitor, sources or download",
               ]}
-              cta="Ask FreDA"
+              cta="Chat with FreDA"
               onPick={() => navigate({ to: "/playbooks/ask" })}
             />
+
           </div>
         </div>
 
