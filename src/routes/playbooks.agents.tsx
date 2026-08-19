@@ -137,13 +137,28 @@ function AgentsPage() {
           <Card className="p-5 flex flex-col min-h-[460px]">
             <SectionTitle hint={`${sources.length} sources`}>Manage sources</SectionTitle>
 
-            <Select className="mb-3" value={project.id} onChange={(e) => setProjectId(e.target.value)}>
-              {customer.projects.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name} — {p.sources.length} sources · {p.datapoints.length} datapoints
-                </option>
-              ))}
-            </Select>
+            <div className="mb-3 rounded-xl border border-primary/40 bg-gradient-to-r from-primary/15 via-primary/5 to-transparent p-3">
+              <div className="text-[11px] uppercase tracking-wider font-bold text-primary mb-1.5">Working on project</div>
+              <div className="relative">
+                <Select
+                  className="h-11 !text-[14px] font-bold border-primary/50 bg-card shadow-sm focus:ring-2 focus:ring-primary/40"
+                  value={project.id}
+                  onChange={(e) => setProjectId(e.target.value)}
+                >
+                  {customer.projects.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name} — {p.sources.length} sources · {p.datapoints.length} datapoints
+                    </option>
+                  ))}
+                </Select>
+              </div>
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                <span className="text-[11px] font-semibold rounded-full px-2 py-0.5 bg-primary/15 text-primary">{project.frequency} refresh</span>
+                <span className="text-[11px] font-semibold rounded-full px-2 py-0.5 bg-secondary text-secondary-foreground">{fmt(project.records)} records</span>
+                <span className="text-[11px] font-semibold rounded-full px-2 py-0.5 bg-secondary text-secondary-foreground">{project.datapoints.length} datapoints</span>
+              </div>
+            </div>
+
 
             <div className="rounded-lg border border-border p-3 mb-3 shrink-0">
               <div className="flex items-center gap-2">
