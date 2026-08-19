@@ -266,36 +266,36 @@ function AgentsPage() {
             <Search className="h-3.5 w-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <Input className="pl-8" placeholder="Search all agents…" value={q} onChange={(e) => setQ(e.target.value)} />
           </div>
-          <span className="text-[11.5px] text-muted-foreground">{agents.length} agents</span>
+          <span className="text-[11.5px] text-muted-foreground">{agents.length} websites onboarded</span>
         </div>
 
-        <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4 items-stretch">
-          {agents.map((a) => (
-            <Card key={`${a.project.id}-${a.id}`} className="p-5 flex flex-col">
-              <div className="flex items-start gap-3">
-                <span className="h-9 w-9 shrink-0 rounded-md bg-info-bg text-info inline-flex items-center justify-center">
-                  <Bot className="h-4 w-4" />
-                </span>
-                <div className="min-w-0 flex-1">
-                  <div className="text-[13.5px] font-semibold leading-snug truncate">{a.label}</div>
-                  <div className="text-[11px] text-muted-foreground mt-0.5 truncate">
+        <Card className="p-0 overflow-hidden">
+          <div className="divide-y divide-border">
+            {agents.map((a, i) => {
+              const art = SOURCE_ART[i % SOURCE_ART.length]!;
+              return (
+                <div key={`${a.project.id}-${a.id}`} className="flex items-center gap-3 px-4 py-3 hover:bg-secondary/40 transition">
+                  <span className={cn("h-1.5 w-8 shrink-0 rounded-full bg-gradient-to-r", art.gradient)} />
+                  <span className={cn("h-8 w-8 shrink-0 rounded-md inline-flex items-center justify-center", art.chip)}>
+                    <Bot className="h-4 w-4" />
+                  </span>
+                  <div className="min-w-0 w-[240px]">
+                    <div className="text-[13px] font-semibold truncate">{a.label}</div>
+                    <a href={a.url} target="_blank" rel="noreferrer" className="text-[11px] text-primary hover:underline inline-flex items-center gap-1 truncate max-w-full">
+                      <ExternalLink className="h-3 w-3 shrink-0" /> <span className="truncate">{a.url}</span>
+                    </a>
+                  </div>
+                  <div className="hidden md:block min-w-0 flex-1 text-[11.5px] text-muted-foreground truncate">
                     {a.project.name} · {cadence[a.project.id] ?? a.project.frequency} · {a.project.datapoints.length} datapoints
                   </div>
+                  <span className="hidden sm:block text-[11.5px] text-muted-foreground whitespace-nowrap">added {a.addedOn}</span>
+                  <span className="text-[12.5px] font-semibold tabular-nums whitespace-nowrap w-[110px] text-right">{fmt(a.records)} records</span>
+                  <Badge tone={a.status === "Live" ? "success" : a.status === "Paused" ? "warning" : "info"}>{a.status}</Badge>
                 </div>
-                <Badge tone={a.status === "Live" ? "success" : a.status === "Paused" ? "warning" : "info"}>{a.status}</Badge>
-              </div>
-
-              <a href={a.url} target="_blank" rel="noreferrer" className="mt-3 flex items-center gap-1.5 text-[11.5px] text-primary hover:underline truncate">
-                <ExternalLink className="h-3 w-3 shrink-0" /> <span className="truncate">{a.url}</span>
-              </a>
-
-              <div className="mt-auto pt-3 flex items-center justify-between text-[11.5px] text-muted-foreground">
-                <span>added {a.addedOn}</span>
-                <span className="tabular-nums font-medium text-foreground">{fmt(a.records)} records</span>
-              </div>
-            </Card>
-          ))}
-        </div>
+              );
+            })}
+          </div>
+        </Card>
       </div>
     </AppLayout>
   );
