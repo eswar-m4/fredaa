@@ -270,29 +270,26 @@ function AgentsPage() {
 
         <Card className="p-0 overflow-hidden">
           <div className="divide-y divide-border">
-            {agents.map((a, i) => {
-              const art = SOURCE_ART[i % SOURCE_ART.length]!;
-              return (
-                <div key={`${a.project.id}-${a.id}`} className="flex items-center gap-3 px-4 py-3 hover:bg-secondary/40 transition">
-                  <span className={cn("h-1.5 w-8 shrink-0 rounded-full bg-gradient-to-r", art.gradient)} />
-                  <span className={cn("h-8 w-8 shrink-0 rounded-md inline-flex items-center justify-center", art.chip)}>
-                    <Bot className="h-4 w-4" />
-                  </span>
-                  <div className="min-w-0 w-[240px]">
-                    <div className="text-[13px] font-semibold truncate">{a.label}</div>
-                    <a href={a.url} target="_blank" rel="noreferrer" className="text-[11px] text-primary hover:underline inline-flex items-center gap-1 truncate max-w-full">
-                      <ExternalLink className="h-3 w-3 shrink-0" /> <span className="truncate">{a.url}</span>
-                    </a>
-                  </div>
-                  <div className="hidden md:block min-w-0 flex-1 text-[11.5px] text-muted-foreground truncate">
-                    {a.project.name} · {cadence[a.project.id] ?? a.project.frequency} · {a.project.datapoints.length} datapoints
-                  </div>
-                  <span className="hidden sm:block text-[11.5px] text-muted-foreground whitespace-nowrap">added {a.addedOn}</span>
-                  <span className="text-[12.5px] font-semibold tabular-nums whitespace-nowrap w-[110px] text-right">{fmt(a.records)} records</span>
-                  <Badge tone={a.status === "Live" ? "success" : a.status === "Paused" ? "warning" : "info"}>{a.status}</Badge>
+            {agents.map((a) => (
+              <div key={`${a.project.id}-${a.id}`} className="flex items-center gap-3 px-4 py-3 hover:bg-secondary/40 transition">
+                <span className={cn("h-1.5 w-8 shrink-0 rounded-full", NEUTRAL_ART.stripe)} />
+                <span className={cn("h-8 w-8 shrink-0 rounded-md inline-flex items-center justify-center", NEUTRAL_ART.chip)}>
+                  <Bot className="h-4 w-4" />
+                </span>
+                <div className="min-w-0 w-[240px]">
+                  <div className="text-[13px] font-semibold truncate">{a.label}</div>
+                  <a href={a.url} target="_blank" rel="noreferrer" className="text-[11px] text-primary hover:underline inline-flex items-center gap-1 truncate max-w-full">
+                    <ExternalLink className="h-3 w-3 shrink-0" /> <span className="truncate">{a.url}</span>
+                  </a>
                 </div>
-              );
-            })}
+                <div className="hidden md:block min-w-0 flex-1 text-[11.5px] text-muted-foreground truncate">
+                  {a.project.name} · {cadence[a.project.id] ?? a.project.frequency} · {a.project.datapoints.length} datapoints
+                </div>
+                <span className="hidden sm:block text-[11.5px] text-muted-foreground whitespace-nowrap">added {a.addedOn}</span>
+                <span className="text-[12.5px] font-semibold tabular-nums whitespace-nowrap w-[110px] text-right">{fmt(a.records)} records</span>
+                <Badge tone={a.status === "Live" ? "success" : a.status === "Paused" ? "warning" : "info"}>{a.status}</Badge>
+              </div>
+            ))}
           </div>
         </Card>
       </div>
