@@ -180,12 +180,12 @@ function AgentsPage() {
             </div>
 
             <div className="flex-1 min-h-0 overflow-y-auto grid sm:grid-cols-2 gap-2 content-start pr-1">
-              {sources.map((s, i) => (
-                <div key={s.id} className={cn("rounded-lg border p-0 overflow-hidden flex flex-col", SOURCE_ART[i % SOURCE_ART.length]!.border)}>
-                  <div className={cn("flex items-center gap-2 px-3 py-2 bg-gradient-to-r text-white", SOURCE_ART[i % SOURCE_ART.length]!.gradient)}>
-                    <Globe className="h-3.5 w-3.5 shrink-0" />
-                    <span className="text-[12.5px] font-semibold truncate">{s.label}</span>
-                    <span className="ml-auto text-[10px] uppercase tracking-wider font-semibold bg-white/20 rounded px-1.5 py-0.5 whitespace-nowrap">{s.status}</span>
+              {sources.map((s) => (
+                <div key={s.id} className={cn("rounded-lg border p-0 overflow-hidden flex flex-col", NEUTRAL_ART.border)}>
+                  <div className={cn("flex items-center gap-2 px-3 py-2", NEUTRAL_ART.header)}>
+                    <Globe className={cn("h-3.5 w-3.5 shrink-0", NEUTRAL_ART.headerText)} />
+                    <span className={cn("text-[12.5px] font-semibold truncate", NEUTRAL_ART.headerText)}>{s.label}</span>
+                    <span className="ml-auto text-[10px] uppercase tracking-wider font-semibold bg-card border rounded px-1.5 py-0.5 whitespace-nowrap">{s.status}</span>
                   </div>
                   <div className="px-3 py-2 flex items-center gap-2">
                     <div className="min-w-0 flex-1">
