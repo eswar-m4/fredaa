@@ -198,16 +198,16 @@ export function AskFredaPanel() {
   function send(text: string) {
     const q = text.trim();
     if (!q) return;
-    let reply: string;
+    let reply: { text: string; nav?: NavHint };
     if (flow >= 0) {
-      reply = handleFlow(q);
+      reply = { text: handleFlow(q) };
     } else if (/new (project|solution|dataset)|add (a )?(project|solution|dataset)|request a/i.test(q)) {
       setFlow(0);
-      reply = FLOW_PROMPTS[0]!;
+      reply = { text: FLOW_PROMPTS[0]! };
     } else {
       reply = answer(q);
     }
-    setMessages((m) => [...m, { role: "user", text: q }, { role: "freda", text: reply }]);
+    setMessages((m) => [...m, { role: "user", text: q }, { role: "freda", ...reply }]);
     setInput("");
     setTimeout(() => endRef.current?.scrollIntoView({ behavior: "smooth" }), 30);
   }
@@ -220,16 +220,25 @@ export function AskFredaPanel() {
             <div key={i} className={cn("flex", m.role === "user" ? "justify-end" : "justify-start")}>
               <div
                 className={cn(
-                  "max-w-[75%] rounded-lg px-3.5 py-2.5 text-[13px] whitespace-pre-line",
+                  "max-w-[78%] rounded-lg px-3.5 py-2.5 text-[13px] whitespace-pre-line",
                   m.role === "user" ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground",
                 )}
               >
                 {m.text}
+                {m.nav && (
+                  <Link
+                    to={m.nav.to}
+                    className="mt-2.5 inline-flex items-center gap-1.5 rounded-md border border-primary/40 bg-primary/10 px-2.5 py-1 text-[12px] font-semibold text-primary hover:bg-primary/15 transition"
+                  >
+                    {m.nav.label} <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
+                )}
               </div>
             </div>
           ))}
           <div ref={endRef} />
         </div>
+
         <form
           onSubmit={(e) => {
             e.preventDefault();
