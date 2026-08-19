@@ -24,6 +24,15 @@ export const Route = createFileRoute("/playbooks/agents")({
 });
 
 const ATTRIBUTE_CHOICES = ATTRIBUTES.map((a) => a.label);
+
+const SOURCE_ART = [
+  { gradient: "from-indigo-500 to-violet-600", border: "border-indigo-500/30", chip: "bg-indigo-500/10 text-indigo-500" },
+  { gradient: "from-emerald-500 to-teal-600", border: "border-emerald-500/30", chip: "bg-emerald-500/10 text-emerald-500" },
+  { gradient: "from-amber-500 to-orange-600", border: "border-amber-500/30", chip: "bg-amber-500/10 text-amber-600" },
+  { gradient: "from-sky-500 to-blue-600", border: "border-sky-500/30", chip: "bg-sky-500/10 text-sky-500" },
+  { gradient: "from-fuchsia-500 to-pink-600", border: "border-fuchsia-500/30", chip: "bg-fuchsia-500/10 text-fuchsia-500" },
+  { gradient: "from-rose-500 to-red-600", border: "border-rose-500/30", chip: "bg-rose-500/10 text-rose-500" },
+];
 type Cadence = "Daily" | "Weekly" | "Monthly" | "Custom";
 
 function AgentsPage() {
