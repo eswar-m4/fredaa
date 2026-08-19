@@ -37,7 +37,6 @@ import {
 import { AppLayout } from "@/components/AppLayout";
 import { Badge, Button, Card, Input, PageHeader, SectionTitle, Select, Steps } from "@/components/ui-bits";
 import { useActiveCustomer } from "@/lib/workspace";
-import { SOLUTION_GROUPS, solutionsFor, type PlaybookSolution } from "@/lib/playbook-solutions";
 import { addTicket } from "@/lib/ticket-store";
 import { readIntakeFile, type IntakeResult } from "@/lib/ai-intake";
 import { estimate, fmt, type Project } from "@/data/customers";
@@ -98,26 +97,6 @@ function fromDataset(d: Dataset): SetupItem {
   };
 }
 
-function fromSolution(s: PlaybookSolution, industry: string): SetupItem {
-  return {
-    id: s.id,
-    name: s.name,
-    category: s.group,
-    tagline: `${s.sources} wired sources · ${s.datapoints} datapoints`,
-    description: s.blurb,
-    icon: "Layers",
-    refresh: s.refresh,
-    rows: `${industry} universe`,
-    sources: Array.from({ length: s.sources }, (_, i) => ({
-      name: `${s.name} source ${i + 1}`,
-      url: `https://source-${i + 1}.${s.id}.freda.io`,
-      kind: i === 0 ? "Company website" : "Third-party",
-      attributes: Math.max(3, Math.round(s.datapoints / s.sources)),
-    })),
-    attributes: Array.from({ length: s.datapoints }, (_, i) => ({ key: `${s.id}_f${i}`, label: `${s.name.split(" ")[0]} attribute ${i + 1}`, group: "Standard" })),
-    origin: "Industry solution",
-  };
-}
 
 const WIZARD_STEPS = ["Configure", "Upload dataset", "Wired sources", "Attributes", "Schedule", "Launch"];
 type Cadence = "Daily" | "Weekly" | "Monthly" | "Custom";
