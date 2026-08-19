@@ -42,6 +42,7 @@ import { readIntakeFile, type IntakeResult } from "@/lib/ai-intake";
 import { estimate, fmt, type Project } from "@/data/customers";
 import { DATASETS, DATASET_CATEGORIES, type Dataset } from "@/data/datasets";
 import { categoryArt } from "@/data/category-art";
+import { industryFit } from "@/lib/industry-datasets";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/playbooks/solutions")({
@@ -102,13 +103,17 @@ const WIZARD_STEPS = ["Configure", "Upload dataset", "Wired sources", "Attribute
 type Cadence = "Daily" | "Weekly" | "Monthly" | "Custom";
 
 function SolutionsPage() {
+  const customer = useActiveCustomer();
   const datasets = useMemo(() => DATASETS.map(fromDataset), []);
+  const fit = useMemo(() => industryFit(customer.industry), [customer.industry]);
+  const relevant = useMemo(() => fit.ids.map((id) => datasets.find((d) => d.id === id)).filter(Boolean) as SetupItem[], [datasets, fit]);
 
   const [q, setQ] = useState("");
   const [cat, setCat] = useState<string>("All");
+  const [scope, setScope] = useState<"fit" | "all">("fit");
   const [active, setActive] = useState<SetupItem | null>(null);
 
-  const pool = datasets;
+  const pool = scope === "fit" ? relevant : datasets;
   const cats = DATASET_CATEGORIES as string[];
 
   const list = useMemo(
@@ -118,6 +123,7 @@ function SolutionsPage() {
       ),
     [pool, cat, q],
   );
+
 
   if (active) return <DatasetSetup item={active} onBack={() => setActive(null)} />;
 
@@ -148,9 +154,20 @@ function SolutionsPage() {
         </Card>
 
         <div className="flex flex-wrap items-center gap-2">
-          <span className="h-8 px-3.5 inline-flex items-center rounded-md bg-primary text-primary-foreground text-[11.5px] font-medium">
-            Standard datasets · {datasets.length}
-          </span>
+          <div className="inline-flex items-center rounded-md border border-border overflow-hidden">
+            <button
+              onClick={() => setScope("fit")}
+              className={cn("h-8 px-3.5 text-[11.5px] font-medium", scope === "fit" ? "bg-primary text-primary-foreground" : "bg-card text-muted-foreground hover:text-foreground")}
+            >
+              For {customer.industry} · {relevant.length}
+            </button>
+            <button
+              onClick={() => setScope("all")}
+              className={cn("h-8 px-3.5 text-[11.5px] font-medium border-l border-border", scope === "all" ? "bg-primary text-primary-foreground" : "bg-card text-muted-foreground hover:text-foreground")}
+            >
+              All datasets · {datasets.length}
+            </button>
+          </div>
           <div className="relative w-full max-w-[280px]">
             <Search className="h-3.5 w-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <Input className="pl-8" placeholder="Search datasets…" value={q} onChange={(e) => setQ(e.target.value)} />
@@ -167,6 +184,17 @@ function SolutionsPage() {
             {list.length} of {pool.length}
           </span>
         </div>
+
+        {scope === "fit" ? (
+          <Card className="p-3.5 flex items-start gap-2.5">
+            <span className="h-7 w-7 shrink-0 rounded-md bg-primary/10 text-primary inline-flex items-center justify-center">
+              <Sparkles className="h-3.5 w-3.5" />
+            </span>
+            <p className="text-[12px] text-muted-foreground leading-relaxed">
+              <span className="font-medium text-foreground">Shortlisted for {customer.name}.</span> {fit.why} Need something else? Switch to all datasets or ask FreDA to raise a build request.
+            </p>
+          </Card>
+        ) : null}
 
         <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4 items-stretch">
           {list.map((d) => {
