@@ -22,7 +22,18 @@ export type Ticket = {
   fileName?: string;
   frequency?: string;
   adminNote?: string;
+  assignee?: string;
+  onboarding?: string[];
 };
+
+export const ONBOARDING_STEPS = [
+  "Scope & feasibility",
+  "Source access checked",
+  "Bots built",
+  "QA & validation",
+  "Onboarded to workspace",
+  "Handover note sent",
+] as const;
 
 const KEY = "freda_tickets_v1";
 const listeners = new Set<() => void>();
