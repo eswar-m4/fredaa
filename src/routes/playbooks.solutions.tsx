@@ -37,7 +37,6 @@ import {
 import { AppLayout } from "@/components/AppLayout";
 import { Badge, Button, Card, Input, PageHeader, SectionTitle, Select, Steps } from "@/components/ui-bits";
 import { useActiveCustomer } from "@/lib/workspace";
-import { SOLUTION_GROUPS, solutionsFor, type PlaybookSolution } from "@/lib/playbook-solutions";
 import { addTicket } from "@/lib/ticket-store";
 import { readIntakeFile, type IntakeResult } from "@/lib/ai-intake";
 import { estimate, fmt, type Project } from "@/data/customers";
@@ -98,42 +97,19 @@ function fromDataset(d: Dataset): SetupItem {
   };
 }
 
-function fromSolution(s: PlaybookSolution, industry: string): SetupItem {
-  return {
-    id: s.id,
-    name: s.name,
-    category: s.group,
-    tagline: `${s.sources} wired sources · ${s.datapoints} datapoints`,
-    description: s.blurb,
-    icon: "Layers",
-    refresh: s.refresh,
-    rows: `${industry} universe`,
-    sources: Array.from({ length: s.sources }, (_, i) => ({
-      name: `${s.name} source ${i + 1}`,
-      url: `https://source-${i + 1}.${s.id}.freda.io`,
-      kind: i === 0 ? "Company website" : "Third-party",
-      attributes: Math.max(3, Math.round(s.datapoints / s.sources)),
-    })),
-    attributes: Array.from({ length: s.datapoints }, (_, i) => ({ key: `${s.id}_f${i}`, label: `${s.name.split(" ")[0]} attribute ${i + 1}`, group: "Standard" })),
-    origin: "Industry solution",
-  };
-}
 
 const WIZARD_STEPS = ["Configure", "Upload dataset", "Wired sources", "Attributes", "Schedule", "Launch"];
 type Cadence = "Daily" | "Weekly" | "Monthly" | "Custom";
 
 function SolutionsPage() {
-  const customer = useActiveCustomer();
-  const industrySolutions = useMemo(() => solutionsFor(customer).map((s) => fromSolution(s, customer.industry)), [customer]);
   const datasets = useMemo(() => DATASETS.map(fromDataset), []);
 
-  const [tab, setTab] = useState<"datasets" | "industry">("datasets");
   const [q, setQ] = useState("");
   const [cat, setCat] = useState<string>("All");
   const [active, setActive] = useState<SetupItem | null>(null);
 
-  const pool = tab === "datasets" ? datasets : industrySolutions;
-  const cats = tab === "datasets" ? (DATASET_CATEGORIES as string[]) : SOLUTION_GROUPS;
+  const pool = datasets;
+  const cats = DATASET_CATEGORIES as string[];
 
   const list = useMemo(
     () =>
@@ -172,20 +148,9 @@ function SolutionsPage() {
         </Card>
 
         <div className="flex flex-wrap items-center gap-2">
-          <div className="inline-flex rounded-md border border-border overflow-hidden">
-            {(["datasets", "industry"] as const).map((t) => (
-              <button
-                key={t}
-                onClick={() => {
-                  setTab(t);
-                  setCat("All");
-                }}
-                className={cn("h-8 px-3.5 text-[11.5px] font-medium transition", tab === t ? "bg-primary text-primary-foreground" : "bg-card text-muted-foreground hover:bg-secondary")}
-              >
-                {t === "datasets" ? `Standard datasets · ${datasets.length}` : `${customer.industry} solutions · ${industrySolutions.length}`}
-              </button>
-            ))}
-          </div>
+          <span className="h-8 px-3.5 inline-flex items-center rounded-md bg-primary text-primary-foreground text-[11.5px] font-medium">
+            Standard datasets · {datasets.length}
+          </span>
           <div className="relative w-full max-w-[280px]">
             <Search className="h-3.5 w-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <Input className="pl-8" placeholder="Search datasets…" value={q} onChange={(e) => setQ(e.target.value)} />
