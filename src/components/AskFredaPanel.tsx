@@ -1,30 +1,34 @@
 import { useRef, useState } from "react";
-import { Send, Sparkles } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { Send, Sparkles, ArrowRight } from "lucide-react";
 import { Button, Card, SectionTitle } from "@/components/ui-bits";
 import { addTicket } from "@/lib/ticket-store";
 import { useActiveCustomer } from "@/lib/workspace";
 import { fmt, rollup, hrsAgo } from "@/data/customers";
 import { cn } from "@/lib/utils";
 
-type Msg = { role: "user" | "freda"; text: string };
+type NavHint = { to: string; label: string };
+type Msg = { role: "user" | "freda"; text: string; nav?: NavHint };
 
 export function AskFredaPanel() {
   const customer = useActiveCustomer();
   const stats = rollup(customer);
 
   const suggestions = [
-    "Request a new project or solution",
-    `What changed in ${customer.industry.toLowerCase()} data this week?`,
-    "Which dataset needs review first?",
-    "Show me accuracy by project",
-    "Which sources are stale?",
+    "What is FreDA and how does it work?",
+    "Where do I review and approve records?",
+    "What changed in my data this week?",
+    "Which dataset needs attention first?",
+    "How do I add a new source to a project?",
+    "How do I change the refresh schedule?",
     "How do I download approved records?",
+    "Request a new project or solution",
   ];
 
   const [messages, setMessages] = useState<Msg[]>([
     {
       role: "freda",
-      text: `Hi — I'm FreDA. I know ${customer.name}'s ${customer.industry.toLowerCase()} domain and the ${customer.projects.length} datasets in this workspace. Ask me what changed, what to review, or how the data is sourced.`,
+      text: `Hi — I'm FreDA, your data assistant for ${customer.name}. I know every screen in this workspace and all ${customer.projects.length} datasets in it.\n\nAsk me to explain how FreDA works, to analyse what changed (ADMV), to tell you what to review first, or to walk you to the right screen.`,
     },
   ]);
   const [input, setInput] = useState("");
@@ -37,27 +41,116 @@ export function AskFredaPanel() {
   });
   const endRef = useRef<HTMLDivElement>(null);
 
-  function answer(q: string): string {
+  function answer(q: string): { text: string; nav?: NavHint } {
     const s = q.toLowerCase();
     const worst = [...customer.projects].sort((a, b) => b.pendingReview - a.pendingReview)[0]!;
     const stale = [...customer.projects].sort((a, b) => a.freshness - b.freshness)[0]!;
+    const best = [...customer.projects].sort((a, b) => b.accuracy - a.accuracy)[0]!;
 
-    if (s.includes("chang") || s.includes("admv") || s.includes("week"))
-      return `Across ${stats.projects} ${customer.industry.toLowerCase()} datasets this cycle: ${fmt(stats.admv.added)} added, ${fmt(stats.admv.deleted)} deleted, ${fmt(stats.admv.modified)} modified and ${fmt(stats.admv.verified)} verified. Biggest mover: ${worst.name}.`;
-    if (s.includes("review"))
-      return `${fmt(stats.pendingReview)} records are pending review. Start with "${worst.name}" — ${fmt(worst.pendingReview)} pending. Open Dashboard → Review to approve batch by batch.`;
-    if (s.includes("accuracy") || s.includes("quality"))
-      return customer.projects.map((p) => `• ${p.name}: ${p.accuracy}% accuracy, ${p.coverage}% coverage`).join("\n");
-    if (s.includes("source") || s.includes("agent"))
-      return customer.projects
-        .map((p) => `• ${p.name} — ${p.sources.length} sources, ${p.frequency.toLowerCase()} agent, last run ${hrsAgo(p.lastRefreshHrs)}`)
-        .join("\n");
-    if (s.includes("download") || s.includes("export") || s.includes("sync"))
-      return `Once a review is completed, the Dashboard "Action needed" column turns into a Download button — or use Monitor to schedule a continuous sync to S3, Snowflake or the API.`;
-    if (s.includes("stale") || s.includes("fresh"))
-      return `Least fresh dataset is "${stale.name}" at ${stale.freshness}% freshness (last run ${hrsAgo(stale.lastRefreshHrs)}). Re-run it from Monitor.`;
-    return `I can help with ${customer.industry.toLowerCase()} data questions: what changed (ADMV), review priorities, dataset accuracy and coverage, source health and downloads.`;
+    const has = (...w: string[]) => w.some((x) => s.includes(x));
+
+    // ---- what FreDA is / how it works
+    if (has("what is freda", "what can you", "how does freda", "how do you work", "explain freda", "about freda", "help me use", "how to use"))
+      return {
+        text:
+          "FreDA — Fresh Data Automation — keeps the external data you rely on sourced, verified and refreshed on a schedule you control.\n\nHow it runs end to end:\n1. Source — agents are onboarded on the websites you trust (Playbooks → Agents).\n2. Extract — each run pulls only the datapoints your project defines.\n3. Validate — records are normalised, deduped and confidence scored.\n4. Review — you approve a sample batch by batch on the Dashboard.\n5. Deliver — approved records are downloadable or synced on a cadence.\n\nAsk me about any of those steps and I'll take you to the screen.",
+        nav: { to: "/", label: "Open Dashboard" },
+      };
+
+    if (has("navigate", "where do i", "which screen", "take me", "lost", "get started", "where to start"))
+      return {
+        text:
+          "Four places to know:\n• Dashboard — ADMV change signature, review by project, and the review workspace.\n• Monitor — job runs, automation status, failures and delivery.\n• Playbooks → Agents — the sources behind each project; add, retire, reschedule.\n• Playbooks → Solutions — packaged datasets to start a new project.\nPlus Request tracker for anything you've asked the FreDA team to build.\n\nTell me what you're trying to do and I'll point precisely.",
+        nav: { to: "/", label: "Open Dashboard" },
+      };
+
+    // ---- concepts
+    if (has("admv", "change signature"))
+      return {
+        text: `ADMV is how FreDA reports change on every run: Added, Deleted, Modified, Verified.\n\nThis cycle across ${stats.projects} datasets: ${fmt(stats.admv.added)} added, ${fmt(stats.admv.deleted)} deleted, ${fmt(stats.admv.modified)} modified, ${fmt(stats.admv.verified)} verified. Verified means re-checked and unchanged — that's the healthy majority.\n\nBiggest mover right now: ${worst.name}.`,
+        nav: { to: "/", label: "See ADMV on Dashboard" },
+      };
+
+    if (has("confidence", "sampling", "sample"))
+      return {
+        text:
+          "Every extracted record carries a confidence score. In the review workspace you set a minimum confidence and a sampling rate (2%–5% is typical) — FreDA then serves you a representative batch instead of all records. Approve or reject batch by batch; the review contour on the left tracks how much of the sample you've cleared.",
+        nav: { to: "/", label: "Open review" },
+      };
+
+    if (has("review", "approve", "pending"))
+      return {
+        text: `${fmt(stats.pendingReview)} records are waiting on you. Start with "${worst.name}" — ${fmt(worst.pendingReview)} pending.\n\nOn the Dashboard, hit Review on that project row. In the workspace you can filter by ADMV type or datapoint, set a confidence threshold, approve a whole batch, or approve all Added / Deleted / Modified at once. When the review completes, the same row turns into a Download button.`,
+        nav: { to: "/", label: "Review by project" },
+      };
+
+    if (has("accuracy", "quality", "coverage"))
+      return {
+        text:
+          `Quality by dataset:\n${customer.projects.map((p) => `• ${p.name} — ${p.accuracy}% accuracy · ${p.coverage}% coverage · ${p.freshness}% fresh`).join("\n")}\n\nStrongest: ${best.name}. Accuracy only lands once a review cycle is completed, so anything still running shows a dash.`,
+        nav: { to: "/", label: "See project table" },
+      };
+
+    if (has("stale", "fresh", "old data", "last run"))
+      return {
+        text: `Least fresh dataset is "${stale.name}" at ${stale.freshness}% freshness — last run ${hrsAgo(stale.lastRefreshHrs)}. Re-run it from Monitor, or tighten its cadence in Agents so it refreshes more often.`,
+        nav: { to: "/monitoring", label: "Open Monitor" },
+      };
+
+    if (has("source", "website", "url", "agent"))
+      return {
+        text:
+          `${customer.projects.map((p) => `• ${p.name} — ${p.sources.length} sources · ${p.frequency.toLowerCase()} agent · last run ${hrsAgo(p.lastRefreshHrs)}`).join("\n")}\n\nTo add or retire a source: Playbooks → Agents, pick the project, paste the URL and choose the attributes to extract. That raises a request; the FreDA team builds the bot and onboards it to your workspace.`,
+        nav: { to: "/playbooks/agents", label: "Manage sources" },
+      };
+
+    if (has("schedule", "cadence", "daily", "weekly", "monthly", "refresh"))
+      return {
+        text:
+          "Refresh cadence lives per project in Playbooks → Agents: Daily, Weekly, Monthly, or a custom rule (e.g. every 2 weeks, Tuesday 06:00 UTC). Saving it logs a request so your delivery lead can confirm the new run window. Live run status is on Monitor.",
+        nav: { to: "/playbooks/agents", label: "Set schedule" },
+      };
+
+    if (has("monitor", "job", "automation", "failed", "run status"))
+      return {
+        text:
+          "Monitor shows every scheduled job: last run, duration, records touched, failures and retries, plus delivery status for each destination. You can trigger a re-run for anything in scope from there.",
+        nav: { to: "/monitoring", label: "Open Monitor" },
+      };
+
+    if (has("download", "export", "sync", "deliver", "s3", "snowflake", "api"))
+      return {
+        text:
+          "Once a project's review is complete, the Action needed column on the Dashboard becomes a Download button (CSV/XLSX of approved records only). For continuous delivery, set up a sync to S3, Snowflake or the API from Monitor.",
+        nav: { to: "/monitoring", label: "Delivery & sync" },
+      };
+
+    if (has("solution", "dataset setup", "catalogue", "template"))
+      return {
+        text:
+          "Solutions are packaged datasets you can stand up without naming sources yourself. Pick a tile, then walk the setup: configure → upload → wired sources → attributes → schedule → launch. Launching raises a build request to the FreDA team.",
+        nav: { to: "/playbooks/solutions", label: "Browse Solutions" },
+      };
+
+    if (has("ticket", "request", "status of", "req"))
+      return {
+        text:
+          "Everything you ask for — new sources, schedule changes, new projects — becomes a REQ ticket. The Request tracker shows its stage: scoping, source access, bot build, QA, onboarding, handover.",
+        nav: { to: "/requests", label: "Open Request tracker" },
+      };
+
+    if (has("what changed", "chang", "week", "this cycle", "delta"))
+      return {
+        text: `Across ${stats.projects} ${customer.industry.toLowerCase()} datasets this cycle: ${fmt(stats.admv.added)} added, ${fmt(stats.admv.deleted)} deleted, ${fmt(stats.admv.modified)} modified and ${fmt(stats.admv.verified)} verified. Biggest mover: ${worst.name}. ${fmt(stats.pendingReview)} records are queued for your review.`,
+        nav: { to: "/", label: "Open Dashboard" },
+      };
+
+    return {
+      text:
+        `I can help with:\n• How FreDA works, end to end\n• What changed (ADMV) and what it means\n• What to review first and how sampling/confidence works\n• Source and schedule changes on your projects\n• Job health, delivery and downloads\n• Requesting a new project or solution\n\nAsk in your own words — e.g. "which dataset is stale?" or "how do I add a source?".`,
+    };
   }
+
 
   const FLOW_PROMPTS = [
     "Great — let's set it up. What should the new project or solution be called?",
