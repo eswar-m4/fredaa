@@ -27,6 +27,7 @@ from app.services.company_verification_service import (
 )
 from app.services.enrichment_service import enrichment_service
 from app.services.gemini_fallback_service import gemini_fallback_service, merge_ai_fallback_values
+from app.services.organization_url_service import resolve_organization_url_candidates
 from app.services.registry_scrapers.registry_orchestrator import registry_orchestrator
 from app.services.registry_scrapers.registry_capabilities import (
     REGISTRY_CAPABILITIES,
@@ -1436,6 +1437,17 @@ class WorkflowService:
                 "[Source Routing] skipping source=Company Website for Contact Enrichment (not selected)"
             )
             return {"url": "", "source": "disabled"}
+
+        hardcoded_candidates = resolve_organization_url_candidates(item or original)
+        if not hardcoded_candidates:
+            hardcoded_candidates = resolve_organization_url_candidates(original)
+        if hardcoded_candidates:
+            url = hardcoded_candidates[0]
+            logger.info(
+                "[Source Routing] executing source=Company Website for Contact Enrichment using hardcoded URL=%s",
+                url,
+            )
+            return {"url": url, "source": "hardcoded_organization_url", "candidates": hardcoded_candidates}
 
         website = item.get("discovered_website") or item.get("website") or original.get("website") or ""
         if website:

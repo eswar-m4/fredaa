@@ -53,7 +53,7 @@ type AdminSearch = {
 };
 
 export const Route = createFileRoute("/admin")({
-  head: () => ({ meta: [{ title: "Admin Console - FreshData AI" }] }),
+  head: () => ({ meta: [{ title: "Admin Console - Freda" }] }),
   validateSearch: (search: Record<string, unknown>): AdminSearch => {
     return {
       username: search.username ? String(search.username) : undefined,
@@ -172,7 +172,7 @@ function payloadString(row: AdminRequestRow, ...keys: string[]) {
 
 function displaySourceSubtitle(row: AdminRequestRow) {
   if (row.request_type === "By Dataset") {
-    return payloadString(row, "source_kind") || row.dataset_name || "By Dataset";
+    return payloadString(row, "source_kind") || row.dataset_name || "Solution";
   }
   if (row.source_kind) {
     return row.source_kind === "Partial Scrape" ? "Custom Scrape" : row.source_kind;
@@ -830,7 +830,7 @@ function AdminConsole() {
             <div className="flex items-center justify-between">
               <Button
                 variant="secondary"
-                onClick={() => navigate({ to: "/admin", search: (prev) => ({ ...prev, username: undefined }) })}
+                onClick={() => navigate({ to: "/admin", search: (prev: any) => ({ ...prev, username: undefined }) })}
                 className="gap-2 bg-secondary text-foreground hover:bg-accent"
               >
                 <ArrowLeft className="h-4 w-4" />
@@ -871,7 +871,7 @@ function AdminConsole() {
               <Button
                 variant={activeTab === "requests" ? "primary" : "secondary"}
                 size="sm"
-                onClick={() => navigate({ to: "/admin", search: (prev) => ({ ...prev, view: "requests" }) })}
+                onClick={() => navigate({ to: "/admin", search: (prev: any) => ({ ...prev, view: "requests" }) })}
                 className="gap-2"
               >
                 <Activity className="h-4 w-4" />
@@ -880,7 +880,7 @@ function AdminConsole() {
               <Button
                 variant={activeTab === "users" ? "primary" : "secondary"}
                 size="sm"
-                onClick={() => navigate({ to: "/admin", search: (prev) => ({ ...prev, view: "users" }) })}
+                onClick={() => navigate({ to: "/admin", search: (prev: any) => ({ ...prev, view: "users" }) })}
                 className="gap-2"
               >
                 <Users className="h-4 w-4" />
@@ -908,7 +908,7 @@ function AdminConsole() {
         {!activeUsername && activeTab === "users" && (
           <UserDirectoryTable
             users={usersSummary}
-            onSelectUser={(uname) => navigate({ to: "/admin", search: (prev) => ({ ...prev, username: uname }) })}
+            onSelectUser={(uname) => navigate({ to: "/admin", search: (prev: any) => ({ ...prev, username: uname }) })}
           />
         )}
 
@@ -921,8 +921,8 @@ function AdminConsole() {
                   <div className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Request type</div>
                   <Select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value as RequestTypeFilter)} className="h-10 bg-background border-input text-foreground">
                     <option value="All">All</option>
-                    <option value="By Source">By Source</option>
-                    <option value="By Dataset">By Dataset</option>
+                    <option value="By Source">Agents</option>
+                    <option value="By Dataset">Solutions</option>
                   </Select>
                 </div>
                 <div className="space-y-1">
@@ -996,27 +996,27 @@ function AdminConsole() {
             {(typeFilter === "All" || typeFilter === "By Source") && (
               <div className="space-y-4">
                 <RequestTable
-                  title={activeUsername ? `By Source requests for @${activeUsername}` : "By Source requests"}
+                  title={activeUsername ? `Agent requests for @${activeUsername}` : "Agent requests"}
                   rows={bySource}
                   headerRight={pendingBySource.length > 0 ? <Badge tone="warning">{pendingBySource.length} pending onboarding</Badge> : undefined}
                   onViewSummary={(row) => {
                     setSelected(row);
                     setDetailMode("overview");
                   }}
-                  onSelectUser={(uname) => navigate({ to: "/admin", search: (prev) => ({ ...prev, username: uname }) })}
+                  onSelectUser={(uname) => navigate({ to: "/admin", search: (prev: any) => ({ ...prev, username: uname }) })}
                 />
               </div>
             )}
 
             {(typeFilter === "All" || typeFilter === "By Dataset") && (
               <RequestTable
-                title={activeUsername ? `By Dataset requests for @${activeUsername}` : "By Dataset requests"}
+                title={activeUsername ? `Solution requests for @${activeUsername}` : "Solution requests"}
                 rows={byDataset}
                 onViewSummary={(row) => {
                   setSelected(row);
                   setDetailMode("overview");
                 }}
-                onSelectUser={(uname) => navigate({ to: "/admin", search: (prev) => ({ ...prev, username: uname }) })}
+                onSelectUser={(uname) => navigate({ to: "/admin", search: (prev: any) => ({ ...prev, username: uname }) })}
               />
             )}
           </>

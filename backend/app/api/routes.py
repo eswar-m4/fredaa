@@ -382,63 +382,18 @@ def get_job_records_from_db(job_id: str) -> Optional[Dict[str, Any]]:
                 filtered.append(r)
         return filtered
 
-    if "keysight" in source_lower:
-        from app.services.scrapers.keysight_scraper import scrape_keysight_products
-        filters = parse_criteria(filters_str)
-        records = scrape_keysight_products(filters)
-        
-    elif "webmd" in source_lower:
-        csv_path = os.path.join(base_dir, "sample_webmd.csv")
-        if os.path.exists(csv_path):
-            df = pd.read_csv(csv_path)
-            records = df.to_dict(orient="records")
-            for r in records:
-                for k, v in r.items():
-                    if pd.isna(v):
-                        r[k] = None
-                if scope in ("Partial Dump", "Custom Dump", "Custom"):
-                    filters = parse_criteria(filters_str)
-                    records = filter_records(records, filters)
-                
-    elif "investegate" in source_lower:
-        csv_path = os.path.join(base_dir, "sample_investegate.csv")
-        if os.path.exists(csv_path):
-            df = pd.read_csv(csv_path)
-            records = df.to_dict(orient="records")
-            for r in records:
-                for k, v in r.items():
-                    if pd.isna(v):
-                        r[k] = None
-            if scope in ("Partial Dump", "Custom Dump", "Custom"):
-                filters = parse_criteria(filters_str)
-                records = filter_records(records, filters)
-                
-    elif "turkeybrokers" in source_lower:
-        csv_path = os.path.join(base_dir, "sample_turkeybrokers.csv")
-        if os.path.exists(csv_path):
-            df = pd.read_csv(csv_path)
-            records = df.to_dict(orient="records")
-            for r in records:
-                for k, v in r.items():
-                    if pd.isna(v):
-                        r[k] = None
-            if scope in ("Partial Dump", "Custom Dump", "Custom"):
-                filters = parse_criteria(filters_str)
-                records = filter_records(records, filters)
-                
-    else:
-        # Custom source / New Source
-        records = [{
-            "url": source,
-            "title": f"Sample Crawled Title for {source}",
-            "meta_description": "Onboarded and crawled successfully",
-            "emails": ["info@example.com"],
-            "phone_numbers": ["+1 555-0199"],
-            "social_links": [],
-            "detected_company_name": source,
-            "detected_keywords": ["crawled", "verified"],
-            "page_text": "Sample visible page text parsed from company website"
-        }]
+    # Custom source / New Source
+    records = [{
+        "url": source,
+        "title": f"Sample Crawled Title for {source}",
+        "meta_description": "Onboarded and crawled successfully",
+        "emails": ["info@example.com"],
+        "phone_numbers": ["+1 555-0199"],
+        "social_links": [],
+        "detected_company_name": source,
+        "detected_keywords": ["crawled", "verified"],
+        "page_text": "Sample visible page text parsed from company website"
+    }]
             
     return {
         "run_id": job_id,

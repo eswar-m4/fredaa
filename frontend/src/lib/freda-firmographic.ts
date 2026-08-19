@@ -66,6 +66,7 @@ export const GEO_LABEL: Record<GeoId, string> = {
   namer: "North America",
   global: "Global",
 };
+
 export const SECTORS: Record<SectorId, Sector> = {
   tech: {
     id: "tech",
@@ -177,6 +178,7 @@ const CORE_ATTRIBUTES = [
   "Source URL",
   "Data verified date",
 ];
+
 /* --------------------------- request focus (intent) --------------------------- */
 
 export type Focus = "reviews" | "contact" | "locations" | "financial" | "people" | "tech" | "pricing";
@@ -268,6 +270,7 @@ export function attributeLibrary(sectorId: SectorId | null, focus: Focus[] = [])
     focus: focusAttrs,
   };
 }
+
 /* ------------------------------ the interview ------------------------------ */
 
 export type QuestionContext = { focus?: Focus[]; answers?: Answers };
@@ -368,6 +371,7 @@ export function buildQuestions(sectorId: SectorId | null, ctx: QuestionContext =
       });
     }
   }
+
   q.push({
     id: "core",
     text: lib.focus.length
@@ -412,6 +416,8 @@ export function profileLabels(sectorId: SectorId | null, ids: string[]): string[
 function slug(s: string) {
   return s.toLowerCase().replace(/\W+/g, "-");
 }
+
+
 /* -------------------------------- proposal -------------------------------- */
 
 export type WorkflowNode = { id: string; label: string; kind: "io" | "fetch" | "llm" | "filter" | "merge" };
@@ -468,6 +474,7 @@ const FRESH_LABEL: Record<string, string> = {
   annual: "Annual refresh",
   once: "One-time snapshot",
 };
+
 export function buildProposal(answers: Answers, requestLine: string, focus: Focus[] = []): Proposal {
   const pick = (id: string) => answers[id]?.[0] ?? "";
   const sectorId = (pick("sector") in SECTORS ? pick("sector") : "generic") as SectorId;
@@ -510,6 +517,7 @@ export function buildProposal(answers: Answers, requestLine: string, focus: Focu
   const extraSel = [...lib.sector, ...lib.focus].filter((a) => chosen.includes(slug(a)));
   const attributes = [...MANDATORY_ATTRIBUTES, ...optional];
 
+
   const freshId = pick("fresh") || "d30";
   const cadence = FRESH_CADENCE[freshId] ?? "Monthly";
 
@@ -523,6 +531,7 @@ export function buildProposal(answers: Answers, requestLine: string, focus: Focu
   ];
 
   const route: Proposal["route"] = universeMode === "upload" ? "openweb" : sectorId === "generic" ? "new" : "openweb";
+
   return {
     sector: s,
     title: requestLine.trim()
@@ -573,16 +582,18 @@ export function buildProposal(answers: Answers, requestLine: string, focus: Focu
     ],
   };
 }
+
 function buildWorkflow(validation: string, universeMode: string, hasExtra: boolean): WorkflowNode[] {
-  // Deliberately short - a readable process flow, not an engineering DAG.
+  // Deliberately short - a readable, high-level process flow, not an engineering DAG.
   return [
     { id: "input", label: universeMode === "upload" ? "Input list" : "Source discovery", kind: "io" },
-    { id: "fetch", label: "Fetch public pages", kind: "fetch" },
-    { id: "extract", label: hasExtra ? "Extract & enrich fields" : "Extract fields", kind: "llm" },
+    { id: "fetch", label: "Crawl & capture pages", kind: "fetch" },
+    { id: "extract", label: "AI-based extraction", kind: "llm" },
+    { id: "classify", label: hasExtra ? "Enrich & classify" : "Classify & score", kind: "llm" },
     { id: "normalise", label: "Normalise & dedupe", kind: "merge" },
     {
       id: "validate",
-      label: validation === "human" ? "Validate + human review" : "Validate against website",
+      label: validation === "human" ? "QC + human review" : "Validate & QC",
       kind: "filter",
     },
     { id: "output", label: "Export dataset", kind: "io" },

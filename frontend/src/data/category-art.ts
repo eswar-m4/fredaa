@@ -2,11 +2,11 @@
 // Gradient + icon + short vertical-specific language.
 
 export type CategoryArt = {
-  icon: string;
-  gradient: string;
-  accent: string;
-  chip: string;
-  blurb: string;
+  icon: string; // lucide icon name
+  gradient: string; // tailwind gradient classes
+  accent: string; // text colour on light chips
+  chip: string; // chip background
+  blurb: string; // vertical-specific language
 };
 
 export const CATEGORY_ART: Record<string, CategoryArt> = {

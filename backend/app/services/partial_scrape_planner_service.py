@@ -44,7 +44,18 @@ class PartialScrapePlannerService:
         capability = get_partial_scrape_capability(source_name)
         if capability is None:
             # Fall back to a generic field-filter capability if a source has not been registered yet.
-            capability = get_partial_scrape_capability(source_key) or next(iter(self._capabilities.values()))
+            capability = get_partial_scrape_capability(source_key)
+            if capability is None:
+                if self._capabilities:
+                    capability = next(iter(self._capabilities.values()))
+                else:
+                    from app.services.partial_scrape_capabilities import PartialScrapeCapability
+                    capability = PartialScrapeCapability(
+                        source_key=source_key,
+                        source_name=source_name,
+                        adapter_kind="field_filter",
+                        supported_fields=[],
+                    )
 
         request_text = (user_request or "").strip()
         if not request_text:
@@ -178,123 +189,6 @@ class PartialScrapePlannerService:
         }
 
     def _field_patterns(self, source_key: str) -> Dict[str, List[tuple[str, str]]]:
-        if source_key == "keysight":
-            return {
-                "category": [
-                    (r"\boscilloscope(s)?\b", "Oscilloscopes"),
-                    (r"\bprobe(s)?\b", "Probes"),
-                    (r"\bsignal generator(s)?\b", "Signal Generators"),
-                    (r"\bspectrum analyzer(s)?\b", "Spectrum Analyzers"),
-                    (r"\bpower supply(ies)?\b", "Power Supplies"),
-                ],
-                "product_family": [
-                    (r"\binfiniivision\b", "InfiniiVision Oscilloscopes"),
-                    (r"\btruevolt\b", "Truevolt Digital Multimeters"),
-                    (r"\btrueform\b", "Trueform Waveform Generators"),
-                ],
-                "product_series": [
-                    (r"\b3000t\b", "3000T X-Series"),
-                    (r"\b1000 x-series\b", "1000 X-Series"),
-                    (r"\b3000g x-series\b", "3000G X-Series"),
-                ],
-                "region": [
-                    (r"\bus\b|\bunited states\b|\ben-us\b", "US / English"),
-                    (r"\bca\b|\bcanada\b", "CA / English"),
-                    (r"\bgb\b|\buk\b|\bengland\b", "GB / English"),
-                ],
-                "sku": [(r"\b\d{4,}[a-z]?\b", lambda m: m.group(0).upper())],
-            }
-        if source_key == "webmd":
-            return {
-                "specialty": [
-                    (r"\bcardiolog(y|ist|ists)\b", "Cardiology"),
-                    (r"\bpediatr(ics|ician|icians)\b", "Pediatrics"),
-                    (r"\bfamily medicine\b", "Family Medicine"),
-                    (r"\binternal medicine\b", "Internal Medicine"),
-                    (r"\bnephrolog(y|ist|ists)\b", "Nephrology"),
-                    (r"\bpulmonolog(y|ist|ists)\b", "Pulmonology"),
-                ],
-                "state": [
-                    (r"\bcalifornia\b|\bca\b", "CA"),
-                    (r"\bflorida\b|\bfl\b", "FL"),
-                    (r"\bnew york\b|\bny\b", "NY"),
-                    (r"\btexas\b|\btx\b", "TX"),
-                    (r"\bnew jersey\b|\bnj\b", "NJ"),
-                    (r"\bpennsylvania\b|\bpa\b", "PA"),
-                ],
-                "city": [
-                    (r"\bchicago\b", "Chicago"),
-                    (r"\blos angeles\b", "Los Angeles"),
-                    (r"\bnew york\b", "New York"),
-                    (r"\bpittsburgh\b", "Pittsburgh"),
-                ],
-                "hospital_affiliations": [
-                    (r"\bhospital\b", "Hospital"),
-                    (r"\bupmc\b", "Upmc East"),
-                ],
-                "languages_spoken": [
-                    (r"\bspanish\b", "Spanish"),
-                    (r"\benglish\b", "English"),
-                    (r"\bfrench\b", "French"),
-                ],
-                "medical_school": [
-                    (r"\bmedical school\b", "Medical School"),
-                ],
-                "accepting_new_patients": [
-                    (r"\baccepting new patients\b|\bnew patients\b", "Yes"),
-                    (r"\bnot accepting\b", "No"),
-                ],
-                "medicare_accepted": [
-                    (r"\bmedicare\b", "Yes"),
-                ],
-                "medicaid_accepted": [
-                    (r"\bmedicaid\b", "Yes"),
-                ],
-            }
-        if source_key == "investegate":
-            return {
-                "ticker": [(r"\b[A-Z]{1,5}\b", lambda m: m.group(0).upper())],
-                "cik": [(r"\bcik\b|\bcentral index key\b", "CIK")],
-                "state_of_incorporation": [
-                    (r"\bdelaware\b|\bde\b", "DE"),
-                    (r"\bcalifornia\b|\bca\b", "CA"),
-                    (r"\bnew york\b|\bny\b", "NY"),
-                ],
-                "sic_description": [
-                    (r"\bfinancial services\b", "Financial Services"),
-                    (r"\btechnology\b", "Technology"),
-                    (r"\bhealthcare\b", "Healthcare"),
-                    (r"\benergy\b", "Energy"),
-                    (r"\bindustrials\b", "Industrials"),
-                ],
-                "filing_type": [
-                    (r"\b10-k\b", "10-K"),
-                    (r"\b10-q\b", "10-Q"),
-                    (r"\b8-k\b", "8-K"),
-                ],
-                "entity_name": [
-                    (r"\bcompany name\b", "Company"),
-                ],
-            }
-        if source_key == "turkeybrokers":
-            return {
-                "city": [
-                    (r"\bistanbul\b", "Istanbul"),
-                    (r"\bankara\b", "Ankara"),
-                    (r"\bizmir\b", "Izmir"),
-                    (r"\bbursa\b", "Bursa"),
-                    (r"\bantalya\b", "Antalya"),
-                    (r"\badana\b", "Adana"),
-                ],
-                "address": [
-                    (r"\baddress\b", "Address"),
-                    (r"\bstreet\b", "Street"),
-                ],
-                "primarykey": [
-                    (r"\bbroker\b", "Broker"),
-                    (r"\bbrokerage\b", "Brokerage"),
-                ],
-            }
         return {}
 
     def _extract_keywords(self, lower: str) -> Dict[str, List[str]]:

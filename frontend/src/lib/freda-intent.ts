@@ -33,6 +33,7 @@ const GEO_HINTS: Record<GeoId, string[]> = {
   namer: ["north america", "canada"],
   global: ["global", "worldwide", "all countries"],
 };
+
 const FRESH_HINTS: Record<string, string[]> = {
   rt: ["real time", "real-time", "daily", "continuous", "every day"],
   d7: ["weekly", "every week"],
@@ -72,6 +73,7 @@ const FOCUS_HINTS: Record<Focus, string[]> = {
   tech: ["tech stack", "technology stack", "cms", "analytics", "hosting"],
   pricing: ["price", "prices", "pricing", "tariff", "tariffs", "menu", "packages", "plans"],
 };
+
 /** Star / class hints that answer the sector "type" question up front. */
 const PROFILE_HINTS: { words: string[]; label: string }[] = [
   { words: ["5 star", "five star", "luxury"], label: "5-star / luxury" },
@@ -86,6 +88,18 @@ const PROFILE_HINTS: { words: string[]; label: string }[] = [
 
 const slugify = (s: string) => s.toLowerCase().replace(/\W+/g, "-");
 
+/** Which data family the request belongs to - drives which questionnaire runs. */
+export type Family = "firmographic" | "product";
+
+const PRODUCT_WORDS = [
+  "product price", "product pricing", "product prices", "product data", "product catalogue", "product catalog",
+  "sku", "skus", "asin", "mrp", "buy box", "buybox", "listing", "listings", "marketplace", "marketplaces",
+  "ecommerce", "e-commerce", "catalogue", "catalog", "price comparison", "competitor pricing", "price monitoring",
+  "price tracking", "out of stock", "stock availability", "deal", "deals", "discount", "discounts",
+];
+
+const MARKETPLACE_WORDS = ["amazon", "flipkart", "walmart", "ebay", "target", "best buy", "myntra", "ajio", "bigbasket", "blinkit", "google shopping", "shopify", "etsy", "alibaba"];
+
 export type Intent = {
   raw: string;
   answers: Answers;
@@ -93,6 +107,8 @@ export type Intent = {
   captured: { label: string; value: string }[];
   /** what the user is actually after - drives which questions and fields appear */
   focus: Focus[];
+  /** firmographic vs product & pricing */
+  family: Family;
   /** agents already onboarded that match sites the user named */
   agentHits: { site: string; hit: OnboardedHit }[];
   /** sites the user named that are not onboarded yet */
@@ -101,6 +117,8 @@ export type Intent = {
   outOfScope: boolean;
   topN: number | null;
 };
+
+
 
 const escape = (w: string) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 /** whole-word match so "chennai" never matches "ai" and "start" never matches "startup" */
@@ -123,10 +141,117 @@ function detectSites(text: string) {
   }
   return [...found];
 }
+
+export function detectFamily(raw: string): Family {
+  const text = ` ${raw.toLowerCase()} `;
+  const productish = score(text, PRODUCT_WORDS) + score(text, MARKETPLACE_WORDS);
+  const priceish = has(text, ["price", "prices", "pricing", "cost", "costs"]);
+  // "amazon pricing", "sku catalogue", "competitor price monitoring" -> product family
+  if (productish >= 2) return "product";
+  if (productish === 1 && priceish) return "product";
+  return "firmographic";
+}
+
+/** Pre-fills for the product & pricing questionnaire. */
+function readProductAnswers(text: string) {
+  const answers: Answers = {};
+  const captured: { label: string; value: string }[] = [];
+
+  const markets = MARKETPLACE_WORDS.filter((m) => wordRe(m).test(text)).map((m) =>
+    m.replace(/\b\w/g, (c) => c.toUpperCase()),
+  );
+  if (markets.length) {
+    answers["pmarket"] = markets.map(slugify);
+    captured.push({ label: "Marketplaces", value: markets.join(", ") });
+  }
+
+  const CATS: [string, string[]][] = [
+    ["Electronics & appliances", ["electronics", "mobile", "mobiles", "phone", "phones", "laptop", "laptops", "appliance", "appliances", "tv"]],
+    ["Fashion & apparel", ["fashion", "apparel", "clothing", "footwear", "shoes"]],
+    ["Grocery & FMCG", ["grocery", "groceries", "fmcg", "food"]],
+    ["Home & furniture", ["furniture", "home decor", "kitchenware"]],
+    ["Beauty & personal care", ["beauty", "cosmetics", "skincare", "personal care"]],
+    ["Health & pharma", ["pharma", "medicine", "medicines", "supplements"]],
+    ["Toys, baby & games", ["toys", "baby", "games"]],
+    ["Books & media", ["books", "media"]],
+    ["Auto parts & accessories", ["auto parts", "spare parts", "tyres", "accessories"]],
+    ["Industrial / MRO", ["industrial", "mro", "tools"]],
+  ];
+  const cats = CATS.filter(([, w]) => has(text, w)).map(([label]) => label);
+  if (cats.length) {
+    answers["pcategory"] = cats.map(slugify);
+    captured.push({ label: "Categories", value: cats.join(", ") });
+  }
+
+  const GEOS: [string, string, string[]][] = [
+    ["india", "India", ["india", "indian", ".in", "flipkart", "myntra", "bigbasket", "blinkit"]],
+    ["us", "United States", ["usa", "u.s.", "united states", "america"]],
+    ["uk", "United Kingdom", ["uk", "united kingdom", "britain"]],
+    ["emea", "Europe / EMEA", ["europe", "emea"]],
+    ["apac", "APAC", ["apac", "singapore", "australia"]],
+  ];
+  const geo = GEOS.find(([, , w]) => has(text, w));
+  if (geo) {
+    answers["pgeo"] = [geo[0]];
+    captured.push({ label: "Storefront", value: geo[1] });
+  }
+
+  if (has(text, ["my list", "our list", "sku list", "asin list", "url list", "i have a list"])) {
+    answers["pscope"] = ["list"];
+    captured.push({ label: "Product scope", value: "Your SKU / ASIN list" });
+  } else if (has(text, ["best seller", "best sellers", "bestseller", "bestsellers", "top ranked", "top selling"])) {
+    answers["pscope"] = ["bestseller"];
+    captured.push({ label: "Product scope", value: "Best-sellers / top-ranked" });
+  } else if (has(text, ["category", "categories", "browse node", "entire catalogue", "entire catalog"])) {
+    answers["pscope"] = ["category"];
+    captured.push({ label: "Product scope", value: "Full category / browse node" });
+  }
+
+  const fields = ["Selling price", "MRP / list price", "Discount %"];
+  if (has(text, ["price", "prices", "pricing"])) {
+    answers["pfields"] = fields.map(slugify);
+    captured.push({ label: "Fields", value: fields.join(", ") });
+  }
+
+  return { answers, captured };
+}
+
 export function readIntent(raw: string): Intent {
   const text = ` ${raw.toLowerCase()} `;
   const answers: Answers = {};
   const captured: { label: string; value: string }[] = [];
+  const family = detectFamily(raw);
+
+  // named sites -> already-onboarded agents (same for every family)
+  const resolveSites = () => {
+    const agentHits: Intent["agentHits"] = [];
+    const newSites: string[] = [];
+    for (const s of detectSites(raw)) {
+      const hit = lookupOnboarded(s);
+      if (hit) agentHits.push({ site: s, hit });
+      else newSites.push(s);
+    }
+    return { agentHits, newSites };
+  };
+
+  if (family === "product") {
+    const p = readProductAnswers(text);
+    const { agentHits, newSites } = resolveSites();
+    return {
+      raw,
+      answers: p.answers,
+      captured: p.captured,
+      focus: ["pricing"],
+      family,
+      agentHits,
+      newSites,
+      outOfScope: false,
+      topN: null,
+    };
+  }
+
+
+
 
   // industry - pick the sector with the most whole-word hits, not the first one
   let sector: SectorId | null = null;
@@ -176,6 +301,7 @@ export function readIntent(raw: string): Intent {
     answers["geo"] = city ? [OTHER_PREFIX + geoWord.replace(/\b\w/g, (c) => c.toUpperCase())] : [geo];
     captured.push({ label: "Geography", value: city ? geoWord.replace(/\b\w/g, (c) => c.toUpperCase()) : GEO_LABEL[geo] });
   }
+
   // refresh frequency
   for (const [id, words] of Object.entries(FRESH_HINTS)) {
     if (has(text, words)) {
@@ -221,6 +347,7 @@ export function readIntent(raw: string): Intent {
   // what the user is actually after
   const focus = (Object.keys(FOCUS_HINTS) as Focus[]).filter((f) => has(text, FOCUS_HINTS[f]));
   if (focus.length) captured.push({ label: "Looking for", value: focus.map((f) => FOCUS_LABEL[f]).join(", ") });
+
   // type / class (star rating, facility type, ...)
   const profiles = PROFILE_HINTS.filter((p) => has(text, p.words));
   if (profiles.length) {
@@ -235,15 +362,9 @@ export function readIntent(raw: string): Intent {
     captured.push({ label: "Attributes", value: attrs.map((a) => a.label).join(", ") });
   }
 
+
   // named sites -> already-onboarded agents
-  const sites = detectSites(raw);
-  const agentHits: Intent["agentHits"] = [];
-  const newSites: string[] = [];
-  for (const s of sites) {
-    const hit = lookupOnboarded(s);
-    if (hit) agentHits.push({ site: s, hit });
-    else newSites.push(s);
-  }
+  const { agentHits, newSites } = resolveSites();
 
   const outOfScope = has(text, [
     "personal email",
@@ -257,7 +378,7 @@ export function readIntent(raw: string): Intent {
     "cv database",
   ]);
 
-  return { raw, answers, captured, focus, agentHits, newSites, outOfScope, topN };
+  return { raw, answers, captured, focus, family, agentHits, newSites, outOfScope, topN };
 }
 
 /** Short, on-topic reply for anything the interview does not cover. */

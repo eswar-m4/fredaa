@@ -21,6 +21,10 @@ from app.core.logger import setup_logger
 from app.services.confidence_explainability_service import confidence_explainability_service
 from app.services.record_comparison_service import record_comparison_service
 from app.services.firmographic_profile_service import get_firmographic_profile, overlay_profile
+from app.services.organization_url_service import (
+    resolve_organization_url,
+    resolve_organization_url_candidates,
+)
 from app.services.scrapers.website_scraper import fetch_website_metadata, _score_match, _extract_domain
 from app.services.source_trust_service import source_trust_service
 from app.services.website_candidate_scoring_service import website_candidate_scoring_service
@@ -262,6 +266,7 @@ def normalize_workflow_record(record: Any) -> Dict[str, Any]:
         }
 
     rec = dict(record) if isinstance(record, dict) else {"company": str(record)}
+
     company = (
         rec.get("company")
         or rec.get("company_name")
@@ -270,7 +275,25 @@ def normalize_workflow_record(record: Any) -> Dict[str, Any]:
         or rec.get("organization")
         or ""
     )
-    website = rec.get("website") or rec.get("domain") or rec.get("url") or ""
+    website = resolve_organization_url(rec)
+    if not website:
+        for candidate in (
+            rec.get("website"),
+            rec.get("website_url"),
+            rec.get("url"),
+            rec.get("domain"),
+            rec.get("ref_url"),
+            rec.get("ref url"),
+            rec.get("reference_url"),
+            rec.get("reference url"),
+            rec.get("source_url"),
+            rec.get("source url"),
+            rec.get("main_url_address"),
+            rec.get("main url address"),
+        ):
+            if candidate not in (None, "", [], {}):
+                website = candidate
+                break
     if isinstance(website, str) and website.strip().lower() in ("null", "none", "n/a"):
         website = ""
 
@@ -334,10 +357,51 @@ class CompanyVerificationService:
         matched_fields: List[str] = []
 
         try:
+            hardcoded_candidates = resolve_organization_url_candidates(rec)
             raw_website = rec.get("website") or ""
             email_domain = _domain_from_email(rec.get("email") or "")
 
-            if identity:
+            if hardcoded_candidates:
+                for candidate_url in hardcoded_candidates:
+                    try:
+                        logger.info(
+                            "[Metadata Scraping] using hardcoded organization URL for %s: %s",
+                            company,
+                            candidate_url,
+                        )
+                        candidate_metadata = await asyncio.wait_for(
+                            fetch_website_metadata(candidate_url),
+                            timeout=SCRAPE_TIMEOUT,
+                        )
+                        if candidate_metadata:
+                            scrape_confidence, candidate_matches = _score_match(rec, candidate_metadata)
+                            if scrape_confidence > 0 or candidate_metadata.get("url"):
+                                selected_url = candidate_metadata.get("url") or candidate_url
+                                selected_domain = _extract_domain(selected_url)
+                                scraped_metadata = candidate_metadata
+                                confidence = scrape_confidence
+                                matched_fields = candidate_matches
+                                scored_candidates = [
+                                    {
+                                        "url": selected_url,
+                                        "domain": selected_domain,
+                                        "confidence": confidence,
+                                        "score_breakdown": {"hardcoded_mapping": confidence},
+                                        "verified": confidence >= 75,
+                                        "title": candidate_metadata.get("title"),
+                                        "snippet": "Mapped organization URL",
+                                    }
+                                ]
+                                discovery_used = False
+                                break
+                    except Exception as exc:
+                        logger.warning(
+                            "[Metadata Scraping] hardcoded URL failed for %s: %s",
+                            candidate_url,
+                            exc,
+                        )
+
+            if not scraped_metadata and identity and not raw_website:
                 discovery_used = True
                 candidates = await website_discovery_service.discover(
                     identity,
@@ -498,7 +562,7 @@ class CompanyVerificationService:
                             confidence = 0
                             matched_fields = []
                             verification_failed = True
-            elif raw_website:
+            elif raw_website and not scraped_metadata:
                 logger.info(
                     "[Metadata Scraping] no company identifier; validating uploaded website only: %s",
                     raw_website,

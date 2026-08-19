@@ -47,34 +47,273 @@ _GENERAL_PUBLIC_DOMAINS = [
 ]
 
 _FIELD_ALIASES = {
-    "company_name": ("company_name", "legal_name", "entity_name", "name", "organization", "detected_company_name"),
+    "company_name": ("company_name", "co_name", "legal_name", "entity_name", "name", "organization", "detected_company_name"),
     "website": ("website", "website_url", "company_website", "homepage", "homepage_url", "url", "domain", "source_url"),
-    "description": ("description", "meta_description", "summary", "overview", "about", "company_description"),
+    "description": ("description", "meta_description", "summary", "overview", "about", "company_description", "business_descrip", "extended_business_desc"),
     "tagline": ("tagline", "slogan", "motto", "strapline"),
     "logo_url": ("logo_url", "logo", "brand_logo_url"),
+    "former_name": ("former_name", "co_former_name", "previous_name", "alias_name"),
+    "former_name_date": ("former_name_date", "co_former_name_date"),
+    "note_1": ("note_1", "co_note1", "note1"),
+    "note_2": ("note_2", "co_note2", "note2"),
     "year_founded": ("year_founded", "founded_year", "incorporation_year", "founding_year"),
-    "company_type": ("company_type", "entity_type", "business_type"),
+    "company_type": ("company_type", "entity_type", "business_type", "co_type"),
     "ownership": ("ownership", "ownership_type", "ownership_status"),
     "industry": ("industry", "sector", "vertical", "category"),
     "sub_industry": ("sub_industry", "subsector", "sub_sector", "niche"),
-    "employee_count": ("employee_count", "employees", "headcount"),
+    "employee_count": ("employee_count", "employees", "headcount", "nbr_employees"),
     "employee_range": ("employee_range", "company_size", "size"),
-    "hq_address": ("hq_address", "headquarters", "address", "registered_office_address", "business_address", "mailing_address"),
+    "hq_address": ("hq_address", "headquarters", "address", "registered_office_address", "business_address"),
     "hq_city": ("hq_city", "city", "headquarters_city"),
     "hq_state": ("hq_state", "state", "province", "region", "headquarters_state"),
     "hq_country": ("hq_country", "country", "headquarters_country"),
+    "postal_code": ("postal_code", "zip", "postal_code1", "postal_code2", "postal_code3", "postalcode", "postcode"),
     "phone": ("phone", "phone_number", "contact_phone", "possible_phone", "telephone", "mobile"),
+    "fax": ("fax", "fax_number"),
+    "toll_free": ("toll_free", "toll_free_number", "tollfree"),
     "email": ("email", "email_address", "contact_email", "possible_email", "mail"),
     "linkedin_url": ("linkedin_url", "linkedin", "linkedin_profile", "contact_linkedin"),
     "twitter_url": ("twitter_url", "twitter_handle", "x_url"),
     "facebook_url": ("facebook_url", "facebook"),
+    "youtube_url": ("youtube_url", "youtube", "youtube_channel", "youtube_url_1"),
     "cms": ("cms", "content_management_system"),
     "analytics": ("analytics", "analytics_platform"),
     "frameworks": ("frameworks", "frontend_frameworks", "frontend_stack"),
     "hosting": ("hosting", "host", "hosting_provider"),
     "tech_stack": ("tech_stack", "technology_stack", "stack"),
-    "registry_number": ("registry_number", "cik", "cin", "lei", "vat_number", "tax_id"),
+    "registry_number": ("registry_number", "cik", "cin", "lei", "vat_number", "tax_id", "co_ent_nbr", "entity_number"),
+    "ultimate_parent_entity_number": ("ultimate_parent_entity_number", "ultimate_parent_entnbr", "ultimate_parent_ent_nbr"),
+    "ultimate_parent_name": ("ultimate_parent_name", "ultimate_parent"),
+    "immediate_parent_entity_number": ("immediate_parent_entity_number", "immediate_parent_entnbr", "immediate_parent_ent_nbr"),
+    "immediate_parent_name": ("immediate_parent_name", "immediate_parent"),
+    "address_line1": ("address_line1", "address1", "street_address1", "street_address", "hq_address_line1"),
+    "address_line2": ("address_line2", "address2", "street_address2"),
+    "address_line3": ("address_line3", "address3", "street_address3"),
+    "mailing_address_line1": ("mailing_address_line1", "mailing_address1"),
+    "mailing_address_line2": ("mailing_address_line2", "mailing_address2"),
+    "mailing_address_line3": ("mailing_address_line3", "mailing_address3"),
+    "mailing_postal_code1": ("mailing_postal_code1", "mailing_postalcode1", "mailing_zip"),
+    "mailing_postal_code2": ("mailing_postal_code2", "mailing_postal_code2"),
+    "mailing_postal_code3": ("mailing_postal_code3", "mailing_postal_code3"),
+    "mailing_city": ("mailing_city", "mail_city"),
+    "mailing_state": ("mailing_state", "mail_state"),
+    "mailing_province": ("mailing_province",),
+    "mailing_country": ("mailing_country", "mail_country"),
+    "state_incorporated": ("state_incorporated", "state_incorp", "incorporation_state"),
+    "ownership_percentage": ("ownership_percentage", "percentage_owned"),
+    "fiscal_year_end_date": ("fiscal_year_end_date", "fiscal_yr_end_date"),
+    "fye_mmdd": ("fye_mmdd",),
+    "revenue_type": ("revenue_type",),
+    "annual_revenue": ("annual_revenue", "sales", "revenue"),
+    "net_income": ("net_income",),
+    "assets": ("assets",),
+    "liabilities": ("liabilities",),
+    "net_worth": ("net_worth",),
+    "lower_sales_range": ("lower_sales_range",),
+    "upper_sales_range": ("upper_sales_range",),
+    "ticker": ("ticker",),
+    "stock_exchange_1": ("stock_exchange_1", "stock_exchange1"),
+    "exchange_desc_1": ("exchange_desc_1", "exchange_desc1"),
+    "stock_exchange_2": ("stock_exchange_2", "stock_exchange2"),
+    "exchange_desc_2": ("exchange_desc_2", "exchange_desc2"),
+    "stock_exchange_3": ("stock_exchange_3", "stock_exchange3"),
+    "exchange_desc_3": ("exchange_desc_3", "exchange_desc3"),
+    "stock_exchange_4": ("stock_exchange_4", "stock_exchange4"),
+    "exchange_desc_4": ("exchange_desc_4", "exchange_desc4"),
+    "stock_exchange_5": ("stock_exchange_5", "stock_exchange5"),
+    "exchange_desc_5": ("exchange_desc_5", "exchange_desc5"),
+    "stock_exchange_6": ("stock_exchange_6", "stock_exchange6"),
+    "exchange_desc_6": ("exchange_desc_6", "exchange_desc6"),
+    "cusip_number": ("cusip_number", "cusip_nbr"),
+    "pension_ending_date": ("pension_ending_date",),
+    "nbr_employee_benefits": ("nbr_employee_benefits",),
+    "pension_assets": ("pension_assets",),
+    "pension_type_1": ("pension_type_1", "pension_type1"),
+    "pension_type_2": ("pension_type_2", "pension_type2"),
+    "pension_type_3": ("pension_type_3", "pension_type3"),
+    "pension_type_4": ("pension_type_4", "pension_type4"),
+    "pension_type_5": ("pension_type_5", "pension_type5"),
+    "pension_type_6": ("pension_type_6", "pension_type6"),
+    "business_description": ("business_description", "business_descrip", "extended_business_desc"),
+    "extended_business_description": ("extended_business_description", "extended_business_desc"),
+    "primary_naics_code": ("primary_naics_code", "primary_naics_code1", "naics_code"),
+    "last_update": ("last_update",),
+    "isin_number": ("isin_number", "isin_nbr"),
+    "fein_number": ("fein_number", "fein_nbr"),
+    "cengage_fdr_id": ("cengage_fdr_id", "fdrid"),
+    "cengage_organization_name": (
+        "cengage_organization_name",
+        "fdr_organization_name",
+        "organization_name",
+        "organization_name_a",
+        "organization_name_b",
+    ),
+    "cengage_physical_street": (
+        "cengage_physical_street",
+        "fdr_physical_street",
+        "physical_street",
+        "physical_street_a",
+        "physical_street_b",
+    ),
+    "cengage_organization_category": ("cengage_organization_category", "organization_category", "organization_category_a", "organization_category_b"),
+    "cengage_organization_status": ("cengage_organization_status", "organization_status", "organization_status_a", "organization_status_b"),
+    "cengage_organization_name_type": ("cengage_organization_name_type", "organization_name_type", "organization_name_type_a", "organization_name_type_b"),
+    "cengage_acronym": ("cengage_acronym", "acronym", "acronym_a", "acronym_b"),
+    "cengage_organization_relationship_type": (
+        "cengage_organization_relationship_type",
+        "organization_relationship_type",
+        "organization_relationship_type_a",
+        "organization_relationship_type_b",
+    ),
+    "cengage_inception_date": ("cengage_inception_date", "inception_date", "inception_date_a", "inception_date_b"),
+    "cengage_main_url_address": ("cengage_main_url_address", "main_url_address", "main_url_address_a", "main_url_address_b"),
+    "cengage_location_type": ("cengage_location_type", "location_type", "location_type_a", "location_type_b"),
+    "cengage_address_status": ("cengage_address_status", "address_status", "address_status_a", "address_status_b"),
+    "cengage_mailing_street": ("cengage_mailing_street", "mailing_street", "mailing_street_a", "mailing_street_b"),
+    "cengage_mailing_city": ("cengage_mailing_city", "mailing_city", "mailing_city_a", "mailing_city_b"),
+    "cengage_mailing_state": ("cengage_mailing_state", "mailing_state", "mailing_state_a", "mailing_state_b"),
+    "cengage_mailing_country": ("cengage_mailing_country", "mailing_country", "mailing_country_a", "mailing_country_b"),
+    "cengage_mailing_postal1": ("cengage_mailing_postal1", "mailing_postal1", "mailing_postal1_a", "mailing_postal1_b"),
+    "cengage_mailing_subdivision": ("cengage_mailing_subdivision", "mailing_subdivision", "mailing_subdivision_a", "mailing_subdivision_b"),
+    "cengage_physical_city": ("cengage_physical_city", "physical_city", "physical_city_a", "physical_city_b"),
+    "cengage_physical_state": ("cengage_physical_state", "physical_state", "physical_state_a", "physical_state_b"),
+    "cengage_physical_country": ("cengage_physical_country", "physical_country", "physical_country_a", "physical_country_b"),
+    "cengage_physical_postal1": ("cengage_physical_postal1", "physical_postal1", "physical_postal1_a", "physical_postal1_b"),
+    "cengage_physical_subdivision": ("cengage_physical_subdivision", "physical_subdivision", "physical_subdivision_a", "physical_subdivision_b"),
+    "cengage_english_spoken": ("cengage_english_spoken", "english_spoken", "english_spoken_a", "english_spoken_b"),
+    "cengage_status": ("cengage_status", "status"),
+    "cengage_variant_name": ("cengage_variant_name", "variant_name", "variant_name_a", "variant_name_b"),
+    "cengage_prefix": ("cengage_prefix", "prefix", "prefix_a", "prefix_b"),
+    "cengage_first_name": ("cengage_first_name", "first_name", "first_name_a", "first_name_b"),
+    "cengage_middle_name": ("cengage_middle_name", "middle_name", "middle_name_a", "middle_name_b"),
+    "cengage_last_name": ("cengage_last_name", "last_name", "last_name_a", "last_name_b"),
+    "cengage_suffix": ("cengage_suffix", "suffix", "suffix_a", "suffix_b"),
+    "cengage_employee_title": ("cengage_employee_title", "employee_title", "employee_title_a", "employee_title_b"),
+    "cengage_employee_title_text": ("cengage_employee_title_text", "employee_title_text", "employee_title_text_a", "employee_title_text_b"),
+    "cengage_email_address": ("cengage_email_address", "email_address", "email_address_a", "email_address_b"),
+    "cengage_final_status": ("cengage_final_status", "final_status"),
+    "cengage_phone_type": ("cengage_phone_type", "phone_type", "phonetype", "phone_type_a", "phone_type_b"),
+    "cengage_country_calling_code": ("cengage_country_calling_code", "country_calling_code", "country_calling_code_a", "country_calling_code_b"),
+    "cengage_city_code": ("cengage_city_code", "city_code", "city_code_a", "city_code_b"),
+    "cengage_area_code": ("cengage_area_code", "area_code", "area_code_a", "area_code_b"),
+    "cengage_phone_number": ("cengage_phone_number", "phone_number", "phone_number_a", "phone_number_b"),
+    "cengage_phone_text": ("cengage_phone_text", "phone_text", "phone_text_a", "phone_text_b"),
+    "cengage_social_media_type": ("cengage_social_media_type", "social_media_type", "social_media_type_a", "social_media_type_b"),
+    "cengage_social_media_handle": ("cengage_social_media_handle", "social_media_handle", "social_media_handle_a", "social_media_handle_b"),
+    "cengage_url_address": ("cengage_url_address", "url_address", "url_address_a", "url_address_b"),
 }
+
+_FIELD_ALIAS_GROUPS: List[tuple[str, ...]] = []
+_FIELD_ALIAS_LOOKUP: Dict[str, str] = {}
+
+
+def _ensure_alias_indexes() -> None:
+    if _FIELD_ALIAS_GROUPS and _FIELD_ALIAS_LOOKUP:
+        return
+    if _FIELD_ALIAS_GROUPS or _FIELD_ALIAS_LOOKUP:
+        _FIELD_ALIAS_GROUPS.clear()
+        _FIELD_ALIAS_LOOKUP.clear()
+    for canonical_name, aliases in _FIELD_ALIASES.items():
+        group = tuple(dict.fromkeys((canonical_name, *aliases)))
+        _FIELD_ALIAS_GROUPS.append(group)
+        canonical_norm = _normalize_key(canonical_name)
+        for alias_name in group:
+            alias_norm = _normalize_key(alias_name)
+            if alias_norm:
+                _FIELD_ALIAS_LOOKUP[alias_norm] = canonical_norm
+
+
+def _expand_aliases(value: Any) -> List[str]:
+    _ensure_alias_indexes()
+    normalized = _normalize_key(value)
+    if not normalized:
+        return []
+    canonical_norm = _FIELD_ALIAS_LOOKUP.get(normalized, normalized)
+    for group in _FIELD_ALIAS_GROUPS:
+        if canonical_norm == _normalize_key(group[0]):
+            return [_normalize_key(item) for item in group if _normalize_key(item)]
+    return [normalized]
+
+
+def _field_matches_requested(field: Any, requested_fields: List[str]) -> bool:
+    _ensure_alias_indexes()
+    if not requested_fields:
+        return True
+    field_norms = set(_expand_aliases(field))
+    if not field_norms:
+        return False
+    requested_norms: set[str] = set()
+    for requested_field in requested_fields:
+        requested_norms.update(_expand_aliases(requested_field))
+        requested_norm = _normalize_key(requested_field)
+        if requested_norm:
+            requested_norms.add(requested_norm)
+    return bool(field_norms.intersection(requested_norms))
+
+
+def _alias_hints(field: Any) -> List[str]:
+    _ensure_alias_indexes()
+    field_norm = _normalize_key(field)
+    if not field_norm:
+        return []
+    canonical_norm = _FIELD_ALIAS_LOOKUP.get(field_norm, field_norm)
+    for group in _FIELD_ALIAS_GROUPS:
+        group_norm = _normalize_key(group[0])
+        if group_norm != canonical_norm:
+            continue
+        return [item for item in group if _normalize_key(item) and _normalize_key(item) != field_norm]
+    return []
+
+
+def _should_skip_ai_field(field: Any) -> bool:
+    field_norm = _normalize_key(field)
+    if not field_norm:
+        return True
+    if field_norm.startswith("disposition_"):
+        return True
+    return field_norm in {"fdrid", "final_status"}
+
+
+def _discover_record_fields(records: List[Dict[str, Any]]) -> List[str]:
+    discovered: List[str] = []
+    seen: set[str] = set()
+    for record in records:
+        if not isinstance(record, dict):
+            continue
+        for key, value in record.items():
+            if str(key).startswith("_"):
+                continue
+            if _should_skip_ai_field(key):
+                continue
+            if _is_blank_like(value):
+                key_norm = _normalize_key(key)
+                if not key_norm:
+                    continue
+                if key_norm in seen:
+                    continue
+                seen.add(key_norm)
+                discovered.append(str(key))
+                continue
+            for alias_name in _alias_hints(key):
+                alias_norm = _normalize_key(alias_name)
+                if not alias_norm or alias_norm in seen:
+                    continue
+                seen.add(alias_norm)
+                discovered.append(alias_name)
+    return discovered
+
+
+def _merge_field_lists(*lists: List[str]) -> List[str]:
+    merged: List[str] = []
+    seen: set[str] = set()
+    for items in lists:
+        for item in items:
+            normalized = _normalize_key(item)
+            if not normalized or normalized in seen:
+                continue
+            seen.add(normalized)
+            merged.append(str(item).strip())
+    return merged
 
 
 def _normalize_key(value: Any) -> str:
@@ -196,10 +435,9 @@ def _summarize_record(record: Dict[str, Any], requested_fields: List[str]) -> Di
         summary["source_evidence"] = source_evidence
 
     if requested_fields:
-        requested_lookup = {_normalize_key(field) for field in requested_fields}
         filtered: Dict[str, Any] = {}
         for key, value in summary.items():
-            if key == "source_evidence" or _normalize_key(key) in requested_lookup:
+            if key == "source_evidence" or _field_matches_requested(key, requested_fields):
                 filtered[key] = value
         for key in ("company_name", "legal_name", "website", "website_url", "source", "source_name", "domain", "country", "registry_number", "ticker"):
             if key in summary:
@@ -209,7 +447,10 @@ def _summarize_record(record: Dict[str, Any], requested_fields: List[str]) -> Di
 
 
 def _build_prompt(batch: List[Dict[str, Any]], requested_fields: List[str]) -> str:
-    field_lines = "\n".join(f"- {field}" for field in requested_fields)
+    field_lines = "\n".join(
+        f"- {field}" + (f" (aliases: {', '.join(_alias_hints(field))})" if _alias_hints(field) else "")
+        for field in requested_fields
+    )
     record_blocks: List[str] = []
     for item in batch:
         record_blocks.append(
@@ -331,12 +572,12 @@ def _project_direct_fields(payload: Dict[str, Any], requested_fields: List[str])
     if not isinstance(payload, dict):
         return {}
 
-    requested_lookup = {_normalize_key(field) for field in requested_fields if _normalize_key(field)}
-    alias_lookup = set(requested_lookup)
-    for canonical_name, aliases in _FIELD_ALIASES.items():
-        candidate_norms = {_normalize_key(canonical_name), *(_normalize_key(alias) for alias in aliases)}
-        if requested_lookup.intersection(candidate_norms):
-            alias_lookup.update(candidate_norms)
+    requested_lookup: set[str] = set()
+    for field in requested_fields:
+        requested_lookup.update(_expand_aliases(field))
+        normalized_field = _normalize_key(field)
+        if normalized_field:
+            requested_lookup.add(normalized_field)
     extracted = payload.get("extracted")
     if isinstance(extracted, dict) and extracted:
         return extracted
@@ -350,7 +591,7 @@ def _project_direct_fields(payload: Dict[str, Any], requested_fields: List[str])
         if isinstance(value, (dict, list, tuple, set)):
             continue
         normalized_key = _normalize_key(key)
-        if alias_lookup and normalized_key not in alias_lookup:
+        if requested_lookup and normalized_key not in requested_lookup:
             continue
         projected[str(key)] = value
     return projected
@@ -368,7 +609,16 @@ def merge_openai_cde_values(
     """Fill only blank fields and attach provenance metadata."""
 
     merged = dict(record or {})
-    requested_lookup = {_normalize_key(field) for field in (requested_fields or []) if _normalize_key(field)}
+    requested_lookup: set[str] = set()
+    requested_original_lookup: Dict[str, str] = {}
+    for field in (requested_fields or []):
+        normalized_field = _normalize_key(field)
+        if normalized_field:
+            requested_lookup.add(normalized_field)
+            requested_original_lookup.setdefault(normalized_field, str(field))
+        for alias_norm in _expand_aliases(field):
+            requested_lookup.add(alias_norm)
+            requested_original_lookup.setdefault(alias_norm, str(field))
     existing_lookup = {
         _normalize_key(key): key
         for key in merged.keys()
@@ -381,46 +631,37 @@ def merge_openai_cde_values(
     for raw_key, raw_value in (extracted or {}).items():
         if _is_blank_like(raw_value):
             continue
+        if _should_skip_ai_field(raw_key):
+            continue
 
         normalized_key = _normalize_key(raw_key)
         if not normalized_key:
             continue
 
-        target_key = existing_lookup.get(normalized_key) or normalized_key
-        if _normalize_key(target_key) != normalized_key:
-            for canonical_name, aliases in _FIELD_ALIASES.items():
-                candidate_names = (canonical_name, *aliases)
-                candidate_norms = {_normalize_key(name) for name in candidate_names}
-                if normalized_key not in candidate_norms:
-                    continue
+        candidate_norms = set(_expand_aliases(raw_key))
+        candidate_norms.add(normalized_key)
 
-                matching_names: List[str] = []
-                for candidate_name in candidate_names:
-                    candidate_norm = _normalize_key(candidate_name)
-                    if requested_lookup and candidate_norm not in requested_lookup:
-                        continue
-                    if candidate_norm in existing_lookup:
-                        matching_names.append(existing_lookup[candidate_norm])
-                    elif not requested_lookup or candidate_norm in requested_lookup:
-                        matching_names.append(candidate_name)
-
-                if not matching_names:
-                    for candidate_name in candidate_names:
-                        candidate_norm = _normalize_key(candidate_name)
-                        if candidate_norm in existing_lookup:
-                            matching_names.append(existing_lookup[candidate_norm])
-                            break
-                    if not matching_names and not requested_lookup:
-                        matching_names.append(canonical_name)
-
-                if matching_names:
-                    target_key = matching_names[0]
+        target_key = ""
+        for candidate_norm in candidate_norms:
+            existing_key = existing_lookup.get(candidate_norm)
+            if existing_key:
+                target_key = existing_key
                 break
+        if not target_key:
+            for candidate_norm in candidate_norms:
+                requested_key = requested_original_lookup.get(candidate_norm)
+                if requested_key:
+                    target_key = requested_key
+                    break
+        if not target_key:
+            target_key = str(raw_key)
+        if _should_skip_ai_field(target_key):
+            continue
 
         if requested_lookup:
             target_normalized = _normalize_key(target_key)
             if (
-                normalized_key not in requested_lookup
+                not candidate_norms.intersection(requested_lookup)
                 and target_normalized not in requested_lookup
                 and normalized_key not in existing_lookup
                 and target_normalized not in existing_lookup
@@ -480,9 +721,13 @@ class OpenAICDEService:
             return []
 
         target_fields = [str(field).strip() for field in (requested_fields or []) if str(field).strip()]
-        if not target_fields:
+        discovered_fields = _discover_record_fields(records)
+        if target_fields:
+            target_fields = _merge_field_lists(target_fields, discovered_fields)
+        else:
             sample = records[0] if records else {}
             target_fields = [key for key in sample.keys() if not str(key).startswith("_")]
+            target_fields = _merge_field_lists(target_fields, discovered_fields)
 
         model_name = str(model or settings.OPENAI_MODEL or "gpt-4o-mini").strip()
         batch_size = 1

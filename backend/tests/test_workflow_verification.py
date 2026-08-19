@@ -7,6 +7,7 @@ from unittest.mock import AsyncMock, patch
 from fastapi.testclient import TestClient
 
 from app.main import app
+from app.services.organization_url_service import resolve_organization_url_candidates
 from app.services.review_service import review_service
 from app.services.workflow_service import workflow_service
 
@@ -124,6 +125,31 @@ def test_verify_record_fake_company_review(mock_discover):
     data = response.json()["result"]
     assert data["status"] in ("Needs Review", "Partially Verified", "Verification Failed")
     assert len(data.get("website_candidates") or []) >= 1
+
+
+@patch("app.services.company_verification_service.fetch_website_metadata", new_callable=AsyncMock)
+@patch("app.services.company_verification_service.website_discovery_service.discover", new_callable=AsyncMock)
+def test_verify_record_uses_hardcoded_org_url_when_website_missing(mock_discover, mock_fetch):
+    expected_url = resolve_organization_url_candidates({"company": "StudyCorgi"})[0]
+    mock_discover.return_value = []
+    mock_fetch.return_value = {**OPENAI_METADATA, "url": expected_url}
+
+    response = client.post(
+        "/api/v1/workflows/verify-record",
+        json={
+            "record": {
+                "company": "StudyCorgi",
+            },
+            "config": {"autoApproveThreshold": 75, "reviewThreshold": 60},
+        },
+    )
+
+    assert response.status_code == 200
+    data = response.json()["result"]
+    assert mock_discover.await_count == 0
+    assert mock_fetch.await_count == 1
+    assert mock_fetch.await_args.args[0] == expected_url
+    assert data.get("website") == expected_url
 
 
 @patch("app.services.company_verification_service.fetch_website_metadata", new_callable=AsyncMock)

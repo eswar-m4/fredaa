@@ -80,11 +80,8 @@ export function getBotDisplayName(source: string, catalog: BotCatalogEntry[] = [
   const normalized = normalizeBotName(baseName);
 
   const friendlyNameMap: Record<string, string> = {
-    webmd: "WebMD",
     instagram: "Instagram",
     "99acres": "99Acres",
-    keysight: "Keysight",
-    turkeybrokers: "TurkeyBrokers",
     linkedin: "LinkedIn",
     github: "GitHub",
     companieshouse: "Companies House (UK)",

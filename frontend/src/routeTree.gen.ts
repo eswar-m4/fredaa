@@ -9,32 +9,16 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as WorkflowsRouteImport } from './routes/workflows'
-import { Route as SiteSpecificRouteImport } from './routes/site-specific'
-import { Route as ReviewRouteImport } from './routes/review'
+import { Route as RefreshRouteImport } from './routes/refresh'
 import { Route as MonitoringRouteImport } from './routes/monitoring'
 import { Route as LoginRouteImport } from './routes/login'
-import { Route as LibraryRouteImport } from './routes/library'
-import { Route as ExportRouteImport } from './routes/export'
-import { Route as DiscoverRouteImport } from './routes/discover'
-import { Route as DashboardRouteImport } from './routes/dashboard'
-import { Route as AnySiteRouteImport } from './routes/any-site'
+import { Route as AskFredaRouteImport } from './routes/ask-freda'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 
-const WorkflowsRoute = WorkflowsRouteImport.update({
-  id: '/workflows',
-  path: '/workflows',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SiteSpecificRoute = SiteSpecificRouteImport.update({
-  id: '/site-specific',
-  path: '/site-specific',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ReviewRoute = ReviewRouteImport.update({
-  id: '/review',
-  path: '/review',
+const RefreshRoute = RefreshRouteImport.update({
+  id: '/refresh',
+  path: '/refresh',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MonitoringRoute = MonitoringRouteImport.update({
@@ -47,29 +31,9 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LibraryRoute = LibraryRouteImport.update({
-  id: '/library',
-  path: '/library',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ExportRoute = ExportRouteImport.update({
-  id: '/export',
-  path: '/export',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DiscoverRoute = DiscoverRouteImport.update({
-  id: '/discover',
-  path: '/discover',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DashboardRoute = DashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AnySiteRoute = AnySiteRouteImport.update({
-  id: '/any-site',
-  path: '/any-site',
+const AskFredaRoute = AskFredaRouteImport.update({
+  id: '/ask-freda',
+  path: '/ask-freda',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -86,127 +50,65 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
-  '/any-site': typeof AnySiteRoute
-  '/dashboard': typeof DashboardRoute
-  '/discover': typeof DiscoverRoute
-  '/export': typeof ExportRoute
-  '/library': typeof LibraryRoute
+  '/ask-freda': typeof AskFredaRoute
   '/login': typeof LoginRoute
   '/monitoring': typeof MonitoringRoute
-  '/review': typeof ReviewRoute
-  '/site-specific': typeof SiteSpecificRoute
-  '/workflows': typeof WorkflowsRoute
+  '/refresh': typeof RefreshRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
-  '/any-site': typeof AnySiteRoute
-  '/dashboard': typeof DashboardRoute
-  '/discover': typeof DiscoverRoute
-  '/export': typeof ExportRoute
-  '/library': typeof LibraryRoute
+  '/ask-freda': typeof AskFredaRoute
   '/login': typeof LoginRoute
   '/monitoring': typeof MonitoringRoute
-  '/review': typeof ReviewRoute
-  '/site-specific': typeof SiteSpecificRoute
-  '/workflows': typeof WorkflowsRoute
+  '/refresh': typeof RefreshRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
-  '/any-site': typeof AnySiteRoute
-  '/dashboard': typeof DashboardRoute
-  '/discover': typeof DiscoverRoute
-  '/export': typeof ExportRoute
-  '/library': typeof LibraryRoute
+  '/ask-freda': typeof AskFredaRoute
   '/login': typeof LoginRoute
   '/monitoring': typeof MonitoringRoute
-  '/review': typeof ReviewRoute
-  '/site-specific': typeof SiteSpecificRoute
-  '/workflows': typeof WorkflowsRoute
+  '/refresh': typeof RefreshRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/admin'
-    | '/any-site'
-    | '/dashboard'
-    | '/discover'
-    | '/export'
-    | '/library'
+    | '/ask-freda'
     | '/login'
     | '/monitoring'
-    | '/review'
-    | '/site-specific'
-    | '/workflows'
+    | '/refresh'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/admin'
-    | '/any-site'
-    | '/dashboard'
-    | '/discover'
-    | '/export'
-    | '/library'
-    | '/login'
-    | '/monitoring'
-    | '/review'
-    | '/site-specific'
-    | '/workflows'
+  to: '/' | '/admin' | '/ask-freda' | '/login' | '/monitoring' | '/refresh'
   id:
     | '__root__'
     | '/'
     | '/admin'
-    | '/any-site'
-    | '/dashboard'
-    | '/discover'
-    | '/export'
-    | '/library'
+    | '/ask-freda'
     | '/login'
     | '/monitoring'
-    | '/review'
-    | '/site-specific'
-    | '/workflows'
+    | '/refresh'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
-  AnySiteRoute: typeof AnySiteRoute
-  DashboardRoute: typeof DashboardRoute
-  DiscoverRoute: typeof DiscoverRoute
-  ExportRoute: typeof ExportRoute
-  LibraryRoute: typeof LibraryRoute
+  AskFredaRoute: typeof AskFredaRoute
   LoginRoute: typeof LoginRoute
   MonitoringRoute: typeof MonitoringRoute
-  ReviewRoute: typeof ReviewRoute
-  SiteSpecificRoute: typeof SiteSpecificRoute
-  WorkflowsRoute: typeof WorkflowsRoute
+  RefreshRoute: typeof RefreshRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/workflows': {
-      id: '/workflows'
-      path: '/workflows'
-      fullPath: '/workflows'
-      preLoaderRoute: typeof WorkflowsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/site-specific': {
-      id: '/site-specific'
-      path: '/site-specific'
-      fullPath: '/site-specific'
-      preLoaderRoute: typeof SiteSpecificRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/review': {
-      id: '/review'
-      path: '/review'
-      fullPath: '/review'
-      preLoaderRoute: typeof ReviewRouteImport
+    '/refresh': {
+      id: '/refresh'
+      path: '/refresh'
+      fullPath: '/refresh'
+      preLoaderRoute: typeof RefreshRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/monitoring': {
@@ -223,39 +125,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/library': {
-      id: '/library'
-      path: '/library'
-      fullPath: '/library'
-      preLoaderRoute: typeof LibraryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/export': {
-      id: '/export'
-      path: '/export'
-      fullPath: '/export'
-      preLoaderRoute: typeof ExportRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/discover': {
-      id: '/discover'
-      path: '/discover'
-      fullPath: '/discover'
-      preLoaderRoute: typeof DiscoverRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard': {
-      id: '/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/any-site': {
-      id: '/any-site'
-      path: '/any-site'
-      fullPath: '/any-site'
-      preLoaderRoute: typeof AnySiteRouteImport
+    '/ask-freda': {
+      id: '/ask-freda'
+      path: '/ask-freda'
+      fullPath: '/ask-freda'
+      preLoaderRoute: typeof AskFredaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -278,16 +152,10 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
-  AnySiteRoute: AnySiteRoute,
-  DashboardRoute: DashboardRoute,
-  DiscoverRoute: DiscoverRoute,
-  ExportRoute: ExportRoute,
-  LibraryRoute: LibraryRoute,
+  AskFredaRoute: AskFredaRoute,
   LoginRoute: LoginRoute,
   MonitoringRoute: MonitoringRoute,
-  ReviewRoute: ReviewRoute,
-  SiteSpecificRoute: SiteSpecificRoute,
-  WorkflowsRoute: WorkflowsRoute,
+  RefreshRoute: RefreshRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

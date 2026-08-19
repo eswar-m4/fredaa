@@ -987,7 +987,7 @@ def _normalize_dataset_review_row(
     aliases = {
         "company_name": ("company_name", "company", "name", "organization", "legal_name"),
         "legal_name": ("company_name", "company", "name", "organization", "legal_name"),
-        "website": ("website", "url", "domain", "website_url", "corp_site", "websiteUrl"),
+        "website": ("website", "url", "domain", "website_url", "corp_site", "websiteUrl", "ref_url", "ref url", "reference_url", "reference url", "source_url"),
         "email": ("email", "email_address", "work_email", "business_email", "contact_email"),
         "phone": ("phone", "phone_number", "telephone", "mobile"),
         "linkedin_url": ("linkedin_url", "linkedin", "linkedin_profile"),
@@ -1167,12 +1167,8 @@ def compare_records(
         rec = new_map[k][0] if new_val_exists else baseline_map[k][0]
         found_website = find_company_website(rec) or source
         source_lower = str(source or "").strip().lower()
-        if "keysight" in source_lower:
-            source_url = "https://www.keysight.com"
-            source_display = "keysight.com"
-        else:
-            source_url = found_website if found_website.startswith("http") else f"https://{found_website}"
-            source_display = clean_domain(found_website)
+        source_url = found_website if found_website.startswith("http") else f"https://{found_website}"
+        source_display = clean_domain(found_website)
 
         record_has_changes = False
 

@@ -1,569 +1,366 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
+import {
+  Activity,
+  RefreshCw,
+  CheckCircle2,
+  AlertTriangle,
+  PlayCircle,
+  Timer,
+  Cloud,
+  Download,
+  Pause,
+  Play,
+} from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
-import { Badge, Card, PageHeader, Button } from "@/components/ui-bits";
-import { Download, ChevronDown, Trash2, Star } from "lucide-react";
-import { apiFetch } from "@/lib/api";
-import { clearDeletedJob, jobsCacheUpdatedEventName, markJobDeleted, readJobsCache, writeJobsCache } from "@/lib/jobs-cache";
-import { fetchBotCatalog, getBotDisplayName, type BotCatalogEntry } from "@/lib/bot-catalog";
-
+import {
+  Badge,
+  Button,
+  Card,
+  DEFAULT_RANGE,
+  PageHeader,
+  RangeFilter,
+  rangeDays,
+  SectionTitle,
+  Select,
+  type RangeValue,
+} from "@/components/ui-bits";
+import { useActiveCustomer } from "@/lib/workspace";
+import { destinationsFor, fmt, hrsAgo, inHrs, jobsFor, rollupProjects, type JobRun } from "@/data/customers";
+import { statusTone } from "@/routes/index";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/monitoring")({
-  head: () => ({ meta: [{ title: "Monitoring – FreshData AI" }] }),
-  component: Monitoring,
+  head: () => ({
+    meta: [
+      { title: "Monitoring — FreDA" },
+      {
+        name: "description",
+        content: "Live job automation status, refresh schedule health and delivery destinations for every FreDA dataset.",
+      },
+      { property: "og:title", content: "Monitoring — FreDA" },
+      {
+        property: "og:description",
+        content: "Live job automation status, refresh schedule health and delivery destinations for every FreDA dataset.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
+  component: MonitoringPage,
 });
 
-// Service simulation helper function to handle Processing -> Completed lifecycle transition.
-export function startJobDemoLifecycleSimulation(
-  customJobs: any[],
-  onComplete: (updated: any[]) => void
-) {
-  const runningJobs = customJobs.filter((j) => j.status === "Running");
-  if (runningJobs.length === 0) return () => {};
+const jobTone: Record<JobRun["state"], "info" | "neutral" | "success" | "destructive"> = {
+  Running: "info",
+  Queued: "neutral",
+  Succeeded: "success",
+  Failed: "destructive",
+};
 
-  const timer = setTimeout(() => {
-    const updated = customJobs.map((j) => {
-      if (j.status === "Running") {
-        const now = new Date();
-        const lastRefresh = now.toISOString();
-        let nextDate = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000); // Default Weekly
-        const freq = String(j.frequency || "").trim().toLowerCase();
-        if (freq === "hourly" || freq === "every hour" || freq === "1 hour" || freq === "1 hr" || freq === "60 minutes") {
-          nextDate = new Date(now.getTime() + 60 * 60 * 1000);
-        }
-        if (j.frequency === "Daily") {
-          nextDate = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-        } else if (j.frequency === "Monthly") {
-          nextDate = new Date(now.getFullYear(), now.getMonth() + 1, now.getDate());
-        } else if (j.frequency === "Quarterly") {
-          nextDate = new Date(now.getTime() + 90 * 24 * 60 * 60 * 1000);
-        }
+function MonitoringPage() {
+  const customer = useActiveCustomer();
+  const [range, setRange] = useState<RangeValue>(DEFAULT_RANGE);
+  const [scope, setScope] = useState("all");
+  const [filter, setFilter] = useState("all");
+  const [running, setRunning] = useState<Record<string, number>>({});
 
-        const recordsScraped = Math.floor(Math.random() * 800) + 150;
-        const accuracyRate = Math.floor(Math.random() * 5) + 95;
+  const scoped = scope === "all" ? customer.projects : customer.projects.filter((p) => p.id === scope);
+  const stats = useMemo(() => rollupProjects(scoped), [customer.id, scope]);
+  const jobs = useMemo(() => jobsFor(customer), [customer.id]);
+  const destinations = useMemo(() => destinationsFor(customer), [customer.id]);
 
-        const newHistoryEntry = {
-          timestamp: lastRefresh,
-          records_scraped: recordsScraped,
-          accuracy_rate: accuracyRate,
-          status: "Success",
-          execution_time_seconds: Math.floor(Math.random() * 30) + 15,
-        };
+  const days = rangeDays(range);
+  const visibleJobs = jobs.filter((j) => (scope === "all" || j.projectId === scope) && j.startedHrs <= days * 24);
+  const projects = scoped.filter((p) => filter === "all" || p.status === filter);
 
-        return {
-          ...j,
-          status: "Completed",
-          last_refresh: lastRefresh,
-          next_refresh: nextDate.toISOString(),
-          refresh_count: (j.refresh_count || 0) + 1,
-          records: recordsScraped,
-          fresh: accuracyRate,
-          refresh_history: [...(j.refresh_history || []), newHistoryEntry],
-        };
+  function refresh(id: string) {
+    setRunning((r) => ({ ...r, [id]: 0 }));
+    let pct = 0;
+    const t = setInterval(() => {
+      pct += 12;
+      setRunning((r) => ({ ...r, [id]: pct }));
+      if (pct >= 100) {
+        clearInterval(t);
+        setTimeout(
+          () =>
+            setRunning((r) => {
+              const { [id]: _drop, ...rest } = r;
+              return rest;
+            }),
+          800,
+        );
       }
-      return j;
-    });
-    onComplete(updated);
-  }, 8000);
-
-  return () => clearTimeout(timer);
-}
-
-function formatRelativeTime(isoStr: string) {
-  if (!isoStr) return "Just now";
-  const diff = Date.now() - new Date(isoStr).getTime();
-  if (diff < 60000) return "Just now";
-  const mins = Math.floor(diff / 60000);
-  if (mins < 60) return `${mins}m ago`;
-  const hours = Math.floor(mins / 60);
-  if (hours < 24) return `${hours}h ago`;
-  return new Date(isoStr).toLocaleDateString();
-}
-
-function formatDateTime(isoStr: string) {
-  if (!isoStr) return "—";
-  const date = new Date(isoStr);
-  if (Number.isNaN(date.getTime())) return isoStr;
-  return date.toLocaleString([], {
-    year: "numeric",
-    month: "short",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
-
-function computeNextRunTime(job: any) {
-  const freq = String(job?.frequency || "").trim().toLowerCase();
-  const nextRefreshValue = job?.next_refresh || job?.nextRefresh || null;
-  const nextRefresh = nextRefreshValue ? new Date(nextRefreshValue) : null;
-  if (nextRefresh && !Number.isNaN(nextRefresh.getTime())) {
-    return nextRefresh.toISOString();
+    }, 260);
   }
 
-  const baseValue = job?.last_refresh || job?.created_at || job?.createdAt || null;
-  const base = baseValue ? new Date(baseValue) : null;
-  if (!base || Number.isNaN(base.getTime())) {
-    return null;
-  }
+  const live = visibleJobs.filter((j) => j.state === "Running").length;
+  const failed = visibleJobs.filter((j) => j.state === "Failed").length;
 
-  const next = new Date(base.getTime());
-  if (freq === "hourly" || freq === "every hour" || freq === "1 hour" || freq === "1 hr" || freq === "60 minutes") {
-    next.setHours(next.getHours() + 1);
-  } else if (freq === "daily") {
-    next.setDate(next.getDate() + 1);
-  } else if (freq === "monthly") {
-    next.setMonth(next.getMonth() + 1);
-  } else if (freq === "quarterly") {
-    next.setMonth(next.getMonth() + 3);
-  } else if (freq === "weekly") {
-    next.setDate(next.getDate() + 7);
-  } else {
-    return null;
-  }
-  return next.toISOString();
-}
-
-function tone(s: string) {
-  if (s === "Running") return "info" as const;
-  if (s === "Completed" || s === "Execution Completed") return "success" as const;
-  if (s === "Review" || s === "Review Pending") return "warning" as const;
-  if (s === "Analysis Complete" || s === "Pending Approval" || s === "Pending Onboarding") return "warning" as const;
-  if (s === "Rejected") return "destructive" as const;
-  return "destructive" as const;
-}
-
-function cleanSourceName(name: string) {
-  if (!name) return "";
-  let clean = String(name).trim();
-  
-  const dashIdxs = [" – ", " - "];
-  for (const dash of dashIdxs) {
-    const idx = clean.indexOf(dash);
-    if (idx !== -1) {
-      clean = clean.substring(0, idx).trim();
-    }
-  }
-
-  if (/^https?:\/\//i.test(clean)) {
-    try {
-      const url = new URL(clean);
-      return url.hostname.replace(/^www\./i, "");
-    } catch (e) {
-      // Ignore
-    }
-  }
-  clean = clean.replace(/^https?:\/\/(www\.)?/i, "");
-  clean = clean.replace(/^www\./i, "");
-  const slashIdx = clean.indexOf("/");
-  if (slashIdx !== -1) {
-    clean = clean.substring(0, slashIdx);
-  }
-  return clean;
-}
-
-function getNewSourceDisplayName(source: string) {
-  if (!source) return "";
-  const clean = cleanSourceName(source);
-  const baseName = clean.split(".")[0].trim();
-  if (!baseName) return "";
-  return baseName.charAt(0).toUpperCase() + baseName.slice(1);
-}
-
-function getAnySiteUploadedFilename(filters: string) {
-  if (!filters || filters === "—") return "";
-  try {
-    const parsed = JSON.parse(filters);
-    return typeof parsed.seedFile === "string"
-      ? parsed.seedFile.trim().replace(/\.(csv|xlsx|xls)$/i, "")
-      : "";
-  } catch {
-    return "";
-  }
-}
-
-function Monitoring() {
-  const [customJobs, setCustomJobs] = useState<any[]>(() => readJobsCache());
-  const [openExportId, setOpenExportId] = useState<string | null>(null);
-  const [catalog, setCatalog] = useState<BotCatalogEntry[]>([]);
-  const [urgentBusyId, setUrgentBusyId] = useState<string | null>(null);
-
-  const baseApiUrl = (() => {
-    if (
-      typeof window !== "undefined" &&
-      (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") &&
-      window.location.port !== "8131"
-    ) {
-      return `http://${window.location.hostname}:8131`;
-    }
-    return "";
-  })();
-
-  useEffect(() => {
-    let active = true;
-    async function fetchJobs() {
-      try {
-        const response = await fetch(`${baseApiUrl}/api/v1/demo/jobs`, { credentials: "include" });
-        if (response.ok) {
-          const data = await response.json();
-          if (active) {
-            // Merge server rows into the existing cache so a freshly launched job
-            // stays visible even if the backend list is briefly behind the UI.
-            const mergedJobs = writeJobsCache([...readJobsCache(), ...data]);
-            setCustomJobs(mergedJobs);
-          }
-        }
-      } catch (err) {
-        console.error("Failed to fetch jobs from backend:", err);
-      }
-    }
-
-    fetchJobs();
-    const interval = setInterval(fetchJobs, 3000);
-    const handleCacheUpdate = () => {
-      if (!active) return;
-      setCustomJobs(readJobsCache());
-    };
-    window.addEventListener(jobsCacheUpdatedEventName(), handleCacheUpdate as EventListener);
-    return () => {
-      active = false;
-      clearInterval(interval);
-      window.removeEventListener(jobsCacheUpdatedEventName(), handleCacheUpdate as EventListener);
-    };
-  }, [baseApiUrl]);
-
-  useEffect(() => {
-    let active = true;
-    fetchBotCatalog()
-      .then((payload) => {
-        if (!active) return;
-        setCatalog(payload.bots || []);
-      })
-      .catch(() => {
-        if (!active) return;
-        setCatalog([]);
-      });
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  async function deleteJob(jobId: string) {
-    let previousJobs: any[] = [];
-    markJobDeleted(jobId);
-    setCustomJobs((current) => {
-      previousJobs = current;
-      const next = current.filter((job) => job.id !== jobId);
-      writeJobsCache(next);
-      return next;
-    });
-    if (openExportId === jobId) {
-      setOpenExportId(null);
-    }
-    try {
-      const response = await apiFetch(`/api/v1/demo/jobs/${jobId}`, {
-        method: "DELETE",
-      });
-      if (!response.ok) {
-        const data = await response.json().catch(() => ({}));
-        throw new Error(data?.detail || data?.message || "Failed to delete job");
-      }
-    } catch (err) {
-      console.error(err);
-      clearDeletedJob(jobId);
-      setCustomJobs(previousJobs);
-      writeJobsCache(previousJobs);
-    }
-  }
-
-  async function toggleUrgent(job: any) {
-    const nextUrgent = !Boolean(job.isUrgent);
-    setUrgentBusyId(job.id);
-    setCustomJobs((current) => {
-      const next = current.map((item) =>
-        item.id === job.id ? { ...item, is_urgent: nextUrgent ? 1 : 0, isUrgent: nextUrgent } : item,
-      );
-      writeJobsCache(next);
-      return next;
-    });
-    try {
-      const response = await apiFetch(`/api/v1/demo/jobs/${job.id}/urgent`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ is_urgent: nextUrgent }),
-      });
-      if (!response.ok) {
-        const data = await response.json().catch(() => ({}));
-        throw new Error(data?.detail || data?.message || "Failed to update urgent flag");
-      }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setUrgentBusyId((current) => (current === job.id ? null : current));
-    }
-  }
-
-  const combinedJobs = [...customJobs].reverse().map((j) => {
-    const sourceName = String(j.source || j.source_name || j.website_url || "Unknown Source");
-    return {
-      id: j.id || `J-${Date.now()}`,
-      source: sourceName,
-      mode: j.mode || "By Source",
-      run: formatRelativeTime(j.created_at),
-      status: j.status,
-      records: j.records !== undefined ? j.records : null,
-      fresh: j.fresh !== undefined ? j.fresh : null,
-      frequency: j.frequency || "Weekly",
-      scope: j.scope || "Full Dump",
-      filters: j.filters || "—",
-      delivery: j.delivery || "S3 bucket",
-      last_refresh: j.last_refresh || null,
-      next_refresh: j.next_refresh || null,
-      refresh_count: j.refresh_count || 0,
-      dataset_path: j.dataset_path || `datasets/${sourceName.toLowerCase().replace(/[^a-z0-9]/g, "_")}_sample.csv`,
-      refresh_history: j.refresh_history || [],
-      isCustomSource: j.isCustomSource ?? true,
-      isUrgent: Boolean(j.is_urgent ?? j.isUrgent),
-      changes_detected: j.changes_detected ?? 0,
-      complexity: j.complexity || null,
-      estimated_onboarding_time: j.estimated_onboarding_time || null,
-      created_at: j.created_at,
-    };
-  });
-
-  // Deduplicate combinedJobs by ID only.
-  const deduplicatedJobs: any[] = [];
-  const seenIds = new Set<string>();
-
-  for (const j of combinedJobs) {
-    if (seenIds.has(j.id)) continue;
-    seenIds.add(j.id);
-    deduplicatedJobs.push(j);
-  }
-
-  // Restore a stable, recency-first sort for display.
-  const finalJobs = [...deduplicatedJobs].sort((a, b) => {
-    const timeA = a.created_at ? new Date(a.created_at).getTime() : 0;
-    const timeB = b.created_at ? new Date(b.created_at).getTime() : 0;
-    const timeDiff = timeB - timeA;
-    if (timeDiff !== 0) return timeDiff;
-
-    const score = (status: string) => {
-      if (status === "Running") return 4;
-      if (status === "Review" || status === "Review Pending") return 3;
-      if (status === "Completed" || status === "Execution Completed") return 2;
-      if (status === "Failed" || status === "Aborted") return 1;
-      return 0;
-    };
-    return score(b.status) - score(a.status);
-  });
-
-  const runningCount = finalJobs.filter((j) => j.status === "Running").length;
-  const completedCount = finalJobs.filter((j) => j.status === "Completed" || j.status === "Execution Completed").length;
-  const reviewCount = finalJobs.filter((j) => j.status === "Review" || j.status === "Review Pending").length;
-  const pendingOnboardingCount = finalJobs.filter((j) => j.status === "Pending Approval" || j.status === "Pending Onboarding").length;
-  const abortedCount = finalJobs.filter((j) => j.status === "Failed" || j.status === "Aborted").length;
-  const isCustomScrapeJob = (j: any) => {
-    const scope = String(j.scope || "").toLowerCase();
-    return Boolean(j.isCustomSource) || scope.includes("custom") || scope.includes("partial");
-  };
   return (
     <AppLayout>
-      <PageHeader title="Monitoring" subtitle="Live state of refreshes across both approaches." />
+      <PageHeader
+        title="Monitoring"
+        subtitle={`${customer.name} · job automation, schedule health and sync destinations`}
+        actions={
+          <Button size="sm" onClick={() => scoped.forEach((p) => refresh(p.id))}>
+            <RefreshCw className="h-3.5 w-3.5" /> Run all in scope
+          </Button>
+        }
+      />
+
       <div className="px-7 pb-8 space-y-5">
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
-          {[
-            { l: "Running", v: runningCount, t: "info" as const },
-            { l: "Completed today", v: completedCount, t: "success" as const },
-            { l: "Needs review", v: reviewCount, t: "warning" as const },
-            { l: "Pending onboarding", v: pendingOnboardingCount, t: "warning" as const },
-            { l: "Aborted", v: abortedCount, t: "destructive" as const },
-          ].map((s) => (
-            <Card key={s.l} className="p-4">
-              <div className="text-[12px] text-muted-foreground">{s.l}</div>
-              <div className="text-[24px] font-semibold mt-1">{s.v}</div>
-              <Badge tone={s.t} className="mt-1">live</Badge>
-            </Card>
-          ))}
+        <Card className="px-4 py-3 flex flex-wrap items-center gap-3">
+          <Select className="w-[280px]" value={scope} onChange={(e) => setScope(e.target.value)}>
+            <option value="all">All projects ({customer.projects.length})</option>
+            {customer.projects.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.name}
+              </option>
+            ))}
+          </Select>
+          <RangeFilter value={range} onChange={setRange} />
+          <div className="ml-auto text-[12px] text-muted-foreground">
+            {fmt(stats.records)} records · {stats.sources} sources monitored
+          </div>
+        </Card>
+
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <Tile icon={PlayCircle} label="Automations running" value={String(live)} tone="info" />
+          <Tile icon={CheckCircle2} label="In sync datasets" value={String(scoped.filter((p) => p.status === "In sync").length)} tone="success" />
+          <Tile icon={AlertTriangle} label="Failed runs" value={String(failed)} tone="warning" />
+          <Tile icon={Activity} label="Changes in window" value={fmt(stats.admv.added + stats.admv.deleted + stats.admv.modified)} tone="purple" />
         </div>
 
-        <Card className="p-0 overflow-x-auto relative">
-          <table className="w-full min-w-[1000px] text-[13px] border-separate border-spacing-0">
-            <thead className="bg-secondary text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">
-              <tr>
-                <th className="text-left px-4 py-2.5 border-b border-border/40">Job</th>
-                <th className="text-left px-4 py-2.5 border-b border-border/40">Source</th>
-                <th className="text-left px-4 py-2.5 border-b border-border/40">Mode</th>
-                <th className="text-left px-4 py-2.5 border-b border-border/40">Last Run</th>
-                <th className="text-left px-4 py-2.5 border-b border-border/40">Status</th>
-                <th className="text-right px-4 py-2.5 border-b border-border/40">Records</th>
-                <th className="text-right px-4 py-2.5 border-b border-border/40">Fresh %</th>
-                <th className="text-right px-4 py-2.5 pr-6 border-b border-border/40">Download</th>
+        {/* Job automation */}
+        <Card className="overflow-hidden">
+          <div className="px-5 pt-4 pb-3 border-b border-border">
+            <h3 className="text-[13px] font-semibold uppercase tracking-wider text-muted-foreground">Job automation status</h3>
+            <p className="text-[12px] text-muted-foreground mt-1">Every crawl, parse and publish run triggered in the selected window.</p>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-[11px] text-muted-foreground">
+              <span className="font-semibold uppercase tracking-wider">Trigger legend</span>
+              <span><strong className="text-foreground">Scheduled</strong> — fired by the project run schedule set in Projects</span>
+              <span><strong className="text-foreground">On demand</strong> — someone pressed “Run now” here</span>
+              <span><strong className="text-foreground">Source change</strong> — change watcher detected a page/layout change and auto-queued a run</span>
+            </div>
+          </div>
+          <div className="max-h-[340px] overflow-y-auto">
+            <table className="w-full text-[12.5px]">
+              <thead className="sticky top-0 bg-card border-b border-border">
+                <tr className="text-left text-[11px] uppercase tracking-wider text-muted-foreground">
+                  <th className="px-5 py-2 font-semibold">Run</th>
+                  <th className="px-3 py-2 font-semibold">Project</th>
+                  <th className="px-3 py-2 font-semibold">Trigger</th>
+                  <th className="px-3 py-2 font-semibold">Stage</th>
+                  <th className="px-3 py-2 font-semibold">Started</th>
+                  <th className="px-3 py-2 font-semibold">Records</th>
+                  <th className="px-5 py-2 font-semibold text-right">State</th>
+                </tr>
+              </thead>
+              <tbody>
+                {visibleJobs.length === 0 && (
+                  <tr>
+                    <td colSpan={7} className="px-5 py-8 text-center text-muted-foreground">
+                      No automation runs in this window.
+                    </td>
+                  </tr>
+                )}
+                {visibleJobs.map((j) => (
+                  <tr key={j.id} className="border-b border-border/60 hover:bg-secondary/40">
+                    <td className="px-5 py-2.5 font-mono text-[11.5px]">{j.id}</td>
+                    <td className="px-3 py-2.5 max-w-[240px] truncate">{j.project}</td>
+                    <td className="px-3 py-2.5">
+                      <Badge tone="neutral">{j.trigger}</Badge>
+                    </td>
+                    <td className="px-3 py-2.5 text-muted-foreground">
+                      {j.step}
+                      {j.state === "Running" && (
+                        <div className="mt-1 h-1.5 w-28 rounded-full bg-secondary overflow-hidden">
+                          <div className="h-full bg-primary rounded-full" style={{ width: `${j.progress}%` }} />
+                        </div>
+                      )}
+                    </td>
+                    <td className="px-3 py-2.5 text-muted-foreground">
+                      {hrsAgo(j.startedHrs)} · {j.durationMin}m
+                    </td>
+                    <td className="px-3 py-2.5 tabular-nums">{fmt(j.records)}</td>
+                    <td className="px-5 py-2.5 text-right">
+                      <Badge tone={jobTone[j.state]}>{j.state}</Badge>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+
+        {/* Schedule */}
+        <Card className="overflow-hidden">
+          <div className="px-5 pt-4 pb-3 border-b border-border flex items-center gap-3">
+            <div className="flex-1">
+              <h3 className="text-[13px] font-semibold uppercase tracking-wider text-muted-foreground">Refresh schedule</h3>
+              <p className="text-[12px] text-muted-foreground mt-1">Existing extractions — re-run any dataset on demand.</p>
+            </div>
+            <Select className="w-52" value={filter} onChange={(e) => setFilter(e.target.value)}>
+              <option value="all">All statuses</option>
+              <option value="In sync">In sync</option>
+              <option value="Review pending">Review pending</option>
+              <option value="Syncing">Syncing</option>
+              <option value="Needs attention">Needs attention</option>
+            </Select>
+          </div>
+          <table className="w-full text-[12.5px]">
+            <thead>
+              <tr className="text-left text-[11px] uppercase tracking-wider text-muted-foreground border-b border-border">
+                <th className="px-5 py-2 font-semibold">Dataset</th>
+                <th className="px-3 py-2 font-semibold">Frequency</th>
+                <th className="px-3 py-2 font-semibold">Last run</th>
+                <th className="px-3 py-2 font-semibold">Next run</th>
+                <th className="px-3 py-2 font-semibold">Records</th>
+                <th className="px-3 py-2 font-semibold">Change volume</th>
+                <th className="px-3 py-2 font-semibold">Status</th>
+                <th className="px-5 py-2 font-semibold text-right">Action</th>
               </tr>
             </thead>
-            <tbody className="">
-              {finalJobs.length === 0 ? (
-                <tr>
-                  <td colSpan={8} className="text-center py-12 text-muted-foreground font-medium">
-                    No active or historical scraper jobs found.
-                  </td>
-                </tr>
-              ) : (
-                finalJobs.map((j) => {
-                  const showNewBadge = j.isCustomSource;
-                  const isNewSourceOnboarding = j.isCustomSource;
-                  const isCustomScrape = isCustomScrapeJob(j);
-                  const displayStatus = j.status === "Failed" ? "Aborted" : j.status;
-                  const uploadedFilename = (j.mode === "Any-Site" || j.mode === "By Dataset") ? getAnySiteUploadedFilename(j.filters) : "";
-                  const sourceDisplayName = isNewSourceOnboarding
-                    ? getNewSourceDisplayName(j.source)
-                    : (uploadedFilename || getBotDisplayName(j.source, catalog));
-
-                  return (
-                    <tr key={j.id} className="hover:bg-secondary/60 group">
-                      <td className="px-4 py-3.5 font-mono border-b border-border/40 text-left text-[13px] leading-normal whitespace-pre-line text-foreground">
-                        {j.id.includes("-") ? `${j.id.split("-")[0]}-\n${j.id.split("-")[1]}` : j.id}
-                      </td>
-                      <td className="px-4 py-3.5 border-b border-border/40 text-left">
-                        <div className="flex flex-col gap-0.5">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span className="font-semibold text-[13px] text-foreground">{sourceDisplayName}</span>
-                            {showNewBadge && (
-                              <Badge tone="warning" className="text-[9px] px-1.5 py-0.5 uppercase tracking-wider font-semibold">NEW</Badge>
-                            )}
-                            <Badge tone="purple" className="text-[9px] px-1.5 py-0.5 uppercase tracking-wider font-semibold">{j.frequency}</Badge>
+            <tbody>
+              {projects.map((p) => {
+                const pct = running[p.id];
+                return (
+                  <tr key={p.id} className="border-b border-border/60 hover:bg-secondary/40">
+                    <td className="px-5 py-3">
+                      <div className="font-medium">{p.name}</div>
+                      <div className="text-[11px] text-muted-foreground">
+                        {p.sources.length} sources · {p.datapoints.length} datapoints
+                      </div>
+                    </td>
+                    <td className="px-3 py-3">
+                      <Badge tone="neutral">{p.frequency}</Badge>
+                    </td>
+                    <td className="px-3 py-3 text-muted-foreground">{hrsAgo(p.lastRefreshHrs)}</td>
+                    <td className="px-3 py-3 text-muted-foreground">
+                      <span className="inline-flex items-center gap-1">
+                        <Timer className="h-3.5 w-3.5" /> {inHrs(p.nextRefreshHrs)}
+                      </span>
+                    </td>
+                    <td className="px-3 py-3 tabular-nums">{fmt(p.records)}</td>
+                    <td className="px-3 py-3">
+                      <span className="text-success">+{fmt(p.admv.added)}</span>{" "}
+                      <span className="text-destructive">-{fmt(p.admv.deleted)}</span>{" "}
+                      <span className="text-warning">~{fmt(p.admv.modified)}</span>
+                    </td>
+                    <td className="px-3 py-3">
+                      <Badge tone={statusTone[p.status]}>{p.status}</Badge>
+                    </td>
+                    <td className="px-5 py-3 text-right">
+                      {pct === undefined ? (
+                        <Button size="sm" variant="outline" onClick={() => refresh(p.id)}>
+                          <RefreshCw className="h-3.5 w-3.5" /> Run now
+                        </Button>
+                      ) : (
+                        <div className="flex items-center gap-2 justify-end">
+                          <div className="h-1.5 w-20 rounded-full bg-secondary overflow-hidden">
+                            <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${Math.min(100, pct)}%` }} />
                           </div>
+                          <span className="text-[11px] text-muted-foreground tabular-nums w-9">{Math.min(100, pct)}%</span>
                         </div>
-                      </td>
-                      <td className="px-4 py-3.5 border-b border-border/40 text-left">
-                        <Badge tone={(j.mode === "Site-Specific" || j.mode === "By Source") ? "info" : "purple"}>
-                          {(j.mode === "Site-Specific" || j.mode === "By Source") ? "Agents" : "Solutions"}
-                        </Badge>
-                      </td>
-                      <td className="px-4 py-3.5 text-muted-foreground border-b border-border/40 text-left">
-                        <div className="flex flex-col">
-                          <span>{j.last_refresh ? formatRelativeTime(j.last_refresh) : j.run || "—"}</span>
-                          {j.status !== "Pending Onboarding" && (computeNextRunTime(j) || j.next_refresh) && (
-                            <span className="text-[11px] text-muted-foreground/75 mt-0.5 font-medium">
-                              Next: {formatDateTime(computeNextRunTime(j) || j.next_refresh)}
-                            </span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-4 py-3.5 border-b border-border/40 text-left">
-                        <div className="flex items-center gap-2">
-                          <Badge tone={tone(j.status)}>{displayStatus}</Badge>
-                          {j.status === "Running" && (
-                            <span className="flex h-2 w-2 relative">
-                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
-                              <span className="relative inline-flex rounded-full h-2 w-2 bg-sky-500"></span>
-                            </span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-4 py-3.5 text-right font-mono border-b border-border/40 text-[13px] text-foreground font-semibold">
-                        {isCustomScrape ? "—" : (j.records !== null && j.records !== undefined ? j.records.toLocaleString() : "—")}
-                      </td>
-                      <td className="px-4 py-3.5 text-right font-mono border-b border-border/40 text-[13px] text-foreground font-semibold">
-                        {isCustomScrape
-                          ? "—"
-                          : (j.status === "Completed" ? "100%" : ((j.status === "Failed" || j.status === "Aborted") ? "0%" : (j.fresh !== null && j.fresh !== undefined ? `${j.fresh}%` : "—")))}
-                      </td>
-                      <td className="px-4 py-3.5 text-right border-b border-border/40 pr-6 relative">
-                        <div className="inline-flex items-center justify-end gap-2">
-                          <button
-                            type="button"
-                            title={j.isUrgent ? "Clear urgent" : "Mark urgent"}
-                            aria-label={`${j.isUrgent ? "Clear urgent" : "Mark urgent"} job ${j.id}`}
-                            disabled={urgentBusyId === j.id}
-                            onMouseDown={(e) => e.stopPropagation()}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              void toggleUrgent(j);
-                            }}
-                            className={`relative z-10 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border transition cursor-pointer ${
-                              j.isUrgent
-                                ? "border-warning bg-warning-bg/40 text-warning hover:bg-warning-bg/60"
-                                : "border-border bg-card text-muted-foreground hover:bg-secondary hover:text-foreground"
-                            } ${urgentBusyId === j.id ? "opacity-70" : ""}`}
-                            style={{
-                              pointerEvents: urgentBusyId === j.id ? "none" : "auto",
-                            }}
-                          >
-                            <Star className={`h-3.5 w-3.5 ${j.isUrgent ? "fill-warning" : ""}`} />
-                          </button>
-                          <button
-                            type="button"
-                            title="Delete job"
-                            aria-label={`Delete job ${j.id}`}
-                            onMouseDown={(e) => e.stopPropagation()}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              void deleteJob(j.id);
-                            }}
-                            className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border bg-card text-muted-foreground transition hover:bg-destructive/10 hover:text-destructive"
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </button>
-                          <div className="inline-block text-left">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              disabled={j.status !== "Completed"}
-                              onClick={() => setOpenExportId(openExportId === j.id ? null : j.id)}
-                              className="flex items-center gap-1 h-8 px-2.5 text-[12px] bg-card border border-border rounded-md font-medium transition hover:bg-secondary"
-                            >
-                              <Download className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                              <span>Export</span>
-                              <ChevronDown className="h-3 w-3 text-muted-foreground shrink-0 ml-0.5" />
-                            </Button>
-                            {openExportId === j.id && (
-                              <>
-                                <div className="fixed inset-0 z-40" onClick={() => setOpenExportId(null)} />
-                                <div className="absolute right-0 mt-1 w-32 rounded-md shadow-lg bg-card border border-border z-50 py-1 text-left">
-                                  <button
-                                    onClick={() => {
-                                      setOpenExportId(null);
-                                      window.open(`${baseApiUrl}/api/v1/export?run_id=${j.id}&format=csv`, "_blank");
-                                    }}
-                                    className="w-full text-left px-3 py-1.5 hover:bg-secondary/60 text-[12px] text-foreground font-medium"
-                                  >
-                                    CSV
-                                  </button>
-                                  <button
-                                    onClick={() => {
-                                      setOpenExportId(null);
-                                      window.open(`${baseApiUrl}/api/v1/export?run_id=${j.id}&format=json`, "_blank");
-                                    }}
-                                    className="w-full text-left px-3 py-1.5 hover:bg-secondary/60 text-[12px] text-foreground font-medium"
-                                  >
-                                    JSON
-                                  </button>
-                                  <button
-                                    onClick={() => {
-                                      setOpenExportId(null);
-                                      window.open(`${baseApiUrl}/api/v1/export?run_id=${j.id}&format=xlsx`, "_blank");
-                                    }}
-                                    className="w-full text-left px-3 py-1.5 hover:bg-secondary/60 text-[12px] text-foreground font-medium"
-                                  >
-                                    Excel (.xlsx)
-                                  </button>
-                                </div>
-                              </>
-                            )}
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </Card>
+
+        {/* Delivery + health */}
+        <div className="grid xl:grid-cols-[1.3fr_1fr] gap-5 items-stretch">
+          <Card className="p-5 h-full flex flex-col">
+            <SectionTitle hint="export & sync">Delivery destinations</SectionTitle>
+            <div className="space-y-2 mt-2">
+              {destinations.map((d) => (
+                <div key={d.id} className="flex flex-wrap items-center gap-3 rounded-lg border border-border px-3 py-2.5">
+                  <span className="h-8 w-8 rounded-md bg-info-bg text-info inline-flex items-center justify-center shrink-0">
+                    <Cloud className="h-4 w-4" />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-[13px] font-medium truncate">{d.name}</div>
+                    <div className="text-[11px] text-muted-foreground truncate">
+                      {d.kind} · {d.cadence} · last sync {hrsAgo(d.lastSyncHrs)} · {fmt(d.rowsLastSync)} rows
+                    </div>
+                  </div>
+                  <Badge tone={d.state === "Connected" ? "success" : d.state === "Paused" ? "warning" : "destructive"}>{d.state}</Badge>
+                  <Button size="sm" variant="outline">
+                    {d.state === "Paused" ? <Play className="h-3.5 w-3.5" /> : <Pause className="h-3.5 w-3.5" />}
+                    {d.state === "Paused" ? "Resume" : "Pause"}
+                  </Button>
+                </div>
+              ))}
+            </div>
+            <div className="flex flex-wrap items-center gap-2 mt-auto pt-4">
+              <Button size="sm" variant="outline">
+                <Download className="h-3.5 w-3.5" /> Download CSV snapshot
+              </Button>
+              <Button size="sm" variant="outline">
+                <Download className="h-3.5 w-3.5" /> Download JSON delta
+              </Button>
+              <Button size="sm">
+                <Cloud className="h-3.5 w-3.5" /> Add destination
+              </Button>
+            </div>
+          </Card>
+
+          <Card className="p-5 h-full flex flex-col">
+            <SectionTitle hint="per dataset">Health scores</SectionTitle>
+            <div className="space-y-3 mt-2">
+              {scoped.map((p) => (
+                <div key={p.id}>
+                  <div className="flex items-center justify-between text-[12.5px]">
+                    <span className="truncate">{p.name}</span>
+                    <span className="text-muted-foreground tabular-nums">
+                      fresh {p.freshness}% · acc {p.accuracy}% · cov {p.coverage}%
+                    </span>
+                  </div>
+                  <div className="mt-1 h-1.5 rounded-full bg-secondary overflow-hidden">
+                    <div
+                      className={cn("h-full rounded-full", p.freshness > 85 ? "bg-success" : p.freshness > 72 ? "bg-warning" : "bg-destructive")}
+                      style={{ width: `${p.freshness}%` }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </div>
       </div>
     </AppLayout>
+  );
+}
+
+function Tile({
+  icon: Icon,
+  label,
+  value,
+  tone,
+}: {
+  icon: typeof Activity;
+  label: string;
+  value: string;
+  tone: "info" | "success" | "warning" | "purple";
+}) {
+  const cls = {
+    info: "bg-info-bg text-info",
+    success: "bg-success-bg text-success",
+    warning: "bg-warning-bg text-warning",
+    purple: "bg-purple-bg text-purple-token",
+  }[tone];
+  return (
+    <Card className="p-4 flex items-center gap-3">
+      <span className={cn("h-9 w-9 rounded-md inline-flex items-center justify-center", cls)}>
+        <Icon className="h-4.5 w-4.5" />
+      </span>
+      <div>
+        <div className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">{label}</div>
+        <div className="text-[20px] font-semibold tabular-nums">{value}</div>
+      </div>
+    </Card>
   );
 }

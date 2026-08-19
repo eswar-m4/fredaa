@@ -1,20 +1,6 @@
 {
   "bots": [
     {
-      "id": 1,
-      "name": "Keysight",
-      "project": "Tevet",
-      "url": "https://www.keysight.com/us/en/home.html",
-      "type": "Listing",
-      "industry": "E Commerce",
-      "country": "US",
-      "dataType": "Price & Product Data",
-      "info": "Product  Information",
-      "category": "Retail & E-Commerce",
-      "complexity": "Complex",
-      "datapoints": 143
-    },
-    {
       "id": 2,
       "name": "NI",
       "project": "Tevet",
@@ -69,20 +55,6 @@
       "category": "Retail & E-Commerce",
       "complexity": "Complex",
       "datapoints": 33
-    },
-    {
-      "id": 6,
-      "name": "Webmd",
-      "project": "WebMD",
-      "url": "https://www.webmd.com",
-      "type": "Listing",
-      "industry": "Healthcare",
-      "country": "US",
-      "dataType": "Physician data",
-      "info": "Physician Information",
-      "category": "Healthcare",
-      "complexity": "Medium",
-      "datapoints": 21
     },
     {
       "id": 7,
@@ -727,20 +699,6 @@
       "category": "Registry & SEC",
       "complexity": "Medium",
       "datapoints": 0
-    },
-    {
-      "id": 53,
-      "name": "Investegate",
-      "project": "LN UK",
-      "url": "https://www.investegate.co.uk",
-      "type": "Listing",
-      "industry": "Financial Regulatories",
-      "country": "UK",
-      "dataType": "Investment & Other Data",
-      "info": "Company Article Information",
-      "category": "Other",
-      "complexity": "Medium",
-      "datapoints": 17
     },
     {
       "id": 54,
@@ -3555,20 +3513,6 @@
       "category": "Business Directory",
       "complexity": "Simple",
       "datapoints": 6
-    },
-    {
-      "id": 255,
-      "name": "TurkeyBrokers",
-      "project": "Alacra",
-      "url": "https://www.cmb.gov.tr/companies/public-companies/communication-information-of-public-companies",
-      "type": "Listing",
-      "industry": "Business Information",
-      "country": "Turkey",
-      "dataType": "company data",
-      "info": "Company Information",
-      "category": "Business Directory",
-      "complexity": "Simple",
-      "datapoints": 3
     },
     {
       "id": 256,

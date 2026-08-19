@@ -10,7 +10,7 @@ export const Route = createFileRoute("/login")({
   validateSearch: (search: Record<string, unknown>) => ({
     next: typeof search.next === "string" ? search.next : undefined,
   }),
-  head: () => ({ meta: [{ title: "Login - FreshData AI" }] }),
+  head: () => ({ meta: [{ title: "Login - Freda" }] }),
   component: LoginPage,
 });
 
@@ -84,10 +84,10 @@ function LoginPage() {
         <div className="space-y-6">
           <div className="inline-flex items-center gap-3 rounded-full border border-info/20 bg-info-bg px-4 py-2 text-sm text-foreground">
             <Shield className="h-4 w-4" />
-            FreshData
+            Freda
           </div>
           <div className="space-y-3">
-            <h1 className="text-4xl font-semibold tracking-tight">Welcome to FreshData</h1>
+            <h1 className="text-4xl font-semibold tracking-tight">Welcome to Freda</h1>
             <p className="max-w-xl text-sm text-muted-foreground leading-6">
               Select your role and sign in to continue.
             </p>

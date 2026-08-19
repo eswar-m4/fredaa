@@ -158,3 +158,133 @@ export function Steps({ steps, current }: { steps: string[]; current: number }) 
     </ol>
   );
 }
+
+/* ---------------- date range filter ---------------- */
+
+export type RangeValue = { key: "today" | "7d" | "30d" | "custom"; from: string; to: string };
+
+export const DEFAULT_RANGE: RangeValue = { key: "7d", from: "", to: "" };
+
+export function rangeDays(v: RangeValue) {
+  if (v.key === "today") return 1;
+  if (v.key === "7d") return 7;
+  if (v.key === "30d") return 30;
+  if (v.from && v.to) {
+    const d = (new Date(v.to).getTime() - new Date(v.from).getTime()) / 86400000;
+    return Math.max(1, Math.round(d) || 1);
+  }
+  return 7;
+}
+
+export function RangeFilter({ value, onChange }: { value: RangeValue; onChange: (v: RangeValue) => void }) {
+  const opts: Array<[RangeValue["key"], string]> = [
+    ["today", "Today"],
+    ["7d", "Last week"],
+    ["30d", "Last month"],
+    ["custom", "Custom"],
+  ];
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <div className="inline-flex rounded-lg border border-border bg-card p-0.5">
+        {opts.map(([k, label]) => (
+          <button
+            key={k}
+            suppressHydrationWarning
+            onClick={() => onChange({ ...value, key: k })}
+            className={cn(
+              "px-3 h-7 rounded-md text-[12px] font-medium transition",
+              value.key === k ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-secondary",
+            )}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+      {value.key === "custom" && (
+        <div className="inline-flex items-center gap-1.5">
+          <input
+            suppressHydrationWarning
+            type="date"
+            value={value.from}
+            onChange={(e) => onChange({ ...value, from: e.target.value })}
+            className="h-7 px-2 rounded-md border border-input bg-card text-[12px] outline-none focus:ring-2 focus:ring-ring/40"
+          />
+          <span className="text-[12px] text-muted-foreground">→</span>
+          <input
+            suppressHydrationWarning
+            type="date"
+            value={value.to}
+            onChange={(e) => onChange({ ...value, to: e.target.value })}
+            className="h-7 px-2 rounded-md border border-input bg-card text-[12px] outline-none focus:ring-2 focus:ring-ring/40"
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ---------------- stacked ADMV bar ---------------- */
+
+export function AdmvBar({
+  a,
+  className,
+  showLegend = false,
+}: {
+  a: { added: number; deleted: number; modified: number; verified: number };
+  className?: string;
+  showLegend?: boolean;
+}) {
+  const total = a.added + a.deleted + a.modified + a.verified || 1;
+  const seg = [
+    { k: "Added", v: a.added, cls: "bg-success" },
+    { k: "Deleted", v: a.deleted, cls: "bg-destructive" },
+    { k: "Modified", v: a.modified, cls: "bg-warning" },
+    { k: "Verified", v: a.verified, cls: "bg-primary/60" },
+  ];
+  return (
+    <div className={className}>
+      <div className="flex h-2 w-full rounded-full overflow-hidden bg-secondary">
+        {seg.map((s) => (
+          <div key={s.k} className={s.cls} style={{ width: `${(s.v / total) * 100}%` }} title={`${s.k} ${((s.v / total) * 100).toFixed(1)}%`} />
+        ))}
+      </div>
+      {showLegend && (
+        <div className="flex flex-wrap gap-x-3 gap-y-1 mt-1.5 text-[10.5px] text-muted-foreground">
+          {seg.map((s) => (
+            <span key={s.k} className="inline-flex items-center gap-1">
+              <span className={cn("h-2 w-2 rounded-sm", s.cls)} /> {s.k} {((s.v / total) * 100).toFixed(1)}%
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export function Donut({ value, label, tone = "primary" }: { value: number; label?: string; tone?: string }) {
+  const r = 26;
+  const c = 2 * Math.PI * r;
+  return (
+    <div className="flex flex-col items-center gap-1 shrink-0">
+    <div className="relative h-[68px] w-[68px]">
+      <svg viewBox="0 0 64 64" className="h-full w-full -rotate-90">
+        <circle cx="32" cy="32" r={r} fill="none" strokeWidth="7" className="stroke-secondary" />
+        <circle
+          cx="32"
+          cy="32"
+          r={r}
+          fill="none"
+          strokeWidth="7"
+          strokeLinecap="round"
+          className={cn(tone === "success" ? "stroke-success" : tone === "warning" ? "stroke-warning" : "stroke-primary")}
+          strokeDasharray={`${(value / 100) * c} ${c}`}
+        />
+      </svg>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className="text-[13px] font-semibold tabular-nums">{Math.round(value)}%</span>
+      </div>
+    </div>
+    {label && <span className="text-[10px] text-muted-foreground uppercase tracking-wide">{label}</span>}
+    </div>
+  );
+}

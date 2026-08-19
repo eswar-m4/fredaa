@@ -120,7 +120,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
         <header className="h-16 border-b border-border bg-card px-6 flex items-center justify-between">
           <div>
             <div className="text-sm font-semibold text-foreground">Workflow Requests</div>
-            <div className="text-xs text-muted-foreground">By Source and By Dataset request visibility</div>
+            <div className="text-xs text-muted-foreground">Agent and Solution request visibility</div>
           </div>
           <div className="flex items-center gap-3 text-xs text-muted-foreground">
             <Activity className="h-4 w-4 text-info" />

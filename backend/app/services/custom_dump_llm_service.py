@@ -8,41 +8,6 @@ from app.config import settings
 logger = logging.getLogger(__name__)
 
 ALLOWED_SCHEMAS = {
-    "Keysight": {
-        "fields": ["category", "product_family", "product_series", "region", "sku"],
-        "description": (
-            "category: String or List of Strings representing product category (e.g. ['Oscilloscopes', 'Probes'] or 'Oscilloscopes'). Matches ANY of the options.\n"
-            "product_family: String or List of Strings representing product family.\n"
-            "product_series: String or List of Strings representing series.\n"
-            "region: String or List of Strings representing region/locale.\n"
-            "sku: String or List of Strings representing product SKU code."
-        )
-    },
-    "Webmd": {
-        "fields": [
-            "Specialty", "State", "City", "Hospital_Affiliations", "Languages_Spoken",
-            "Medical_School", "Accepting_New_Patients", "Medicare_Accepted", "Medicaid_Accepted"
-        ],
-        "description": (
-            "Specialty: String or List of Strings representing medical specialty (e.g. ['Cardiology', 'Pediatrics'] or 'Cardiology').\n"
-            "State: String or List of Strings representing 2-letter uppercase state code (e.g. ['CA', 'NY'] or 'CA').\n"
-            "City: String or List of Strings representing city.\n"
-            "Hospital_Affiliations: String or List of Strings representing hospital affiliation.\n"
-            "Languages_Spoken: String or List of Strings representing language.\n"
-            "Medical_School: String or List of Strings representing medical school name.\n"
-            "Accepting_New_Patients: String which must be either 'Yes' or 'No'.\n"
-            "Medicare_Accepted: String which must be either 'Yes' or 'No'.\n"
-            "Medicaid_Accepted: String which must be either 'Yes' or 'No'."
-        )
-    },
-    "TurkeyBrokers": {
-        "fields": ["City", "Address", "PrimaryKey"],
-        "description": (
-            "City: String or List of Strings representing the city in Turkey (e.g. ['Istanbul', 'Ankara'] or 'Istanbul').\n"
-            "Address: String or List of Strings representing street address/location.\n"
-            "PrimaryKey: String or List of Strings representing the name of the broker or brokerage house."
-        )
-    },
     "Investegate": {
         "fields": [
             "ticker", "cik", "state_of_incorporation", "sic_description",
