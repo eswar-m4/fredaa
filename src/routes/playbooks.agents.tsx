@@ -137,13 +137,28 @@ function AgentsPage() {
           <Card className="p-5 flex flex-col min-h-[460px]">
             <SectionTitle hint={`${sources.length} sources`}>Manage sources</SectionTitle>
 
-            <Select className="mb-3" value={project.id} onChange={(e) => setProjectId(e.target.value)}>
-              {customer.projects.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name} — {p.sources.length} sources · {p.datapoints.length} datapoints
-                </option>
-              ))}
-            </Select>
+            <div className="mb-3 rounded-xl border border-primary/40 bg-gradient-to-r from-primary/15 via-primary/5 to-transparent p-3">
+              <div className="text-[11px] uppercase tracking-wider font-bold text-primary mb-1.5">Working on project</div>
+              <div className="relative">
+                <Select
+                  className="h-11 !text-[14px] font-bold border-primary/50 bg-card shadow-sm focus:ring-2 focus:ring-primary/40"
+                  value={project.id}
+                  onChange={(e) => setProjectId(e.target.value)}
+                >
+                  {customer.projects.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name} — {p.sources.length} sources · {p.datapoints.length} datapoints
+                    </option>
+                  ))}
+                </Select>
+              </div>
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                <span className="text-[11px] font-semibold rounded-full px-2 py-0.5 bg-primary/15 text-primary">{project.frequency} refresh</span>
+                <span className="text-[11px] font-semibold rounded-full px-2 py-0.5 bg-secondary text-secondary-foreground">{fmt(project.records)} records</span>
+                <span className="text-[11px] font-semibold rounded-full px-2 py-0.5 bg-secondary text-secondary-foreground">{project.datapoints.length} datapoints</span>
+              </div>
+            </div>
+
 
             <div className="rounded-lg border border-border p-3 mb-3 shrink-0">
               <div className="flex items-center gap-2">
@@ -179,30 +194,36 @@ function AgentsPage() {
               </div>
             </div>
 
-            <div className="flex-1 min-h-0 overflow-y-auto grid sm:grid-cols-2 gap-2 content-start pr-1">
-              {sources.map((s) => (
-                <div key={s.id} className={cn("rounded-lg border p-0 overflow-hidden flex flex-col", NEUTRAL_ART.border)}>
-                  <div className={cn("flex items-center gap-2 px-3 py-2", NEUTRAL_ART.header)}>
-                    <Globe className={cn("h-3.5 w-3.5 shrink-0", NEUTRAL_ART.headerText)} />
-                    <span className={cn("text-[12.5px] font-semibold truncate", NEUTRAL_ART.headerText)}>{s.label}</span>
-                    <span className="ml-auto text-[10px] uppercase tracking-wider font-semibold bg-card border rounded px-1.5 py-0.5 whitespace-nowrap">{s.status}</span>
-                  </div>
-                  <div className="px-3 py-2 flex items-center gap-2">
-                    <div className="min-w-0 flex-1">
-                      <div className="text-[11px] text-muted-foreground truncate">added {s.addedOn}</div>
-                      <div className="text-[13px] font-semibold tabular-nums">{fmt(s.records)} <span className="text-[11px] font-normal text-muted-foreground">records</span></div>
+            <div className="flex-1 min-h-0 rounded-xl border border-border bg-secondary/20 p-2.5 flex flex-col">
+              <div className="px-1 pb-2 text-[11px] uppercase tracking-wider font-semibold text-muted-foreground shrink-0">
+                Sources on this project · {sources.length}
+              </div>
+              <div className="flex-1 min-h-0 overflow-y-auto grid sm:grid-cols-2 gap-2 content-start pr-1">
+                {sources.map((s) => (
+                  <div key={s.id} className={cn("rounded-lg border bg-card p-0 overflow-hidden flex flex-col", NEUTRAL_ART.border)}>
+                    <div className={cn("flex items-center gap-2 px-3 py-2", NEUTRAL_ART.header)}>
+                      <Globe className={cn("h-3.5 w-3.5 shrink-0", NEUTRAL_ART.headerText)} />
+                      <span className={cn("text-[12.5px] font-semibold truncate", NEUTRAL_ART.headerText)}>{s.label}</span>
+                      <span className="ml-auto text-[10px] uppercase tracking-wider font-semibold bg-card border rounded px-1.5 py-0.5 whitespace-nowrap">{s.status}</span>
                     </div>
-                    <button
-                      onClick={() => removeSource(s.id)}
-                      title="Retire source"
-                      className="h-8 w-8 shrink-0 rounded-md inline-flex items-center justify-center border border-border hover:bg-destructive/10 hover:text-destructive transition"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </button>
+                    <div className="px-3 py-2 flex items-center gap-2">
+                      <div className="min-w-0 flex-1">
+                        <div className="text-[11px] text-muted-foreground truncate">added {s.addedOn}</div>
+                        <div className="text-[13px] font-semibold tabular-nums">{fmt(s.records)} <span className="text-[11px] font-normal text-muted-foreground">records</span></div>
+                      </div>
+                      <button
+                        onClick={() => removeSource(s.id)}
+                        title="Retire source"
+                        className="h-8 w-8 shrink-0 rounded-md inline-flex items-center justify-center border border-border hover:bg-destructive/10 hover:text-destructive transition"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
+
           </Card>
 
           {/* schedule */}
