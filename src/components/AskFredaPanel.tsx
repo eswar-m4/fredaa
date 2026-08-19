@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { Send, Sparkles } from "lucide-react";
 import { Button, Card, SectionTitle } from "@/components/ui-bits";
+import { addTicket } from "@/lib/ticket-store";
 import { useActiveCustomer } from "@/lib/workspace";
 import { fmt, rollup, hrsAgo } from "@/data/customers";
 import { cn } from "@/lib/utils";
@@ -12,6 +13,7 @@ export function AskFredaPanel() {
   const stats = rollup(customer);
 
   const suggestions = [
+    "Request a new project or solution",
     `What changed in ${customer.industry.toLowerCase()} data this week?`,
     "Which dataset needs review first?",
     "Show me accuracy by project",
@@ -26,6 +28,13 @@ export function AskFredaPanel() {
     },
   ]);
   const [input, setInput] = useState("");
+  const [flow, setFlow] = useState<number>(-1);
+  const [draft, setDraft] = useState<{ name: string; sources: string[]; datapoints: string[]; schedule: string }>({
+    name: "",
+    sources: [],
+    datapoints: [],
+    schedule: "Weekly",
+  });
   const endRef = useRef<HTMLDivElement>(null);
 
   function answer(q: string): string {
@@ -50,10 +59,62 @@ export function AskFredaPanel() {
     return `I can help with ${customer.industry.toLowerCase()} data questions: what changed (ADMV), review priorities, dataset accuracy and coverage, source health and downloads.`;
   }
 
+  const FLOW_PROMPTS = [
+    "Great — let's set it up. What should the new project or solution be called?",
+    "Which websites or sources should FreDA extract from? Paste them comma separated.",
+    "Which datapoints do you need? Comma separated (e.g. Company name, HQ city, Revenue).",
+    "How often should it refresh — Daily, Weekly, Monthly or a custom cadence?",
+  ];
+
+  function handleFlow(q: string): string {
+    if (flow === 0) {
+      setDraft((d) => ({ ...d, name: q }));
+      setFlow(1);
+      return FLOW_PROMPTS[1]!;
+    }
+    if (flow === 1) {
+      setDraft((d) => ({ ...d, sources: q.split(",").map((s) => s.trim()).filter(Boolean) }));
+      setFlow(2);
+      return FLOW_PROMPTS[2]!;
+    }
+    if (flow === 2) {
+      setDraft((d) => ({ ...d, datapoints: q.split(",").map((s) => s.trim()).filter(Boolean) }));
+      setFlow(3);
+      return FLOW_PROMPTS[3]!;
+    }
+    const schedule = q;
+    const sources = draft.sources;
+    const datapoints = draft.datapoints;
+    const days = Math.max(3, Math.round(sources.length * 1.5 + datapoints.length * 0.2));
+    const t = addTicket({
+      workspaceId: customer.id,
+      workspaceName: customer.name,
+      project: draft.name || "New solution",
+      type: "New project",
+      detail: `Ask FreDA request — ${draft.name || "New solution"} · ${sources.length} sources · ${datapoints.length} datapoints · ${schedule}`,
+      raisedBy: `${customer.shortName.toLowerCase()} workspace user`,
+      estimateDays: days,
+      sources,
+      datapoints,
+      frequency: schedule,
+    });
+    setFlow(-1);
+    return `Done — ${t.id} raised with your FreDA admin.\n\n• Project: ${draft.name}\n• Sources: ${sources.length}\n• Datapoints: ${datapoints.length}\n• Refresh: ${schedule}\n• Estimate: ${days} days to build and onboard\n\nAdmin will approve it, build the bots in the backend and onboard it to your workspace. Track it in the Request tracker.`;
+  }
+
   function send(text: string) {
     const q = text.trim();
     if (!q) return;
-    setMessages((m) => [...m, { role: "user", text: q }, { role: "freda", text: answer(q) }]);
+    let reply: string;
+    if (flow >= 0) {
+      reply = handleFlow(q);
+    } else if (/new (project|solution|dataset)|add (a )?(project|solution|dataset)|request a/i.test(q)) {
+      setFlow(0);
+      reply = FLOW_PROMPTS[0]!;
+    } else {
+      reply = answer(q);
+    }
+    setMessages((m) => [...m, { role: "user", text: q }, { role: "freda", text: reply }]);
     setInput("");
     setTimeout(() => endRef.current?.scrollIntoView({ behavior: "smooth" }), 30);
   }
