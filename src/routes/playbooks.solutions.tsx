@@ -102,13 +102,17 @@ const WIZARD_STEPS = ["Configure", "Upload dataset", "Wired sources", "Attribute
 type Cadence = "Daily" | "Weekly" | "Monthly" | "Custom";
 
 function SolutionsPage() {
+  const customer = useActiveCustomer();
   const datasets = useMemo(() => DATASETS.map(fromDataset), []);
+  const fit = useMemo(() => industryFit(customer.industry), [customer.industry]);
+  const relevant = useMemo(() => fit.ids.map((id) => datasets.find((d) => d.id === id)).filter(Boolean) as SetupItem[], [datasets, fit]);
 
   const [q, setQ] = useState("");
   const [cat, setCat] = useState<string>("All");
+  const [scope, setScope] = useState<"fit" | "all">("fit");
   const [active, setActive] = useState<SetupItem | null>(null);
 
-  const pool = datasets;
+  const pool = scope === "fit" ? relevant : datasets;
   const cats = DATASET_CATEGORIES as string[];
 
   const list = useMemo(
@@ -118,6 +122,7 @@ function SolutionsPage() {
       ),
     [pool, cat, q],
   );
+
 
   if (active) return <DatasetSetup item={active} onBack={() => setActive(null)} />;
 
