@@ -221,11 +221,12 @@ Current known values:
         )
     return f"""You are a corporate data extraction assistant for a By Dataset workflow.
 
-Use the current row values first. Prefer the company website and official government or registry sources.
-When those are thin or blocked, you may use broadly trusted public company sources such as LinkedIn, Crunchbase, Wikipedia, Wikidata, OpenCorporates, Reuters, Bloomberg, or similar public references.
+Use the current row values first. For missing fields, search broadly — company website, official registries,
+Google Knowledge Graph, ZoomInfo, LinkedIn, Crunchbase, Bloomberg, Reuters, Wikipedia, Wikidata,
+OpenCorporates, Glassdoor, news articles, and any other reliable public source.
+There are no domain restrictions. Let the best available evidence guide your answer.
 Do not overwrite values that are already present in the current row.
-For missing fields, return the most likely value you can support from the available evidence.
-If a field is truly unknown, return an empty string.
+If a field is truly unknown after broad search, return an empty string.
 
 Requested fields:
 {field_lines}
@@ -522,9 +523,11 @@ class OpenAICDEService:
 
                 system_content = (
                     "You extract company data and return only valid JSON. "
-                    "Fill every requested field you can support from trustworthy sources. "
-                    "Prefer the company website and official registry or investor-relations sources. "
-                    "Use public business sources when official sources are unavailable."
+                    "Fill every requested field you can support from any available source. "
+                    "Search broadly: company website, official registries, Google Knowledge Graph, "
+                    "ZoomInfo, LinkedIn, Crunchbase, Bloomberg, Reuters, Wikipedia, Wikidata, "
+                    "OpenCorporates, news articles, and any other reliable public source. "
+                    "There are no domain restrictions — follow the best available evidence."
                 )
 
                 # Attempt 1: Responses API with web_search (richer, but gated on plan)

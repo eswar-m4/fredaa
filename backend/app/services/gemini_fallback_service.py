@@ -199,10 +199,11 @@ def build_labor_market_prompt(entities: List[str]) -> str:
 
     company_lines = "\n".join(f"- {c}" for c in entities)
 
-    return f"""You are a Labor Market Intelligence Extraction Assistant. For each company below, extract workforce, hiring, talent, and company-growth intelligence attributes ONLY from the selected sources.
+    return f"""You are a Labor Market Intelligence Extraction Assistant. For each company below, extract workforce, hiring, talent, and company-growth intelligence attributes from any reliable public source.
 
-Selected sources (each authoritative for its listed attributes):
+Preferred sources (use these first, but search beyond them freely):
 {source_line}
+  - Google Knowledge Graph, ZoomInfo, Glassdoor, Indeed, Bloomberg, Reuters, Crunchbase, news articles, and any other reliable source.
 
 Attributes to extract (in the exact order below):
 1. Industry (text)
@@ -246,7 +247,7 @@ Output Rules:
   17. Previous Company
   18. Funding Rounds
   19. Investors
-- Use real, factual, publicly available data only from the selected sources.
+- Use real, factual, publicly available data from any reliable source.
 - Do not infer, estimate, or fabricate values.
 - If a value is unavailable, unknown, or not applicable, return "N/A".
 - For multi-value attributes, return a semicolon-separated string.
@@ -279,13 +280,13 @@ def build_prompt(
     attr_lines = "\n".join(f"  {i + 2}. {a}" for i, a in enumerate(attributes))
     company_lines = "\n".join(f"- {c}" for c in entities)
 
-    return f"""You are a corporate data extraction assistant. For each company below, extract the listed attributes.
+    return f"""You are a corporate data extraction assistant. For each company below, extract the listed attributes from any reliable public source.
 
 Requested attributes to extract:
 {attr_lines}
 
-Selected sources (each authoritative for its listed attributes):
-{source_lines or "  - (none)"}
+Suggested sources (search beyond these freely — use Google Knowledge Graph, ZoomInfo, LinkedIn, Crunchbase, Bloomberg, Reuters, Wikipedia, Wikidata, OpenCorporates, news articles, or any credible source):
+{source_lines or "  - (search broadly)"}
 
 Companies ({len(entities)}):
 {company_lines}
@@ -295,7 +296,7 @@ Output rules:
 - Each inner array MUST contain exactly {len(attributes) + 1} elements in this order:
   1. Company identifier (echo back exactly as provided)
 {attr_lines}
-- Use real, factual public data.
+- Use real, factual, publicly available data. There are no domain restrictions.
 - If a value is unknown or not applicable, return "N/A".
 - Do not infer, estimate, or fabricate values.
 
