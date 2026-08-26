@@ -57,12 +57,20 @@ const jobTone: Record<JobRun["state"], "info" | "neutral" | "success" | "destruc
   Failed: "destructive",
 };
 
+function toDateTimeLocalValue(date: Date) {
+  const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60_000);
+  return localDate.toISOString().slice(0, 16);
+}
+
 function MonitoringPage() {
   const customer = useActiveCustomer();
   const [range, setRange] = useState<RangeValue>(DEFAULT_RANGE);
   const [scope, setScope] = useState("all");
   const [filter, setFilter] = useState("all");
   const [running, setRunning] = useState<Record<string, number>>({});
+  const [scheduleEditor, setScheduleEditor] = useState<string | null>(null);
+  const [scheduledRuns, setScheduledRuns] = useState<Record<string, string>>({});
+  const [scheduleDraft, setScheduleDraft] = useState("");
 
   const scoped = scope === "all" ? customer.projects : customer.projects.filter((p) => p.id === scope);
   const stats = useMemo(() => rollupProjects(scoped), [customer.id, scope]);
@@ -74,6 +82,7 @@ function MonitoringPage() {
   const projects = scoped.filter((p) => filter === "all" || p.status === filter);
 
   function refresh(id: string) {
+    setScheduleEditor(null);
     setRunning((r) => ({ ...r, [id]: 0 }));
     let pct = 0;
     const t = setInterval(() => {
@@ -91,6 +100,19 @@ function MonitoringPage() {
         );
       }
     }, 260);
+  }
+
+  function openScheduleEditor(id: string) {
+    const defaultTime = new Date(Date.now() + 60 * 60 * 1000);
+    defaultTime.setMinutes(0, 0, 0);
+    setScheduleDraft(toDateTimeLocalValue(defaultTime));
+    setScheduleEditor(id);
+  }
+
+  function scheduleRun(id: string) {
+    if (!scheduleDraft) return;
+    setScheduledRuns((runs) => ({ ...runs, [id]: scheduleDraft }));
+    setScheduleEditor(null);
   }
 
   const live = visibleJobs.filter((j) => j.state === "Running").length;
@@ -238,7 +260,7 @@ function MonitoringPage() {
                     <td className="px-3 py-3 text-muted-foreground">{hrsAgo(p.lastRefreshHrs)}</td>
                     <td className="px-3 py-3 text-muted-foreground">
                       <span className="inline-flex items-center gap-1">
-                        <Timer className="h-3.5 w-3.5" /> {inHrs(p.nextRefreshHrs)}
+                        <Timer className="h-3.5 w-3.5" /> {scheduledRuns[p.id] ? new Date(scheduledRuns[p.id]).toLocaleString() : inHrs(p.nextRefreshHrs)}
                       </span>
                     </td>
                     <td className="px-3 py-3 tabular-nums">{fmt(p.records)}</td>
@@ -251,7 +273,31 @@ function MonitoringPage() {
                       <Badge tone={statusTone[p.status]}>{p.status}</Badge>
                     </td>
                     <td className="px-5 py-3 text-right">
-                      {pct === undefined ? (
+                      {pct === undefined ? p.frequency === "Weekly" ? (
+                        scheduleEditor === p.id ? (
+                          <div className="flex flex-wrap justify-end items-center gap-1.5">
+                            <input
+                              type="datetime-local"
+                              aria-label={`Schedule ${p.name} rerun`}
+                              value={scheduleDraft}
+                              min={toDateTimeLocalValue(new Date())}
+                              onChange={(e) => setScheduleDraft(e.target.value)}
+                              className="h-8 w-[172px] rounded-md border border-border bg-background px-2 text-[11px]"
+                            />
+                            <Button size="sm" onClick={() => scheduleRun(p.id)} disabled={!scheduleDraft}>Schedule</Button>
+                            <Button size="sm" variant="ghost" onClick={() => setScheduleEditor(null)}>Cancel</Button>
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-end gap-1.5">
+                            <Button size="sm" variant="outline" onClick={() => refresh(p.id)}>
+                              <RefreshCw className="h-3.5 w-3.5" /> Run now
+                            </Button>
+                            <Button size="sm" variant="outline" onClick={() => openScheduleEditor(p.id)}>
+                              <Timer className="h-3.5 w-3.5" /> Schedule later
+                            </Button>
+                          </div>
+                        )
+                      ) : (
                         <Button size="sm" variant="outline" onClick={() => refresh(p.id)}>
                           <RefreshCw className="h-3.5 w-3.5" /> Run now
                         </Button>

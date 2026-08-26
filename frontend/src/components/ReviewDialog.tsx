@@ -6,6 +6,7 @@ import { Check, X, ChevronLeft, ChevronRight, ArrowRight, RotateCcw, Layers, Sen
 import { reviewRecordsFor, fmt, hrsAgo, type Project, type ReviewRecord, type ChangeType } from "@/data/customers";
 
 type Decision = "approved" | "rejected";
+type ReviewSort = "latest" | "oldest" | "confidence-high" | "confidence-low";
 
 const CHANGE_TYPES: ChangeType[] = ["Added", "Deleted", "Modified", "Verified"];
 
@@ -30,11 +31,21 @@ export function ReviewDialog({
   const [minConf, setMinConf] = useState(0);
   const [datapoint, setDatapoint] = useState("all");
   const [query, setQuery] = useState("");
+  const [sort, setSort] = useState<ReviewSort>("latest");
   const [decisions, setDecisions] = useState<Record<string, Decision>>({});
   const [cursor, setCursor] = useState(0);
   const [submitted, setSubmitted] = useState(0);
 
-  const sampled = useMemo(() => all.slice(0, Math.max(1, Math.round((all.length * sampling) / 100))), [all, sampling]);
+  const sorted = useMemo(() => {
+    return [...all].sort((a, b) => {
+      if (sort === "oldest") return b.detectedHrs - a.detectedHrs;
+      if (sort === "confidence-high") return b.confidence - a.confidence;
+      if (sort === "confidence-low") return a.confidence - b.confidence;
+      return a.detectedHrs - b.detectedHrs;
+    });
+  }, [all, sort]);
+
+  const sampled = useMemo(() => sorted.slice(0, Math.max(1, Math.round((sorted.length * sampling) / 100))), [sorted, sampling]);
 
 
   const records = useMemo(
@@ -51,7 +62,7 @@ export function ReviewDialog({
     [sampled, types, minConf, datapoint, query],
   );
 
-  useEffect(() => setCursor(0), [types, minConf, datapoint, query, sampling]);
+  useEffect(() => setCursor(0), [types, minConf, datapoint, query, sampling, sort]);
 
   const decided = records.filter((r) => decisions[r.id]).length;
   const approved = records.filter((r) => decisions[r.id] === "approved").length;
@@ -214,6 +225,16 @@ export function ReviewDialog({
               <Input placeholder="Search…" value={query} onChange={(e) => setQuery(e.target.value)} />
             </div>
 
+            <div>
+              <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">Sort tickets</div>
+              <Select value={sort} onChange={(e) => setSort(e.target.value as ReviewSort)}>
+                <option value="latest">Latest detected first</option>
+                <option value="oldest">Oldest detected first</option>
+                <option value="confidence-high">Highest confidence first</option>
+                <option value="confidence-low">Lowest confidence first</option>
+              </Select>
+            </div>
+
             <div className="rounded-lg border border-border bg-card p-3">
               <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">Group approval</div>
               <div className="space-y-1.5">
@@ -339,6 +360,7 @@ export function ReviewDialog({
                     <th className="px-3 py-2 font-semibold">Change</th>
                     <th className="px-3 py-2 font-semibold">Old → New</th>
                     <th className="px-3 py-2 font-semibold">Source</th>
+                    <th className="px-3 py-2 font-semibold">Detected</th>
                     <th className="px-3 py-2 font-semibold">Conf.</th>
                     <th className="px-6 py-2 font-semibold text-right">Decision</th>
                   </tr>
@@ -376,6 +398,7 @@ export function ReviewDialog({
                             <ExternalLink className="h-3 w-3 shrink-0" /> {r.source}
                           </a>
                         </td>
+                        <td className="px-3 py-2 text-muted-foreground whitespace-nowrap">{hrsAgo(r.detectedHrs)}</td>
                         <td className="px-3 py-2 tabular-nums">{r.confidence}%</td>
                         <td className="px-6 py-2">
                           <div className="flex items-center justify-end gap-1.5">
