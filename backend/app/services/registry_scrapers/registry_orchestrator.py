@@ -11,6 +11,7 @@ from app.core.logger import setup_logger
 from app.services.company_verification_service import normalize_workflow_record, resolve_company_identity
 from app.services.registry_scrapers.companies_house_scraper import companies_house_scraper
 from app.services.registry_scrapers.gleif_scraper import gleif_scraper
+from app.services.registry_scrapers.kg_scraper import kg_scraper
 from app.services.registry_scrapers.mca_scraper import mca_scraper
 from app.services.registry_scrapers.registry_capabilities import (
     REGISTRY_CAPABILITIES,
@@ -72,8 +73,10 @@ def _requested_registry_sources(config: Dict[str, Any]) -> set[str]:
         requested.add("companies_house")
     if "gleif" in text or "lei" in text:
         requested.add("gleif")
-    if "wikidata" in text or "knowledge graph" in text:
+    if "wikidata" in text:
         requested.add("wikidata")
+    if "knowledge graph" in text or "google kg" in text or "google knowledge" in text:
+        requested.add("google_kg")
     return requested
 
 
@@ -302,6 +305,7 @@ class RegistryOrchestrator:
             "gleif": gleif_scraper,
             "companies_house": companies_house_scraper,
             "wikidata": wikidata_scraper,
+            "google_kg": kg_scraper,
         }
 
     def _raw_company_name(
@@ -343,7 +347,7 @@ class RegistryOrchestrator:
         inferred = self.choose_registry(record, config=config, website_result=website_result)
         if inferred:
             if inferred == "gleif" and not _has_strong_registry_identifier(normalize_workflow_record(record)):
-                return ["gleif", "wikidata"]
+                return ["gleif", "wikidata", "google_kg"]
             return [inferred]
         normalized_record = normalize_workflow_record(record)
         company_name = self._raw_company_name(normalized_record, website_result)
@@ -354,7 +358,7 @@ class RegistryOrchestrator:
             or ""
         )
         if company_name and not website_domain and not _has_strong_registry_identifier(normalized_record):
-            return ["gleif", "wikidata"]
+            return ["gleif", "wikidata", "google_kg"]
         return []
 
     async def _attempt_registry_source(

@@ -76,6 +76,7 @@ class Settings(BaseSettings):
     # AI/LLM settings
     LOVABLE_API_KEY: Optional[str] = None
     GEMINI_API_KEY: Optional[str] = None
+    GOOGLE_KG_API_KEY: Optional[str] = None
     GEMINI_MODEL: str = "gemini-1.5-flash"
     GROQ_API_KEY: Optional[str] = None
     GROQ_API_BASE: str = "https://api.groq.com/openai/v1"
@@ -122,6 +123,7 @@ def _load_settings() -> Settings:
                     "GEMINI_API_KEY",
                     "GROQ_API_KEY",
                     "LOVABLE_API_KEY",
+                    "GOOGLE_KG_API_KEY",
                 ):
                     env_overrides[key] = value
 

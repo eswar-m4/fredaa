@@ -42,7 +42,10 @@ REGISTRY_SOURCE_ALIASES: Dict[str, str] = {
     "wikidata": "wikidata",
     "wiki": "wikidata",
     "wikidataenrichment": "wikidata",
-    "knowledgegraph": "wikidata",
+    "knowledgegraph": "google_kg",
+    "googlekg": "google_kg",
+    "googleknowledgegraph": "google_kg",
+    "kgsearch": "google_kg",
 }
 
 
@@ -111,7 +114,7 @@ REGISTRY_CAPABILITIES: Dict[str, RegistryCapability] = {
         label="Wikidata",
         source_type="knowledge_graph",
         adapter_kind="knowledge_graph",
-        keywords=("wikidata", "wiki data", "knowledge graph"),
+        keywords=("wikidata", "wiki data"),
         jurisdiction_hints=("global",),
         supported_fields=(
             "company_name",
@@ -129,6 +132,25 @@ REGISTRY_CAPABILITIES: Dict[str, RegistryCapability] = {
         ),
         trust_weight=0.62,
         priority=5,
+    ),
+    "google_kg": RegistryCapability(
+        source_key="google_kg",
+        label="Google Knowledge Graph",
+        source_type="knowledge_graph",
+        adapter_kind="knowledge_graph",
+        keywords=("google knowledge graph", "knowledge graph", "kgsearch", "google kg"),
+        jurisdiction_hints=("global",),
+        supported_fields=(
+            "company_name",
+            "description",
+            "website",
+            "industry",
+            "hq_country",
+            "year_founded",
+            "employee_count",
+        ),
+        trust_weight=0.70,
+        priority=6,
     ),
 }
 
