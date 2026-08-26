@@ -98,23 +98,36 @@ class Settings(BaseSettings):
     
     class Config:
         """Pydantic config class"""
-        env_file = str(Path(__file__).resolve().parents[1] / ".env")
+        _base = Path(__file__).resolve().parents[1]
+        env_file = (
+            str(_base / ".env"),
+            str(_base / ".env.production"),  # overrides .env when present (server)
+        )
         env_file_encoding = "utf-8"
         case_sensitive = True
 
 
 def _load_settings() -> Settings:
     """
-    Load settings, giving .env file values priority over system environment
-    variables for API keys. This prevents stale system-level env vars from
-    overriding the keys configured in .env.
+    Load settings, giving env file values priority over system environment
+    variables for API keys. Checks .env.production first (server), then .env (local).
     """
     import os
 
-    env_file = Path(__file__).resolve().parents[1] / ".env"
+    _base = Path(__file__).resolve().parents[1]
+    _API_KEYS = (
+        "OPENAI_API_KEY",
+        "GEMINI_API_KEY",
+        "GROQ_API_KEY",
+        "LOVABLE_API_KEY",
+        "GOOGLE_KG_API_KEY",
+    )
     env_overrides: dict = {}
 
-    if env_file.exists():
+    # Read both files; .env.production wins over .env
+    for env_file in (_base / ".env", _base / ".env.production"):
+        if not env_file.exists():
+            continue
         with open(env_file, encoding="utf-8") as f:
             for line in f:
                 line = line.strip()
@@ -123,14 +136,7 @@ def _load_settings() -> Settings:
                 key, _, value = line.partition("=")
                 key = key.strip()
                 value = value.strip().strip('"').strip("'")
-                # Only override API key fields — don't mess with anything else
-                if key in (
-                    "OPENAI_API_KEY",
-                    "GEMINI_API_KEY",
-                    "GROQ_API_KEY",
-                    "LOVABLE_API_KEY",
-                    "GOOGLE_KG_API_KEY",
-                ):
+                if key in _API_KEYS:
                     env_overrides[key] = value
 
     # Temporarily set the .env values in the process environment so
