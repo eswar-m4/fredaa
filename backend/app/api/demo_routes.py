@@ -2565,6 +2565,10 @@ class SubmitReviewRequest(BaseModel):
     job_id: str
     decisions: List[ReviewDecisionItem]
 
+
+class WeeklyRerunRequest(BaseModel):
+    scheduled_for: Optional[datetime] = None
+
 @router.post("/jobs/submit_review")
 async def submit_review(req: SubmitReviewRequest):
     import logging
@@ -2865,7 +2869,34 @@ async def get_job_review_summary_endpoint(job_id: str):
     from app.services.wcm_comparison_service import get_job_review_summary
     try:
         summary = get_job_review_summary(job_id)
-        return summary
+    return summary
+
+
+@router.post("/jobs/{job_id}/weekly-rerun")
+async def weekly_rerun_job(job_id: str, payload: WeeklyRerunRequest, background_tasks: BackgroundTasks):
+    with get_connection() as conn:
+        row = conn.execute("SELECT frequency FROM scraper_jobs WHERE id = ?", (job_id,)).fetchone()
+        if not row:
+            raise HTTPException(status_code=404, detail="Job not found")
+        if str(row[0] or "").strip().lower() != "weekly":
+            raise HTTPException(status_code=400, detail="Only weekly jobs can be rerun from this action")
+
+        if payload.scheduled_for:
+            scheduled_at = payload.scheduled_for
+            if scheduled_at.tzinfo is not None:
+                scheduled_at = scheduled_at.astimezone().replace(tzinfo=None)
+            if scheduled_at <= datetime.utcnow():
+                raise HTTPException(status_code=400, detail="The scheduled rerun must be in the future")
+            next_refresh = scheduled_at.isoformat() + "Z"
+            conn.execute("UPDATE scraper_jobs SET next_refresh = ? WHERE id = ?", (next_refresh, job_id))
+            conn.commit()
+            return {"status": "scheduled", "next_refresh": next_refresh}
+
+        conn.execute("UPDATE scraper_jobs SET status = 'Running', next_refresh = NULL WHERE id = ?", (job_id,))
+        conn.commit()
+
+    background_tasks.add_task(run_scraper_background, job_id)
+    return {"status": "running"}
     except Exception as e:
         logger.error("Failed to get review summary for job %s: %s", job_id, e)
         raise HTTPException(status_code=500, detail=f"Failed to fetch review summary: {str(e)}")

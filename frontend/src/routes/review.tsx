@@ -14,6 +14,7 @@ export const Route = createFileRoute("/review")({
 });
 
 type ChangeType = "A" | "D" | "M" | "V" | "N";
+type ReviewSort = "latest" | "oldest" | "confidence-high" | "confidence-low";
 
 // Cycle a subtle palette per record group so the 10 attributes of one record visually cluster
 const RECORD_GROUP_PALETTE = [
@@ -336,6 +337,15 @@ function parseTimestamp(value: unknown): Date | null {
   if (!text) return null;
   const d = new Date(text.replace("Z", "+00:00"));
   return Number.isNaN(d.getTime()) ? null : d;
+}
+
+function reviewRowTimestamp(row: any): number {
+  const record = row?.record && typeof row.record === "object" ? row.record : {};
+  for (const key of ["scraped_at", "updated_at", "timestamp", "created_at", "fetched_at", "retrieved_at", "published_at", "last_updated"]) {
+    const parsed = parseTimestamp(row?.[key] ?? record[key]);
+    if (parsed) return parsed.getTime();
+  }
+  return 0;
 }
 
 function buildConfidenceEvidence(
@@ -811,6 +821,7 @@ function Review() {
   const [openJob, setOpenJob] = useState<JobRow | null>(null);
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
   const [changeFilter, setChangeFilter] = useState<"all" | ChangeType>("all");
+  const [reviewSort, setReviewSort] = useState<ReviewSort>("latest");
   const [confFilter, setConfFilter] = useState<"all" | "high" | "medium" | "low">("all");
   const [activeConfJobId, setActiveConfJobId] = useState<string | null>(null);
   const [confLimits, setConfLimits] = useState<Record<string, { min: number; max: number }>>({});
@@ -1456,12 +1467,18 @@ function Review() {
       }
     });
 
-    return activeSample.rows.filter((r) => {
+    const filteredRows = activeSample.rows.filter((r) => {
       if (changeFilter !== "all" && r.changeType !== changeFilter) return false;
       const recordKey = getReviewRecordKey(r, 0);
       return allowedRecordKeys.has(recordKey);
     });
-  }, [activeSample, changeFilter, openJob, confLimits]);
+    return filteredRows.sort((a, b) => {
+      if (reviewSort === "oldest") return reviewRowTimestamp(a) - reviewRowTimestamp(b);
+      if (reviewSort === "confidence-high") return Number(b.conf ?? 0) - Number(a.conf ?? 0);
+      if (reviewSort === "confidence-low") return Number(a.conf ?? 0) - Number(b.conf ?? 0);
+      return reviewRowTimestamp(b) - reviewRowTimestamp(a);
+    });
+  }, [activeSample, changeFilter, openJob, confLimits, reviewSort]);
 
   const counts = useMemo(() => {
     const c: Record<string, number> = { A: 0, D: 0, M: 0, V: 0, N: 0, high: 0, medium: 0, low: 0 };
@@ -2034,6 +2051,19 @@ function Review() {
                     <Chip on={changeFilter === "D"} onClick={() => setChangeFilter("D")} tone="destructive">D · {counts.D}</Chip>
                     <Chip on={changeFilter === "M"} onClick={() => setChangeFilter("M")} tone="warning">M · {counts.M}</Chip>
                     <Chip on={changeFilter === "V"} onClick={() => setChangeFilter("V")} tone="info">V · {counts.V}</Chip>
+                <label className="ml-2 flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                  Sort
+                  <select
+                    value={reviewSort}
+                    onChange={(event) => setReviewSort(event.target.value as ReviewSort)}
+                    className="h-7 rounded-md border border-border bg-card px-2 text-[11px] text-foreground"
+                  >
+                    <option value="latest">Latest first</option>
+                    <option value="oldest">Oldest first</option>
+                    <option value="confidence-high">Highest confidence</option>
+                    <option value="confidence-low">Lowest confidence</option>
+                  </select>
+                </label>
                 <span className="text-[11px] text-muted-foreground ml-auto">{visibleRows.length} rows shown</span>
               </div>
 

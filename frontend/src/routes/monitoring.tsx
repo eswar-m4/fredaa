@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { Badge, Card, PageHeader, Button } from "@/components/ui-bits";
-import { Download, ChevronDown, Trash2, Star } from "lucide-react";
+import { Download, ChevronDown, Trash2, Star, RefreshCw, Timer } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { clearDeletedJob, jobsCacheUpdatedEventName, markJobDeleted, readJobsCache, writeJobsCache } from "@/lib/jobs-cache";
 import { fetchBotCatalog, getBotDisplayName, type BotCatalogEntry } from "@/lib/bot-catalog";
@@ -187,6 +187,9 @@ function Monitoring() {
   const [openExportId, setOpenExportId] = useState<string | null>(null);
   const [catalog, setCatalog] = useState<BotCatalogEntry[]>([]);
   const [urgentBusyId, setUrgentBusyId] = useState<string | null>(null);
+  const [rerunJobId, setRerunJobId] = useState<string | null>(null);
+  const [rerunAt, setRerunAt] = useState("");
+  const [rerunBusyId, setRerunBusyId] = useState<string | null>(null);
 
   const baseApiUrl = (() => {
     if (
@@ -305,6 +308,31 @@ function Monitoring() {
     }
   }
 
+  async function rerunWeeklyJob(job: any, scheduledFor?: string) {
+    setRerunBusyId(job.id);
+    try {
+      const response = await apiFetch(`/api/v1/demo/jobs/${job.id}/weekly-rerun`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(scheduledFor ? { scheduled_for: new Date(scheduledFor).toISOString() } : {}),
+      });
+      if (!response.ok) throw new Error("Failed to update weekly rerun");
+      const result = await response.json();
+      setCustomJobs((current) => {
+        const next = current.map((item) => item.id === job.id ? {
+          ...item,
+          status: scheduledFor ? item.status : "Running",
+          next_refresh: scheduledFor ? result.next_refresh : null,
+        } : item);
+        writeJobsCache(next);
+        return next;
+      });
+      setRerunJobId(null);
+    } finally {
+      setRerunBusyId(null);
+    }
+  }
+
   const combinedJobs = [...customJobs].reverse().map((j) => {
     const sourceName = String(j.source || j.source_name || j.website_url || "Unknown Source");
     return {
@@ -400,13 +428,14 @@ function Monitoring() {
                 <th className="text-left px-4 py-2.5 border-b border-border/40">Status</th>
                 <th className="text-right px-4 py-2.5 border-b border-border/40">Records</th>
                 <th className="text-right px-4 py-2.5 border-b border-border/40">Fresh %</th>
+                <th className="text-right px-4 py-2.5 border-b border-border/40">Rerun</th>
                 <th className="text-right px-4 py-2.5 pr-6 border-b border-border/40">Download</th>
               </tr>
             </thead>
             <tbody className="">
               {finalJobs.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="text-center py-12 text-muted-foreground font-medium">
+                  <td colSpan={9} className="text-center py-12 text-muted-foreground font-medium">
                     No active or historical scraper jobs found.
                   </td>
                 </tr>
@@ -470,6 +499,22 @@ function Monitoring() {
                         {isCustomScrape
                           ? "—"
                           : (j.status === "Completed" ? "100%" : ((j.status === "Failed" || j.status === "Aborted") ? "0%" : (j.fresh !== null && j.fresh !== undefined ? `${j.fresh}%` : "—")))}
+                      </td>
+                      <td className="px-4 py-3.5 text-right border-b border-border/40">
+                        {String(j.frequency).toLowerCase() === "weekly" && (
+                          rerunJobId === j.id ? (
+                            <div className="flex items-center justify-end gap-1">
+                              <input type="datetime-local" value={rerunAt} min={new Date().toISOString().slice(0, 16)} onChange={(event) => setRerunAt(event.target.value)} className="h-8 w-40 rounded-md border border-border bg-card px-2 text-[11px]" />
+                              <Button size="sm" disabled={!rerunAt || rerunBusyId === j.id} onClick={() => void rerunWeeklyJob(j, rerunAt)}>Schedule</Button>
+                              <Button size="sm" variant="ghost" onClick={() => setRerunJobId(null)}>Cancel</Button>
+                            </div>
+                          ) : (
+                            <div className="inline-flex gap-1">
+                              <Button size="sm" variant="outline" disabled={rerunBusyId === j.id} onClick={() => void rerunWeeklyJob(j)}><RefreshCw className="h-3.5 w-3.5" /> Run now</Button>
+                              <Button size="sm" variant="outline" disabled={rerunBusyId === j.id} onClick={() => { setRerunAt(""); setRerunJobId(j.id); }}><Timer className="h-3.5 w-3.5" /> Schedule later</Button>
+                            </div>
+                          )
+                        )}
                       </td>
                       <td className="px-4 py-3.5 text-right border-b border-border/40 pr-6 relative">
                         <div className="inline-flex items-center justify-end gap-2">
