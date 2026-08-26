@@ -809,6 +809,8 @@ async def run_scraper_background(job_id: str):
             run_website = True
             run_sec = True
             run_mca = True
+            run_linkedin = True
+            run_registry = True
             if not picked_sources:
                 run_builtwith = True
 
@@ -896,7 +898,8 @@ async def run_scraper_background(job_id: str):
                     sec_fields = {}
                     mca_fields = {}
                     linkedin_metadata = {}
-                    
+                    registry_fields = {}
+
                     # Run the real enrichment stack for every record in the uploaded dataset.
                     should_scrape = True
 
@@ -962,6 +965,24 @@ async def run_scraper_background(job_id: str):
                         except Exception as e:
                             logger.warning("[By Dataset] MCA lookup failed/timed out for %s: %s", company_val, e)
 
+                    if should_scrape and run_registry:
+                        try:
+                            from app.services.registry_scrapers.registry_orchestrator import registry_orchestrator
+                            reg_result = await asyncio.wait_for(
+                                registry_orchestrator.enrich_record(
+                                    record,
+                                    website_result={
+                                        "website": website_resolved or normalized_website_val or website_val,
+                                        "scraped_metadata": scraped_metadata,
+                                    },
+                                    config=config_data,
+                                ),
+                                timeout=25.0,
+                            )
+                            registry_fields = reg_result.get("extracted_fields") or {}
+                        except Exception as e:
+                            logger.warning("[By Dataset] Registry orchestrator failed for %s: %s", company_val, e)
+
                     if should_scrape and run_linkedin:
                         try:
                             discovery = await asyncio.wait_for(
@@ -1004,15 +1025,16 @@ async def run_scraper_background(job_id: str):
                     
                     for key in selected_outputs:
                         if key in ("company_name", "legal_name"):
-                            val = sec_fields.get("entity_name") or mca_fields.get("company_name") or linkedin_metadata.get("company_name") or linkedin_metadata.get("linkedin_company_name") or scraped_metadata.get("detected_company_name") or company_val
+                            val = sec_fields.get("entity_name") or registry_fields.get("company_name") or mca_fields.get("company_name") or linkedin_metadata.get("company_name") or linkedin_metadata.get("linkedin_company_name") or scraped_metadata.get("detected_company_name") or company_val
                             enriched_row[key] = val if val else None
                         elif key == "website":
-                            val = sec_fields.get("website") or linkedin_metadata.get("website") or linkedin_metadata.get("linkedin_website") or scraped_metadata.get("url") or website_resolved or normalized_website_val or website_val
+                            val = sec_fields.get("website") or registry_fields.get("website") or linkedin_metadata.get("website") or linkedin_metadata.get("linkedin_website") or scraped_metadata.get("url") or website_resolved or normalized_website_val or website_val
                             enriched_row[key] = val if val else None
                         elif key == "description":
                             val = (
                                 linkedin_metadata.get("description")
                                 or linkedin_metadata.get("linkedin_description")
+                                or registry_fields.get("description")
                                 or website_enrichment.get("description")
                                 or scraped_metadata.get("description")
                                 or scraped_metadata.get("meta_description")
@@ -1022,6 +1044,7 @@ async def run_scraper_background(job_id: str):
                         elif key in ("founded_year", "year_founded"):
                             val = (
                                 sec_fields.get("year_founded")
+                                or registry_fields.get("year_founded")
                                 or mca_fields.get("year_founded")
                                 or linkedin_metadata.get("year_founded")
                                 or scraped_metadata.get("year_founded")
@@ -1063,6 +1086,7 @@ async def run_scraper_background(job_id: str):
                             val = (
                                 sec_street
                                 or mca_fields.get("registered_office_address")
+                                or registry_fields.get("hq_address")
                                 or li_hq_str
                                 or scraped_metadata.get("hq_address")
                                 or website_enrichment.get("address")
@@ -1070,39 +1094,40 @@ async def run_scraper_background(job_id: str):
                             )
                             enriched_row[key] = val if val else None
                         elif key == "hq_city":
-                            val = sec_city or mca_hq.get("city") or li_hq.get("city") or scraped_metadata.get("hq_city") or scraped_metadata.get("city")
+                            val = sec_city or mca_hq.get("city") or registry_fields.get("hq_city") or li_hq.get("city") or scraped_metadata.get("hq_city") or scraped_metadata.get("city")
                             enriched_row[key] = val if val else None
                         elif key == "hq_state":
-                            val = sec_state or mca_hq.get("state") or li_hq.get("state") or scraped_metadata.get("hq_state") or scraped_metadata.get("state")
+                            val = sec_state or mca_hq.get("state") or registry_fields.get("hq_state") or li_hq.get("state") or scraped_metadata.get("hq_state") or scraped_metadata.get("state")
                             enriched_row[key] = val if val else None
                         elif key == "hq_country":
-                            val = sec_country or ("India" if mca_fields.get("registered_office_address") else None) or li_hq.get("country") or scraped_metadata.get("hq_country") or scraped_metadata.get("country")
+                            val = sec_country or ("India" if mca_fields.get("registered_office_address") else None) or registry_fields.get("hq_country") or li_hq.get("country") or scraped_metadata.get("hq_country") or scraped_metadata.get("country")
                             enriched_row[key] = val if val else None
                         elif key == "country":
-                            val = sec_country or ("India" if mca_fields.get("registered_office_address") else None) or li_hq.get("country") or scraped_metadata.get("hq_country") or scraped_metadata.get("country")
+                            val = sec_country or ("India" if mca_fields.get("registered_office_address") else None) or registry_fields.get("hq_country") or li_hq.get("country") or scraped_metadata.get("hq_country") or scraped_metadata.get("country")
                             enriched_row[key] = val if val else None
                         elif key == "registry_number":
-                            val = sec_fields.get("cik") or mca_fields.get("cin") or registry_val
+                            val = sec_fields.get("cik") or mca_fields.get("cin") or registry_fields.get("registry_number") or registry_fields.get("lei") or registry_val
                             enriched_row[key] = val if val else None
                         elif key == "ticker":
-                            enriched_row["ticker"] = sec_fields.get("ticker") or None
+                            enriched_row["ticker"] = sec_fields.get("ticker") or registry_fields.get("ticker") or None
                         elif key == "sic_code":
                             enriched_row["sic_code"] = sec_fields.get("sic") or None
                         elif key == "incorporation_state":
-                            enriched_row["incorporation_state"] = sec_fields.get("state_of_incorporation") or None
+                            enriched_row["incorporation_state"] = sec_fields.get("state_of_incorporation") or registry_fields.get("hq_state") or None
                         elif key == "fiscal_year":
                             enriched_row["fiscal_year"] = sec_fields.get("fiscal_year_end") or None
                         elif key == "industry":
-                            val = sec_fields.get("sic_description") or linkedin_metadata.get("industry") or linkedin_metadata.get("linkedin_industry") or scraped_metadata.get("detected_industry") or scraped_metadata.get("industry")
+                            val = sec_fields.get("sic_description") or registry_fields.get("industry") or linkedin_metadata.get("industry") or linkedin_metadata.get("linkedin_industry") or scraped_metadata.get("detected_industry") or scraped_metadata.get("industry")
                             enriched_row[key] = val if val else None
                         elif key == "sub_industry":
-                            val = sec_fields.get("sic_description") or linkedin_metadata.get("industry") or linkedin_metadata.get("linkedin_industry") or scraped_metadata.get("detected_industry") or scraped_metadata.get("industry")
+                            val = sec_fields.get("sic_description") or registry_fields.get("industry") or linkedin_metadata.get("industry") or linkedin_metadata.get("linkedin_industry") or scraped_metadata.get("detected_industry") or scraped_metadata.get("industry")
                             enriched_row[key] = val if val else None
                         elif key in ("employees", "employee_count"):
                             li_emp = parse_employee_count(linkedin_metadata.get("company_size") or linkedin_metadata.get("linkedin_company_size"))
-                            enriched_row[key] = li_emp if li_emp else cb_fields.get("employee_count") or cb_fields.get("employee_range") or None
+                            val = li_emp or registry_fields.get("employee_count") or cb_fields.get("employee_count") or cb_fields.get("employee_range")
+                            enriched_row[key] = val if val else None
                         elif key == "employee_range":
-                            val = linkedin_metadata.get("linkedin_employee_range") or linkedin_metadata.get("company_size") or cb_fields.get("employee_range")
+                            val = linkedin_metadata.get("linkedin_employee_range") or linkedin_metadata.get("company_size") or registry_fields.get("employee_count") or cb_fields.get("employee_range")
                             enriched_row[key] = val if val else None
                         elif key in ("annual_revenue", "revenue", "revenue_range", "net_income", "assets", "liabilities"):
                             val = (
@@ -1110,6 +1135,7 @@ async def run_scraper_background(job_id: str):
                                 or cb_fields.get("annual_revenue")
                                 or scraped_metadata.get(key)
                                 or website_enrichment.get(key)
+                                or registry_fields.get(key)
                             )
                             enriched_row[key] = val if val else None
                         elif key in ("funding_total", "latest_round", "latest_round_amount", "valuation", "investors", "last_round", "amount_raised"):
@@ -1122,8 +1148,8 @@ async def run_scraper_background(job_id: str):
                                 or website_enrichment.get(key)
                             )
                             enriched_row[key] = val if val else None
-                        elif key in ("company_type", "ownership"):
-                            val = sec_fields.get(key) or mca_fields.get(key) or linkedin_metadata.get(key) or scraped_metadata.get(key) or website_enrichment.get(key)
+                        elif key in ("company_type", "ownership", "legal_form"):
+                            val = sec_fields.get(key) or registry_fields.get("legal_form") or registry_fields.get(key) or mca_fields.get(key) or linkedin_metadata.get(key) or scraped_metadata.get(key) or website_enrichment.get(key)
                             enriched_row[key] = val if val else None
                         elif key in ("cms", "analytics", "frameworks", "hosting", "tech_stack"):
                             val = (
@@ -1142,6 +1168,7 @@ async def run_scraper_background(job_id: str):
                         scraped_metadata=scraped_metadata,
                         sec_fields=sec_fields,
                         mca_fields=mca_fields,
+                        registry_fields=registry_fields,
                         linkedin_metadata=linkedin_metadata,
                         website_enrichment=website_enrichment,
                         cb_fields=cb_fields,
@@ -1214,6 +1241,50 @@ async def run_scraper_background(job_id: str):
 
             except Exception as fallback_err:
                 logger.warning(f"[OpenAI CDE] Extraction step in demo_routes failed: {fallback_err}")
+
+            # Gemini fallback — fills any fields still blank after OpenAI CDE
+            try:
+                from app.services.gemini_fallback_service import gemini_fallback_service, merge_ai_fallback_values
+
+                blank_attrs_per_record: list = []
+                all_blank_attrs: set = set()
+                for rec in enriched_records:
+                    blank = [
+                        k for k in (target_attrs or [])
+                        if not str(k).startswith("_")
+                        and rec.get(k) in (None, "", [], {})
+                    ]
+                    blank_attrs_per_record.append(blank)
+                    all_blank_attrs.update(blank)
+
+                if all_blank_attrs:
+                    gemini_entities = [
+                        str(rec.get("company_name") or rec.get("legal_name") or "").strip()
+                        for rec in enriched_records
+                    ]
+                    gemini_results = await gemini_fallback_service.extract_fallback_data(
+                        entities=[e for e in gemini_entities if e],
+                        attributes=sorted(all_blank_attrs),
+                        workflow_ids=workflow_ids,
+                    )
+                    gemini_by_entity = {
+                        str(r.get("entity", "")).strip(): r.get("extracted") or {}
+                        for r in gemini_results
+                        if isinstance(r, dict)
+                    }
+                    for idx, rec in enumerate(enriched_records):
+                        entity_key = gemini_entities[idx] if idx < len(gemini_entities) else ""
+                        extracted = gemini_by_entity.get(entity_key) or {}
+                        if extracted:
+                            enriched_records[idx] = merge_ai_fallback_values(
+                                rec,
+                                extracted,
+                                requested_fields=blank_attrs_per_record[idx],
+                                source="gemini_fallback",
+                                confidence=55,
+                            )
+            except Exception as gemini_err:
+                logger.warning("[Gemini Fallback] BY Dataset step failed: %s", gemini_err)
 
             sanitized_records = [_strip_internal_keys(record) for record in enriched_records]
 
