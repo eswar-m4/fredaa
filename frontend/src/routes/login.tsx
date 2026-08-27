@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { Shield, UserRound, LogIn, Loader2, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 
@@ -19,7 +19,7 @@ function LoginPage() {
   const { next } = Route.useSearch();
   const [role, setRole] = useState<"user" | "admin">("user");
   const [username, setUsername] = useState("user");
-  const [password, setPassword] = useState("REDACTED_USER_PASS");
+  const [password, setPassword] = useState("");
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [loading, setLoading] = useState(false);
   const [checking, setChecking] = useState(true);
@@ -43,9 +43,8 @@ function LoginPage() {
 
   const hint = useMemo(() => {
     if (mode === "signup") return "Create a new user account.\nUse your own username and password.";
-    if (role === "admin") return "Demo Credentials\nUsername: admin\nPassword: REDACTED_ADMIN_PASS";
-    return "Demo Credentials\nUsername: user\nPassword: REDACTED_USER_PASS";
-  }, [mode, role]);
+    return null;
+  }, [mode]);
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -137,7 +136,7 @@ function LoginPage() {
                   const nextRole = e.target.value as "user" | "admin";
                   setRole(nextRole);
                   setUsername(nextRole === "admin" ? "admin" : "user");
-                  setPassword(nextRole === "admin" ? "REDACTED_ADMIN_PASS" : "REDACTED_USER_PASS");
+                  setPassword("");
                 }} className="h-11 bg-background border-input text-foreground">
                   <option value="user">User</option>
                   <option value="admin">Admin</option>
@@ -166,9 +165,11 @@ function LoginPage() {
               />
             </div>
 
-            <div className="rounded-xl border border-info/20 bg-info-bg px-4 py-3 text-xs text-info whitespace-pre-line">
-              {hint}
-            </div>
+            {hint && (
+              <div className="rounded-xl border border-info/20 bg-info-bg px-4 py-3 text-xs text-info whitespace-pre-line">
+                {hint}
+              </div>
+            )}
 
             <Button
               type="submit"
@@ -188,7 +189,7 @@ function LoginPage() {
                 clearStoredSession();
                 setRole("user");
                 setUsername("user");
-                setPassword("REDACTED_USER_PASS");
+                setPassword("");
               }}
             >
               <UserPlus className="h-4 w-4" />
