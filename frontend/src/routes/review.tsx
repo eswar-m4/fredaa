@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { AppLayout } from "@/components/AppLayout";
 import { Badge, Button, Card, PageHeader, Input } from "@/components/ui-bits";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Check, X, ExternalLink, Edit3, Save, Eye, Info, Zap, CheckCheck, XCircle } from "lucide-react";
+import { Check, X, ExternalLink, Edit3, Save, Eye, Info, Zap, CheckCheck, XCircle, Download } from "lucide-react";
 import { toast } from "sonner";
 import { jobsCacheUpdatedEventName, readJobsCache, writeJobsCache } from "@/lib/jobs-cache";
 import { buildReviewSummary } from "@/lib/review-summary";
@@ -2205,6 +2205,23 @@ function Review() {
 
               <div className="flex justify-end gap-2">
                 <Button variant="outline" size="sm" onClick={() => setOpenJob(null)}>Close</Button>
+                <Button variant="outline" size="sm" onClick={() => {
+                  if (!openJob) return;
+                  const rows = bulkSample?.rows?.length ? bulkSample.rows : visibleRows;
+                  const header = ["Record", "Attribute", "Previous Value", "New Value", "Change Type", "Decision", "Source", "Source URL"];
+                  const csvRows = rows.map((r: any) => {
+                    const key = `${openJob.id}-${r.id}`;
+                    const decision = rowStatus[key] === "rejected" ? "Rejected" : rowStatus[key] === "approved" ? "Approved" : "Pending";
+                    return [r.record, r.attribute, r.previous ?? "", r.value ?? "", r.changeType, decision, r.source ?? "", r.sourceUrl ?? ""].map((v: any) => `"${String(v).replace(/"/g, '""')}"`).join(",");
+                  });
+                  const blob = new Blob([[header.join(","), ...csvRows].join("\n")], { type: "text/csv" });
+                  const a = document.createElement("a");
+                  a.href = URL.createObjectURL(blob);
+                  a.download = `review-${openJob.id}-${new Date().toISOString().slice(0, 10)}.csv`;
+                  a.click();
+                }}>
+                  <Download className="h-3.5 w-3.5" /> Download
+                </Button>
                 <Button size="sm" onClick={handleSaveReview}>Save review</Button>
               </div>
                 </>

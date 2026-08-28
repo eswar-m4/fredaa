@@ -193,6 +193,7 @@ function Monitoring() {
   const [expandedJobId, setExpandedJobId] = useState<string | null>(null);
   const [convertJobId, setConvertJobId] = useState<string | null>(null);
   const [convertFrequency, setConvertFrequency] = useState("Weekly");
+  const [filterTab, setFilterTab] = useState<"all" | "agents" | "solutions">("all");
 
   const baseApiUrl = (() => {
     if (
@@ -423,7 +424,24 @@ function Monitoring() {
           ))}
         </div>
 
-        <Card className="p-0 overflow-x-auto relative">
+        <Card className="p-0 overflow-hidden relative">
+          {/* Filter tabs */}
+          <div className="flex items-center gap-0.5 px-4 pt-3 pb-2 border-b border-border/40">
+            {(["all", "agents", "solutions"] as const).map((tab) => (
+              <button
+                key={tab}
+                type="button"
+                onClick={() => setFilterTab(tab)}
+                className={`px-3 py-1 rounded text-[12px] font-medium transition-colors ${
+                  filterTab === tab
+                    ? "bg-foreground text-background"
+                    : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+                }`}
+              >
+                {tab === "all" ? "All Jobs" : tab === "agents" ? "Agents" : "Solutions"}
+              </button>
+            ))}
+          </div>
           {finalJobs.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground font-medium text-sm">
               No active or historical scraper jobs found.
@@ -433,6 +451,8 @@ function Monitoring() {
               const isAgentJob = (j: any) => j.mode === "Site-Specific" || j.mode === "By Source";
               const agentJobs = finalJobs.filter(isAgentJob);
               const solutionJobs = finalJobs.filter((j) => !isAgentJob(j));
+              const visibleAgent = filterTab === "solutions" ? [] : agentJobs;
+              const visibleSolution = filterTab === "agents" ? [] : solutionJobs;
 
               const renderGroup = (groupJobs: any[], label: string, tone: "info" | "purple") => {
                 if (groupJobs.length === 0) return null;
@@ -451,7 +471,7 @@ function Monitoring() {
                           <th className="text-left px-4 py-2 border-b border-border/40 w-[130px]">Status</th>
                           <th className="text-right px-4 py-2 border-b border-border/40 w-[80px]">Records</th>
                           <th className="text-right px-4 py-2 border-b border-border/40 w-[70px]">Fresh %</th>
-                          <th className="text-right px-4 py-2 border-b border-border/40 w-[200px]">Actions</th>
+                          <th className="text-right px-4 py-2 border-b border-border/40 w-[160px]">Actions</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -651,8 +671,11 @@ function Monitoring() {
 
               return (
                 <>
-                  {renderGroup(agentJobs, "Agents", "info")}
-                  {renderGroup(solutionJobs, "Solutions", "purple")}
+                  {renderGroup(visibleAgent, "Agents", "info")}
+                  {renderGroup(visibleSolution, "Solutions", "purple")}
+                  {visibleAgent.length === 0 && visibleSolution.length === 0 && (
+                    <div className="text-center py-10 text-muted-foreground text-sm">No jobs in this category.</div>
+                  )}
                 </>
               );
             })()

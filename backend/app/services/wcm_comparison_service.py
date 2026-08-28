@@ -1167,12 +1167,16 @@ def compare_records(
         rec = new_map[k][0] if new_val_exists else baseline_map[k][0]
         found_website = find_company_website(rec) or source
         source_lower = str(source or "").strip().lower()
+        # Prefer a record-level detail URL (specific page) over the root domain
+        _detail_url_fields = ("detail_url", "listing_url", "source_url", "profile_url", "page_url", "url", "link", "href")
+        _record_url = next((str(rec.get(f, "")).strip() for f in _detail_url_fields if rec.get(f) and str(rec.get(f, "")).startswith("http")), None)
         if "keysight" in source_lower:
-            source_url = "https://www.keysight.com"
-            source_display = "keysight.com"
+            source_url = _record_url or "https://www.keysight.com"
+            source_display = clean_domain(source_url) if _record_url else "keysight.com"
         else:
-            source_url = found_website if found_website.startswith("http") else f"https://{found_website}"
-            source_display = clean_domain(found_website)
+            root_url = found_website if found_website.startswith("http") else f"https://{found_website}"
+            source_url = _record_url or root_url
+            source_display = clean_domain(source_url)
 
         record_has_changes = False
 

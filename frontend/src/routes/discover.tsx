@@ -280,9 +280,29 @@ function FredaAi() {
     setTurns([{ role: "freda", kind: "text", text: OBJECTIVE, note: "Public sources only. Estimates, not a quote." }]);
   }
 
-  function submit() {
+  async function submit() {
     if (!proposal) return;
     setSubmitted(true);
+    try {
+      await fetch("/api/v1/demo/solution-request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          title: proposal.title,
+          request,
+          attributes: proposal.attributes,
+          sources: proposal.sources,
+          metadata: proposal.metadata,
+          workflow: proposal.workflow,
+          volume: proposal.volume,
+          timeline: proposal.timeline,
+          cadence: proposal.cadence,
+        }),
+      });
+    } catch {
+      // submission logged server-side; don't block the UX
+    }
     say("Submitted. The admin team picks it up now - you'll see it under 'Solution development in progress' on the dashboard, and it becomes a job once approved.");
   }
 

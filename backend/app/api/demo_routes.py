@@ -9,6 +9,7 @@ import random
 import logging
 from datetime import datetime
 from typing import Any, Dict, Optional
+from uuid import uuid4
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel, Field
@@ -1502,6 +1503,66 @@ async def run_scraper_background(job_id: str):
                         context[ctx_name] = ctx_value
                 return context
 
+            def _post_fill_missing_fields(row: dict, raw: dict) -> None:
+                """Derive values for blank output fields from other already-filled fields to improve coverage."""
+                # tags: derive from industry / sector when blank
+                if not row.get("tags") and "tags" in row:
+                    parts = [
+                        row.get("industry") or raw.get("industry"),
+                        row.get("sector") or raw.get("sector"),
+                        row.get("sub_industry") or raw.get("sub_industry"),
+                    ]
+                    tag_list = [str(p).strip() for p in parts if p and str(p).strip()]
+                    if tag_list:
+                        row["tags"] = ", ".join(dict.fromkeys(tag_list))
+
+                # office_locations: build from HQ city/state/country when blank
+                if not row.get("office_locations") and "office_locations" in row:
+                    city = row.get("hq_city") or row.get("city") or raw.get("hq_city") or raw.get("city")
+                    state = row.get("hq_state") or row.get("state") or raw.get("hq_state") or raw.get("state")
+                    country = row.get("hq_country") or row.get("country") or raw.get("hq_country") or raw.get("country")
+                    location_parts = [str(p).strip() for p in [city, state, country] if p and str(p).strip()]
+                    if location_parts:
+                        row["office_locations"] = ", ".join(location_parts)
+
+                # executives / leadership_team: use ceo_name as fallback single-entry list when blank
+                for exec_key in ("executives", "leadership_team"):
+                    if exec_key in row and not row.get(exec_key):
+                        ceo = (
+                            row.get("ceo_name") or raw.get("ceo_name")
+                            or raw.get("ceo") or raw.get("founder") or raw.get("founders")
+                        )
+                        if ceo:
+                            row[exec_key] = [{"name": str(ceo).strip(), "title": "CEO"}]
+
+                # dba: check raw record trade/brand names when blank
+                if not row.get("dba") and "dba" in row:
+                    dba = (
+                        raw.get("trade_name") or raw.get("brand_name")
+                        or raw.get("trading_name") or raw.get("doing_business_as")
+                        or raw.get("dba")
+                    )
+                    if dba:
+                        row["dba"] = str(dba).strip()
+
+                # investors: check raw record when blank
+                if not row.get("investors") and "investors" in row:
+                    investors = raw.get("investors") or raw.get("backers") or raw.get("funding_investors")
+                    if investors:
+                        row["investors"] = investors
+
+                # board_members: check raw record when blank
+                if not row.get("board_members") and "board_members" in row:
+                    board = raw.get("board_members") or raw.get("board") or raw.get("directors")
+                    if board:
+                        row["board_members"] = board
+
+                # cms: attempt from raw record tech fields when blank
+                if not row.get("cms") and "cms" in row:
+                    cms = raw.get("cms") or raw.get("content_management_system") or raw.get("platform")
+                    if cms:
+                        row["cms"] = cms
+
             # Concurrency limit and task definition
             sem = asyncio.Semaphore(5)
 
@@ -1900,6 +1961,7 @@ async def run_scraper_background(job_id: str):
                         else:
                             matched_val = record.get(mapping.get(key) or key)
                             enriched_row[key] = matched_val if matched_val is not None else None
+                    _post_fill_missing_fields(enriched_row, record)
                     enriched_row["_source_context"] = _extract_public_context(
                         enriched_row,
                         scraped_metadata=scraped_metadata,
@@ -3053,3 +3115,76 @@ async def delete_job(job_id: str):
     except Exception as e:
         logger.error("Failed to delete job %s: %s", job_id, e)
         raise HTTPException(status_code=500, detail=str(e))
+
+
+class SolutionRequestPayload(BaseModel):
+    title: str
+    request: Optional[str] = None
+    attributes: list = []
+    sources: list = []
+    metadata: list = []
+    workflow: list = []
+    volume: Optional[str] = None
+    timeline: Optional[str] = None
+    cadence: Optional[str] = None
+
+
+@router.post("/solution-request")
+async def submit_solution_request(request: Request, payload: SolutionRequestPayload):
+    """Record an Ask Freda solution request in the admin console."""
+    from app.services.admin_request_audit_service import admin_request_audit_service
+    session = auth_service.get_session(request)
+    owner_username = (session or {}).get("username") or "user"
+    display_name = (session or {}).get("display_name") or owner_username
+    user_id = (session or {}).get("user_id") or owner_username
+
+    now = datetime.utcnow().isoformat()
+    job_id = f"sol_{uuid4().hex[:10]}"
+
+    with get_connection() as conn:
+        conn.execute(
+            """INSERT INTO scraper_jobs
+               (id, owner_username, source, scope, filters, frequency, status, records, fresh,
+                created_at, mode, complexity, estimated_onboarding_time)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            (
+                job_id,
+                owner_username,
+                "Ask Freda",
+                payload.title,
+                json.dumps({"attributes": payload.attributes, "sources": [s.get("name") if isinstance(s, dict) else s for s in payload.sources]}),
+                payload.cadence or "On-demand",
+                "Solution Requested",
+                0,
+                100,
+                now,
+                "By Dataset",
+                "medium",
+                payload.timeline or "TBD",
+            ),
+        )
+        conn.commit()
+
+    admin_request_audit_service.record_request(
+        job_id=job_id,
+        request_type="By Dataset",
+        source="Ask Freda",
+        dataset_name=payload.title,
+        mode="By Dataset",
+        scope=payload.title,
+        user={"user_id": user_id, "username": owner_username, "role": (session or {}).get("role") or "user", "display_name": display_name},
+        raw_payload={
+            "title": payload.title,
+            "request": payload.request,
+            "attributes": payload.attributes,
+            "sources": payload.sources,
+            "metadata": payload.metadata,
+            "volume": payload.volume,
+            "timeline": payload.timeline,
+            "cadence": payload.cadence,
+        },
+        request_status="Solution Requested",
+        job_status="Solution Requested",
+    )
+
+    return {"success": True, "job_id": job_id}
