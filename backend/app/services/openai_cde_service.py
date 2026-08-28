@@ -74,6 +74,13 @@ _FIELD_ALIASES = {
     "hosting": ("hosting", "host", "hosting_provider"),
     "tech_stack": ("tech_stack", "technology_stack", "stack"),
     "registry_number": ("registry_number", "cik", "cin", "lei", "vat_number", "tax_id"),
+    "dba": ("dba", "doing_business_as", "trading_name", "trade_name", "dba_name", "brand_name"),
+    "tags": ("tags", "business_tags", "keywords", "labels", "categories", "topics"),
+    "investors": ("investors", "backers", "venture_investors", "funding_investors", "shareholders"),
+    "ceo_email": ("ceo_email", "chief_executive_email", "ceo_contact_email"),
+    "executives": ("executives", "leadership_team", "executive_team", "management_team", "leadership", "c_suite"),
+    "board_members": ("board_members", "board", "board_of_directors", "directors", "governing_board"),
+    "office_locations": ("office_locations", "offices", "locations", "branch_locations", "additional_offices"),
 }
 
 

@@ -1847,6 +1847,56 @@ async def run_scraper_background(job_id: str):
                                 or linkedin_metadata.get(key)
                             )
                             enriched_row[key] = val if val else None
+                        elif key == "dba":
+                            val = (
+                                registry_fields.get("dba")
+                                or sec_fields.get("dba")
+                                or mca_fields.get("dba")
+                                or scraped_metadata.get("trading_name")
+                                or scraped_metadata.get("dba")
+                                or website_enrichment.get("dba")
+                            )
+                            enriched_row[key] = val if val else None
+                        elif key == "tags":
+                            val = (
+                                scraped_metadata.get("tags")
+                                or website_enrichment.get("tags")
+                                or linkedin_metadata.get("tags")
+                                or scraped_metadata.get("keywords")
+                                or website_enrichment.get("keywords")
+                            )
+                            enriched_row[key] = val if val else None
+                        elif key == "ceo_email":
+                            val = (
+                                scraped_metadata.get("ceo_email")
+                                or website_enrichment.get("ceo_email")
+                            )
+                            enriched_row[key] = val if val else None
+                        elif key in ("executives", "leadership_team"):
+                            val = (
+                                linkedin_metadata.get("executives")
+                                or scraped_metadata.get("executives")
+                                or website_enrichment.get("executives")
+                                or scraped_metadata.get("leadership_team")
+                                or website_enrichment.get("leadership_team")
+                            )
+                            enriched_row[key] = val if val else None
+                        elif key in ("board_members", "board"):
+                            val = (
+                                sec_fields.get("board_members")
+                                or scraped_metadata.get("board_members")
+                                or registry_fields.get("board_members")
+                                or website_enrichment.get("board_members")
+                            )
+                            enriched_row[key] = val if val else None
+                        elif key == "office_locations":
+                            val = (
+                                linkedin_metadata.get("office_locations")
+                                or scraped_metadata.get("office_locations")
+                                or registry_fields.get("office_locations")
+                                or website_enrichment.get("office_locations")
+                            )
+                            enriched_row[key] = val if val else None
                         else:
                             matched_val = record.get(mapping.get(key) or key)
                             enriched_row[key] = matched_val if matched_val is not None else None
