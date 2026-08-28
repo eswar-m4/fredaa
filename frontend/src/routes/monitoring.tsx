@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { Badge, Card, PageHeader, Button } from "@/components/ui-bits";
-import { Download, ChevronDown, Trash2, Star, RefreshCw, Timer } from "lucide-react";
+import { Download, Trash2, Star, RefreshCw, Timer } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { clearDeletedJob, jobsCacheUpdatedEventName, markJobDeleted, readJobsCache, writeJobsCache } from "@/lib/jobs-cache";
 import { fetchBotCatalog, getBotDisplayName, type BotCatalogEntry } from "@/lib/bot-catalog";
@@ -124,7 +124,7 @@ function computeNextRunTime(job: any) {
   return next.toISOString();
 }
 
-function tone(s: string) {
+function statusToneFn(s: string) {
   if (s === "Running") return "info" as const;
   if (s === "Completed" || s === "Execution Completed") return "success" as const;
   if (s === "Review" || s === "Review Pending") return "warning" as const;
@@ -190,6 +190,9 @@ function Monitoring() {
   const [rerunJobId, setRerunJobId] = useState<string | null>(null);
   const [rerunAt, setRerunAt] = useState("");
   const [rerunBusyId, setRerunBusyId] = useState<string | null>(null);
+  const [expandedJobId, setExpandedJobId] = useState<string | null>(null);
+  const [convertJobId, setConvertJobId] = useState<string | null>(null);
+  const [convertFrequency, setConvertFrequency] = useState("Weekly");
 
   const baseApiUrl = (() => {
     if (
@@ -358,6 +361,9 @@ function Monitoring() {
       complexity: j.complexity || null,
       estimated_onboarding_time: j.estimated_onboarding_time || null,
       created_at: j.created_at,
+      selected_outputs: j.selected_outputs || j.config?.selected_outputs || [],
+      workflow_id: j.workflow_id || "",
+      request_payload: j.config || {},
     };
   });
 
@@ -418,195 +424,239 @@ function Monitoring() {
         </div>
 
         <Card className="p-0 overflow-x-auto relative">
-          <table className="w-full min-w-[1000px] text-[13px] border-separate border-spacing-0">
-            <thead className="bg-secondary text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">
-              <tr>
-                <th className="text-left px-4 py-2.5 border-b border-border/40">Job</th>
-                <th className="text-left px-4 py-2.5 border-b border-border/40">Source</th>
-                <th className="text-left px-4 py-2.5 border-b border-border/40">Mode</th>
-                <th className="text-left px-4 py-2.5 border-b border-border/40">Last Run</th>
-                <th className="text-left px-4 py-2.5 border-b border-border/40">Status</th>
-                <th className="text-right px-4 py-2.5 border-b border-border/40">Records</th>
-                <th className="text-right px-4 py-2.5 border-b border-border/40">Fresh %</th>
-                <th className="text-right px-4 py-2.5 border-b border-border/40">Rerun</th>
-                <th className="text-right px-4 py-2.5 pr-6 border-b border-border/40">Download</th>
-              </tr>
-            </thead>
-            <tbody className="">
-              {finalJobs.length === 0 ? (
-                <tr>
-                  <td colSpan={9} className="text-center py-12 text-muted-foreground font-medium">
-                    No active or historical scraper jobs found.
-                  </td>
-                </tr>
-              ) : (
-                finalJobs.map((j) => {
-                  const showNewBadge = j.isCustomSource;
-                  const isNewSourceOnboarding = j.isCustomSource;
-                  const isCustomScrape = isCustomScrapeJob(j);
-                  const displayStatus = j.status === "Failed" ? "Aborted" : j.status;
-                  const uploadedFilename = (j.mode === "Any-Site" || j.mode === "By Dataset") ? getAnySiteUploadedFilename(j.filters) : "";
-                  const sourceDisplayName = isNewSourceOnboarding
-                    ? getNewSourceDisplayName(j.source)
-                    : (uploadedFilename || getBotDisplayName(j.source, catalog));
+          {finalJobs.length === 0 ? (
+            <div className="text-center py-12 text-muted-foreground font-medium text-sm">
+              No active or historical scraper jobs found.
+            </div>
+          ) : (
+            (() => {
+              const isAgentJob = (j: any) => j.mode === "Site-Specific" || j.mode === "By Source";
+              const agentJobs = finalJobs.filter(isAgentJob);
+              const solutionJobs = finalJobs.filter((j) => !isAgentJob(j));
 
-                  return (
-                    <tr key={j.id} className="hover:bg-secondary/60 group">
-                      <td className="px-4 py-3.5 font-mono border-b border-border/40 text-left text-[13px] leading-normal whitespace-pre-line text-foreground">
-                        {j.id.includes("-") ? `${j.id.split("-")[0]}-\n${j.id.split("-")[1]}` : j.id}
-                      </td>
-                      <td className="px-4 py-3.5 border-b border-border/40 text-left">
-                        <div className="flex flex-col gap-0.5">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span className="font-semibold text-[13px] text-foreground">{sourceDisplayName}</span>
-                            {showNewBadge && (
-                              <Badge tone="warning" className="text-[9px] px-1.5 py-0.5 uppercase tracking-wider font-semibold">NEW</Badge>
-                            )}
-                            <Badge tone="purple" className="text-[9px] px-1.5 py-0.5 uppercase tracking-wider font-semibold">{j.frequency}</Badge>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3.5 border-b border-border/40 text-left">
-                        <Badge tone={(j.mode === "Site-Specific" || j.mode === "By Source") ? "info" : "purple"}>
-                          {(j.mode === "Site-Specific" || j.mode === "By Source") ? "Agents" : "Solutions"}
-                        </Badge>
-                      </td>
-                      <td className="px-4 py-3.5 text-muted-foreground border-b border-border/40 text-left">
-                        <div className="flex flex-col">
-                          <span>{j.last_refresh ? formatRelativeTime(j.last_refresh) : j.run || "—"}</span>
-                          {j.status !== "Pending Onboarding" && (computeNextRunTime(j) || j.next_refresh) && (
-                            <span className="text-[11px] text-muted-foreground/75 mt-0.5 font-medium">
-                              Next: {formatDateTime(computeNextRunTime(j) || j.next_refresh)}
-                            </span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-4 py-3.5 border-b border-border/40 text-left">
-                        <div className="flex items-center gap-2">
-                          <Badge tone={tone(j.status)}>{displayStatus}</Badge>
-                          {j.status === "Running" && (
-                            <span className="flex h-2 w-2 relative">
-                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
-                              <span className="relative inline-flex rounded-full h-2 w-2 bg-sky-500"></span>
-                            </span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-4 py-3.5 text-right font-mono border-b border-border/40 text-[13px] text-foreground font-semibold">
-                        {isCustomScrape ? "—" : (j.records !== null && j.records !== undefined ? j.records.toLocaleString() : "—")}
-                      </td>
-                      <td className="px-4 py-3.5 text-right font-mono border-b border-border/40 text-[13px] text-foreground font-semibold">
-                        {isCustomScrape
-                          ? "—"
-                          : (j.status === "Completed" ? "100%" : ((j.status === "Failed" || j.status === "Aborted") ? "0%" : (j.fresh !== null && j.fresh !== undefined ? `${j.fresh}%` : "—")))}
-                      </td>
-                      <td className="px-4 py-3.5 text-right border-b border-border/40">
-                        {String(j.frequency).toLowerCase() === "weekly" && (
-                          rerunJobId === j.id ? (
-                            <div className="flex items-center justify-end gap-1">
-                              <input type="datetime-local" value={rerunAt} min={new Date().toISOString().slice(0, 16)} onChange={(event) => setRerunAt(event.target.value)} className="h-8 w-40 rounded-md border border-border bg-card px-2 text-[11px]" />
-                              <Button size="sm" disabled={!rerunAt || rerunBusyId === j.id} onClick={() => void rerunWeeklyJob(j, rerunAt)}>Schedule</Button>
-                              <Button size="sm" variant="ghost" onClick={() => setRerunJobId(null)}>Cancel</Button>
-                            </div>
-                          ) : (
-                            <div className="inline-flex gap-1">
-                              <Button size="sm" variant="outline" disabled={rerunBusyId === j.id} onClick={() => void rerunWeeklyJob(j)}><RefreshCw className="h-3.5 w-3.5" /> Run now</Button>
-                              <Button size="sm" variant="outline" disabled={rerunBusyId === j.id} onClick={() => { setRerunAt(""); setRerunJobId(j.id); }}><Timer className="h-3.5 w-3.5" /> Schedule later</Button>
-                            </div>
-                          )
-                        )}
-                      </td>
-                      <td className="px-4 py-3.5 text-right border-b border-border/40 pr-6 relative">
-                        <div className="inline-flex items-center justify-end gap-2">
-                          <button
-                            type="button"
-                            title={j.isUrgent ? "Clear urgent" : "Mark urgent"}
-                            aria-label={`${j.isUrgent ? "Clear urgent" : "Mark urgent"} job ${j.id}`}
-                            disabled={urgentBusyId === j.id}
-                            onMouseDown={(e) => e.stopPropagation()}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              void toggleUrgent(j);
-                            }}
-                            className={`relative z-10 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border transition cursor-pointer ${
-                              j.isUrgent
-                                ? "border-warning bg-warning-bg/40 text-warning hover:bg-warning-bg/60"
-                                : "border-border bg-card text-muted-foreground hover:bg-secondary hover:text-foreground"
-                            } ${urgentBusyId === j.id ? "opacity-70" : ""}`}
-                            style={{
-                              pointerEvents: urgentBusyId === j.id ? "none" : "auto",
-                            }}
-                          >
-                            <Star className={`h-3.5 w-3.5 ${j.isUrgent ? "fill-warning" : ""}`} />
-                          </button>
-                          <button
-                            type="button"
-                            title="Delete job"
-                            aria-label={`Delete job ${j.id}`}
-                            onMouseDown={(e) => e.stopPropagation()}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              void deleteJob(j.id);
-                            }}
-                            className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border bg-card text-muted-foreground transition hover:bg-destructive/10 hover:text-destructive"
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </button>
-                          <div className="inline-block text-left">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              disabled={j.status !== "Completed"}
-                              onClick={() => setOpenExportId(openExportId === j.id ? null : j.id)}
-                              className="flex items-center gap-1 h-8 px-2.5 text-[12px] bg-card border border-border rounded-md font-medium transition hover:bg-secondary"
-                            >
-                              <Download className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-                              <span>Export</span>
-                              <ChevronDown className="h-3 w-3 text-muted-foreground shrink-0 ml-0.5" />
-                            </Button>
-                            {openExportId === j.id && (
-                              <>
-                                <div className="fixed inset-0 z-40" onClick={() => setOpenExportId(null)} />
-                                <div className="absolute right-0 mt-1 w-32 rounded-md shadow-lg bg-card border border-border z-50 py-1 text-left">
+              const renderGroup = (groupJobs: any[], label: string, tone: "info" | "purple") => {
+                if (groupJobs.length === 0) return null;
+                return (
+                  <div key={label}>
+                    <div className="flex items-center gap-2 px-4 py-2 border-b border-border/40 bg-secondary/40">
+                      <Badge tone={tone} className="text-[10px] px-2 py-0.5 uppercase tracking-wider font-semibold">{label}</Badge>
+                      <span className="text-[11px] text-muted-foreground">{groupJobs.length} job{groupJobs.length !== 1 ? "s" : ""}</span>
+                    </div>
+                    <table className="w-full text-[13px] border-separate border-spacing-0">
+                      <thead className="bg-secondary text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">
+                        <tr>
+                          <th className="text-left px-4 py-2 border-b border-border/40 w-[110px]">Job ID</th>
+                          <th className="text-left px-4 py-2 border-b border-border/40">Source</th>
+                          <th className="text-left px-4 py-2 border-b border-border/40 w-[90px]">Last Run</th>
+                          <th className="text-left px-4 py-2 border-b border-border/40 w-[130px]">Status</th>
+                          <th className="text-right px-4 py-2 border-b border-border/40 w-[80px]">Records</th>
+                          <th className="text-right px-4 py-2 border-b border-border/40 w-[70px]">Fresh %</th>
+                          <th className="text-right px-4 py-2 border-b border-border/40 w-[200px]">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {groupJobs.map((j) => {
+                          const isNewSourceOnboarding = j.isCustomSource;
+                          const isCustomScrape = isCustomScrapeJob(j);
+                          const displayStatus = j.status === "Failed" ? "Aborted" : j.status;
+                          const uploadedFilename = (j.mode === "Any-Site" || j.mode === "By Dataset") ? getAnySiteUploadedFilename(j.filters) : "";
+                          const sourceDisplayName = isNewSourceOnboarding
+                            ? getNewSourceDisplayName(j.source)
+                            : (uploadedFilename || getBotDisplayName(j.source, catalog));
+                          const isExpanded = expandedJobId === j.id;
+                          const isRecurring = !["once", "one-time", "onetime", ""].includes(String(j.frequency).toLowerCase());
+                          const selectedOutputs: string[] = Array.isArray(j.selected_outputs) ? j.selected_outputs : [];
+
+                          return (
+                            <>
+                              <tr key={j.id} className={`hover:bg-secondary/60 group ${isExpanded ? "bg-secondary/40" : ""}`}>
+                                <td className="px-4 py-3 border-b border-border/40 text-left">
                                   <button
-                                    onClick={() => {
-                                      setOpenExportId(null);
-                                      window.open(`${baseApiUrl}/api/v1/export?run_id=${j.id}&format=csv`, "_blank");
-                                    }}
-                                    className="w-full text-left px-3 py-1.5 hover:bg-secondary/60 text-[12px] text-foreground font-medium"
+                                    type="button"
+                                    onClick={() => setExpandedJobId(isExpanded ? null : j.id)}
+                                    className="font-mono text-[11px] text-info hover:text-info/80 underline underline-offset-2 text-left leading-tight"
+                                    title="Click to expand request details"
                                   >
-                                    CSV
+                                    {j.id.length > 16 ? `${j.id.slice(0, 8)}…` : j.id}
                                   </button>
-                                  <button
-                                    onClick={() => {
-                                      setOpenExportId(null);
-                                      window.open(`${baseApiUrl}/api/v1/export?run_id=${j.id}&format=json`, "_blank");
-                                    }}
-                                    className="w-full text-left px-3 py-1.5 hover:bg-secondary/60 text-[12px] text-foreground font-medium"
-                                  >
-                                    JSON
-                                  </button>
-                                  <button
-                                    onClick={() => {
-                                      setOpenExportId(null);
-                                      window.open(`${baseApiUrl}/api/v1/export?run_id=${j.id}&format=xlsx`, "_blank");
-                                    }}
-                                    className="w-full text-left px-3 py-1.5 hover:bg-secondary/60 text-[12px] text-foreground font-medium"
-                                  >
-                                    Excel (.xlsx)
-                                  </button>
-                                </div>
-                              </>
-                            )}
-                          </div>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
+                                  <div className="mt-0.5">
+                                    <Badge tone="purple" className="text-[9px] px-1 py-0 uppercase tracking-wider font-semibold">{j.frequency}</Badge>
+                                  </div>
+                                </td>
+                                <td className="px-4 py-3 border-b border-border/40 text-left max-w-[200px]">
+                                  <div className="flex flex-col gap-0.5">
+                                    <div className="flex items-center gap-1.5 flex-wrap">
+                                      <span className="font-semibold text-[13px] text-foreground truncate max-w-[160px]">{sourceDisplayName}</span>
+                                      {j.isCustomSource && (
+                                        <Badge tone="warning" className="text-[9px] px-1.5 py-0.5 uppercase tracking-wider font-semibold shrink-0">NEW</Badge>
+                                      )}
+                                    </div>
+                                  </div>
+                                </td>
+                                <td className="px-4 py-3 text-muted-foreground border-b border-border/40 text-left text-[12px]">
+                                  <div className="flex flex-col">
+                                    <span>{j.last_refresh ? formatRelativeTime(j.last_refresh) : j.run || "—"}</span>
+                                    {j.status !== "Pending Onboarding" && (computeNextRunTime(j) || j.next_refresh) && (
+                                      <span className="text-[10px] text-muted-foreground/75 mt-0.5">
+                                        Next: {formatDateTime(computeNextRunTime(j) || j.next_refresh)}
+                                      </span>
+                                    )}
+                                  </div>
+                                </td>
+                                <td className="px-4 py-3 border-b border-border/40 text-left">
+                                  <div className="flex items-center gap-1.5">
+                                    <Badge tone={statusToneFn(j.status)}>{displayStatus}</Badge>
+                                    {j.status === "Running" && (
+                                      <span className="flex h-2 w-2 relative">
+                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+                                        <span className="relative inline-flex rounded-full h-2 w-2 bg-sky-500"></span>
+                                      </span>
+                                    )}
+                                  </div>
+                                </td>
+                                <td className="px-4 py-3 text-right font-mono border-b border-border/40 text-[12px] text-foreground font-semibold">
+                                  {isCustomScrape ? "—" : (j.records != null ? j.records.toLocaleString() : "—")}
+                                </td>
+                                <td className="px-4 py-3 text-right font-mono border-b border-border/40 text-[12px] text-foreground font-semibold">
+                                  {isCustomScrape ? "—" : (j.status === "Completed" ? "100%" : ((j.status === "Failed" || j.status === "Aborted") ? "0%" : (j.fresh != null ? `${j.fresh}%` : "—")))}
+                                </td>
+                                <td className="px-4 py-3 text-right border-b border-border/40 pr-4">
+                                  <div className="flex items-center justify-end gap-1 flex-wrap">
+                                    {rerunJobId === j.id ? (
+                                      <>
+                                        <input type="datetime-local" value={rerunAt} min={new Date().toISOString().slice(0, 16)} onChange={(e) => setRerunAt(e.target.value)} className="h-7 w-36 rounded border border-border bg-card px-1.5 text-[11px]" />
+                                        <Button size="sm" disabled={!rerunAt || rerunBusyId === j.id} onClick={() => void rerunWeeklyJob(j, rerunAt)}>Go</Button>
+                                        <Button size="sm" variant="ghost" onClick={() => setRerunJobId(null)}>✕</Button>
+                                      </>
+                                    ) : convertJobId === j.id ? (
+                                      <>
+                                        <select value={convertFrequency} onChange={(e) => setConvertFrequency(e.target.value)} className="h-7 rounded border border-border bg-card px-1.5 text-[11px] text-foreground">
+                                          {["Hourly", "Daily", "Weekly", "Monthly"].map((f) => <option key={f}>{f}</option>)}
+                                        </select>
+                                        <Button size="sm" disabled={rerunBusyId === j.id} onClick={() => {
+                                          const updated = { ...j, frequency: convertFrequency };
+                                          void rerunWeeklyJob(updated);
+                                          setConvertJobId(null);
+                                        }}>Apply</Button>
+                                        <Button size="sm" variant="ghost" onClick={() => setConvertJobId(null)}>✕</Button>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <Button size="sm" variant="outline" disabled={rerunBusyId === j.id} onClick={() => void rerunWeeklyJob(j)} title="Run now">
+                                          <RefreshCw className="h-3 w-3" />
+                                        </Button>
+                                        <Button size="sm" variant="outline" disabled={rerunBusyId === j.id} onClick={() => { setRerunAt(""); setRerunJobId(j.id); }} title="Schedule later">
+                                          <Timer className="h-3 w-3" />
+                                        </Button>
+                                        {!isRecurring && (
+                                          <Button size="sm" variant="outline" disabled={rerunBusyId === j.id} onClick={() => { setConvertFrequency("Weekly"); setConvertJobId(j.id); }} title="Make recurring" className="text-[10px] px-1.5">
+                                            Recurring
+                                          </Button>
+                                        )}
+                                      </>
+                                    )}
+                                    <button
+                                      type="button"
+                                      title={j.isUrgent ? "Clear urgent" : "Mark urgent"}
+                                      disabled={urgentBusyId === j.id}
+                                      onClick={(e) => { e.stopPropagation(); void toggleUrgent(j); }}
+                                      className={`inline-flex h-7 w-7 shrink-0 items-center justify-center rounded border transition ${j.isUrgent ? "border-warning bg-warning-bg/40 text-warning" : "border-border bg-card text-muted-foreground hover:bg-secondary"}`}
+                                    >
+                                      <Star className={`h-3 w-3 ${j.isUrgent ? "fill-warning" : ""}`} />
+                                    </button>
+                                    <div className="inline-block text-left relative">
+                                      <Button variant="outline" size="sm" disabled={j.status !== "Completed"} onClick={() => setOpenExportId(openExportId === j.id ? null : j.id)} className="h-7 px-2 text-[11px]">
+                                        <Download className="h-3 w-3" />
+                                      </Button>
+                                      {openExportId === j.id && (
+                                        <>
+                                          <div className="fixed inset-0 z-40" onClick={() => setOpenExportId(null)} />
+                                          <div className="absolute right-0 mt-1 w-28 rounded shadow-lg bg-card border border-border z-50 py-1 text-left">
+                                            {(["csv", "json", "xlsx"] as const).map((fmt) => (
+                                              <button key={fmt} onClick={() => { setOpenExportId(null); window.open(`${baseApiUrl}/api/v1/export?run_id=${j.id}&format=${fmt}`, "_blank"); }} className="w-full text-left px-3 py-1.5 hover:bg-secondary/60 text-[12px] text-foreground font-medium capitalize">
+                                                {fmt === "xlsx" ? "Excel (.xlsx)" : fmt.toUpperCase()}
+                                              </button>
+                                            ))}
+                                          </div>
+                                        </>
+                                      )}
+                                    </div>
+                                    <button
+                                      type="button"
+                                      title="Delete job"
+                                      onClick={(e) => { e.stopPropagation(); void deleteJob(j.id); }}
+                                      className="inline-flex h-7 w-7 items-center justify-center rounded border border-border bg-card text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                                    >
+                                      <Trash2 className="h-3 w-3" />
+                                    </button>
+                                  </div>
+                                </td>
+                              </tr>
+                              {isExpanded && (
+                                <tr key={`${j.id}-detail`}>
+                                  <td colSpan={7} className="px-6 py-4 bg-secondary/20 border-b border-border/40">
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-[12px]">
+                                      <div>
+                                        <div className="text-muted-foreground uppercase tracking-wider text-[10px] font-semibold mb-1">Job ID</div>
+                                        <div className="font-mono text-foreground break-all">{j.id}</div>
+                                      </div>
+                                      <div>
+                                        <div className="text-muted-foreground uppercase tracking-wider text-[10px] font-semibold mb-1">Mode</div>
+                                        <div className="text-foreground">{j.mode}</div>
+                                      </div>
+                                      <div>
+                                        <div className="text-muted-foreground uppercase tracking-wider text-[10px] font-semibold mb-1">Frequency</div>
+                                        <div className="text-foreground">{j.frequency}</div>
+                                      </div>
+                                      <div>
+                                        <div className="text-muted-foreground uppercase tracking-wider text-[10px] font-semibold mb-1">Scope</div>
+                                        <div className="text-foreground">{j.scope}</div>
+                                      </div>
+                                      <div>
+                                        <div className="text-muted-foreground uppercase tracking-wider text-[10px] font-semibold mb-1">Created</div>
+                                        <div className="text-foreground">{j.created_at ? formatDateTime(j.created_at) : "—"}</div>
+                                      </div>
+                                      <div>
+                                        <div className="text-muted-foreground uppercase tracking-wider text-[10px] font-semibold mb-1">Delivery</div>
+                                        <div className="text-foreground">{j.delivery || "—"}</div>
+                                      </div>
+                                      {selectedOutputs.length > 0 && (
+                                        <div className="col-span-2">
+                                          <div className="text-muted-foreground uppercase tracking-wider text-[10px] font-semibold mb-1">Requested Attributes ({selectedOutputs.length})</div>
+                                          <div className="flex flex-wrap gap-1">
+                                            {selectedOutputs.map((attr: string) => (
+                                              <span key={attr} className="inline-block bg-secondary border border-border/60 rounded px-1.5 py-0.5 text-[10px] text-foreground font-medium">{attr}</span>
+                                            ))}
+                                          </div>
+                                        </div>
+                                      )}
+                                      {j.filters && j.filters !== "—" && (
+                                        <div className="col-span-2">
+                                          <div className="text-muted-foreground uppercase tracking-wider text-[10px] font-semibold mb-1">Filters</div>
+                                          <div className="font-mono text-[11px] text-foreground bg-secondary rounded px-2 py-1 break-all">{j.filters}</div>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </td>
+                                </tr>
+                              )}
+                            </>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                );
+              };
+
+              return (
+                <>
+                  {renderGroup(agentJobs, "Agents", "info")}
+                  {renderGroup(solutionJobs, "Solutions", "purple")}
+                </>
+              );
+            })()
+          )}
         </Card>
       </div>
     </AppLayout>
