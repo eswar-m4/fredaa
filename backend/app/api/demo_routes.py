@@ -3020,9 +3020,6 @@ async def weekly_rerun_job(job_id: str, payload: WeeklyRerunRequest, background_
 
     background_tasks.add_task(run_scraper_background, job_id)
     return {"status": "running"}
-    except Exception as e:
-        logger.error("Failed to get review summary for job %s: %s", job_id, e)
-        raise HTTPException(status_code=500, detail=f"Failed to fetch review summary: {str(e)}")
 
 
 class ToggleUrgentRequest(BaseModel):
