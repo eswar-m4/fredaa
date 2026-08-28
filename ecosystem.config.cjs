@@ -3,7 +3,7 @@ module.exports = {
   apps: [
     {
       name: 'freda-customer',
-      script: '.output/server/index.mjs',
+      script: './web.config.cjs',
       cwd: '.',
       interpreter: 'node',
       watch: false,
