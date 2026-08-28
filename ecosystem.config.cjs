@@ -3,7 +3,7 @@ module.exports = {
   apps: [
     {
       name: 'freda-customer',
-      script: './web.config.cjs',
+      script: './start-nitro.mjs',
       cwd: '.',
       interpreter: 'node',
       watch: false,

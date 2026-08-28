@@ -115,7 +115,11 @@ const server = createServer(async (req, res) => {
       ...(bodyInit ? { duplex: 'half' } : {}),
     });
 
-    const webRes = await fetchFn(webReq, {}, {});
+    const cfCtx = {
+      waitUntil: (p) => { p.catch(console.error); },
+      passThroughOnException: () => {},
+    };
+    const webRes = await fetchFn(webReq, {}, cfCtx);
 
     const resHeaders = {};
     webRes.headers.forEach((v, k) => { resHeaders[k] = v; });
