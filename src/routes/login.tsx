@@ -44,8 +44,8 @@ function LoginPage() {
 
   const hint = useMemo(() => {
     if (mode === "signup") return "Create a new account with your own username and password.";
-    if (role === "admin") return "Administrator access — all workspaces, sources and tickets.";
-    return "Workspace access — your projects, review, monitoring and playbooks.";
+    if (role === "admin") return "Administrator access — all workspaces, sources and tickets.\n\nDefault credentials: admin / Freda@2024";
+    return "Workspace access — your projects, review, monitoring and playbooks.\n\nDefault credentials: user / Freda@2024";
   }, [mode, role]);
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {

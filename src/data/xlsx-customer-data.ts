@@ -266,6 +266,22 @@ export const XLSX_PROJECT_OVERRIDES: Record<string, XlsxProjectOverride> = {
     sampleRows: CENGAGE_FDR_PERSONNEL.sampleRows,
   },
 
+  // Geospatial Insights
+  "geo-p1": {
+    // POI Data Pipeline → Input records
+    records:       POI_DATA.inputRecords,
+    inputRecords:  POI_DATA.inputRecords,
+    outputRecords: POI_DATA.outputRecords,
+    admv: {
+      added:    Math.round(POI_DATA.outputRecords * 0.04),
+      deleted:  Math.round(POI_DATA.outputRecords * 0.01),
+      modified: Math.round(POI_DATA.outputRecords * 0.09),
+      verified: Math.round(POI_DATA.outputRecords * 0.86),
+    },
+    columns:    POI_DATA.outputColumns,
+    sampleRows: POI_DATA.outputSamples,
+  },
+
   // IBG Partners
   "ibg-p1": {
     // Private Company Financials → Parent company hierarchy

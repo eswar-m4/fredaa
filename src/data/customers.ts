@@ -184,6 +184,19 @@ const SPECS: Spec[] = [
     ],
   },
   {
+    id: "geo",
+    name: "Geospatial Insights",
+    shortName: "GeoSI",
+    industry: "Location Intelligence",
+    accountManager: "Priya Nair",
+    since: "Feb 2024",
+    dpSet: "retail",
+    projects: [
+      { name: "POI Data Pipeline", source: "location data feeds", url: "https://geo.example.com/poi", records: 42000, freq: "Monthly" },
+      { name: "Venue Category Refresh", source: "mapping services", url: "https://geo.example.com/venues", records: 18600, freq: "Weekly" },
+    ],
+  },
+  {
     id: "candid",
     name: "Candid Data",
     shortName: "Candid",
