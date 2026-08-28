@@ -2990,7 +2990,9 @@ async def get_job_review_summary_endpoint(job_id: str):
     from app.services.wcm_comparison_service import get_job_review_summary
     try:
         summary = get_job_review_summary(job_id)
-    return summary
+        return summary
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.post("/jobs/{job_id}/weekly-rerun")
