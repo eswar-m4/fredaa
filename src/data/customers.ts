@@ -2,7 +2,10 @@
  * FreDA — existing-customer workspace demo data.
  *
  * Deterministic (hash based) so server and client render identical values.
+ * Where real xlsx data exists (NTM, Cengage, IBG), record counts and ADMV
+ * are overridden via XLSX_PROJECT_OVERRIDES from xlsx-customer-data.ts.
  */
+import { XLSX_PROJECT_OVERRIDES } from "./xlsx-customer-data";
 
 export type ProjectStatus = "In sync" | "Review pending" | "Syncing" | "Needs attention";
 
@@ -230,11 +233,12 @@ function buildSources(id: string, p: Spec["projects"][number], records: number):
 
 function buildProject(spec: Spec, p: Spec["projects"][number], idx: number): Project {
   const id = `${spec.id}-p${idx + 1}`;
-  const records = p.records;
-  const added = int(`${id}-a`, records * 0.004, records * 0.02);
-  const deleted = int(`${id}-d`, records * 0.001, records * 0.006);
-  const modified = int(`${id}-m`, records * 0.01, records * 0.05);
-  const verified = records - added - deleted - modified;
+  const xlsxOverride = XLSX_PROJECT_OVERRIDES[id] ?? null;
+  const records = xlsxOverride ? xlsxOverride.records || p.records : p.records;
+  const added   = xlsxOverride ? xlsxOverride.admv.added   : int(`${id}-a`, records * 0.004, records * 0.02);
+  const deleted  = xlsxOverride ? xlsxOverride.admv.deleted  : int(`${id}-d`, records * 0.001, records * 0.006);
+  const modified = xlsxOverride ? xlsxOverride.admv.modified : int(`${id}-m`, records * 0.01,  records * 0.05);
+  const verified = xlsxOverride ? xlsxOverride.admv.verified : records - added - deleted - modified;
   const status = pick(`${id}-s`, ["In sync", "Review pending", "Syncing", "In sync", "Needs attention", "Review pending"] as ProjectStatus[]);
   const gap = p.freq === "Daily" ? 24 : p.freq === "Weekly" ? 168 : 720;
   const lastRefreshHrs = Number(rnd(`${id}-lr`, 0.4, gap * 0.6).toFixed(1));
