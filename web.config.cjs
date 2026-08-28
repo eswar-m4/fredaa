@@ -15,7 +15,7 @@ const url = require('url');
 const PORT = parseInt(process.env.PORT || '8132', 10);
 const HOST = process.env.HOST || '127.0.0.1';
 
-// TanStack Start outputs client files to dist/client/, plain Vite to dist/
+// TanStack Start + Nitro outputs to .output/public/
 const CANDIDATES = [
   path.join(__dirname, '.output', 'public'),
   path.join(__dirname, 'dist', 'client'),

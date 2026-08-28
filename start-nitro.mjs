@@ -28,7 +28,7 @@ const PORT = parseInt(process.env.NITRO_PORT || process.env.PORT || '8132', 10);
 const HOST = process.env.NITRO_HOST || process.env.HOST || '127.0.0.1';
 
 const __dir = fileURLToPath(new URL('.', import.meta.url));
-const CLIENT_DIR = resolve(__dir, 'dist/client');
+const CLIENT_DIR = resolve(__dir, '.output/public');
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -49,12 +49,12 @@ const MIME = {
   '.txt':  'text/plain',
 };
 
-// server.js exports default: { fetch } (Cloudflare Workers style)
-const { default: app } = await import('./dist/server/server.js');
+// index.mjs exports default: { fetch } (Cloudflare Workers style)
+const { default: app } = await import('./.output/server/index.mjs');
 const fetchFn = typeof app === 'function' ? app : app?.fetch;
 
 if (typeof fetchFn !== 'function') {
-  console.error('[freda-customer] ERROR: no fetch handler found in dist/server/server.js');
+  console.error('[freda-customer] ERROR: no fetch handler found in .output/server/index.mjs');
   process.exit(1);
 }
 
