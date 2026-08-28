@@ -3,7 +3,7 @@ module.exports = {
   apps: [
     {
       name: 'freda-customer',
-      script: './start-nitro.mjs',
+      script: '.output/server/index.mjs',
       cwd: '.',
       interpreter: 'node',
       watch: false,
@@ -12,9 +12,7 @@ module.exports = {
       restart_delay: 3000,
       env: {
         PORT: '8132',
-        NITRO_PORT: '8132',
         HOST: '127.0.0.1',
-        NITRO_HOST: '127.0.0.1',
         NODE_ENV: 'production',
       },
     },

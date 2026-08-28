@@ -16,6 +16,6 @@ const { defineConfig } = require('@lovable.dev/vite-tanstack-config');
 
 module.exports = defineConfig({
   tanstackStart: {
-    server: { entry: 'server' },
+    server: { entry: 'server', preset: 'node-server' },
   },
 });
