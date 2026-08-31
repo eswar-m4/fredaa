@@ -173,7 +173,8 @@ function payloadString(row: AdminRequestRow, ...keys: string[]) {
 
 function displaySourceSubtitle(row: AdminRequestRow) {
   if (row.request_type === "By Dataset") {
-    return payloadString(row, "source_kind") || row.dataset_name || "By Dataset";
+    if (row.source === "Ask Freda") return "Ask Freda";
+    return payloadString(row, "source_kind") || row.dataset_name || "By Solutions";
   }
   if (row.source_kind) {
     return row.source_kind === "Partial Scrape" ? "Custom Scrape" : row.source_kind;
@@ -183,6 +184,9 @@ function displaySourceSubtitle(row: AdminRequestRow) {
 
 function displaySourcePrimary(row: AdminRequestRow) {
   if (row.request_type === "By Dataset") {
+    if (row.source === "Ask Freda") {
+      return row.dataset_name || payloadString(row, "title", "request") || "Ask Freda request";
+    }
     return payloadString(row, "seedFile", "seed_file", "filename", "file_name") || row.source || row.dataset_name || "?";
   }
   return payloadString(row, "source", "website_url", "source_name") || row.source || row.dataset_name || "?";
@@ -734,7 +738,7 @@ function AdminConsole() {
     for (const row of displayedRows) {
       const status = requestStatusLabel(row);
       if (status === "Running") bucket.running += 1;
-      if (status === "Completed") bucket.completed += 1;
+      if (status === "Completed" || status === "Onboarding Completed" || status === "Execution Completed") bucket.completed += 1;
       if (status === "Failed" || status === "Aborted") bucket.aborted += 1;
       if (status === "Refreshing") bucket.refreshing += 1;
       if (status === "Review Pending" || status === "Awaiting Review") bucket.awaiting_review += 1;
@@ -934,7 +938,7 @@ function AdminConsole() {
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             <AdminStatCard label="Total requests" value={summary.total_requests} tone="cyan" />
             <AdminStatCard label="Running" value={summary.running} tone="blue" />
-            <AdminStatCard label="Completed" value={summary.completed} tone="emerald" />
+            <AdminStatCard label="Completed / Onboarded" value={summary.completed} tone="emerald" />
             <AdminStatCard label="Aborted" value={summary.aborted} tone="rose" />
             <AdminStatCard label="Unsupported" value={summary.unsupported} tone="amber" />
             <AdminStatCard label="Needs clarification" value={summary.needs_clarification} tone="amber" />
@@ -990,8 +994,8 @@ function AdminConsole() {
                   <div className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Request type</div>
                   <Select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value as RequestTypeFilter)} className="h-10 bg-background border-input text-foreground">
                     <option value="All">All</option>
-                    <option value="By Source">By Source</option>
-                    <option value="By Dataset">By Dataset</option>
+                    <option value="By Source">By Agents</option>
+                    <option value="By Dataset">By Solutions</option>
                   </Select>
                 </div>
                 <div className="space-y-1">
@@ -1065,7 +1069,7 @@ function AdminConsole() {
             {(typeFilter === "All" || typeFilter === "By Source") && (
               <div className="space-y-4">
                 <RequestTable
-                  title={activeUsername ? `By Source requests for @${activeUsername}` : "By Source requests"}
+                  title={activeUsername ? `By Agents for @${activeUsername}` : "By Agents"}
                   rows={bySource}
                   headerRight={pendingBySource.length > 0 ? <Badge tone="warning">{pendingBySource.length} pending onboarding</Badge> : undefined}
                   onViewSummary={(row) => {
@@ -1079,7 +1083,7 @@ function AdminConsole() {
 
             {(typeFilter === "All" || typeFilter === "By Dataset") && (
               <RequestTable
-                title={activeUsername ? `By Dataset requests for @${activeUsername}` : "By Dataset requests"}
+                title={activeUsername ? `By Solutions for @${activeUsername}` : "By Solutions"}
                 rows={byDataset}
                 onViewSummary={(row) => {
                   setSelected(row);
@@ -1106,7 +1110,10 @@ function AdminConsole() {
               <div className="flex flex-wrap gap-2">
                 <Badge tone={statusTone(requestStatusLabel(selected))}>{requestStatusLabel(selected)}</Badge>
                 <Badge tone="neutral">{prettyPlannerStatus(selected.planner_status)}</Badge>
-                <Badge tone="neutral">{selected.request_type}</Badge>
+                <Badge tone="neutral">{selected.request_type === "By Source" ? "By Agents" : selected.request_type === "By Dataset" ? "By Solutions" : selected.request_type}</Badge>
+                {(selected.source === "Ask Freda" || (selected.raw_payload as any)?.channel === "ask_freda") && (
+                  <Badge tone="info">Ask Freda</Badge>
+                )}
                 <Badge tone="neutral">{selected.investigated ? "Investigated" : "Open"}</Badge>
               </div>
 
@@ -1453,7 +1460,10 @@ function RequestTable({
                   </td>
                   <td className="px-4 py-2 max-w-[220px] overflow-hidden">
                     <div className="font-medium text-foreground truncate">{displaySourcePrimary(row)}</div>
-                    <div className="text-xs text-muted-foreground truncate">{displaySourceSubtitle(row)}</div>
+                    <div className="text-xs text-muted-foreground truncate flex items-center gap-1">
+                      {displaySourceSubtitle(row)}
+                      {row.source === "Ask Freda" && <span className="inline-block px-1 py-0 rounded bg-info-bg text-info text-[9px] font-semibold uppercase tracking-wide">Ask Freda</span>}
+                    </div>
                   </td>
                   <td className="px-4 py-2">
                     <Badge tone={statusTone(requestStatusLabel(row))}>{requestStatusLabel(row)}</Badge>

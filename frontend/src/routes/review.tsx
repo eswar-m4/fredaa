@@ -1735,7 +1735,7 @@ function Review() {
                             : ""
                       }`}
                     >
-                      <td className="px-3 py-1.5 font-mono"><span className="break-all">{j.id}</span></td>
+                      <td className="px-3 py-1.5 font-mono max-w-[100px] overflow-hidden"><span className="truncate block">{j.id}</span></td>
                       <td className="px-3 py-1.5 max-w-[160px] overflow-hidden">
                         <span className="font-semibold truncate block">{j.isDatasetJob ? (getAnySiteUploadedFilename(j.filters) || j.source) : j.source}</span>
                       </td>
@@ -1903,8 +1903,8 @@ function Review() {
                             : ""
                       }`}
                     >
-                      <td className="px-3 py-1.5 font-mono">
-                        <span className="break-all">{j.id}</span>
+                      <td className="px-3 py-1.5 font-mono max-w-[100px] overflow-hidden">
+                        <span className="truncate block">{j.id}</span>
                       </td>
                       <td className="px-3 py-1.5 max-w-[160px] overflow-hidden">
                         <div className="font-semibold text-foreground truncate block">{j.source}</div>

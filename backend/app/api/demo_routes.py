@@ -3298,6 +3298,7 @@ async def submit_solution_request(request: Request, payload: SolutionRequestPayl
             "volume": payload.volume,
             "timeline": payload.timeline,
             "cadence": payload.cadence,
+            "channel": "ask_freda",
         },
         request_status="Solution Requested",
         job_status="Solution Requested",

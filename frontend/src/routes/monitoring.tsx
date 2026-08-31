@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { Badge, Card, PageHeader, Button } from "@/components/ui-bits";
-import { Download, Trash2, Star, RefreshCw, Timer } from "lucide-react";
+import { Download, Trash2, Star, RefreshCw, Timer, Filter } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { clearDeletedJob, jobsCacheUpdatedEventName, markJobDeleted, readJobsCache, writeJobsCache } from "@/lib/jobs-cache";
 import { fetchBotCatalog, getBotDisplayName, type BotCatalogEntry } from "@/lib/bot-catalog";
@@ -503,9 +503,13 @@ function Monitoring() {
                             >
                               <span className="inline-flex items-center gap-0.5">
                                 {label}
-                                <span className={monSort.col === col ? "opacity-100" : "opacity-25"}>
-                                  {monSort.col === col && monSort.dir === "asc" ? "↑" : monSort.col === col && monSort.dir === "desc" ? "↓" : "↕"}
-                                </span>
+                                {monSort.col === col && monSort.dir === "asc" ? (
+                                  <span className="opacity-100 text-[10px]">↑</span>
+                                ) : monSort.col === col && monSort.dir === "desc" ? (
+                                  <span className="opacity-100 text-[10px]">↓</span>
+                                ) : (
+                                  <Filter className="h-2.5 w-2.5 shrink-0 opacity-35" />
+                                )}
                               </span>
                             </th>
                           ))}
