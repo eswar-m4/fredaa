@@ -817,6 +817,7 @@ function formatNextRefreshDate(isoStr: string | null | undefined): string {
 
 function Review() {
   const [modeFilter, setModeFilter] = useState<"All" | JobMode>("All");
+  const [jobSort, setJobSort] = useState<"latest" | "oldest" | "id-asc" | "id-desc" | "status">("latest");
   const [jobRates, setJobRates] = useState<Record<string, number>>({});
   const [openJob, setOpenJob] = useState<JobRow | null>(null);
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
@@ -1280,6 +1281,18 @@ function Review() {
     [allJobs, modeFilter],
   );
 
+  const sortedJobs = useMemo(() => {
+    return [...filteredJobs].sort((a, b) => {
+      if (jobSort === "oldest") {
+        return String(a.id).localeCompare(String(b.id));
+      }
+      if (jobSort === "id-asc") return String(a.id).localeCompare(String(b.id));
+      if (jobSort === "id-desc") return String(b.id).localeCompare(String(a.id));
+      if (jobSort === "status") return String(a.reviewStatus).localeCompare(String(b.reviewStatus));
+      return String(b.id).localeCompare(String(a.id));
+    });
+  }, [filteredJobs, jobSort]);
+
   const getJobScore = (j: any) => {
     if (j.approved_count !== undefined && j.approved_count !== null) {
       return {
@@ -1642,12 +1655,30 @@ function Review() {
                 {m.label} {m.value !== "All" && <span className="opacity-70">({allJobs.filter((j) => j.mode === m.value).length})</span>}
               </button>
             ))}
-            <span className="text-[11px] text-muted-foreground ml-auto">{filteredJobs.length} of {allJobs.length} jobs · {filteredJobs.reduce((s, j) => s + j.rows, 0).toLocaleString()} rows</span>
+            <span className="text-[11px] text-muted-foreground">{filteredJobs.length} of {allJobs.length} jobs · {filteredJobs.reduce((s, j) => s + j.rows, 0).toLocaleString()} rows</span>
+            <div className="flex items-center gap-2 ml-auto flex-wrap">
+              <span className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">Sort</span>
+              {[
+                { value: "latest", label: "Latest" },
+                { value: "oldest", label: "Oldest" },
+                { value: "id-asc", label: "ID ↑" },
+                { value: "id-desc", label: "ID ↓" },
+                { value: "status", label: "Status" },
+              ].map((s) => (
+                <button
+                  key={s.value}
+                  onClick={() => setJobSort(s.value as any)}
+                  className={`px-2.5 py-1 rounded-md border text-[12px] ${jobSort === s.value ? "bg-primary text-primary-foreground border-primary" : "bg-card border-border hover:bg-secondary"}`}
+                >
+                  {s.label}
+                </button>
+              ))}
+            </div>
           </div>
         </Card>
 
         {/* Solutions jobs - ADMV sampling table */}
-        {(modeFilter === "All" || modeFilter === "By Dataset") && filteredJobs.some((j) => j.mode === "By Dataset") && (
+        {(modeFilter === "All" || modeFilter === "By Dataset") && sortedJobs.some((j) => j.mode === "By Dataset") && (
           <Card className="p-0 overflow-hidden">
             <div className="px-4 py-3 border-b border-border">
               <h3 className="font-semibold text-[14px]">Solutions - sampling review</h3>
@@ -1657,20 +1688,21 @@ function Review() {
               <table className="w-full text-[12.5px]">
               <thead className="bg-secondary text-[11px] uppercase tracking-wider text-muted-foreground sticky top-0 z-10 dark:bg-secondary/80">
                 <tr>
-                  <th className="text-left px-3 py-2">Job</th>
-                  <th className="text-left px-3 py-2">Source</th>
-                  <th className="text-right px-3 py-2">Rows</th>
-                  <th className="text-right px-3 py-2">Changed</th>
-                  <th className="text-left px-3 py-2 w-64">Sample rate</th>
-                  <th className="text-left px-3 py-2 w-48">Confidence filter</th>
-                  <th className="text-left px-3 py-2 w-36">Status</th>
-                  <th className="text-left px-3 py-2 w-28">Coverage</th>
-                  <th className="text-left px-3 py-2 w-28">Quality</th>
-                  <th className="text-right px-3 py-2 w-28">Review</th>
+                  <th className="text-left px-3 py-1.5">Job</th>
+                  <th className="text-left px-3 py-1.5">Source</th>
+                  <th className="text-right px-3 py-1.5">Rows</th>
+                  <th className="text-right px-3 py-1.5">Changed</th>
+                  <th className="text-right px-3 py-1.5 w-28">Runs</th>
+                  <th className="text-left px-3 py-1.5 w-64">Sample rate</th>
+                  <th className="text-left px-3 py-1.5 w-48">Confidence filter</th>
+                  <th className="text-left px-3 py-1.5 w-36">Status</th>
+                  <th className="text-left px-3 py-1.5 w-28">Coverage</th>
+                  <th className="text-left px-3 py-1.5 w-28">Quality</th>
+                  <th className="text-right px-3 py-1.5 w-36">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {filteredJobs.filter((j) => j.mode === "By Dataset").map((j) => {
+                {sortedJobs.filter((j) => j.mode === "By Dataset").map((j) => {
                   const rate = jobRates[j.id] ?? 2;
                   const sampled = Math.max(1, Math.round((j.rows * rate) / 100));
                   const done = reviewed[j.id];
@@ -1689,13 +1721,14 @@ function Review() {
                             : ""
                       }`}
                     >
-                      <td className="px-3 py-2 font-mono">{j.id}</td>
-                      <td className="px-3 py-2 font-semibold">
-                        {j.isDatasetJob ? (getAnySiteUploadedFilename(j.filters) || j.source) : j.source}
+                      <td className="px-3 py-1.5 font-mono max-w-[100px] overflow-hidden"><span className="truncate block">{j.id}</span></td>
+                      <td className="px-3 py-1.5 max-w-[160px] overflow-hidden">
+                        <span className="font-semibold truncate block">{j.isDatasetJob ? (getAnySiteUploadedFilename(j.filters) || j.source) : j.source}</span>
                       </td>
-                      <td className="px-3 py-2 text-right font-mono">{j.rows.toLocaleString()}</td>
-                      <td className="px-3 py-2 text-right"><Badge tone={(j.changedPct ?? 0) > 20 ? "warning" : "info"}>{j.changedPct}%</Badge></td>
-                      <td className="px-3 py-2">
+                      <td className="px-3 py-1.5 text-right font-mono">{j.rows.toLocaleString()}</td>
+                      <td className="px-3 py-1.5 text-right"><Badge tone={(j.changedPct ?? 0) > 20 ? "warning" : "info"}>{j.changedPct}%</Badge></td>
+                      <td className="px-3 py-1.5 text-right text-[12px] font-mono">{j.refreshCount || 0} run{(j.refreshCount || 0) !== 1 ? "s" : ""}</td>
+                      <td className="px-3 py-1.5">
                         <div className="flex items-center gap-2">
                           <div className="relative w-20">
                             <Input
@@ -1711,7 +1744,7 @@ function Review() {
                           <span className="text-[11px] text-muted-foreground">≈ {sampled.toLocaleString()} row{sampled === 1 ? "" : "s"} selected</span>
                         </div>
                       </td>
-                      <td className="px-3 py-2 relative">
+                      <td className="px-3 py-1.5 relative">
                         {(() => {
                           const limits = confLimits[j.id] || { min: 0, max: 100 };
                           const isOpen = activeConfJobId === j.id;
@@ -1770,7 +1803,7 @@ function Review() {
                           );
                         })()}
                       </td>
-                      <td className="px-3 py-2">
+                      <td className="px-3 py-1.5">
                         {j.statusText === "Running" || j.statusText === "Refreshing" ? (
                           <Badge tone="info">{j.statusText === "Refreshing" ? "Refreshing" : "Running"}</Badge>
                         ) : j.reviewStatus === "Completed" || reviewed[j.id] ? (
@@ -1781,7 +1814,7 @@ function Review() {
                           </Badge>
                         )}
                       </td>
-                      <td className="px-3 py-2">
+                      <td className="px-3 py-1.5">
                         {(() => {
                           const coverageValue = j.coverage?.job_coverage;
                           return coverageValue === null || coverageValue === undefined || Number.isNaN(coverageValue)
@@ -1789,11 +1822,16 @@ function Review() {
                             : <Badge tone={coverageTone(coverageValue)}>{formatCoveragePct(coverageValue)}</Badge>;
                         })()}
                       </td>
-                      <td className="px-3 py-2"><QualityCell score={sc} /></td>
-                      <td className="px-3 py-2 text-right">
-                        <Button size="sm" variant="outline" onClick={() => { setOpenJob(j); setChangeFilter("all"); setConfFilter("all"); }}>
-                          <Eye className="h-3.5 w-3.5" /> Review
-                        </Button>
+                      <td className="px-3 py-1.5"><QualityCell score={sc} /></td>
+                      <td className="px-3 py-1.5 text-right">
+                        <div className="flex items-center justify-end gap-1">
+                          <Button size="sm" variant="outline" onClick={() => { setOpenJob(j); setChangeFilter("all"); setConfFilter("all"); }}>
+                            <Eye className="h-3.5 w-3.5" /> Review
+                          </Button>
+                          <Button size="sm" variant="outline" title="Download" onClick={() => window.open(`/api/v1/export?run_id=${j.id}&format=xlsx`, "_blank")}>
+                            <Download className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
                       </td>
                     </tr>
                   );
@@ -1805,7 +1843,7 @@ function Review() {
         )}
 
         {/* Agents jobs - source-centric review (full dump w/ schedule + change monitoring) */}
-        {(modeFilter === "All" || modeFilter === "By Source") && filteredJobs.some((j) => j.mode === "By Source") && (
+        {(modeFilter === "All" || modeFilter === "By Source") && sortedJobs.some((j) => j.mode === "By Source") && (
           <Card className="p-0 overflow-hidden">
             <div className="px-4 py-3 border-b border-border">
               <h3 className="font-semibold text-[14px]">Agents - extraction review</h3>
@@ -1817,20 +1855,20 @@ function Review() {
               <table className="w-full text-[12.5px]">
               <thead className="bg-secondary text-[11px] uppercase tracking-wider text-muted-foreground sticky top-0 z-10 dark:bg-secondary/80">
                 <tr>
-                  <th className="text-left px-3 py-2">Job</th>
-                  <th className="text-left px-3 py-2">Source</th>
-                  <th className="text-right px-3 py-2">Rows</th>
-                  <th className="text-left px-3 py-2 w-44">Type</th>
-                  <th className="text-left px-3 py-2 w-64">Sample rate</th>
-                  <th className="text-left px-3 py-2 w-48">Confidence filter</th>
-                  <th className="text-left px-3 py-2 w-36">Status</th>
-                  <th className="text-left px-3 py-2 w-28">Coverage</th>
-                  <th className="text-left px-3 py-2 w-28">Quality</th>
-                  <th className="text-right px-3 py-2 w-28">Review</th>
+                  <th className="text-left px-3 py-1.5">Job</th>
+                  <th className="text-left px-3 py-1.5">Source</th>
+                  <th className="text-right px-3 py-1.5">Rows</th>
+                  <th className="text-left px-3 py-1.5 w-44">Type</th>
+                  <th className="text-left px-3 py-1.5 w-64">Sample rate</th>
+                  <th className="text-left px-3 py-1.5 w-48">Confidence filter</th>
+                  <th className="text-left px-3 py-1.5 w-36">Status</th>
+                  <th className="text-left px-3 py-1.5 w-28">Coverage</th>
+                  <th className="text-left px-3 py-1.5 w-28">Quality</th>
+                  <th className="text-right px-3 py-1.5 w-36">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {filteredJobs.filter((j) => j.mode === "By Source").map((j) => {
+                {sortedJobs.filter((j) => j.mode === "By Source").map((j) => {
                   const isCM = j.kind === "Change Monitoring";
                   const schedule = j.schedule || "Weekly";
                   const done = reviewed[j.id];
@@ -1851,15 +1889,15 @@ function Review() {
                             : ""
                       }`}
                     >
-                      <td className="px-3 py-2 font-mono whitespace-pre-line leading-normal">
-                        {j.id.includes("-") ? `${j.id.split("-")[0]}-\n${j.id.split("-")[1]}` : j.id}
+                      <td className="px-3 py-1.5 font-mono max-w-[100px] overflow-hidden">
+                        <span className="truncate block">{j.id.length > 16 ? `${j.id.slice(0, 12)}…` : j.id}</span>
                       </td>
-                      <td className="px-3 py-2">
-                        <div className="font-semibold text-foreground">{j.source}</div>
-                        <div className="text-[10.5px] text-muted-foreground mt-0.5">{j.domain}</div>
+                      <td className="px-3 py-1.5 max-w-[160px] overflow-hidden">
+                        <div className="font-semibold text-foreground truncate block">{j.source}</div>
+                        <div className="text-[10.5px] text-muted-foreground mt-0.5 truncate">{j.domain}</div>
                       </td>
-                      <td className="px-3 py-2 text-right font-mono">{j.rows.toLocaleString()}</td>
-                      <td className="px-3 py-2">
+                      <td className="px-3 py-1.5 text-right font-mono">{j.rows.toLocaleString()}</td>
+                      <td className="px-3 py-1.5">
                         {j.kind === "Change Monitoring" && (
                           <Badge tone="warning">Change monitoring · {schedule}</Badge>
                         )}
@@ -1870,7 +1908,7 @@ function Review() {
                           <Badge tone="purple">Partial scrape · {schedule}</Badge>
                         )}
                       </td>
-                      <td className="px-3 py-2">
+                      <td className="px-3 py-1.5">
                         <div className="flex items-center gap-2">
                           <div className="relative w-20">
                             <Input
@@ -1886,7 +1924,7 @@ function Review() {
                           <span className="text-[11px] text-muted-foreground">≈ {sampled.toLocaleString()} row{sampled === 1 ? "" : "s"} selected</span>
                         </div>
                       </td>
-                      <td className="px-3 py-2 relative">
+                      <td className="px-3 py-1.5 relative">
                         {(() => {
                           const limits = confLimits[j.id] || { min: 0, max: 100 };
                           const isOpen = activeConfJobId === j.id;
@@ -1945,7 +1983,7 @@ function Review() {
                           );
                         })()}
                       </td>
-                      <td className="px-3 py-2">
+                      <td className="px-3 py-1.5">
                         {j.reviewStatus === "Completed" || reviewed[j.id] ? (
                           <Badge tone="success">Review completed</Badge>
                         ) : (
@@ -1954,7 +1992,7 @@ function Review() {
                           </Badge>
                         )}
                       </td>
-                      <td className="px-3 py-2">
+                      <td className="px-3 py-1.5">
                         {(() => {
                           const coverageValue = j.coverage?.job_coverage;
                           return coverageValue === null || coverageValue === undefined || Number.isNaN(coverageValue)
@@ -1962,11 +2000,16 @@ function Review() {
                             : <Badge tone={coverageTone(coverageValue)}>{formatCoveragePct(coverageValue)}</Badge>;
                         })()}
                       </td>
-                      <td className="px-3 py-2"><QualityCell score={sc} /></td>
-                      <td className="px-3 py-2 text-right">
-                        <Button size="sm" variant="outline" onClick={() => { setOpenJob(j); setChangeFilter("all"); setConfFilter("all"); }} disabled={j.statusText === "Running" || j.statusText === "Refreshing"}>
-                          <Eye className="h-3.5 w-3.5" /> Review
-                        </Button>
+                      <td className="px-3 py-1.5"><QualityCell score={sc} /></td>
+                      <td className="px-3 py-1.5 text-right">
+                        <div className="flex items-center justify-end gap-1">
+                          <Button size="sm" variant="outline" onClick={() => { setOpenJob(j); setChangeFilter("all"); setConfFilter("all"); }} disabled={j.statusText === "Running" || j.statusText === "Refreshing"}>
+                            <Eye className="h-3.5 w-3.5" /> Review
+                          </Button>
+                          <Button size="sm" variant="outline" title="Download" onClick={() => window.open(`/api/v1/export?run_id=${j.id}&format=xlsx`, "_blank")}>
+                            <Download className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
                       </td>
                     </tr>
                   );

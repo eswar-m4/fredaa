@@ -2591,10 +2591,28 @@ async def launch_jobs(request: Request, payload: LaunchJobsRequest, background_t
     return {"status": "success", "launched_count": len(payload.jobs)}
 
 
+def _next_sequential_job_id() -> str:
+    """Return the next sequential job ID like J-10001, J-10002, etc."""
+    try:
+        with get_connection() as conn:
+            rows = conn.execute("SELECT id FROM scraper_jobs WHERE id LIKE 'J-%'").fetchall()
+        max_num = 10000
+        for row in rows:
+            raw = str(row["id"] or "")
+            if not raw.startswith("J-"):
+                continue
+            suffix = raw[2:]
+            if suffix.isdigit() and len(suffix) <= 7:
+                max_num = max(max_num, int(suffix))
+        return f"J-{max_num + 1}"
+    except Exception:
+        import random
+        return f"J-{random.randint(10001, 99999)}"
+
+
 @router.post("/jobs/create_pending")
 async def create_pending_job(request: Request, item: PendingJobItem):
-    import random
-    job_id = f"J-{random.randint(1000, 9999)}"
+    job_id = _next_sequential_job_id()
     now_str = datetime.utcnow().isoformat() + "Z"
     status = "Pending Onboarding"
     session = auth_service.get_session(request)

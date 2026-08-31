@@ -465,13 +465,13 @@ function Monitoring() {
                     <table className="w-full text-[13px] border-separate border-spacing-0">
                       <thead className="bg-secondary text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">
                         <tr>
-                          <th className="text-left px-4 py-2 border-b border-border/40 w-[110px]">Job ID</th>
-                          <th className="text-left px-4 py-2 border-b border-border/40">Source</th>
-                          <th className="text-left px-4 py-2 border-b border-border/40 w-[90px]">Last Run</th>
-                          <th className="text-left px-4 py-2 border-b border-border/40 w-[130px]">Status</th>
-                          <th className="text-right px-4 py-2 border-b border-border/40 w-[80px]">Records</th>
-                          <th className="text-right px-4 py-2 border-b border-border/40 w-[70px]">Fresh %</th>
-                          <th className="text-right px-4 py-2 border-b border-border/40 w-[160px]">Actions</th>
+                          <th className="text-left px-4 py-1.5 border-b border-border/40 w-[120px]">Job ID</th>
+                          <th className="text-left px-4 py-1.5 border-b border-border/40">Source</th>
+                          <th className="text-left px-4 py-1.5 border-b border-border/40 w-[140px]">Last Run</th>
+                          <th className="text-left px-4 py-1.5 border-b border-border/40 w-[130px]">Status</th>
+                          <th className="text-right px-4 py-1.5 border-b border-border/40 w-[80px]">Records</th>
+                          <th className="text-right px-4 py-1.5 border-b border-border/40 w-[70px]">Fresh</th>
+                          <th className="text-right px-4 py-1.5 border-b border-border/40 w-[170px]">Actions</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -490,11 +490,11 @@ function Monitoring() {
                           return (
                             <>
                               <tr key={j.id} className={`hover:bg-secondary/60 group ${isExpanded ? "bg-secondary/40" : ""}`}>
-                                <td className="px-4 py-3 border-b border-border/40 text-left">
+                                <td className="px-4 py-1.5 border-b border-border/40 text-left w-[120px] overflow-hidden">
                                   <button
                                     type="button"
                                     onClick={() => setExpandedJobId(isExpanded ? null : j.id)}
-                                    className="font-mono text-[11px] text-info hover:text-info/80 underline underline-offset-2 text-left leading-tight"
+                                    className="font-mono text-[11px] text-info hover:text-info/80 underline underline-offset-2 text-left leading-tight truncate block max-w-[110px]"
                                     title="Click to expand request details"
                                   >
                                     {j.id.length > 16 ? `${j.id.slice(0, 8)}…` : j.id}
@@ -502,45 +502,62 @@ function Monitoring() {
                                   <div className="mt-0.5">
                                     <Badge tone="purple" className="text-[9px] px-1 py-0 uppercase tracking-wider font-semibold">{j.frequency}</Badge>
                                   </div>
+                                  {(j.refresh_count || 0) > 0 && (
+                                    <div className="mt-0.5">
+                                      <Badge tone="info" className="text-[9px] px-1 py-0 uppercase tracking-wider font-semibold">Rerun #{j.refresh_count}</Badge>
+                                    </div>
+                                  )}
                                 </td>
-                                <td className="px-4 py-3 border-b border-border/40 text-left max-w-[200px]">
+                                <td className="px-4 py-1.5 border-b border-border/40 text-left max-w-[200px] overflow-hidden">
                                   <div className="flex flex-col gap-0.5">
                                     <div className="flex items-center gap-1.5 flex-wrap">
-                                      <span className="font-semibold text-[13px] text-foreground truncate max-w-[160px]">{sourceDisplayName}</span>
+                                      <span className="font-semibold text-[13px] text-foreground truncate block max-w-[180px]">{sourceDisplayName}</span>
                                       {j.isCustomSource && (
                                         <Badge tone="warning" className="text-[9px] px-1.5 py-0.5 uppercase tracking-wider font-semibold shrink-0">NEW</Badge>
                                       )}
                                     </div>
                                   </div>
                                 </td>
-                                <td className="px-4 py-3 text-muted-foreground border-b border-border/40 text-left text-[12px]">
+                                <td className="px-4 py-1.5 text-muted-foreground border-b border-border/40 text-left text-[12px] w-[140px] overflow-hidden">
                                   <div className="flex flex-col">
-                                    <span>{j.last_refresh ? formatRelativeTime(j.last_refresh) : j.run || "—"}</span>
+                                    <span className="truncate">{j.last_refresh ? formatDateTime(j.last_refresh) : (j.created_at ? formatDateTime(j.created_at) : "—")}</span>
                                     {j.status !== "Pending Onboarding" && (computeNextRunTime(j) || j.next_refresh) && (
-                                      <span className="text-[10px] text-muted-foreground/75 mt-0.5">
+                                      <span className="text-[10px] text-muted-foreground/75 mt-0.5 truncate">
                                         Next: {formatDateTime(computeNextRunTime(j) || j.next_refresh)}
                                       </span>
                                     )}
                                   </div>
                                 </td>
-                                <td className="px-4 py-3 border-b border-border/40 text-left">
+                                <td className="px-4 py-1.5 border-b border-border/40 text-left">
                                   <div className="flex items-center gap-1.5">
-                                    <Badge tone={statusToneFn(j.status)}>{displayStatus}</Badge>
-                                    {j.status === "Running" && (
-                                      <span className="flex h-2 w-2 relative">
-                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
-                                        <span className="relative inline-flex rounded-full h-2 w-2 bg-sky-500"></span>
-                                      </span>
+                                    {rerunBusyId === j.id ? (
+                                      <>
+                                        <Badge tone="info">Running</Badge>
+                                        <span className="flex h-2 w-2 relative">
+                                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+                                          <span className="relative inline-flex rounded-full h-2 w-2 bg-sky-500"></span>
+                                        </span>
+                                      </>
+                                    ) : (
+                                      <>
+                                        <Badge tone={statusToneFn(j.status)}>{displayStatus}</Badge>
+                                        {j.status === "Running" && (
+                                          <span className="flex h-2 w-2 relative">
+                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+                                            <span className="relative inline-flex rounded-full h-2 w-2 bg-sky-500"></span>
+                                          </span>
+                                        )}
+                                      </>
                                     )}
                                   </div>
                                 </td>
-                                <td className="px-4 py-3 text-right font-mono border-b border-border/40 text-[12px] text-foreground font-semibold">
+                                <td className="px-4 py-1.5 text-right font-mono border-b border-border/40 text-[12px] text-foreground font-semibold w-[80px]">
                                   {isCustomScrape ? "—" : (j.records != null ? j.records.toLocaleString() : "—")}
                                 </td>
-                                <td className="px-4 py-3 text-right font-mono border-b border-border/40 text-[12px] text-foreground font-semibold">
+                                <td className="px-4 py-1.5 text-right font-mono border-b border-border/40 text-[12px] text-foreground font-semibold w-[70px]">
                                   {isCustomScrape ? "—" : (j.status === "Completed" ? "100%" : ((j.status === "Failed" || j.status === "Aborted") ? "0%" : (j.fresh != null ? `${j.fresh}%` : "—")))}
                                 </td>
-                                <td className="px-4 py-3 text-right border-b border-border/40 pr-4">
+                                <td className="px-4 py-1.5 text-right border-b border-border/40 pr-4 w-[170px]">
                                   <div className="flex items-center justify-end gap-1 flex-wrap">
                                     {rerunJobId === j.id ? (
                                       <>
@@ -616,6 +633,12 @@ function Monitoring() {
                                 <tr key={`${j.id}-detail`}>
                                   <td colSpan={7} className="px-6 py-4 bg-secondary/20 border-b border-border/40">
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-[12px]">
+                                      <div>
+                                        <div className="text-muted-foreground uppercase tracking-wider text-[10px] font-semibold mb-1">Run</div>
+                                        <div className="text-foreground font-mono">
+                                          {(j.refresh_count || 0) === 0 ? "Initial Run" : `Rerun #${j.refresh_count}`}
+                                        </div>
+                                      </div>
                                       <div>
                                         <div className="text-muted-foreground uppercase tracking-wider text-[10px] font-semibold mb-1">Job ID</div>
                                         <div className="font-mono text-foreground break-all">{j.id}</div>
