@@ -400,22 +400,35 @@ export function reviewRecordsFor(project: Project, count = 24): ReviewRecord[] {
 
 /* ---------------- xlsx → review records ---------------- */
 
+// Priority-ordered list for entity column detection in plain datasets
 const ENTITY_COLUMN_CANDIDATES = [
-  "Hotel", "Organization Name", "Company Name", "Company", "BusinessName",
-  "Business Name", "Name", "Title", "Facility Name", "Location Name",
-  "Place Name", "PropertyName", "Property Name",
+  "Hotel", "HotelName", "POIName", "CO_Name", "Organization Name",
+  "Company Name", "Company", "BusinessName", "Business Name",
+  "FDR Organization Name", "Name", "Title", "Facility Name",
+  "Location Name", "Place Name", "PropertyName", "Property Name",
 ];
 
+type SchemaPattern = "cengage_ab" | "poi_newdisp" | "plain";
+
+function detectPattern(columns: string[]): SchemaPattern {
+  const hasDispPrefix = columns.some((c) => c.startsWith("Disposition_"));
+  const hasABPairs = columns.some((c) => c.endsWith("_A") && columns.includes(c.replace(/_A$/, "_B")));
+  if (hasDispPrefix && hasABPairs) return "cengage_ab";
+  const hasDispSuffix = columns.some((c) => /_(d|D)isp$/.test(c));
+  const hasNewPrefix = columns.some((c) => c.startsWith("New_"));
+  if (hasDispSuffix && hasNewPrefix) return "poi_newdisp";
+  return "plain";
+}
+
 function guessEntityColumn(columns: string[]): string {
-  const nonDisp = columns.filter((c) => !c.startsWith("Disposition_"));
   for (const candidate of ENTITY_COLUMN_CANDIDATES) {
-    if (nonDisp.includes(candidate)) return candidate;
+    if (columns.includes(candidate)) return candidate;
   }
-  const nonId = nonDisp.filter((c) => {
+  const nonId = columns.filter((c) => {
     const l = c.toLowerCase();
-    return !l.includes("id") && !l.includes("key") && !l.includes("code") && !l.includes("num");
+    return !l.includes("id") && !l.includes("key") && !l.includes("code") && !l.includes("nbr");
   });
-  return nonId[0] ?? nonDisp[0] ?? columns[0] ?? "Entity";
+  return nonId[0] ?? columns[0] ?? "Entity";
 }
 
 function dispToChangeType(d: string): ChangeType {
@@ -430,61 +443,108 @@ export function xlsxRowsToReviewRecords(project: Project): ReviewRecord[] {
   const { sampleRows, columns } = project;
   if (!sampleRows || sampleRows.length === 0 || !columns || columns.length === 0) return [];
 
-  const entityCol = guessEntityColumn(columns);
-  const dispCols = columns.filter((c) => c.startsWith("Disposition_"));
-  const dataCols = columns.filter((c) => !c.startsWith("Disposition_") && c !== entityCol);
+  const pattern = detectPattern(columns);
+  const src = project.sources[0] ?? { label: project.source, url: project.websiteUrl };
 
-  // Map field name → its Disposition_ column
-  const dispMap: Record<string, string> = {};
-  for (const dc of dispCols) {
-    dispMap[dc.replace(/^Disposition_/, "")] = dc;
-  }
-  const mainDispCol = dispMap[entityCol] ?? dispCols[0] ?? null;
-
-  // Fallback ADMV distribution weights when no Disposition_ columns exist
   const total = Math.max(1, project.admv.added + project.admv.deleted + project.admv.modified + project.admv.verified);
   const wAdded = project.admv.added / total;
   const wDeleted = project.admv.deleted / total;
   const wModified = project.admv.modified / total;
 
-  const src = project.sources[0] ?? { label: project.source, url: project.websiteUrl };
+  function fallbackChangeType(seed: string): ChangeType {
+    const r = (hash(seed) % 1000) / 1000;
+    return r < wAdded ? "Added" : r < wAdded + wDeleted ? "Deleted" : r < wAdded + wDeleted + wModified ? "Modified" : "Verified";
+  }
+
   const records: ReviewRecord[] = [];
 
-  sampleRows.forEach((row, rowIdx) => {
-    const entity = row[entityCol] || `Record ${rowIdx + 1}`;
+  function push(entity: string, datapoint: string, changeType: ChangeType, oldVal: string, newVal: string, rowIdx: number) {
+    if (!datapoint || (!oldVal && !newVal)) return;
+    const seed = `${project.id}-xlsx-${rowIdx}-${datapoint}`;
+    records.push({
+      id: `${project.id}-X${rowIdx}-${datapoint.replace(/\W+/g, "_")}`,
+      projectId: project.id,
+      entity: entity || `Record ${rowIdx + 1}`,
+      datapoint,
+      oldValue: changeType === "Added" ? "—" : oldVal || "—",
+      newValue: changeType === "Deleted" ? "—" : newVal || "—",
+      changeType,
+      confidence: Number((71 + (hash(seed + "cf") % 28) + (hash(seed + "cf2") % 10) / 10).toFixed(1)),
+      source: src.label,
+      sourceUrl: src.url,
+      detectedHrs: Number((0.3 + (hash(seed + "dt") % 480) / 10).toFixed(1)),
+    });
+  }
 
-    let rowChangeType: ChangeType;
-    if (mainDispCol && row[mainDispCol]) {
-      rowChangeType = dispToChangeType(row[mainDispCol]);
-    } else {
-      const r = (hash(`${project.id}-disp-${rowIdx}`) % 1000) / 1000;
-      rowChangeType = r < wAdded ? "Added" : r < wAdded + wDeleted ? "Deleted" : r < wAdded + wDeleted + wModified ? "Modified" : "Verified";
+  if (pattern === "cengage_ab") {
+    // Schema: Field_B (before), Field_A (after), Disposition_Field (V/M/A/D/X)
+    const baseFields = columns
+      .filter((c) => c.endsWith("_A") && columns.includes(c.replace(/_A$/, "_B")))
+      .map((c) => c.replace(/_A$/, ""));
+
+    sampleRows.forEach((row, rowIdx) => {
+      // Build entity: try standalone name columns first, then First Name_A + Last Name_A
+      let entity =
+        row["FDR Organization Name"] ||
+        row["CO_Name"] ||
+        row["HotelName"] ||
+        row["Hotel"];
+      if (!entity) {
+        const fn = row["First Name_A"] || "";
+        const ln = row["Last Name_A"] || "";
+        entity = `${fn} ${ln}`.trim();
+      }
+      if (!entity) entity = `Record ${rowIdx + 1}`;
+
+      for (const field of baseFields) {
+        const dispVal = (row[`Disposition_${field}`] || "").toUpperCase().trim();
+        if (!dispVal || dispVal === "X") continue; // X = not applicable
+        const changeType = dispToChangeType(dispVal);
+        const oldVal = row[`${field}_B`] || "—";
+        const newVal = row[`${field}_A`] || "—";
+        push(entity, field, changeType, oldVal, newVal, rowIdx);
+      }
+    });
+
+  } else if (pattern === "poi_newdisp") {
+    // Schema: Field (current), New_Field (updated), Field_disp (V/M/A/D/NV)
+    const dispColMap: Record<string, string> = {};
+    for (const c of columns) {
+      if (/_(d|D)isp$/.test(c)) {
+        const base = c.replace(/_(d|D)isp$/, "");
+        if (columns.includes(base)) dispColMap[base] = c;
+      }
     }
 
-    for (const col of dataCols) {
-      const realVal = row[col] || "—";
-      const colDispCol = dispMap[col] ?? null;
-      const changeType: ChangeType = colDispCol && row[colDispCol] ? dispToChangeType(row[colDispCol]) : rowChangeType;
+    sampleRows.forEach((row, rowIdx) => {
+      const entity = row["POIName"] || row["LocationName"] || row["Name"] || `Record ${rowIdx + 1}`;
 
-      const oldValue = changeType === "Added" ? "—" : changeType === "Deleted" ? realVal : changeType === "Verified" ? realVal : "(previous)";
-      const newValue = changeType === "Deleted" ? "—" : realVal;
+      for (const [field, dispCol] of Object.entries(dispColMap)) {
+        if (field === "POIName") continue; // skip entity field itself
+        const dispVal = (row[dispCol] || "").toUpperCase().trim();
+        if (!dispVal || dispVal === "NV" || dispVal === "") continue; // NV = not verified / skip
+        const changeType = dispToChangeType(dispVal);
+        const oldVal = row[field] || "—";
+        const newVal = row[`New_${field}`] || row[field] || "—";
+        push(entity, field, changeType, oldVal, newVal, rowIdx);
+      }
+    });
 
-      const seed = `${project.id}-xlsx-${rowIdx}-${col}`;
-      records.push({
-        id: `${project.id}-X${rowIdx}-${col.replace(/\W+/g, "_")}`,
-        projectId: project.id,
-        entity,
-        datapoint: col,
-        oldValue,
-        newValue,
-        changeType,
-        confidence: Number((71 + (hash(seed + "cf") % 28) + (hash(seed + "cf2") % 10) / 10).toFixed(1)),
-        source: src.label,
-        sourceUrl: src.url,
-        detectedHrs: Number((0.3 + (hash(seed + "dt") % 480) / 10).toFixed(1)),
-      });
-    }
-  });
+  } else {
+    // Plain: no disposition columns — NTM Hotel Matching, IBG, etc.
+    const entityCol = guessEntityColumn(columns);
+    const dataCols = columns.filter((c) => c !== entityCol);
+
+    sampleRows.forEach((row, rowIdx) => {
+      const entity = row[entityCol] || `Record ${rowIdx + 1}`;
+      for (const col of dataCols) {
+        const val = row[col];
+        if (!val) continue; // skip empty columns
+        const changeType = fallbackChangeType(`${project.id}-disp-${rowIdx}-${col}`);
+        push(entity, col, changeType, val, val, rowIdx);
+      }
+    });
+  }
 
   return records;
 }
