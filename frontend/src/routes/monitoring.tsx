@@ -194,6 +194,7 @@ function Monitoring() {
   const [convertJobId, setConvertJobId] = useState<string | null>(null);
   const [convertFrequency, setConvertFrequency] = useState("Weekly");
   const [filterTab, setFilterTab] = useState<"all" | "agents" | "solutions">("all");
+  const [monSort, setMonSort] = useState<{ col: string; dir: "asc" | "desc" | "none" }>({ col: "", dir: "none" });
 
   const baseApiUrl = (() => {
     if (
@@ -337,6 +338,14 @@ function Monitoring() {
     }
   }
 
+  function handleSortColumn(col: string) {
+    setMonSort((prev) => {
+      if (prev.col !== col) return { col, dir: "asc" };
+      if (prev.dir === "asc") return { col, dir: "desc" };
+      return { col: "", dir: "none" };
+    });
+  }
+
   const combinedJobs = [...customJobs].reverse().map((j) => {
     const sourceName = String(j.source || j.source_name || j.website_url || "Unknown Source");
     return {
@@ -456,6 +465,20 @@ function Monitoring() {
 
               const renderGroup = (groupJobs: any[], label: string, tone: "info" | "purple") => {
                 if (groupJobs.length === 0) return null;
+                const sortedGroupJobs = monSort.col && monSort.dir !== "none"
+                  ? [...groupJobs].sort((a, b) => {
+                      let valA: any = "";
+                      let valB: any = "";
+                      if (monSort.col === "id") { valA = a.id; valB = b.id; }
+                      else if (monSort.col === "source") { valA = String(a.source).toLowerCase(); valB = String(b.source).toLowerCase(); }
+                      else if (monSort.col === "lastrun") { valA = a.last_refresh || a.created_at || ""; valB = b.last_refresh || b.created_at || ""; }
+                      else if (monSort.col === "status") { valA = a.status; valB = b.status; }
+                      else if (monSort.col === "records") { valA = a.records ?? -1; valB = b.records ?? -1; }
+                      else if (monSort.col === "fresh") { valA = a.fresh ?? -1; valB = b.fresh ?? -1; }
+                      const cmp = valA < valB ? -1 : valA > valB ? 1 : 0;
+                      return monSort.dir === "asc" ? cmp : -cmp;
+                    })
+                  : groupJobs;
                 return (
                   <div key={label}>
                     <div className="flex items-center gap-2 px-4 py-2 border-b border-border/40 bg-secondary/40">
@@ -465,17 +488,32 @@ function Monitoring() {
                     <table className="w-full text-[13px] border-separate border-spacing-0">
                       <thead className="bg-secondary text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">
                         <tr>
-                          <th className="text-left px-4 py-1.5 border-b border-border/40 w-[120px]">Job ID</th>
-                          <th className="text-left px-4 py-1.5 border-b border-border/40">Source</th>
-                          <th className="text-left px-4 py-1.5 border-b border-border/40 w-[140px]">Last Run</th>
-                          <th className="text-left px-4 py-1.5 border-b border-border/40 w-[130px]">Status</th>
-                          <th className="text-right px-4 py-1.5 border-b border-border/40 w-[80px]">Records</th>
-                          <th className="text-right px-4 py-1.5 border-b border-border/40 w-[70px]">Fresh</th>
-                          <th className="text-right px-4 py-1.5 border-b border-border/40 w-[170px]">Actions</th>
+                          {([
+                            { col: "id", label: "Job ID", cls: "text-left w-[120px]" },
+                            { col: "source", label: "Source", cls: "text-left w-[200px]" },
+                            { col: "lastrun", label: "Last Run", cls: "text-left w-[140px]" },
+                            { col: "status", label: "Status", cls: "text-left w-[130px]" },
+                            { col: "records", label: "Records", cls: "text-right w-[80px]" },
+                            { col: "fresh", label: "Fresh", cls: "text-right w-[70px]" },
+                          ] as const).map(({ col, label, cls }) => (
+                            <th
+                              key={col}
+                              onClick={() => handleSortColumn(col)}
+                              className={`${cls} px-4 py-1.5 border-b border-border/40 cursor-pointer select-none hover:bg-secondary/70`}
+                            >
+                              <span className="inline-flex items-center gap-0.5">
+                                {label}
+                                <span className={monSort.col === col ? "opacity-100" : "opacity-25"}>
+                                  {monSort.col === col && monSort.dir === "asc" ? "↑" : monSort.col === col && monSort.dir === "desc" ? "↓" : "↕"}
+                                </span>
+                              </span>
+                            </th>
+                          ))}
+                          <th className="text-right px-4 py-1.5 border-b border-border/40 w-[190px]">Actions</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {groupJobs.map((j) => {
+                        {sortedGroupJobs.map((j) => {
                           const isNewSourceOnboarding = j.isCustomSource;
                           const isCustomScrape = isCustomScrapeJob(j);
                           const displayStatus = j.status === "Failed" ? "Aborted" : j.status;
@@ -508,7 +546,7 @@ function Monitoring() {
                                     </div>
                                   )}
                                 </td>
-                                <td className="px-4 py-1.5 border-b border-border/40 text-left max-w-[200px] overflow-hidden">
+                                <td className="px-4 py-1.5 border-b border-border/40 text-left w-[200px] max-w-[200px] overflow-hidden">
                                   <div className="flex flex-col gap-0.5">
                                     <div className="flex items-center gap-1.5 flex-wrap">
                                       <span className="font-semibold text-[13px] text-foreground truncate block max-w-[180px]">{sourceDisplayName}</span>
@@ -557,8 +595,8 @@ function Monitoring() {
                                 <td className="px-4 py-1.5 text-right font-mono border-b border-border/40 text-[12px] text-foreground font-semibold w-[70px]">
                                   {isCustomScrape ? "—" : (j.status === "Completed" ? "100%" : ((j.status === "Failed" || j.status === "Aborted") ? "0%" : (j.fresh != null ? `${j.fresh}%` : "—")))}
                                 </td>
-                                <td className="px-4 py-1.5 text-right border-b border-border/40 pr-4 w-[170px]">
-                                  <div className="flex items-center justify-end gap-1 flex-wrap">
+                                <td className="px-4 py-1.5 text-right border-b border-border/40 pr-4 w-[190px]">
+                                  <div className="flex items-center justify-end gap-1 flex-nowrap">
                                     {rerunJobId === j.id ? (
                                       <>
                                         <input type="datetime-local" value={rerunAt} min={new Date().toISOString().slice(0, 16)} onChange={(e) => setRerunAt(e.target.value)} className="h-7 w-36 rounded border border-border bg-card px-1.5 text-[11px]" />
