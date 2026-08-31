@@ -18,6 +18,11 @@ const ACCOUNTS_STORAGE_KEY = "freda.auth.accounts.v1";
 
 type StoredAccount = { username: string; password: string; role: "user" | "admin"; display_name: string };
 
+const DEFAULT_ACCOUNTS: StoredAccount[] = [
+  { username: "user", password: "Freda@2024", role: "user", display_name: "Workspace User" },
+  { username: "admin", password: "Freda@2024", role: "admin", display_name: "Administrator" },
+];
+
 function readAccounts(): StoredAccount[] {
   if (typeof window === "undefined") return [];
   try {
@@ -36,6 +41,25 @@ function writeAccounts(accounts: StoredAccount[]) {
     // ignore
   }
 }
+
+function seedDefaultAccounts() {
+  if (typeof window === "undefined") return;
+  const accounts = readAccounts();
+  // Ensure default accounts exist and always use the canonical password
+  let updated = [...accounts];
+  for (const def of DEFAULT_ACCOUNTS) {
+    const idx = updated.findIndex((a) => a.username.toLowerCase() === def.username.toLowerCase());
+    if (idx === -1) {
+      updated.push(def);
+    } else {
+      updated[idx] = { ...updated[idx], password: def.password, role: def.role };
+    }
+  }
+  writeAccounts(updated);
+}
+
+// Ensure defaults are present each time the module loads
+if (typeof window !== "undefined") seedDefaultAccounts();
 
 function makeSession(account: StoredAccount): SessionInfo {
   const now = new Date();
