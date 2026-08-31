@@ -1563,6 +1563,60 @@ async def run_scraper_background(job_id: str):
                     if cms:
                         row["cms"] = cms
 
+                # company_type: default to "Private" if no public signals and field is blank
+                if not row.get("company_type") and "company_type" in row:
+                    has_ticker = row.get("ticker") or raw.get("ticker")
+                    has_cik = row.get("registry_number") or raw.get("cik") or raw.get("registry_number")
+                    row["company_type"] = "Public" if has_ticker or (has_cik and str(has_cik).isdigit()) else "Private"
+
+                # founded_year: extract year from date fields when blank
+                if not row.get("founded_year") and "founded_year" in row:
+                    for date_field in ("founding_date", "incorporation_date", "registration_date", "created_at", "founded"):
+                        date_val = row.get(date_field) or raw.get(date_field)
+                        if date_val:
+                            year_match = str(date_val)[:4]
+                            if year_match.isdigit() and 1800 < int(year_match) < 2030:
+                                row["founded_year"] = int(year_match)
+                                break
+
+                # email_domain: extract from website when blank
+                if not row.get("email_domain") and "email_domain" in row:
+                    website = row.get("website") or row.get("website_url") or raw.get("website") or raw.get("domain")
+                    if website:
+                        try:
+                            from urllib.parse import urlparse
+                            host = urlparse(str(website) if "://" in str(website) else f"https://{website}").netloc
+                            domain = host.lstrip("www.").strip()
+                            if domain and "." in domain:
+                                row["email_domain"] = domain
+                        except Exception:
+                            pass
+
+                # hq_country: default to "United States" when city/state present but country blank
+                if not row.get("hq_country") and "hq_country" in row:
+                    state = row.get("hq_state") or raw.get("hq_state") or raw.get("state")
+                    if state:
+                        us_states = {
+                            "AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA",
+                            "KS","KY","LA","ME","MD","MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ",
+                            "NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT",
+                            "VA","WA","WV","WI","WY","DC",
+                        }
+                        if str(state).strip().upper() in us_states:
+                            row["hq_country"] = "United States"
+
+                # country: mirror from hq_country when blank
+                if not row.get("country") and "country" in row and row.get("hq_country"):
+                    row["country"] = row["hq_country"]
+
+                # legal_name: fall back to company_name when blank
+                if not row.get("legal_name") and "legal_name" in row:
+                    row["legal_name"] = row.get("company_name") or raw.get("company_name") or raw.get("legal_name")
+
+                # sub_industry: mirror industry when blank
+                if not row.get("sub_industry") and "sub_industry" in row and row.get("industry"):
+                    row["sub_industry"] = row["industry"]
+
             # Concurrency limit and task definition
             sem = asyncio.Semaphore(5)
 

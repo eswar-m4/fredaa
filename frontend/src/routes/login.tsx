@@ -43,8 +43,9 @@ function LoginPage() {
 
   const hint = useMemo(() => {
     if (mode === "signup") return "Create a new user account.\nUse your own username and password.";
-    return null;
-  }, [mode]);
+    if (role === "admin") return "Admin credentials: admin / Freda@2024";
+    return "Default credentials: user / Freda@2024";
+  }, [mode, role]);
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();

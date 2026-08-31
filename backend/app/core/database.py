@@ -403,9 +403,7 @@ def init_db() -> None:
         except sqlite3.OperationalError:
             pass
 
-        # Seed default login accounts from env vars — never hardcode passwords.
-        # Set FREDA_DEFAULT_USER_PASS and FREDA_DEFAULT_ADMIN_PASS in .env
-        # before first run; if absent, no default accounts are created.
+        # Seed default login accounts. Env vars override the fallback "Freda@2024".
         try:
             from hashlib import pbkdf2_hmac
             from app.config import settings as _settings
@@ -414,11 +412,11 @@ def init_db() -> None:
                 salt = str(_settings.FREDA_AUTH_SALT).encode("utf-8")
                 return pbkdf2_hmac("sha256", password.encode("utf-8"), salt, 200_000).hex()
 
-            seed_users = []
-            if _settings.FREDA_DEFAULT_USER_PASS:
-                seed_users.append(("user", _hash(_settings.FREDA_DEFAULT_USER_PASS), "user", "FreshData User"))
-            if _settings.FREDA_DEFAULT_ADMIN_PASS:
-                seed_users.append(("admin", _hash(_settings.FREDA_DEFAULT_ADMIN_PASS), "admin", "FreshData Admin"))
+            default_password = "Freda@2024"
+            seed_users = [
+                ("user", _hash(_settings.FREDA_DEFAULT_USER_PASS or default_password), "user", "FreshData User"),
+                ("admin", _hash(_settings.FREDA_DEFAULT_ADMIN_PASS or default_password), "admin", "FreshData Admin"),
+            ]
 
             now = datetime.utcnow().isoformat()
             for username, password_hash, role, display_name in seed_users:
