@@ -4,7 +4,7 @@ import { AdmvBar, Badge, Button, Donut, Input, Select } from "@/components/ui-bi
 import { cn } from "@/lib/utils";
 import { Check, X, ChevronLeft, ChevronRight, RotateCcw, Layers, Send, ExternalLink, Download } from "lucide-react";
 import { downloadCsv } from "@/lib/download";
-import { reviewRecordsFor, fmt, hrsAgo, type Project, type ReviewRecord, type ChangeType } from "@/data/customers";
+import { reviewRecordsFor, xlsxRowsToReviewRecords, fmt, hrsAgo, type Project, type ReviewRecord, type ChangeType } from "@/data/customers";
 
 type Decision = "approved" | "rejected";
 
@@ -24,10 +24,13 @@ export function ReviewDialog({
   open: boolean;
   onOpenChange: (v: boolean) => void;
 }) {
-  const all = useMemo(
-    () => (project ? reviewRecordsFor(project, Math.min(POOL, Math.max(1200, project.pendingReview))) : []),
-    [project?.id],
-  );
+  const all = useMemo(() => {
+    if (!project) return [];
+    if (project.sampleRows && project.sampleRows.length > 0) {
+      return xlsxRowsToReviewRecords(project);
+    }
+    return reviewRecordsFor(project, Math.min(POOL, Math.max(1200, project.pendingReview)));
+  }, [project?.id]);
   const [batchSize, setBatchSize] = useState(25);
 
 

@@ -43,6 +43,8 @@ export type Project = {
   status: ProjectStatus;
   pendingReview: number;
   history: ProjectHistoryPoint[];
+  sampleRows: Record<string, string>[];
+  columns: string[];
 };
 
 export type Customer = {
@@ -282,6 +284,8 @@ function buildProject(spec: Spec, p: Spec["projects"][number], idx: number): Pro
     status,
     pendingReview: status === "In sync" ? int(`${id}-pr`, 0, 40) : int(`${id}-pr`, 60, 900),
     history,
+    sampleRows: xlsxOverride?.sampleRows ?? [],
+    columns: xlsxOverride?.columns ?? [],
   };
 }
 
@@ -392,6 +396,97 @@ export function reviewRecordsFor(project: Project, count = 24): ReviewRecord[] {
       detectedHrs: Number(rnd(seed + "dt", 0.3, 48).toFixed(1)),
     };
   });
+}
+
+/* ---------------- xlsx → review records ---------------- */
+
+const ENTITY_COLUMN_CANDIDATES = [
+  "Hotel", "Organization Name", "Company Name", "Company", "BusinessName",
+  "Business Name", "Name", "Title", "Facility Name", "Location Name",
+  "Place Name", "PropertyName", "Property Name",
+];
+
+function guessEntityColumn(columns: string[]): string {
+  const nonDisp = columns.filter((c) => !c.startsWith("Disposition_"));
+  for (const candidate of ENTITY_COLUMN_CANDIDATES) {
+    if (nonDisp.includes(candidate)) return candidate;
+  }
+  const nonId = nonDisp.filter((c) => {
+    const l = c.toLowerCase();
+    return !l.includes("id") && !l.includes("key") && !l.includes("code") && !l.includes("num");
+  });
+  return nonId[0] ?? nonDisp[0] ?? columns[0] ?? "Entity";
+}
+
+function dispToChangeType(d: string): ChangeType {
+  const u = (d || "").toUpperCase().trim();
+  if (u === "A") return "Added";
+  if (u === "D") return "Deleted";
+  if (u === "M") return "Modified";
+  return "Verified";
+}
+
+export function xlsxRowsToReviewRecords(project: Project): ReviewRecord[] {
+  const { sampleRows, columns } = project;
+  if (!sampleRows || sampleRows.length === 0 || !columns || columns.length === 0) return [];
+
+  const entityCol = guessEntityColumn(columns);
+  const dispCols = columns.filter((c) => c.startsWith("Disposition_"));
+  const dataCols = columns.filter((c) => !c.startsWith("Disposition_") && c !== entityCol);
+
+  // Map field name → its Disposition_ column
+  const dispMap: Record<string, string> = {};
+  for (const dc of dispCols) {
+    dispMap[dc.replace(/^Disposition_/, "")] = dc;
+  }
+  const mainDispCol = dispMap[entityCol] ?? dispCols[0] ?? null;
+
+  // Fallback ADMV distribution weights when no Disposition_ columns exist
+  const total = Math.max(1, project.admv.added + project.admv.deleted + project.admv.modified + project.admv.verified);
+  const wAdded = project.admv.added / total;
+  const wDeleted = project.admv.deleted / total;
+  const wModified = project.admv.modified / total;
+
+  const src = project.sources[0] ?? { label: project.source, url: project.websiteUrl };
+  const records: ReviewRecord[] = [];
+
+  sampleRows.forEach((row, rowIdx) => {
+    const entity = row[entityCol] || `Record ${rowIdx + 1}`;
+
+    let rowChangeType: ChangeType;
+    if (mainDispCol && row[mainDispCol]) {
+      rowChangeType = dispToChangeType(row[mainDispCol]);
+    } else {
+      const r = (hash(`${project.id}-disp-${rowIdx}`) % 1000) / 1000;
+      rowChangeType = r < wAdded ? "Added" : r < wAdded + wDeleted ? "Deleted" : r < wAdded + wDeleted + wModified ? "Modified" : "Verified";
+    }
+
+    for (const col of dataCols) {
+      const realVal = row[col] || "—";
+      const colDispCol = dispMap[col] ?? null;
+      const changeType: ChangeType = colDispCol && row[colDispCol] ? dispToChangeType(row[colDispCol]) : rowChangeType;
+
+      const oldValue = changeType === "Added" ? "—" : changeType === "Deleted" ? realVal : changeType === "Verified" ? realVal : "(previous)";
+      const newValue = changeType === "Deleted" ? "—" : realVal;
+
+      const seed = `${project.id}-xlsx-${rowIdx}-${col}`;
+      records.push({
+        id: `${project.id}-X${rowIdx}-${col.replace(/\W+/g, "_")}`,
+        projectId: project.id,
+        entity,
+        datapoint: col,
+        oldValue,
+        newValue,
+        changeType,
+        confidence: Number((71 + (hash(seed + "cf") % 28) + (hash(seed + "cf2") % 10) / 10).toFixed(1)),
+        source: src.label,
+        sourceUrl: src.url,
+        detectedHrs: Number((0.3 + (hash(seed + "dt") % 480) / 10).toFixed(1)),
+      });
+    }
+  });
+
+  return records;
 }
 
 /* ---------------- dashboard side panels ---------------- */
