@@ -1411,61 +1411,57 @@ function RequestTable({
         <table className="w-full text-sm">
           <thead className="bg-card text-muted-foreground text-[11px] uppercase tracking-[0.18em]">
             <tr>
-              <th className="px-4 py-3 text-left font-semibold">Request id</th>
-              <th className="px-4 py-3 text-left font-semibold">User</th>
-              <th className="px-4 py-3 text-left font-semibold">Source</th>
-              <th className="px-4 py-3 text-left font-semibold">Status</th>
-              <th className="px-4 py-3 text-left font-semibold">Planner</th>
-              <th className="px-4 py-3 text-left font-semibold">Created</th>
-              <th className="px-4 py-3 text-left font-semibold">Updated</th>
-              <th className="px-4 py-3 text-left font-semibold">Job correlation</th>
-              <th className="px-4 py-3 text-left font-semibold">Summary</th>
+              <th className="px-4 py-2 text-left font-semibold w-[130px]">Job ID</th>
+              <th className="px-4 py-2 text-left font-semibold w-[160px]">User</th>
+              <th className="px-4 py-2 text-left font-semibold">Source</th>
+              <th className="px-4 py-2 text-left font-semibold w-[150px]">Status</th>
+              <th className="px-4 py-2 text-left font-semibold w-[160px]">Created</th>
+              <th className="px-4 py-2 text-left font-semibold w-[100px]">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border/60">
             {rows.length === 0 ? (
               <tr>
-                <td colSpan={9} className="px-4 py-8 text-center text-muted-foreground">
+                <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">
                   No requests match the current filters.
                 </td>
               </tr>
             ) : (
               rows.map((row) => (
-                <tr key={row.id} className="hover:bg-card">
-                  <td className="px-4 py-3 font-mono text-[12px] text-muted-foreground">{row.id}</td>
-                  <td className="px-4 py-3">
+                <tr key={row.id} className="hover:bg-secondary/30">
+                  <td className="px-4 py-2 font-mono text-[12px] text-info font-semibold">
+                    {row.job_id || row.id}
+                  </td>
+                  <td className="px-4 py-2 max-w-[160px] overflow-hidden">
                     {onSelectUser && row.username ? (
                       <button
                         type="button"
                         onClick={() => onSelectUser(row.username!)}
-                        className="text-left group hover:opacity-80 transition"
+                        className="text-left group hover:opacity-80 transition w-full"
                       >
-                        <div className="font-medium text-foreground group-hover:text-info flex items-center gap-1">
-                          <span>{row.display_name || row.username || "—"}</span>
+                        <div className="font-medium text-foreground group-hover:text-info truncate">
+                          {row.display_name || row.username || "—"}
                         </div>
-                        <div className="text-xs text-muted-foreground">{row.role || "—"} · @{row.username}</div>
+                        <div className="text-xs text-muted-foreground truncate">@{row.username}</div>
                       </button>
                     ) : (
                       <>
-                        <div className="font-medium text-foreground">{row.display_name || row.username || "—"}</div>
-                        <div className="text-xs text-muted-foreground">{row.role || "—"} · {row.username || "—"}</div>
+                        <div className="font-medium text-foreground truncate">{row.display_name || row.username || "—"}</div>
+                        <div className="text-xs text-muted-foreground truncate">@{row.username || "—"}</div>
                       </>
                     )}
                   </td>
-                  <td className="px-4 py-3">
-                    <div className="font-medium text-foreground">{displaySourcePrimary(row)}</div>
-                    <div className="text-xs text-muted-foreground">{displaySourceSubtitle(row)}</div>
+                  <td className="px-4 py-2 max-w-[220px] overflow-hidden">
+                    <div className="font-medium text-foreground truncate">{displaySourcePrimary(row)}</div>
+                    <div className="text-xs text-muted-foreground truncate">{displaySourceSubtitle(row)}</div>
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-2">
                     <Badge tone={statusTone(requestStatusLabel(row))}>{requestStatusLabel(row)}</Badge>
                   </td>
-                  <td className="px-4 py-3 text-muted-foreground">{prettyPlannerStatus(row.planner_status)}</td>
-                  <td className="px-4 py-3 text-muted-foreground">{formatExactDateTime(row.created_at)}</td>
-                  <td className="px-4 py-3 text-muted-foreground">{formatExactDateTime(row.updated_at)}</td>
-                  <td className="px-4 py-3 font-mono text-[12px] text-muted-foreground">{row.job_id}</td>
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-2 text-[12px] text-muted-foreground whitespace-nowrap">{formatExactDateTime(row.created_at)}</td>
+                  <td className="px-4 py-2">
                     <Button variant="secondary" size="sm" className="bg-secondary text-foreground hover:bg-accent" onClick={() => onViewSummary(row)}>
-                      View summary
+                      View
                     </Button>
                   </td>
                 </tr>
