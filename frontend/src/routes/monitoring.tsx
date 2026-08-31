@@ -471,6 +471,7 @@ function Monitoring() {
                       let valB: any = "";
                       if (monSort.col === "id") { valA = a.id; valB = b.id; }
                       else if (monSort.col === "source") { valA = String(a.source).toLowerCase(); valB = String(b.source).toLowerCase(); }
+                      else if (monSort.col === "mode") { valA = isAgentJob(a) ? "agent" : "solution"; valB = isAgentJob(b) ? "agent" : "solution"; }
                       else if (monSort.col === "lastrun") { valA = a.last_refresh || a.created_at || ""; valB = b.last_refresh || b.created_at || ""; }
                       else if (monSort.col === "status") { valA = a.status; valB = b.status; }
                       else if (monSort.col === "records") { valA = a.records ?? -1; valB = b.records ?? -1; }
@@ -490,7 +491,8 @@ function Monitoring() {
                         <tr>
                           {([
                             { col: "id", label: "Job ID", cls: "text-left w-[120px]" },
-                            { col: "source", label: "Source", cls: "text-left w-[200px]" },
+                            { col: "source", label: "Description", cls: "text-left w-[180px]" },
+                            { col: "mode", label: "Mode", cls: "text-left w-[90px]" },
                             { col: "lastrun", label: "Last Run", cls: "text-left w-[140px]" },
                             { col: "status", label: "Status", cls: "text-left w-[130px]" },
                             { col: "records", label: "Records", cls: "text-right w-[80px]" },
@@ -550,15 +552,20 @@ function Monitoring() {
                                     </div>
                                   )}
                                 </td>
-                                <td className="px-4 py-1.5 border-b border-border/40 text-left w-[200px] max-w-[200px] overflow-hidden">
+                                <td className="px-4 py-1.5 border-b border-border/40 text-left w-[180px] max-w-[180px] overflow-hidden">
                                   <div className="flex flex-col gap-0.5">
-                                    <div className="flex items-center gap-1.5 flex-wrap">
-                                      <span className="font-semibold text-[13px] text-foreground truncate block max-w-[180px]">{sourceDisplayName}</span>
+                                    <div className="flex items-center gap-1.5">
+                                      <span className="font-semibold text-[13px] text-foreground truncate block max-w-[160px]">{sourceDisplayName}</span>
                                       {j.isCustomSource && (
                                         <Badge tone="warning" className="text-[9px] px-1.5 py-0.5 uppercase tracking-wider font-semibold shrink-0">NEW</Badge>
                                       )}
                                     </div>
                                   </div>
+                                </td>
+                                <td className="px-4 py-1.5 border-b border-border/40 text-left w-[90px]">
+                                  <Badge tone={isAgentJob(j) ? "info" : "purple"} className="text-[9px] px-1.5 py-0.5 uppercase tracking-wider font-semibold">
+                                    {isAgentJob(j) ? "Agent" : "Solution"}
+                                  </Badge>
                                 </td>
                                 <td className="px-4 py-1.5 text-muted-foreground border-b border-border/40 text-left text-[12px] w-[140px] overflow-hidden">
                                   <div className="flex flex-col">
@@ -570,26 +577,18 @@ function Monitoring() {
                                     )}
                                   </div>
                                 </td>
-                                <td className="px-4 py-1.5 border-b border-border/40 text-left">
+                                <td className="px-4 py-1.5 border-b border-border/40 text-left w-[130px]">
                                   <div className="flex items-center gap-1.5">
+                                    {(rerunBusyId === j.id || j.status === "Running") ? (
+                                      <span className="flex h-2.5 w-2.5 relative shrink-0">
+                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+                                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-sky-500"></span>
+                                      </span>
+                                    ) : null}
                                     {rerunBusyId === j.id ? (
-                                      <>
-                                        <Badge tone="info">Running</Badge>
-                                        <span className="flex h-2 w-2 relative">
-                                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
-                                          <span className="relative inline-flex rounded-full h-2 w-2 bg-sky-500"></span>
-                                        </span>
-                                      </>
+                                      <Badge tone="info">Running</Badge>
                                     ) : (
-                                      <>
-                                        <Badge tone={statusToneFn(j.status)}>{displayStatus}</Badge>
-                                        {j.status === "Running" && (
-                                          <span className="flex h-2 w-2 relative">
-                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
-                                            <span className="relative inline-flex rounded-full h-2 w-2 bg-sky-500"></span>
-                                          </span>
-                                        )}
-                                      </>
+                                      <Badge tone={statusToneFn(j.status)}>{displayStatus}</Badge>
                                     )}
                                   </div>
                                 </td>
@@ -673,7 +672,7 @@ function Monitoring() {
                               </tr>
                               {isExpanded && (
                                 <tr key={`${j.id}-detail`}>
-                                  <td colSpan={7} className="px-6 py-4 bg-secondary/20 border-b border-border/40">
+                                  <td colSpan={8} className="px-6 py-4 bg-secondary/20 border-b border-border/40">
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-[12px]">
                                       <div>
                                         <div className="text-muted-foreground uppercase tracking-wider text-[10px] font-semibold mb-1">Run</div>
