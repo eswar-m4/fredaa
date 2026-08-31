@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { AppLayout } from "@/components/AppLayout";
 import { Badge, Button, Card, PageHeader, Input } from "@/components/ui-bits";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Check, X, ExternalLink, Edit3, Save, Eye, Info, Zap, CheckCheck, XCircle, Download } from "lucide-react";
+import { Check, X, ExternalLink, Edit3, Save, Eye, Info, Zap, CheckCheck, XCircle, Download, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { jobsCacheUpdatedEventName, readJobsCache, writeJobsCache } from "@/lib/jobs-cache";
 import { buildReviewSummary } from "@/lib/review-summary";
@@ -1055,6 +1055,20 @@ function Review() {
     }
   };
 
+  async function deleteJobFromReview(jobId: string) {
+    try {
+      await fetch(`${baseApiUrl}/api/v1/demo/jobs/${jobId}`, { method: "DELETE", credentials: "include" });
+    } catch (e) {
+      // ignore
+    }
+    setDbJobs((jobs) => {
+      const next = jobs.filter((j: any) => String(j.id) !== String(jobId));
+      writeJobsCache(next);
+      return next;
+    });
+    setOpenJob(null);
+  }
+
   async function ensureFullReviewRows() {
     if (!openJob) return [] as any[];
     if (bulkSample?.rows?.length) return bulkSample.rows;
@@ -1721,7 +1735,7 @@ function Review() {
                             : ""
                       }`}
                     >
-                      <td className="px-3 py-1.5 font-mono max-w-[100px] overflow-hidden"><span className="truncate block">{j.id}</span></td>
+                      <td className="px-3 py-1.5 font-mono"><span className="break-all">{j.id}</span></td>
                       <td className="px-3 py-1.5 max-w-[160px] overflow-hidden">
                         <span className="font-semibold truncate block">{j.isDatasetJob ? (getAnySiteUploadedFilename(j.filters) || j.source) : j.source}</span>
                       </td>
@@ -1889,8 +1903,8 @@ function Review() {
                             : ""
                       }`}
                     >
-                      <td className="px-3 py-1.5 font-mono max-w-[100px] overflow-hidden">
-                        <span className="truncate block">{j.id.length > 16 ? `${j.id.slice(0, 12)}…` : j.id}</span>
+                      <td className="px-3 py-1.5 font-mono">
+                        <span className="break-all">{j.id}</span>
                       </td>
                       <td className="px-3 py-1.5 max-w-[160px] overflow-hidden">
                         <div className="font-semibold text-foreground truncate block">{j.source}</div>
@@ -2039,6 +2053,16 @@ function Review() {
                   </span>
                   <span className="text-[13px] text-muted-foreground">Loading review data...</span>
                 </div>
+              ) : activeSample.rows.length === 0 ? (
+                <div className="flex flex-col items-center gap-4 py-16">
+                  <p className="text-muted-foreground text-sm">No review data available for this job.</p>
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" onClick={() => setOpenJob(null)}>Close</Button>
+                    <Button variant="destructive" size="sm" onClick={() => void deleteJobFromReview(openJob.id)}>
+                      <Trash2 className="h-3.5 w-3.5" /> Delete job
+                    </Button>
+                  </div>
+                </div>
               ) : (
                 <>
               <div className="flex items-center justify-between gap-3 flex-wrap text-[12px] text-muted-foreground">
@@ -2168,13 +2192,13 @@ function Review() {
                 <table className="w-full text-[12px] table-fixed">
                   <thead className="bg-secondary text-[10px] uppercase tracking-wider text-muted-foreground sticky top-0 z-10 dark:bg-secondary/80">
                     <tr>
-                      <th className="text-left px-2.5 py-2 w-[7%]">ADMV</th>
+                      <th className="text-left px-2.5 py-2 w-[5%]">ADMV</th>
                       <th className="text-left px-2.5 py-2 w-[10%]">Record</th>
-                      <th className="text-left px-2.5 py-2 w-[13%]">Attribute</th>
-                      <th className="text-left px-2.5 py-2 w-[25%]">Previous</th>
-                      <th className="text-left px-2.5 py-2 w-[25%]">New value</th>
-                      <th className="text-left px-2.5 py-2 w-[8%]">Conf.</th>
-                      <th className="text-left px-2.5 py-2 w-[12%]">Source</th>
+                      <th className="text-left px-2.5 py-2 w-[12%]">Attribute</th>
+                      <th className="text-left px-2.5 py-2 w-[23%]">Previous</th>
+                      <th className="text-left px-2.5 py-2 w-[23%]">New value</th>
+                      <th className="text-left px-2.5 py-2 w-[7%]">Conf.</th>
+                      <th className="text-left px-2.5 py-2 w-[10%]">Source</th>
                       <th className="text-right px-2.5 py-2 w-[10%]">Action</th>
                     </tr>
                   </thead>
@@ -2190,7 +2214,7 @@ function Review() {
                           <td className="px-2.5 py-1.5"><Badge tone={changeTone(r.changeType)}>{r.changeType}</Badge></td>
                           <td className="px-2.5 py-1.5 font-medium">{r.record}</td>
                           <td className="px-2.5 py-1.5 text-muted-foreground">{r.attribute}</td>
-                          <td className="px-2.5 py-1.5 font-mono text-[11px] text-muted-foreground break-words whitespace-pre-wrap">{r.previous}</td>
+                          <td className="px-2.5 py-1.5 font-mono text-[11px] text-muted-foreground break-all whitespace-normal">{r.previous}</td>
                           <td className="px-2.5 py-1.5">
                             {isEditing ? (
                               <div className="flex items-center gap-1">
@@ -2205,7 +2229,7 @@ function Review() {
                                   r.changed ? "bg-warning-bg font-bold text-warning-foreground" : "",
                                 ].join(" ")}
                               >
-                                <span className="break-words whitespace-pre-wrap">{r.value}</span>
+                                <span className="break-all whitespace-normal">{r.value}</span>
                                 <Edit3 className="h-3 w-3 text-muted-foreground shrink-0 mt-0.5" />
                               </button>
                             )}
