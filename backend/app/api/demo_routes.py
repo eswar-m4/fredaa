@@ -2530,7 +2530,51 @@ async def launch_jobs(request: Request, payload: LaunchJobsRequest, background_t
                 conn.commit()
         except Exception:
             pass
-        
+
+        try:
+            from app.services.admin_request_audit_service import admin_request_audit_service
+            display_name = (session or {}).get("display_name") or owner_username
+            user_id = (session or {}).get("user_id") or owner_username
+            user_role = (session or {}).get("role") or "user"
+            _req_type = "By Dataset" if (item.mode or "").strip() in {"By Dataset", "Any-Site"} else "By Source"
+            _src_kind = (
+                "Partial Scrape" if _is_partial_scope(item.scope)
+                else "By Dataset" if _req_type == "By Dataset"
+                else "New Source" if bool(item.isCustomSource)
+                else "Full Scrape"
+            )
+            admin_request_audit_service.record_request(
+                job_id=item.id,
+                request_type=_req_type,
+                source=item.source,
+                dataset_name=item.source if _req_type == "By Dataset" else None,
+                mode=item.mode,
+                scope=item.scope,
+                user={"user_id": user_id, "username": owner_username, "role": user_role, "display_name": display_name},
+                raw_payload={
+                    "source": item.source,
+                    "scope": item.scope,
+                    "filters": item.filters,
+                    "frequency": item.frequency,
+                    "delivery": item.delivery,
+                    "output_format": item.output_format,
+                    "mode": item.mode,
+                    "isCustomSource": bool(item.isCustomSource),
+                    "custom_criteria": item.custom_criteria,
+                },
+                planner_json=json.loads(planner_json_value) if planner_json_value else None,
+                request_status=status_val,
+                job_status=status_val,
+                execution_metadata={
+                    "source_kind": _src_kind,
+                    "records": item.records,
+                    "complexity": complexity_val,
+                    "estimated_onboarding_time": sla_val,
+                },
+            )
+        except Exception:
+            pass
+
         # Delete pending job to prevent duplicates
         try:
             with get_connection() as conn:

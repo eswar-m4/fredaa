@@ -187,28 +187,72 @@ async def onboard_bot_request(request: Request, request_id: str, payload: Dict[s
     return {"success": True, "request": updated}
 
 
+def _serialize_request(row: Dict[str, Any]) -> Dict[str, Any]:
+    row["created_at"] = _to_iso(row.get("created_at"))
+    row["updated_at"] = _to_iso(row.get("updated_at"))
+    row["investigated_at"] = _to_iso(row.get("investigated_at"))
+    row["decision_at"] = _to_iso(row.get("decision_at"))
+    row["timeline"] = [
+        {**entry, "timestamp": _to_iso(entry.get("timestamp"))}
+        for entry in row.get("timeline", [])
+        if isinstance(entry, dict)
+    ]
+    return row
+
+
+@router.post("/requests/{request_id}/begin-review")
+async def begin_review_request(request: Request, request_id: str, payload: Dict[str, Any]) -> Dict[str, Any]:
+    """Move a Solution Requested ticket to Under Review."""
+    session = _require_admin(request)
+    notes = str(payload.get("notes") or "").strip() or None
+    row = admin_request_audit_service.get_request(request_id)
+    if not row:
+        raise HTTPException(status_code=404, detail="Request not found")
+    if row.get("request_status") != "Solution Requested":
+        raise HTTPException(status_code=409, detail="Only Solution Requested tickets can be moved to Under Review")
+    job_id = row.get("job_id")
+    with get_connection() as conn:
+        conn.execute("UPDATE scraper_jobs SET status = 'Under Review' WHERE id = ?", (job_id,))
+        conn.commit()
+    admin_request_audit_service.update_job_state(
+        job_id=job_id,
+        request_status="Under Review",
+        job_status="Under Review",
+        status_reason=notes,
+        event="begin_review",
+    )
+    updated = admin_request_audit_service.get_request(request_id)
+    if not updated:
+        raise HTTPException(status_code=404, detail="Request not found")
+    return {"success": True, "request": _serialize_request(updated)}
+
+
 @router.post("/requests/{request_id}/approve")
-async def approve_new_source_request(request: Request, request_id: str, payload: Dict[str, Any]) -> Dict[str, Any]:
+async def approve_request(request: Request, request_id: str, payload: Dict[str, Any]) -> Dict[str, Any]:
     session = _require_admin(request)
     reason = str(payload.get("reason") or "").strip() or None
     row = admin_request_audit_service.get_request(request_id)
     if not row:
-      raise HTTPException(status_code=404, detail="Request not found")
-    if row.get("request_type") != "By Source" or row.get("request_status") != "Pending Approval":
-      raise HTTPException(status_code=409, detail="Only pending approval new source requests can be approved")
+        raise HTTPException(status_code=404, detail="Request not found")
+    req_type = row.get("request_type")
+    req_status = row.get("request_status")
+    if req_type == "By Source" and req_status != "Pending Approval":
+        raise HTTPException(status_code=409, detail="Only Pending Approval By Source requests can be approved")
+    if req_type == "By Dataset" and req_status not in ("Solution Requested", "Under Review"):
+        raise HTTPException(status_code=409, detail="Only Solution Requested or Under Review tickets can be approved")
+    if req_type not in ("By Source", "By Dataset"):
+        raise HTTPException(status_code=409, detail="Invalid request type for approval")
 
+    next_status = "Pending Onboarding" if req_type == "By Source" else "Approved"
     job_id = row.get("job_id")
     with get_connection() as conn:
-        conn.execute(
-            "UPDATE scraper_jobs SET status = 'Pending Onboarding' WHERE id = ?",
-            (job_id,),
-        )
+        conn.execute("UPDATE scraper_jobs SET status = ? WHERE id = ?", (next_status, job_id))
         conn.commit()
     decision = _decision_payload(session, "approved", reason)
     admin_request_audit_service.update_job_state(
         job_id=job_id,
-        request_status="Pending Onboarding",
-        job_status="Pending Onboarding",
+        request_status=next_status,
+        job_status=next_status,
         status_reason=reason,
         execution_metadata=decision,
         event="approved",
@@ -220,34 +264,28 @@ async def approve_new_source_request(request: Request, request_id: str, payload:
     updated = admin_request_audit_service.get_request(request_id)
     if not updated:
         raise HTTPException(status_code=404, detail="Request not found")
-    updated["created_at"] = _to_iso(updated.get("created_at"))
-    updated["updated_at"] = _to_iso(updated.get("updated_at"))
-    updated["investigated_at"] = _to_iso(updated.get("investigated_at"))
-    updated["decision_at"] = _to_iso(updated.get("decision_at"))
-    updated["timeline"] = [
-        {**entry, "timestamp": _to_iso(entry.get("timestamp"))}
-        for entry in updated.get("timeline", [])
-        if isinstance(entry, dict)
-    ]
-    return {"success": True, "request": updated}
+    return {"success": True, "request": _serialize_request(updated)}
 
 
 @router.post("/requests/{request_id}/reject")
-async def reject_new_source_request(request: Request, request_id: str, payload: Dict[str, Any]) -> Dict[str, Any]:
+async def reject_request(request: Request, request_id: str, payload: Dict[str, Any]) -> Dict[str, Any]:
     session = _require_admin(request)
     reason = str(payload.get("reason") or "").strip() or "Rejected by admin"
     row = admin_request_audit_service.get_request(request_id)
     if not row:
-      raise HTTPException(status_code=404, detail="Request not found")
-    if row.get("request_type") != "By Source" or row.get("request_status") != "Pending Approval":
-      raise HTTPException(status_code=409, detail="Only pending approval new source requests can be rejected")
+        raise HTTPException(status_code=404, detail="Request not found")
+    req_type = row.get("request_type")
+    req_status = row.get("request_status")
+    if req_type == "By Source" and req_status != "Pending Approval":
+        raise HTTPException(status_code=409, detail="Only Pending Approval By Source requests can be rejected")
+    if req_type == "By Dataset" and req_status not in ("Solution Requested", "Under Review"):
+        raise HTTPException(status_code=409, detail="Only Solution Requested or Under Review tickets can be rejected")
+    if req_type not in ("By Source", "By Dataset"):
+        raise HTTPException(status_code=409, detail="Invalid request type for rejection")
 
     job_id = row.get("job_id")
     with get_connection() as conn:
-        conn.execute(
-            "UPDATE scraper_jobs SET status = 'Rejected' WHERE id = ?",
-            (job_id,),
-        )
+        conn.execute("UPDATE scraper_jobs SET status = 'Rejected' WHERE id = ?", (job_id,))
         conn.commit()
     decision = _decision_payload(session, "rejected", reason)
     admin_request_audit_service.update_job_state(
@@ -265,13 +303,31 @@ async def reject_new_source_request(request: Request, request_id: str, payload: 
     updated = admin_request_audit_service.get_request(request_id)
     if not updated:
         raise HTTPException(status_code=404, detail="Request not found")
-    updated["created_at"] = _to_iso(updated.get("created_at"))
-    updated["updated_at"] = _to_iso(updated.get("updated_at"))
-    updated["investigated_at"] = _to_iso(updated.get("investigated_at"))
-    updated["decision_at"] = _to_iso(updated.get("decision_at"))
-    updated["timeline"] = [
-        {**entry, "timestamp": _to_iso(entry.get("timestamp"))}
-        for entry in updated.get("timeline", [])
-        if isinstance(entry, dict)
-    ]
-    return {"success": True, "request": updated}
+    return {"success": True, "request": _serialize_request(updated)}
+
+
+@router.post("/requests/{request_id}/complete-onboarding")
+async def complete_onboarding_request(request: Request, request_id: str, payload: Dict[str, Any]) -> Dict[str, Any]:
+    """Mark a Pending Onboarding or Approved ticket as Onboarding Completed (ready to run)."""
+    session = _require_admin(request)
+    notes = str(payload.get("notes") or "").strip() or None
+    row = admin_request_audit_service.get_request(request_id)
+    if not row:
+        raise HTTPException(status_code=404, detail="Request not found")
+    if row.get("request_status") not in ("Pending Onboarding", "Approved"):
+        raise HTTPException(status_code=409, detail="Only Pending Onboarding or Approved requests can be completed")
+    job_id = row.get("job_id")
+    with get_connection() as conn:
+        conn.execute("UPDATE scraper_jobs SET status = 'Onboarding Completed' WHERE id = ?", (job_id,))
+        conn.commit()
+    admin_request_audit_service.update_job_state(
+        job_id=job_id,
+        request_status="Onboarding Completed",
+        job_status="Onboarding Completed",
+        status_reason=notes,
+        event="onboarding_completed",
+    )
+    updated = admin_request_audit_service.get_request(request_id)
+    if not updated:
+        raise HTTPException(status_code=404, detail="Request not found")
+    return {"success": True, "request": _serialize_request(updated)}

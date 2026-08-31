@@ -64,7 +64,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-screen bg-background text-foreground flex">
-      <aside className="w-72 shrink-0 border-r border-border bg-card px-5 py-6 flex flex-col">
+      <aside className="w-72 shrink-0 border-r border-border bg-card px-5 py-6 flex flex-col sticky top-0 h-screen overflow-y-auto">
         <div className="flex items-center gap-3">
           <div className="h-11 w-11 rounded-xl bg-info-bg border border-info/20 flex items-center justify-center">
             <Shield className="h-5 w-5 text-info" />

@@ -126,9 +126,9 @@ function computeNextRunTime(job: any) {
 
 function statusToneFn(s: string) {
   if (s === "Running") return "info" as const;
-  if (s === "Completed" || s === "Execution Completed") return "success" as const;
-  if (s === "Review" || s === "Review Pending") return "warning" as const;
-  if (s === "Analysis Complete" || s === "Pending Approval" || s === "Pending Onboarding") return "warning" as const;
+  if (s === "Completed" || s === "Execution Completed" || s === "Onboarding Completed") return "success" as const;
+  if (s === "Review" || s === "Review Pending" || s === "Solution Requested" || s === "Under Review") return "warning" as const;
+  if (s === "Analysis Complete" || s === "Pending Approval" || s === "Pending Onboarding" || s === "Approved") return "warning" as const;
   if (s === "Rejected") return "destructive" as const;
   return "destructive" as const;
 }

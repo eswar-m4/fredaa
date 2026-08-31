@@ -118,9 +118,10 @@ function formatExactDateTime(value?: string | null) {
 
 function statusTone(status: string) {
   if (status === "Running") return "info" as const;
-  if (status === "Completed") return "success" as const;
+  if (status === "Completed" || status === "Onboarding Completed") return "success" as const;
   if (status === "Review Pending" || status === "Awaiting Review") return "warning" as const;
   if (status === "Pending Approval" || status === "Pending Onboarding") return "warning" as const;
+  if (status === "Solution Requested" || status === "Under Review" || status === "Approved") return "warning" as const;
   if (status === "Rejected" || status === "Failed" || status === "Aborted" || status === "Unsupported Request" || status === "Needs Clarification") return "destructive" as const;
   return "neutral" as const;
 }
@@ -569,6 +570,10 @@ function AdminConsole() {
   const [onboardPackage, setOnboardPackage] = useState<File | null>(null);
   const [onboardBusy, setOnboardBusy] = useState(false);
   const [onboardPhase, setOnboardPhase] = useState<"idle" | "uploading" | "launching">("idle");
+  const [actionRow, setActionRow] = useState<AdminRequestRow | null>(null);
+  const [actionType, setActionType] = useState<"approve" | "reject" | "begin-review" | "complete-onboarding" | null>(null);
+  const [actionReason, setActionReason] = useState("");
+  const [actionBusy, setActionBusy] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -821,6 +826,40 @@ function AdminConsole() {
     }
   }
 
+  async function performAction() {
+    if (!actionRow || !actionType) return;
+    try {
+      setActionBusy(true);
+      const body: Record<string, unknown> = {};
+      if (actionType === "approve" || actionType === "reject") body.reason = actionReason;
+      if (actionType === "begin-review" || actionType === "complete-onboarding") body.notes = actionReason;
+      const response = await apiFetch(`/api/v1/admin/requests/${actionRow.id}/${actionType}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data?.detail || "Action failed");
+      const actionLabel = actionType === "approve" ? "Approved" : actionType === "reject" ? "Rejected" : actionType === "begin-review" ? "Review started" : "Onboarding completed";
+      toast.success(actionLabel);
+      syncSelectedRow(data.request as AdminRequestRow);
+      setActionRow(null);
+      setActionType(null);
+      setActionReason("");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Action failed");
+    } finally {
+      setActionBusy(false);
+    }
+  }
+
+  const pendingActionRows = useMemo(() => {
+    return rows.filter((row) => {
+      const s = requestStatusLabel(row);
+      return s === "Solution Requested" || s === "Under Review" || s === "Pending Approval" || s === "Pending Onboarding" || s === "Approved";
+    });
+  }, [rows]);
+
   return (
     <AdminLayout>
       <div className="space-y-6">
@@ -904,6 +943,36 @@ function AdminConsole() {
           </div>
         )}
 
+        {/* PENDING ACTIONS BANNER */}
+        {!activeUsername && activeTab === "requests" && pendingActionRows.length > 0 && (
+          <Card className="border-warning/30 bg-warning-bg p-4">
+            <div className="flex items-center justify-between gap-4 flex-wrap">
+              <div>
+                <div className="text-sm font-semibold text-foreground">Pending Admin Actions</div>
+                <div className="mt-1 text-xs text-muted-foreground">
+                  {pendingActionRows.length} ticket{pendingActionRows.length === 1 ? "" : "s"} require review or onboarding action.
+                </div>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {pendingActionRows.slice(0, 4).map((row) => (
+                  <button
+                    key={row.id}
+                    type="button"
+                    onClick={() => { setSelected(row); setDetailMode("overview"); }}
+                    className="inline-flex items-center gap-2 rounded-lg border border-warning/30 bg-card px-3 py-2 text-xs font-medium text-foreground hover:bg-accent transition"
+                  >
+                    <Badge tone={statusTone(requestStatusLabel(row))}>{requestStatusLabel(row)}</Badge>
+                    <span className="max-w-[140px] truncate">{displaySourcePrimary(row)}</span>
+                  </button>
+                ))}
+                {pendingActionRows.length > 4 && (
+                  <span className="text-xs text-muted-foreground self-center">+{pendingActionRows.length - 4} more</span>
+                )}
+              </div>
+            </div>
+          </Card>
+        )}
+
         {/* USERS DIRECTORY VIEW */}
         {!activeUsername && activeTab === "users" && (
           <UserDirectoryTable
@@ -928,7 +997,7 @@ function AdminConsole() {
                 <div className="space-y-1">
                   <div className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Status</div>
                   <Select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="h-10 bg-background border-input text-foreground">
-                    {["All", "Running", "Completed", "Aborted", "Review Pending", "Awaiting Review", "Pending Approval", "Pending Onboarding", "Rejected", "Unsupported Request", "Needs Clarification", "Planner Rejected", "Refreshing"].map((opt) => (
+                    {["All", "Running", "Completed", "Aborted", "Review Pending", "Awaiting Review", "Solution Requested", "Under Review", "Pending Approval", "Pending Onboarding", "Approved", "Onboarding Completed", "Rejected", "Unsupported Request", "Needs Clarification", "Planner Rejected", "Refreshing"].map((opt) => (
                       <option key={opt} value={opt}>{opt}</option>
                     ))}
                   </Select>
@@ -1093,6 +1162,48 @@ function AdminConsole() {
                 )}
               </div>
 
+              {/* Admin workflow action buttons */}
+              {(() => {
+                const status = requestStatusLabel(selected);
+                if (status === "Solution Requested") {
+                  return (
+                    <div className="flex flex-wrap gap-2 rounded-xl border border-info/20 bg-info-bg p-3">
+                      <div className="w-full text-xs text-muted-foreground mb-1">Admin action required — start review to progress this ticket.</div>
+                      <Button onClick={() => { setActionRow(selected); setActionType("begin-review"); setActionReason(""); }}>
+                        Begin Review
+                      </Button>
+                      <Button variant="outline" onClick={() => { setActionRow(selected); setActionType("reject"); setActionReason(""); }}>
+                        Reject
+                      </Button>
+                    </div>
+                  );
+                }
+                if (status === "Under Review" || status === "Pending Approval") {
+                  return (
+                    <div className="flex flex-wrap gap-2 rounded-xl border border-warning/20 bg-warning-bg p-3">
+                      <div className="w-full text-xs text-muted-foreground mb-1">Under review — approve or reject this request.</div>
+                      <Button onClick={() => { setActionRow(selected); setActionType("approve"); setActionReason(""); }}>
+                        Approve
+                      </Button>
+                      <Button variant="outline" onClick={() => { setActionRow(selected); setActionType("reject"); setActionReason(""); }}>
+                        Reject
+                      </Button>
+                    </div>
+                  );
+                }
+                if (status === "Pending Onboarding" || status === "Approved") {
+                  return (
+                    <div className="flex flex-wrap gap-2 rounded-xl border border-success/20 bg-success-bg p-3">
+                      <div className="w-full text-xs text-muted-foreground mb-1">Ready for onboarding — mark as complete to make it visible in monitoring.</div>
+                      <Button onClick={() => { setActionRow(selected); setActionType("complete-onboarding"); setActionReason(""); }}>
+                        Complete Onboarding
+                      </Button>
+                    </div>
+                  );
+                }
+                return null;
+              })()}
+
               {detailMode === "overview" && (
                 <div key={selected.id} className="space-y-4">
                   <InfoCard title="Launch Details" items={buildLaunchDetailItems(selected)} />
@@ -1202,6 +1313,52 @@ function AdminConsole() {
                 disabled={onboardBusy || !onboardPackage}
               >
                 {onboardPhase === "uploading" ? "Uploading..." : onboardPhase === "launching" ? "Launching..." : "Upload package"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={!!actionRow} onOpenChange={(open) => {
+        if (!open) { setActionRow(null); setActionType(null); setActionReason(""); }
+      }}>
+        <DialogContent className="max-w-lg bg-background border-border text-foreground">
+          <DialogHeader className="text-left pr-8">
+            <DialogTitle className="text-foreground">
+              {actionType === "approve" ? "Approve request" : actionType === "reject" ? "Reject request" : actionType === "begin-review" ? "Begin review" : "Complete onboarding"}
+            </DialogTitle>
+            <DialogDescription className="text-muted-foreground">
+              {actionRow ? displaySourcePrimary(actionRow) : ""}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            {(actionType === "approve" || actionType === "reject") && (
+              <div className="space-y-1.5">
+                <label className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Reason (optional)</label>
+                <Input
+                  value={actionReason}
+                  onChange={(e) => setActionReason(e.target.value)}
+                  placeholder={actionType === "reject" ? "Reason for rejection" : "Optional approval notes"}
+                  className="bg-background border-input"
+                />
+              </div>
+            )}
+            {(actionType === "begin-review" || actionType === "complete-onboarding") && (
+              <div className="space-y-1.5">
+                <label className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Notes (optional)</label>
+                <Input
+                  value={actionReason}
+                  onChange={(e) => setActionReason(e.target.value)}
+                  placeholder="Optional notes"
+                  className="bg-background border-input"
+                />
+              </div>
+            )}
+            <div className="flex items-center justify-end gap-2">
+              <Button type="button" variant="secondary" onClick={() => { setActionRow(null); setActionType(null); setActionReason(""); }}>
+                Cancel
+              </Button>
+              <Button type="button" onClick={() => void performAction()} disabled={actionBusy}>
+                {actionBusy ? "Processing..." : actionType === "approve" ? "Approve" : actionType === "reject" ? "Reject" : actionType === "begin-review" ? "Begin Review" : "Complete Onboarding"}
               </Button>
             </div>
           </div>
