@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { AppLayout } from "@/components/AppLayout";
 import { Badge, Button, Card, PageHeader, Input } from "@/components/ui-bits";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Check, X, ExternalLink, Edit3, Save, Eye, Info, Zap, CheckCheck, XCircle, Download, Trash2 } from "lucide-react";
+import { Check, X, ExternalLink, Edit3, Save, Eye, Info, Zap, CheckCheck, XCircle, Download, Trash2, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { jobsCacheUpdatedEventName, readJobsCache, writeJobsCache } from "@/lib/jobs-cache";
 import { buildReviewSummary } from "@/lib/review-summary";
@@ -840,6 +840,9 @@ function Review() {
 
   const [dbJobs, setDbJobs] = useState<any[]>(() => readJobsCache());
   const [sample, setSample] = useState<{ rows: any[]; totalSampled: number; sampledCount: number; coverage?: ReviewCoverage | null } | null>(null);
+  const [sampleJobId, setSampleJobId] = useState<string | null>(null);
+  const [sampleRevision, setSampleRevision] = useState(0);
+  const forceRefreshRef = useRef(false);
   const sampleCacheRef = useRef<Record<string, { rows: any[]; totalSampled: number; sampledCount: number; coverage?: ReviewCoverage | null }>>({});
   const [queueMetrics, setQueueMetrics] = useState<ReviewQueueMetrics>({
     pending: 0,
@@ -1054,6 +1057,21 @@ function Review() {
       toast.error("An error occurred while finalizing review");
     }
   };
+
+  function handleRetry() {
+    if (!openJob) return;
+    const jobId = openJob.id;
+    Object.keys(sampleCacheRef.current).forEach((k) => {
+      if (k.startsWith(`${jobId}:`)) delete sampleCacheRef.current[k];
+    });
+    REVIEW_SAMPLE_CACHE.forEach((_, k) => {
+      if (k.startsWith(`${jobId}:`)) REVIEW_SAMPLE_CACHE.delete(k);
+    });
+    forceRefreshRef.current = true;
+    setSample(null);
+    setSampleJobId(null);
+    setSampleRevision((r) => r + 1);
+  }
 
   async function deleteJobFromReview(jobId: string) {
     try {
@@ -1355,77 +1373,76 @@ function Review() {
       return;
     }
 
-    const sampleRate = jobRates[openJob.id] ?? 2;
-    const sampleKey = `${openJob.id}:${sampleRate}:review_logic_v6:${viewInBulk ? "bulk" : pageOffset}`;
+    const jobId = openJob.id;
+    const sampleRate = jobRates[jobId] ?? 2;
+    const sampleKey = `${jobId}:${sampleRate}:review_logic_v6:${viewInBulk ? "bulk" : pageOffset}`;
+
+    const bypass = forceRefreshRef.current;
+    if (bypass) {
+      forceRefreshRef.current = false;
+      delete sampleCacheRef.current[sampleKey];
+      REVIEW_SAMPLE_CACHE.delete(sampleKey);
+    }
+
     const cachedSample = sampleCacheRef.current[sampleKey];
     if (cachedSample) {
       setSample(cachedSample);
+      setSampleJobId(jobId);
       return;
     }
     const sharedCachedSample = REVIEW_SAMPLE_CACHE.get(sampleKey);
     if (sharedCachedSample) {
       sampleCacheRef.current[sampleKey] = sharedCachedSample;
       setSample(sharedCachedSample);
+      setSampleJobId(jobId);
       return;
     }
     setSample(null);
+    setSampleJobId(null);
 
     if (!openJob.isDbJob) {
       const generated = generateSample(openJob, sampleRate);
       sampleCacheRef.current[sampleKey] = generated;
       setSample(generated);
+      setSampleJobId(jobId);
       return;
     }
 
-    const isDatasetJob = openJob.isDatasetJob;
-
     let active = true;
-    if (isDatasetJob) {
-      // Dataset job review flow: reuse the backend comparison rows so previous/current values stay aligned.
-      const sampleOffset = viewInBulk ? 0 : pageOffset;
-      fetch(`${baseApiUrl}/api/v1/demo/jobs/review_data?job_id=${openJob.id}&sample_rate=${sampleRate}&sample_offset=${sampleOffset}`, { credentials: "include", cache: "no-store" })
-        .then((res) => {
-          if (!res.ok) throw new Error("Failed to load review data");
-          return res.json();
-        })
-        .then((data) => {
-          if (!active) return;
-          sampleCacheRef.current[sampleKey] = data;
-          REVIEW_SAMPLE_CACHE.set(sampleKey, data);
-          setSample(data);
-        })
-        .catch((err) => {
-          console.error("Failed to load real dataset for review:", err);
-          if (active) {
-            setSample({ rows: [], totalSampled: 0, sampledCount: 0 });
-          }
-        });
-    } else {
-      // Site-specific (By Source) job review flow: call backend comparison review_data endpoint
-      const sampleOffset = viewInBulk ? 0 : pageOffset;
-      fetch(`${baseApiUrl}/api/v1/demo/jobs/review_data?job_id=${openJob.id}&sample_rate=${sampleRate}&sample_offset=${sampleOffset}`, { credentials: "include", cache: "no-store" })
-        .then((res) => {
-          if (!res.ok) throw new Error("Failed to load review data");
-          return res.json();
-        })
-        .then((data) => {
-          if (!active) return;
-          sampleCacheRef.current[sampleKey] = data;
-          REVIEW_SAMPLE_CACHE.set(sampleKey, data);
-          setSample(data);
-        })
-        .catch((err) => {
-          console.error("Failed to load site-specific dataset for review:", err);
-          if (active) {
-            setSample({ rows: [], totalSampled: 0, sampledCount: 0 });
-          }
-        });
-    }
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000);
+    const sampleOffset = viewInBulk ? 0 : pageOffset;
+
+    fetch(
+      `${baseApiUrl}/api/v1/demo/jobs/review_data?job_id=${jobId}&sample_rate=${sampleRate}&sample_offset=${sampleOffset}`,
+      { credentials: "include", cache: "no-store", signal: controller.signal },
+    )
+      .then((res) => {
+        clearTimeout(timeoutId);
+        if (!res.ok) throw new Error(`Server error ${res.status}`);
+        return res.json();
+      })
+      .then((data) => {
+        if (!active) return;
+        sampleCacheRef.current[sampleKey] = data;
+        REVIEW_SAMPLE_CACHE.set(sampleKey, data);
+        setSample(data);
+        setSampleJobId(jobId);
+      })
+      .catch((err) => {
+        clearTimeout(timeoutId);
+        if (!active) return;
+        console.error("Failed to load review data:", err);
+        setSample({ rows: [], totalSampled: 0, sampledCount: 0 });
+        setSampleJobId(jobId);
+      });
 
     return () => {
       active = false;
+      clearTimeout(timeoutId);
+      controller.abort();
     };
-  }, [openJob, jobRates, baseApiUrl, pageOffset, viewInBulk]);
+  }, [openJob, jobRates, baseApiUrl, pageOffset, viewInBulk, sampleRevision]);
 
   useEffect(() => {
     if (!openJob || !viewInBulk) {
@@ -1480,7 +1497,9 @@ function Review() {
     };
   }, [openJob, viewInBulk, baseApiUrl]);
 
-  const activeSample = viewInBulk ? bulkSample : sample;
+  const activeSample = openJob
+    ? (viewInBulk ? bulkSample : (sampleJobId === openJob.id ? sample : null))
+    : null;
 
   const visibleRows = useMemo(() => {
     if (!activeSample) return [];
@@ -2058,6 +2077,9 @@ function Review() {
                   <p className="text-muted-foreground text-sm">No review data available for this job.</p>
                   <div className="flex gap-2">
                     <Button variant="outline" size="sm" onClick={() => setOpenJob(null)}>Close</Button>
+                    <Button variant="outline" size="sm" onClick={handleRetry}>
+                      <RefreshCw className="h-3.5 w-3.5" /> Retry
+                    </Button>
                     <Button variant="destructive" size="sm" onClick={() => void deleteJobFromReview(openJob.id)}>
                       <Trash2 className="h-3.5 w-3.5" /> Delete job
                     </Button>

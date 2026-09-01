@@ -1098,6 +1098,7 @@ def compare_records(
     allowed_attrs: Optional[List[str]] = None,
     attr_mapping: Optional[Dict[str, str]] = None,
     record_offset: int = 0,
+    scope: Optional[str] = None,
 ) -> Tuple[List[Dict[str, Any]], int]:
     from app.api.demo_routes import get_record_key
 
@@ -1168,14 +1169,15 @@ def compare_records(
         found_website = find_company_website(rec) or source
         source_lower = str(source or "").strip().lower()
         # Prefer a record-level detail URL (specific page) over the root domain
-        _detail_url_fields = ("detail_url", "listing_url", "source_url", "profile_url", "page_url", "url", "link", "href")
+        _detail_url_fields = ("detail_url", "listing_url", "source_url", "profile_url", "page_url", "url", "link", "href", "page", "product_url", "item_url")
         _record_url = next((str(rec.get(f, "")).strip() for f in _detail_url_fields if rec.get(f) and str(rec.get(f, "")).startswith("http")), None)
+        scope_url = str(scope or "").strip() if scope and str(scope or "").strip().startswith("http") else None
         if "keysight" in source_lower:
-            source_url = _record_url or "https://www.keysight.com"
-            source_display = clean_domain(source_url) if _record_url else "keysight.com"
+            source_url = _record_url or scope_url or "https://www.keysight.com"
+            source_display = clean_domain(source_url) if (_record_url or scope_url) else "keysight.com"
         else:
             root_url = found_website if found_website.startswith("http") else f"https://{found_website}"
-            source_url = _record_url or root_url
+            source_url = _record_url or scope_url or root_url
             source_display = clean_domain(source_url)
 
         record_has_changes = False
@@ -1446,6 +1448,7 @@ def get_review_rows(job_id: str, sample_rate: float, sample_offset: int = 0, inc
         allowed_attrs=selected_outputs if selected_outputs else None,
         attr_mapping=attr_mapping if attr_mapping else None,
         record_offset=sample_offset,
+        scope=scope,
     )
 
     if is_one_time and not is_dataset and rows:
