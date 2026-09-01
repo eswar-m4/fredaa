@@ -8,7 +8,7 @@ import re
 import random
 import logging
 from datetime import datetime
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 from uuid import uuid4
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import FileResponse, JSONResponse
@@ -3305,3 +3305,26 @@ async def submit_solution_request(request: Request, payload: SolutionRequestPayl
     )
 
     return {"success": True, "job_id": job_id}
+
+
+# ---------------------------------------------------------------------------
+# Ask Freda AI chat endpoint
+# ---------------------------------------------------------------------------
+
+class AskFredaMessage(BaseModel):
+    role: str  # "user" or "assistant"
+    content: str
+
+
+class AskFredaChatRequest(BaseModel):
+    messages: List[AskFredaMessage]
+
+
+@router.post("/ask-freda/chat")
+async def ask_freda_chat(payload: AskFredaChatRequest):
+    """Send conversation history to Ask Freda AI and return the assistant reply."""
+    from app.services.ask_freda_service import ask_freda_service
+
+    messages = [{"role": m.role, "content": m.content} for m in payload.messages]
+    reply = await ask_freda_service.chat(messages)
+    return {"reply": reply}
