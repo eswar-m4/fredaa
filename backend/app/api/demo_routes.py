@@ -3322,9 +3322,10 @@ class AskFredaChatRequest(BaseModel):
 
 @router.post("/ask-freda/chat")
 async def ask_freda_chat(payload: AskFredaChatRequest):
-    """Send conversation history to Ask Freda AI and return the assistant reply."""
+    """Send conversation history to Ask Freda AI and return structured response."""
     from app.services.ask_freda_service import ask_freda_service
 
     messages = [{"role": m.role, "content": m.content} for m in payload.messages]
-    reply = await ask_freda_service.chat(messages)
-    return {"reply": reply}
+    result = await ask_freda_service.chat(messages)
+    # result is a dict: {message, actions, next_question, phase}
+    return result
