@@ -13,7 +13,8 @@ import {
 } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
 import { NewProjectDialog } from "@/components/NewProjectDialog";
-import { downloadCsv } from "@/lib/download";
+import { downloadCsv, downloadXlsx } from "@/lib/download";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   Badge,
 
@@ -108,6 +109,7 @@ function DashboardPage() {
   const [range, setRange] = useState<RangeValue>(DEFAULT_RANGE);
   const [scope, setScope] = useState<string>("all");
   const [reviewProject, setReviewProject] = useState<Project | null>(null);
+  const [downloadOpenFor, setDownloadOpenFor] = useState<string | null>(null);
   const [newProjectOpen, setNewProjectOpen] = useState(false);
   const [selected, setSelected] = useState<string>(customer.projects[0]!.id);
 
@@ -251,47 +253,81 @@ function DashboardPage() {
                         <Badge tone={st === "Still running" ? "info" : reviewTone[rs]}>{st}</Badge>
                       </td>
                       <td className="px-5 py-3 text-center">
-                        <div className="flex items-center justify-center">
-                          {rs === "Completed" ? (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="w-[150px] justify-center whitespace-nowrap"
-                            title="Download reviewed file"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              downloadCsv(
-                                `${p.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-reviewed.csv`,
-                                reviewRecordsFor(p, 200).map((r) => ({
-                                  entity: r.entity,
-                                  datapoint: r.datapoint,
-                                  change: r.changeType,
-                                  old_value: r.oldValue,
-                                  new_value: r.newValue,
-                                  confidence: r.confidence,
-                                  source: r.sourceUrl,
-                                  status: "Approved",
-                                })),
-                              );
-                            }}
-                          >
-                            <Download className="h-3.5 w-3.5" /> Download file
-                          </Button>
-                          ) : (
-                          <Button
-                            size="sm"
-                            className="w-[150px] justify-center whitespace-nowrap"
-                            variant={action ? "primary" : p.pendingReview > 0 ? "primary" : "outline"}
-                            title={action || "Open review workspace"}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setReviewProject(p);
-                            }}
-                          >
-                            <CheckSquare className="h-3.5 w-3.5" />
-                            {p.pendingReview > 0 ? `Review ${fmt(p.pendingReview)}` : "Review"}
-                          </Button>
+                        <div className="flex items-center justify-center gap-2">
+                          {rs !== "Completed" && (
+                            <Button
+                              size="sm"
+                              className="justify-center whitespace-nowrap"
+                              variant={action ? "primary" : p.pendingReview > 0 ? "primary" : "outline"}
+                              title={action || "Open review workspace"}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setReviewProject(p);
+                              }}
+                            >
+                              <CheckSquare className="h-3.5 w-3.5" />
+                              {p.pendingReview > 0 ? `Review ${fmt(p.pendingReview)}` : "Review"}
+                            </Button>
                           )}
+
+                          {/* Download button with format popup */}
+                          <Popover
+                            open={downloadOpenFor === p.id}
+                            onOpenChange={(open) => {
+                              setDownloadOpenFor(open ? p.id : null);
+                            }}
+                          >
+                            <PopoverTrigger asChild>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                title="Download data"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <Download className="h-3.5 w-3.5" />
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent
+                              align="end"
+                              className="w-44 p-2"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <div className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold px-2 pb-1.5">
+                                Download as
+                              </div>
+                              {[
+                                { label: "CSV (.csv)", ext: "csv" },
+                                { label: "Excel (.xlsx)", ext: "xlsx" },
+                              ].map(({ label, ext }) => (
+                                <button
+                                  key={ext}
+                                  className="w-full flex items-center gap-2 rounded-md px-2 py-2 text-[13px] text-foreground hover:bg-secondary transition text-left"
+                                  onClick={() => {
+                                    setDownloadOpenFor(null);
+                                    const slug = p.name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+                                    const rows = reviewRecordsFor(p, 200).map((r) => ({
+                                      entity: r.entity,
+                                      datapoint: r.datapoint,
+                                      change: r.changeType,
+                                      old_value: r.oldValue,
+                                      new_value: r.newValue,
+                                      confidence: r.confidence,
+                                      source: r.sourceUrl,
+                                      status: rs === "Completed" ? "Approved" : rs,
+                                    }));
+                                    if (ext === "csv") {
+                                      downloadCsv(`${slug}-data.csv`, rows);
+                                    } else {
+                                      void downloadXlsx(`${slug}-data.xlsx`, rows);
+                                    }
+                                  }}
+                                >
+                                  <Download className="h-3.5 w-3.5 text-muted-foreground" />
+                                  {label}
+                                </button>
+                              ))}
+                            </PopoverContent>
+                          </Popover>
                         </div>
                       </td>
 
