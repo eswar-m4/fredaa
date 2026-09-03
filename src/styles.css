@@ -77,7 +77,7 @@
   --input: oklch(0.92 0.015 255);
   --ring: oklch(0.51 0.22 275);
 
-  --navy: oklch(0.20 0.07 285);                  /* midnight indigo */
+  --navy: #1A1A1A;                               /* charcoal sidebar */
   --navy-foreground: oklch(0.97 0.005 250);
 
   --surface2: oklch(0.95 0.012 250);
@@ -111,52 +111,52 @@
 }
 
 .dark {
-  /* Slate/Navy Dark Palette (Refined Enterprise SaaS Style) */
-  --background: #0a0a1a;
-  --foreground: #F8FAFC;
-  
-  --card: #141432;
-  --card-foreground: #F8FAFC;
-  
-  --popover: #1a1a3d;
-  --popover-foreground: #F8FAFC;
+  /* Claude-inspired Charcoal Dark Palette — three depth tones */
+  --background: #212121;             /* tone 2 — page background */
+  --foreground: #EBEBEB;
 
-  --primary: #6366f1;                /* Indigo */
-  --primary-foreground: #f5f5ff;     /* Dark Canvas text color on Neon Blue CTAs */
+  --card: #2A2A2A;                   /* tone 3 — cards / panels */
+  --card-foreground: #EBEBEB;
 
-  --secondary: #141432;
-  --secondary-foreground: #CBD5E1;   /* Slate/Secondary text */
+  --popover: #333333;                /* tone 3+ — elevated popovers */
+  --popover-foreground: #EBEBEB;
 
-  --muted: #141432;
-  --muted-foreground: #94A3B8;       /* Muted Slate text */
+  --primary: #6366f1;                /* Indigo CTA */
+  --primary-foreground: #f5f5ff;
 
-  --accent: #1e1e5a;
-  --accent-foreground: #F8FAFC;
+  --secondary: #2A2A2A;
+  --secondary-foreground: #ABABAB;
 
-  --destructive: #EF4444;            /* Neon Red */
-  --destructive-foreground: #F8FAFC;
+  --muted: #2A2A2A;
+  --muted-foreground: #8E8E8E;
 
-  --border: #23234d;                 /* Border color */
-  --input: #141432;
-  --ring: #6366f1;                   /* Neon Blue ring outline */
+  --accent: #333333;
+  --accent-foreground: #EBEBEB;
 
-  --navy: #07071a;                   /* Deep Navy Sidebar background */
-  --navy-foreground: #CBD5E1;        /* Muted slate sidebar text */
+  --destructive: #EF4444;
+  --destructive-foreground: #EBEBEB;
 
-  --surface2: #141432;
-  --surface3: #1e1e5a;
+  --border: #383838;
+  --input: #2A2A2A;
+  --ring: #6366f1;
 
-  --success: #22C55E;                /* Neon Green */
-  --success-bg: rgba(34, 197, 94, 0.15); /* Dark Green fill */
-  
-  --warning: #F59E0B;                /* Neon Amber */
-  --warning-bg: rgba(245, 158, 11, 0.15); /* Dark Amber fill */
-  
-  --info: #818cf8;                   /* Neon Cyan */
-  --info-bg: rgba(129, 140, 248, 0.16); /* Dark Cyan fill */
-  
-  --purple-token: #A855F7;           /* Neon Purple */
-  --purple-bg: rgba(168, 85, 247, 0.15); /* Dark Purple fill */
+  --navy: #1A1A1A;                   /* tone 1 — sidebar, darkest */
+  --navy-foreground: #ABABAB;
+
+  --surface2: #2A2A2A;
+  --surface3: #333333;
+
+  --success: #22C55E;
+  --success-bg: rgba(34, 197, 94, 0.12);
+
+  --warning: #F59E0B;
+  --warning-bg: rgba(245, 158, 11, 0.12);
+
+  --info: #818cf8;
+  --info-bg: rgba(129, 140, 248, 0.12);
+
+  --purple-token: #A855F7;
+  --purple-bg: rgba(168, 85, 247, 0.12);
 
   /* Prototype Aliases */
   --bg: var(--background);
