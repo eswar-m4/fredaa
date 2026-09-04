@@ -5,13 +5,13 @@ import {
   Activity,
   BookOpen,
   Ticket,
-
   Bell,
   HelpCircle,
   PanelLeft,
   ChevronsUpDown,
   Sun,
   Moon,
+  LogOut,
 } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { fetchSession, logoutRequest, type SessionInfo } from "@/lib/auth";
@@ -263,7 +263,16 @@ export function AppLayout({ children }: { children: ReactNode }) {
             </div>
           ))}
         </nav>
-        <div className="p-3 border-t border-white/10 text-[11px] text-white/50 whitespace-nowrap">v2.1 · enterprise</div>
+        <div className="p-3 border-t border-white/10 whitespace-nowrap">
+          <button
+            onClick={() => void handleLogout()}
+            className="w-full flex items-center gap-2.5 rounded-md px-2.5 py-2 text-[13px] text-white/70 hover:bg-white/10 hover:text-white transition"
+          >
+            <LogOut className="h-4 w-4 shrink-0" />
+            <span>Sign out</span>
+          </button>
+          <div className="mt-2 px-2.5 text-[10px] text-white/35">v2.1 · enterprise</div>
+        </div>
       </aside>
 
       <div className="flex-1 flex flex-col min-w-0">

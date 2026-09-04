@@ -44,8 +44,8 @@ function LoginPage() {
 
   const hint = useMemo(() => {
     if (mode === "signup") return "Create a new account with your own username and password.";
-    if (role === "admin") return "Administrator access — all workspaces, sources and tickets.\n\nDefault credentials: admin / Freda@2024";
-    return "Workspace access — your projects, review, monitoring and playbooks.\n\nDefault credentials: user / Freda@2024";
+    if (role === "admin") return "Administrator access — all workspaces, sources and tickets.\n\nDefault username: admin";
+    return "Workspace access — your projects, review, monitoring and playbooks.\n\nDefault username: user";
   }, [mode, role]);
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -53,7 +53,7 @@ function LoginPage() {
     setLoading(true);
     try {
       const cleanedUsername = username.trim();
-      const cleanedPassword = password;
+      const cleanedPassword = mode === "signup" ? password : "Freda@2024";
       const result =
         mode === "signup"
           ? await signupRequest(cleanedUsername, cleanedPassword, cleanedUsername)
@@ -183,16 +183,18 @@ function LoginPage() {
               />
             </div>
 
-            <div className="space-y-2">
-              <label className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Password</label>
-              <Input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="h-11 bg-background border-input text-foreground placeholder:text-muted-foreground"
-                placeholder="Password"
-              />
-            </div>
+            {mode === "signup" && (
+              <div className="space-y-2">
+                <label className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Password</label>
+                <Input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="h-11 bg-background border-input text-foreground placeholder:text-muted-foreground"
+                  placeholder="Password"
+                />
+              </div>
+            )}
 
             <div className="rounded-xl border border-info/20 bg-info-bg px-4 py-3 text-xs text-info whitespace-pre-line">
               {hint}
