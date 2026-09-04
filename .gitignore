@@ -11,9 +11,8 @@ __pycache__/
 
 # Environment variables / Secrets
 .env
-.env.local
-.env.development
-.env.production
+.env.*
+!.env.example
 
 # Backend logs and databases (contain user data — never commit)
 backend/logs/*
@@ -26,6 +25,11 @@ backend/data/chrome-cdp/
 backend/data/chrome-cdp-live/
 # Runtime bot package artifacts (generated at runtime)
 backend/data/bot_packages/
+# Same database, root-level location (app can also be run from repo root)
+data/*.db
+
+# Regenerable extraction cache (not source data)
+backend/datasets/.review_cache/
 
 # IDE / Editor configurations
 .vscode/
