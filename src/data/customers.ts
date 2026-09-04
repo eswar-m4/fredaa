@@ -132,7 +132,17 @@ type Spec = {
   accountManager: string;
   since: string;
   dpSet: keyof typeof DP_SETS;
-  projects: Array<{ name: string; source: string; url: string; records: number; freq: Project["frequency"] }>;
+  projects: Array<{
+    name: string;
+    source: string;
+    url: string;
+    records: number;
+    freq: Project["frequency"];
+    /** Excluded from customer.projects / all UI listings, but its id/index
+     *  stays stable (ids are index-based) so any prior XLSX_PROJECT_OVERRIDES
+     *  or live-refresh-profiles keyed to this slot keep working unaffected. */
+    hidden?: boolean;
+  }>;
 };
 
 const SPECS: Spec[] = [
@@ -145,11 +155,13 @@ const SPECS: Spec[] = [
     since: "Mar 2022",
     dpSet: "b2b",
     projects: [
-      { name: "Enterprise Accounts EMEA", source: "company websites", url: "https://ntm.example.com", records: 184200, freq: "Daily" },
-      { name: "Technographics Feed", source: "builtwith.com", url: "https://builtwith.com", records: 96400, freq: "Daily" },
-      { name: "Funding & M&A Signals", source: "crunchbase.com", url: "https://crunchbase.com", records: 41800, freq: "Weekly" },
-      { name: "Decision Maker Contacts", source: "linkedin.com", url: "https://linkedin.com", records: 268900, freq: "Weekly" },
-      { name: "Hiring Intent Monitor", source: "careers pages", url: "https://ntm.example.com/jobs", records: 58300, freq: "Daily" },
+      { name: "Enterprise Accounts EMEA", source: "company websites", url: "https://ntm.example.com", records: 184200, freq: "Daily", hidden: true },
+      { name: "Technographics Feed", source: "builtwith.com", url: "https://builtwith.com", records: 96400, freq: "Daily", hidden: true },
+      { name: "NTM Maintenance", source: "hotel websites (HotelWeb)", url: "https://ntm.example.com/maintenance", records: 25, freq: "Monthly" },
+      { name: "Decision Maker Contacts", source: "linkedin.com", url: "https://linkedin.com", records: 268900, freq: "Weekly", hidden: true },
+      { name: "Hiring Intent Monitor", source: "careers pages", url: "https://ntm.example.com/jobs", records: 58300, freq: "Daily", hidden: true },
+      { name: "NTM Monitoring", source: "hotel websites (HotelWeb)", url: "https://ntm.example.com/monitoring", records: 25, freq: "Weekly" },
+      { name: "NTM POI", source: "point-of-interest websites (Website)", url: "https://ntm.example.com/poi", records: 25, freq: "Weekly" },
     ],
   },
   {
@@ -272,7 +284,7 @@ function buildProject(spec: Spec, p: Spec["projects"][number], idx: number): Pro
     source: p.source,
     websiteUrl: p.url,
     datapoints: DP_SETS[spec.dpSet]!.slice(0, int(`${id}-dp`, 8, 20)),
-    sources: buildSources(id, p, records),
+    sources: xlsxOverride?.sources ?? buildSources(id, p, records),
     records,
     admv: { added, deleted, modified, verified },
     freshness: Math.max(62, Math.round(100 - (lastRefreshHrs / gap) * 34)),
@@ -296,7 +308,10 @@ export const CUSTOMERS: Customer[] = SPECS.map((spec) => ({
   industry: spec.industry,
   accountManager: spec.accountManager,
   since: spec.since,
-  projects: spec.projects.map((p, i) => buildProject(spec, p, i)),
+  projects: spec.projects
+    .map((p, i) => ({ project: buildProject(spec, p, i), hidden: p.hidden }))
+    .filter((x) => !x.hidden)
+    .map((x) => x.project),
 }));
 
 export function getCustomer(id: string): Customer {

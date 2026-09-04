@@ -2,9 +2,10 @@ import { useEffect, useMemo, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AdmvBar, Badge, Button, Donut, Input, Select } from "@/components/ui-bits";
 import { cn } from "@/lib/utils";
-import { Check, X, ChevronLeft, ChevronRight, RotateCcw, Layers, Send, ExternalLink, Download } from "lucide-react";
+import { AlertTriangle, Check, X, ChevronLeft, ChevronRight, RotateCcw, Layers, Send, ExternalLink, Download } from "lucide-react";
 import { downloadCsv } from "@/lib/download";
 import { reviewRecordsFor, xlsxRowsToReviewRecords, fmt, hrsAgo, type Project, type ReviewRecord, type ChangeType } from "@/data/customers";
+import { isLiveCheckable } from "@/lib/monitoring-live-review";
 
 type Decision = "approved" | "rejected";
 
@@ -15,22 +16,46 @@ const toneFor = (t: ChangeType) =>
 
 const POOL = 6000;
 
+/** Result of a real "Run" — when present, the dialog shows these records
+ *  (live Old → New, tagged Added/Deleted/Modified/Verified) instead of the
+ *  static sample-file records. */
+export type LiveReviewData = {
+  records: ReviewRecord[];
+  checkedAt: string;
+  aiConfigured: boolean;
+  reachableCount: number;
+  totalCount: number;
+  fetchErrors: { entity: string; error: string }[];
+};
+
 export function ReviewDialog({
   project,
   open,
   onOpenChange,
+  live,
 }: {
   project: Project | null;
   open: boolean;
   onOpenChange: (v: boolean) => void;
+  /** Pass the result of a live "Run" to show real fetched data instead of the sample file. */
+  live?: LiveReviewData | null;
 }) {
+  // Live-refresh-enabled projects (NTM Monitoring/POI/Maintenance) must never
+  // fall back to the synthetic sample-file/seeded generators below — those
+  // fabricate a changeType label without any real before/after comparison
+  // (the "plain" xlsx path literally reuses the same value for old and new),
+  // which reads as a real but broken diff instead of "no run yet".
+  const noLiveRunYet = !live && !!project && isLiveCheckable(project);
+
   const all = useMemo(() => {
     if (!project) return [];
+    if (live) return live.records;
+    if (isLiveCheckable(project)) return [];
     if (project.sampleRows && project.sampleRows.length > 0) {
       return xlsxRowsToReviewRecords(project);
     }
     return reviewRecordsFor(project, Math.min(POOL, Math.max(1200, project.pendingReview)));
-  }, [project?.id]);
+  }, [project?.id, live]);
   const [batchSize, setBatchSize] = useState(25);
 
 
@@ -141,16 +166,40 @@ export function ReviewDialog({
     >
       <DialogContent className="max-w-none w-[97vw] h-[94vh] p-0 gap-0 overflow-hidden flex flex-col sm:max-w-none">
         <DialogHeader className="px-6 pt-5 pb-4 border-b border-border shrink-0">
-          <DialogTitle className="text-[17px]">Review workspace — {project.name}</DialogTitle>
-          <div className="flex flex-wrap items-center gap-2 pt-2 text-[12px] text-muted-foreground">
-            <Badge tone="info">{project.source}</Badge>
-            <Badge tone="neutral">{project.datapoints.length} datapoints</Badge>
-            <Badge tone="warning">{fmt(project.pendingReview)} pending</Badge>
-            <Badge tone="purple">sampling {sampling}%</Badge>
-            <span>
-              Coverage {project.coverage}% · Avg confidence {avgConf.toFixed(1)}%
-            </span>
-          </div>
+          <DialogTitle className="text-[17px]">
+            {live ? "Live refresh results — " : "Review workspace — "}
+            {project.name}
+          </DialogTitle>
+          {live ? (
+            <div className="flex flex-wrap items-center gap-2 pt-2 text-[12px] text-muted-foreground">
+              <Badge tone="success">
+                {live.reachableCount}/{live.totalCount} sites reachable
+              </Badge>
+              <Badge tone="neutral">{live.records.length} fields checked</Badge>
+              <span>checked {new Date(live.checkedAt).toLocaleTimeString()}</span>
+              {!live.aiConfigured && (
+                <span className="inline-flex items-center gap-1 text-warning">
+                  <AlertTriangle className="h-3.5 w-3.5" /> OPENAI_API_KEY not set — showing reachability only, field
+                  values were not re-extracted
+                </span>
+              )}
+              {live.fetchErrors.length > 0 && (
+                <span className="inline-flex items-center gap-1 text-destructive">
+                  <AlertTriangle className="h-3.5 w-3.5" /> {live.fetchErrors.length} site(s) could not be fetched
+                </span>
+              )}
+            </div>
+          ) : (
+            <div className="flex flex-wrap items-center gap-2 pt-2 text-[12px] text-muted-foreground">
+              <Badge tone="info">{project.source}</Badge>
+              <Badge tone="neutral">{project.datapoints.length} datapoints</Badge>
+              <Badge tone="warning">{fmt(project.pendingReview)} pending</Badge>
+              <Badge tone="purple">sampling {sampling}%</Badge>
+              <span>
+                Coverage {project.coverage}% · Avg confidence {avgConf.toFixed(1)}%
+              </span>
+            </div>
+          )}
         </DialogHeader>
 
         <div className="flex-1 min-h-0 grid lg:grid-cols-[250px_1fr]">
@@ -320,7 +369,13 @@ export function ReviewDialog({
 
 
             <div className="flex-1 min-h-0 overflow-y-auto">
-              {batch.length === 0 ? (
+              {noLiveRunYet ? (
+                <div className="m-6 rounded-lg border border-dashed border-border p-8 text-center text-[13px] text-muted-foreground">
+                  <div className="text-foreground font-medium mb-1">No live run yet for {project.name}</div>
+                  Go to the Monitoring tab and click <strong className="text-foreground">Run now</strong> to fetch
+                  real data from every source URL — this dialog will then show the actual Old → New comparison.
+                </div>
+              ) : batch.length === 0 ? (
                 <div className="m-6 rounded-lg border border-dashed border-border p-8 text-center text-[13px] text-muted-foreground">
                   No records match the current filters.
                 </div>

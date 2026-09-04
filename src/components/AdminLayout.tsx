@@ -8,7 +8,6 @@ import { fetchSession, logoutRequest, type SessionInfo } from "@/lib/auth";
 type AdminNavItem = { to: string; label: string; icon: typeof Users };
 
 const NAV_ITEMS: AdminNavItem[] = [
-  { to: "/admin", label: "Overview", icon: Users },
   { to: "/admin-tickets", label: "Ticket queue", icon: Ticket },
   { to: "/admin-sources", label: "Sources", icon: Database },
   { to: "/admin-access", label: "Accounts & access", icon: Shield },

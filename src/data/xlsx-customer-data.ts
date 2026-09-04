@@ -196,6 +196,15 @@ export const POI_DATA = {
 /* Unified per-customer project overrides                              */
 /* ------------------------------------------------------------------ */
 
+export type XlsxSourceOverride = {
+  id: string;
+  label: string;
+  url: string;
+  status: "Live" | "Paused" | "Pending approval";
+  records: number;
+  addedOn: string;
+};
+
 export type XlsxProjectOverride = {
   records: number;
   admv: { added: number; deleted: number; modified: number; verified: number };
@@ -203,7 +212,30 @@ export type XlsxProjectOverride = {
   sampleRows: Record<string, string>[];
   inputRecords?: number;
   outputRecords?: number;
+  /** Real per-record source URLs (e.g. one row per hotel website) — when
+   *  present, this replaces the synthetic buildSources() output so the
+   *  project's "sources" reflect the actual URLs found in the onboarded file. */
+  sources?: XlsxSourceOverride[];
 };
+
+/** Builds one real source entry per row using the given entity-name and URL columns. */
+function sourcesFromRows(
+  idPrefix: string,
+  rows: Record<string, string>[],
+  nameCol: string,
+  urlCol: string,
+): XlsxSourceOverride[] {
+  return rows
+    .filter((row) => (row[urlCol] ?? "").trim())
+    .map((row, i) => ({
+      id: `${idPrefix}-${i + 1}`,
+      label: (row[nameCol] ?? `Record ${i + 1}`).trim(),
+      url: row[urlCol]!.trim(),
+      status: "Live" as const,
+      records: 1,
+      addedOn: "Sep 2026",
+    }));
+}
 
 export const XLSX_PROJECT_OVERRIDES: Record<string, XlsxProjectOverride> = {
   // NTM Global
@@ -236,7 +268,10 @@ export const XLSX_PROJECT_OVERRIDES: Record<string, XlsxProjectOverride> = {
     sampleRows: NTM_MONITORING.outputSamples,
   },
   "ntm-p3": {
-    // Funding & M&A Signals → NTM Maintenance dataset (25 hotels)
+    // NTM Maintenance → onboarded from NTM-Maintenance Input_25.xlsx /
+    // NTM-Maintenance Output_25.xlsx (25 hotels, monthly cadence). Same flat
+    // template + field dictionary as NTM Monitoring (identical 126-column
+    // layout), just a different hotel set and refresh frequency.
     records:       NTM_MAINTENANCE.outputRecords,
     inputRecords:  NTM_MAINTENANCE.inputRecords,
     outputRecords: NTM_MAINTENANCE.outputRecords,
@@ -248,6 +283,44 @@ export const XLSX_PROJECT_OVERRIDES: Record<string, XlsxProjectOverride> = {
     },
     columns:    NTM_MAINTENANCE.outputColumns,
     sampleRows: NTM_MAINTENANCE.outputSamples,
+    sources:    sourcesFromRows("ntm-maint-src", NTM_MAINTENANCE.outputSamples, "HotelName", "HotelWeb"),
+  },
+  "ntm-p6": {
+    // NTM Monitoring → onboarded from Monitoring Input_25.xlsx / Monitoring
+    // Output_25.xlsx (25 hotels). "sources" is one real entry per hotel
+    // website (HotelWeb column) so the weekly "Run" actually checks each one.
+    records:       NTM_MONITORING.outputRecords,
+    inputRecords:  NTM_MONITORING.inputRecords,
+    outputRecords: NTM_MONITORING.outputRecords,
+    admv: {
+      added:    2,
+      deleted:  0,
+      modified: 8,
+      verified: NTM_MONITORING.outputRecords - 10,
+    },
+    columns:    NTM_MONITORING.outputColumns,
+    sampleRows: NTM_MONITORING.outputSamples,
+    sources:    sourcesFromRows("ntm-mon-src", NTM_MONITORING.outputSamples, "HotelName", "HotelWeb"),
+  },
+  "ntm-p7": {
+    // NTM POI → onboarded from POI_Input and Output-25.xlsx (25 points of
+    // interest). Output template uses Field/New_Field/Field_disp triples
+    // (not the flat layout Monitoring uses) — the live refresh and download
+    // both respect that via outputFormat: "disposition" in
+    // src/lib/live-refresh-profiles.ts. "sources" is one real entry per POI
+    // website (Website column, from the clean input sheet).
+    records:       POI_DATA.outputRecords,
+    inputRecords:  POI_DATA.inputRecords,
+    outputRecords: POI_DATA.outputRecords,
+    admv: {
+      added:    3,
+      deleted:  1,
+      modified: 6,
+      verified: POI_DATA.outputRecords - 10,
+    },
+    columns:    POI_DATA.outputColumns,
+    sampleRows: POI_DATA.outputSamples,
+    sources:    sourcesFromRows("ntm-poi-src", POI_DATA.inputSamples, "POIName", "Website"),
   },
 
   // Cengage Learning

@@ -5,6 +5,6 @@ echo.
 echo  Starting F.R.E.D.A Customer Portal...
 echo  http://localhost:5434
 echo.
-npm install
-npm run dev
+call npm install
+call npm run dev
 pause

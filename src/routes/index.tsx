@@ -9,11 +9,9 @@ import {
   Rocket,
   FolderPlus,
   BookOpen,
-  Download,
 } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
 import { NewProjectDialog } from "@/components/NewProjectDialog";
-import { downloadCsv } from "@/lib/download";
 import {
   Badge,
 
@@ -27,7 +25,9 @@ import {
   Select,
   type RangeValue,
 } from "@/components/ui-bits";
-import { ReviewDialog } from "@/components/ReviewDialog";
+import { ReviewDialog, type LiveReviewData } from "@/components/ReviewDialog";
+import { DownloadMenu } from "@/components/DownloadMenu";
+import { isLiveCheckable, loadLiveReview } from "@/lib/monitoring-live-review";
 import { useActiveCustomer } from "@/lib/workspace";
 import {
   actionsFor,
@@ -35,7 +35,6 @@ import {
   devPipeline,
   fmt,
   rangeFactor,
-  reviewRecordsFor,
   reviewStatusFor,
   rollupProjects,
   scaleAdmv,
@@ -108,8 +107,16 @@ function DashboardPage() {
   const [range, setRange] = useState<RangeValue>(DEFAULT_RANGE);
   const [scope, setScope] = useState<string>("all");
   const [reviewProject, setReviewProject] = useState<Project | null>(null);
+  const [liveReview, setLiveReview] = useState<LiveReviewData | null>(null);
   const [newProjectOpen, setNewProjectOpen] = useState(false);
   const [selected, setSelected] = useState<string>(customer.projects[0]!.id);
+
+  // "Run" only happens on the Monitor tab — here we just show whatever the
+  // last run produced (if any), read back from where Monitor saved it.
+  function openReview(p: Project) {
+    setLiveReview(isLiveCheckable(p) ? loadLiveReview(p.id) : null);
+    setReviewProject(p);
+  }
 
   const scoped = scope === "all" ? customer.projects : customer.projects.filter((p) => p.id === scope);
   const factor = rangeFactor(range.key, rangeDays(range));
@@ -251,47 +258,25 @@ function DashboardPage() {
                         <Badge tone={st === "Still running" ? "info" : reviewTone[rs]}>{st}</Badge>
                       </td>
                       <td className="px-5 py-3 text-center">
-                        <div className="flex items-center justify-center">
-                          {rs === "Completed" ? (
+                        <div className="flex items-center justify-center gap-1.5">
                           <Button
                             size="sm"
-                            variant="outline"
-                            className="w-[150px] justify-center whitespace-nowrap"
-                            title="Download reviewed file"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              downloadCsv(
-                                `${p.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-reviewed.csv`,
-                                reviewRecordsFor(p, 200).map((r) => ({
-                                  entity: r.entity,
-                                  datapoint: r.datapoint,
-                                  change: r.changeType,
-                                  old_value: r.oldValue,
-                                  new_value: r.newValue,
-                                  confidence: r.confidence,
-                                  source: r.sourceUrl,
-                                  status: "Approved",
-                                })),
-                              );
-                            }}
-                          >
-                            <Download className="h-3.5 w-3.5" /> Download file
-                          </Button>
-                          ) : (
-                          <Button
-                            size="sm"
-                            className="w-[150px] justify-center whitespace-nowrap"
+                            className="w-[130px] justify-center whitespace-nowrap"
                             variant={action ? "primary" : p.pendingReview > 0 ? "primary" : "outline"}
-                            title={action || "Open review workspace"}
+                            title={
+                              isLiveCheckable(p)
+                                ? "Open the review workspace (run a fresh check from the Monitor tab)"
+                                : action || "Open review workspace"
+                            }
                             onClick={(e) => {
                               e.stopPropagation();
-                              setReviewProject(p);
+                              openReview(p);
                             }}
                           >
                             <CheckSquare className="h-3.5 w-3.5" />
                             {p.pendingReview > 0 ? `Review ${fmt(p.pendingReview)}` : "Review"}
                           </Button>
-                          )}
+                          <DownloadMenu project={p} />
                         </div>
                       </td>
 
@@ -358,7 +343,17 @@ function DashboardPage() {
       </div>
 
       <NewProjectDialog open={newProjectOpen} onOpenChange={setNewProjectOpen} />
-      <ReviewDialog project={reviewProject} open={!!reviewProject} onOpenChange={(v) => !v && setReviewProject(null)} />
+      <ReviewDialog
+        project={reviewProject}
+        live={liveReview}
+        open={!!reviewProject}
+        onOpenChange={(v) => {
+          if (!v) {
+            setReviewProject(null);
+            setLiveReview(null);
+          }
+        }}
+      />
     </AppLayout>
   );
 }

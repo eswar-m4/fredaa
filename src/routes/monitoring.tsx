@@ -26,9 +26,12 @@ import {
   type RangeValue,
 } from "@/components/ui-bits";
 import { useActiveCustomer } from "@/lib/workspace";
-import { destinationsFor, fmt, hrsAgo, inHrs, jobsFor, rollupProjects, type JobRun } from "@/data/customers";
+import { destinationsFor, fmt, hrsAgo, inHrs, jobsFor, rollupProjects, type JobRun, type Project } from "@/data/customers";
 import { statusTone } from "@/routes/index";
 import { cn } from "@/lib/utils";
+import { ReviewDialog, type LiveReviewData } from "@/components/ReviewDialog";
+import { DownloadMenu } from "@/components/DownloadMenu";
+import { isLiveCheckable, fetchLiveReview } from "@/lib/monitoring-live-review";
 
 export const Route = createFileRoute("/monitoring")({
   head: () => ({
@@ -63,6 +66,8 @@ function MonitoringPage() {
   const [scope, setScope] = useState("all");
   const [filter, setFilter] = useState("all");
   const [running, setRunning] = useState<Record<string, number>>({});
+  const [liveReview, setLiveReview] = useState<LiveReviewData | null>(null);
+  const [liveReviewProject, setLiveReviewProject] = useState<Project | null>(null);
 
   const scoped = scope === "all" ? customer.projects : customer.projects.filter((p) => p.id === scope);
   const stats = useMemo(() => rollupProjects(scoped), [customer.id, scope]);
@@ -74,6 +79,11 @@ function MonitoringPage() {
   const projects = scoped.filter((p) => filter === "all" || p.status === filter);
 
   function refresh(id: string) {
+    const project = customer.projects.find((p) => p.id === id);
+    if (project && isLiveCheckable(project)) {
+      runLiveCheck(project);
+      return;
+    }
     setRunning((r) => ({ ...r, [id]: 0 }));
     let pct = 0;
     const t = setInterval(() => {
@@ -91,6 +101,26 @@ function MonitoringPage() {
         );
       }
     }, 260);
+  }
+
+  async function runLiveCheck(project: Project) {
+    setRunning((r) => ({ ...r, [project.id]: 1 }));
+    // Progress here reflects "in flight", not a fake countdown — with ~120
+    // fields re-extracted per hotel via Gemini, a full run can take a while.
+    const pulse = setInterval(() => {
+      setRunning((r) => (r[project.id] === undefined ? r : { ...r, [project.id]: Math.min(90, (r[project.id] ?? 0) + 4) }));
+    }, 700);
+    try {
+      const live = await fetchLiveReview(project);
+      setLiveReview(live);
+      setLiveReviewProject(project);
+    } finally {
+      clearInterval(pulse);
+      setRunning((r) => {
+        const { [project.id]: _drop, ...rest } = r;
+        return rest;
+      });
+    }
   }
 
   const live = visibleJobs.filter((j) => j.state === "Running").length;
@@ -228,7 +258,14 @@ function MonitoringPage() {
                 return (
                   <tr key={p.id} className="border-b border-border/60 hover:bg-secondary/40">
                     <td className="px-5 py-3">
-                      <div className="font-medium">{p.name}</div>
+                      <div className="font-medium flex items-center gap-1.5">
+                        {p.name}
+                        {isLiveCheckable(p) && (
+                          <span title="Run now performs a real live check of every source URL">
+                            <Badge tone="info">Live</Badge>
+                          </span>
+                        )}
+                      </div>
                       <div className="text-[11px] text-muted-foreground">
                         {p.sources.length} sources · {p.datapoints.length} datapoints
                       </div>
@@ -253,9 +290,12 @@ function MonitoringPage() {
                     </td>
                     <td className="px-5 py-3 text-right">
                       {pct === undefined ? (
-                        <Button size="sm" variant="outline" onClick={() => refresh(p.id)}>
-                          <RefreshCw className="h-3.5 w-3.5" /> Run now
-                        </Button>
+                        <div className="flex items-center justify-end gap-1.5">
+                          <Button size="sm" variant="outline" onClick={() => refresh(p.id)}>
+                            <RefreshCw className="h-3.5 w-3.5" /> Run now
+                          </Button>
+                          <DownloadMenu project={p} />
+                        </div>
                       ) : (
                         <div className="flex items-center gap-2 justify-end">
                           <div className="h-1.5 w-20 rounded-full bg-secondary overflow-hidden">
@@ -332,6 +372,18 @@ function MonitoringPage() {
           </Card>
         </div>
       </div>
+
+      <ReviewDialog
+        project={liveReviewProject}
+        live={liveReview}
+        open={!!liveReviewProject}
+        onOpenChange={(v) => {
+          if (!v) {
+            setLiveReviewProject(null);
+            setLiveReview(null);
+          }
+        }}
+      />
     </AppLayout>
   );
 }

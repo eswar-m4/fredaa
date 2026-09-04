@@ -4,6 +4,7 @@ import { Badge, Button, Input, Select } from "@/components/ui-bits";
 import { Paperclip, Plus, Trash2, Send, FileSpreadsheet, CheckCircle2, X } from "lucide-react";
 import { useActiveCustomer } from "@/lib/workspace";
 import { estimate } from "@/data/customers";
+import { addTicket } from "@/lib/ticket-store";
 
 export function NewProjectDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (v: boolean) => void }) {
   const customer = useActiveCustomer();
@@ -156,7 +157,25 @@ export function NewProjectDialog({ open, onOpenChange }: { open: boolean; onOpen
             <Button
               size="sm"
               disabled={!name.trim()}
-              onClick={() => setReq(`REQ-${String(1000 + Math.round(name.length * 7 + urls.length * 13))}`)}
+              onClick={() => {
+                const sourceList = urls.filter((u) => u.trim());
+                const dpList = datapoints.split(",").map((d) => d.trim()).filter(Boolean);
+                const t = addTicket({
+                  workspaceId: customer.id,
+                  workspaceName: customer.name,
+                  project: name.trim(),
+                  type: "New project",
+                  detail: `New project request — ${name.trim()} · ${sourceList.length} source${sourceList.length === 1 ? "" : "s"} · ${dpList.length} datapoint${dpList.length === 1 ? "" : "s"} · ${frequency}`,
+                  raisedBy: `${customer.shortName.toLowerCase()} workspace user`,
+                  estimateDays: est.setupDays,
+                  monthlyRecords: est.monthlyRecords,
+                  sources: sourceList,
+                  datapoints: dpList,
+                  frequency,
+                  ...(files[0] ? { fileName: files[0] } : {}),
+                });
+                setReq(t.id);
+              }}
             >
               <Send className="h-3.5 w-3.5" /> Submit project request
             </Button>

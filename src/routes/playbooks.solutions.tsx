@@ -256,6 +256,7 @@ function DatasetSetup({ item, onBack }: { item: SetupItem; onBack: () => void })
   const [name, setName] = useState(`${item.name} — ${customer.shortName}`);
   const [owner, setOwner] = useState("");
   const [intake, setIntake] = useState<IntakeResult | null>(null);
+  const [readError, setReadError] = useState<string | null>(null);
   const [extraUrls, setExtraUrls] = useState<string[]>([]);
   const [wired, setWired] = useState<string[]>(item.sources.slice(0, Math.min(4, item.sources.length)).map((s) => s.name));
   const [attrs, setAttrs] = useState<string[]>(item.attributes.slice(0, Math.min(12, item.attributes.length)).map((a) => a.key));
@@ -278,10 +279,18 @@ function DatasetSetup({ item, onBack }: { item: SetupItem; onBack: () => void })
   }, [item]);
 
   async function readFile(file: File) {
-    const text = await file.text();
-    const r = readIntakeFile(file.name, text);
-    setIntake(r);
-    if (r.urls.length) setExtraUrls(r.urls);
+    setReadError(null);
+    try {
+      const text = await file.text();
+      const r = readIntakeFile(file.name, text);
+      setIntake(r);
+      if (r.urls.length) setExtraUrls(r.urls);
+    } catch (err) {
+      setReadError(
+        `Couldn't read "${file.name}" as text — try a CSV, TSV or TXT export instead of a binary file (e.g. .xlsx or .docx).`,
+      );
+      console.error("Failed to read intake file:", err);
+    }
   }
 
   function launch() {
@@ -370,6 +379,11 @@ function DatasetSetup({ item, onBack }: { item: SetupItem; onBack: () => void })
                   <div className="text-[11.5px] text-muted-foreground">CSV, TSV or TXT — FreDA AI reads the file, extracts source URLs and datapoint columns</div>
                   <input ref={fileRef} type="file" className="hidden" accept=".csv,.tsv,.txt" onChange={(e) => { const f = e.target.files?.[0]; if (f) void readFile(f); }} />
                 </div>
+                {readError && (
+                  <div className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2.5 text-[11.5px] text-destructive">
+                    {readError}
+                  </div>
+                )}
                 {intake && (
                   <div className="rounded-lg border border-info/30 bg-info-bg px-3 py-2.5 text-[11.5px] text-info space-y-1">
                     <div className="font-medium inline-flex items-center gap-1.5">

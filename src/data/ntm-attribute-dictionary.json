@@ -1,0 +1,602 @@
+[
+  {
+    "column": "NTMHotelID",
+    "group": "Base Information",
+    "label": "NTMHotelID"
+  },
+  {
+    "column": "HotelName",
+    "group": "Base Information",
+    "label": "HotelName"
+  },
+  {
+    "column": "Street1",
+    "group": "Base Information",
+    "label": "Address Street 1"
+  },
+  {
+    "column": "Street2",
+    "group": "Base Information",
+    "label": "Address Street 2"
+  },
+  {
+    "column": "City",
+    "group": "Base Information",
+    "label": "City"
+  },
+  {
+    "column": "State",
+    "group": "Base Information",
+    "label": "State"
+  },
+  {
+    "column": "Country",
+    "group": "Base Information",
+    "label": "Country"
+  },
+  {
+    "column": "Zip",
+    "group": "Base Information",
+    "label": "Zip Code"
+  },
+  {
+    "column": "PhoneAC",
+    "group": "Base Information",
+    "label": "Phone Area Code"
+  },
+  {
+    "column": "Phone",
+    "group": "Base Information",
+    "label": "Phone number"
+  },
+  {
+    "column": "FaxAC",
+    "group": "Base Information",
+    "label": "Fax Area Code"
+  },
+  {
+    "column": "Fax",
+    "group": "Base Information",
+    "label": "Fax number"
+  },
+  {
+    "column": "TollFreeAC",
+    "group": "Base Information",
+    "label": "Toll Free Area Code"
+  },
+  {
+    "column": "TollFree",
+    "group": "Base Information",
+    "label": "Toll Free number"
+  },
+  {
+    "column": "HotelWeb",
+    "group": "Base Information",
+    "label": "Hotel Website"
+  },
+  {
+    "column": "HotelEmail",
+    "group": "Base Information",
+    "label": "Hotel Email"
+  },
+  {
+    "column": "ChainName",
+    "group": "Base Information",
+    "label": "ChainName"
+  },
+  {
+    "column": "ChainName_Comments",
+    "group": "Base Information",
+    "label": "Chain Name — Notes"
+  },
+  {
+    "column": "YearBuilt",
+    "group": "Base Information",
+    "label": "YearBuilt"
+  },
+  {
+    "column": "YearRenovated",
+    "group": "Base Information",
+    "label": "YearRenovated"
+  },
+  {
+    "column": "RatesDailyorWeekly",
+    "group": "Rates, Policy &Travel Agency Commission",
+    "label": "Rate Basis (Daily or Weekly)"
+  },
+  {
+    "column": "RatesCurrencyKey",
+    "group": "Rates, Policy &Travel Agency Commission",
+    "label": "Rate Currency"
+  },
+  {
+    "column": "StandardRoomRateMinimum",
+    "group": "Rates, Policy &Travel Agency Commission",
+    "label": "Standard Room Rate — Minimum"
+  },
+  {
+    "column": "StandardRoomRateMaximum",
+    "group": "Rates, Policy &Travel Agency Commission",
+    "label": "Standard Room Rate — Maximum"
+  },
+  {
+    "column": "SuiteRateMinimum",
+    "group": "Rates, Policy &Travel Agency Commission",
+    "label": "Suite Rate — Minimum"
+  },
+  {
+    "column": "SuiteRateMaximum",
+    "group": "Rates, Policy &Travel Agency Commission",
+    "label": "Suite Rate — Maximum"
+  },
+  {
+    "column": "RateEffectiveDateStart",
+    "group": "Rates, Policy &Travel Agency Commission",
+    "label": "Rate Effective Date — Start"
+  },
+  {
+    "column": "RateEffectiveDateEnd",
+    "group": "Rates, Policy &Travel Agency Commission",
+    "label": "Rate Effective Date — End"
+  },
+  {
+    "column": "TravelAgentsDoNotPay",
+    "group": "Rates, Policy &Travel Agency Commission",
+    "label": "Travel Agents Do Not Pay"
+  },
+  {
+    "column": "TravelAgentsRoomOnlyPercent",
+    "group": "Rates, Policy &Travel Agency Commission",
+    "label": "Travel Agents Room Only Percent"
+  },
+  {
+    "column": "QtyTotalRms",
+    "group": "Rooms,Restaurant & Meal Plan",
+    "label": "Quantity Total Rooms"
+  },
+  {
+    "column": "QtyFloors",
+    "group": "Rooms,Restaurant & Meal Plan",
+    "label": "Quantity Floors"
+  },
+  {
+    "column": "AmenMtgInetBroadInd",
+    "group": "Rooms,Restaurant & Meal Plan",
+    "label": "Meeting Broadband Internet"
+  },
+  {
+    "column": "AmenMtgInetWirelessInd",
+    "group": "Rooms,Restaurant & Meal Plan",
+    "label": "Meeting Wireless Internet"
+  },
+  {
+    "column": "MtgTotalCapacity",
+    "group": "Rooms,Restaurant & Meal Plan",
+    "label": "Meeting Total Capacity"
+  },
+  {
+    "column": "MtgTotalRms",
+    "group": "Rooms,Restaurant & Meal Plan",
+    "label": "Meeting Total Rooms"
+  },
+  {
+    "column": "MtgTotalRmSpace",
+    "group": "Rooms,Restaurant & Meal Plan",
+    "label": "Meeting Total Room Space"
+  },
+  {
+    "column": "MtgTotalRmSpaceUnits",
+    "group": "Rooms,Restaurant & Meal Plan",
+    "label": "Meeting Total Room Space Units"
+  },
+  {
+    "column": "MtgTotalExhibitSpace",
+    "group": "Rooms,Restaurant & Meal Plan",
+    "label": "Meeting Total Exhibit Space"
+  },
+  {
+    "column": "MtgTotalExhibitSpaceUnits",
+    "group": "Rooms,Restaurant & Meal Plan",
+    "label": "Meeting Total Exhibit Space Units"
+  },
+  {
+    "column": "OnSiteBarLoungeQty",
+    "group": "Rooms,Restaurant & Meal Plan",
+    "label": "Bar"
+  },
+  {
+    "column": "OnSiteRestrQty",
+    "group": "Rooms,Restaurant & Meal Plan",
+    "label": "Restaurant"
+  },
+  {
+    "column": "MealIncAllIncInd",
+    "group": "Rooms,Restaurant & Meal Plan",
+    "label": "All Inclusive"
+  },
+  {
+    "column": "MealIncCPInd",
+    "group": "Rooms,Restaurant & Meal Plan",
+    "label": "Continental Plan"
+  },
+  {
+    "column": "MealIncAPInd",
+    "group": "Rooms,Restaurant & Meal Plan",
+    "label": "American Plan"
+  },
+  {
+    "column": "MealIncFBInd",
+    "group": "Rooms,Restaurant & Meal Plan",
+    "label": "Full Breakfast"
+  },
+  {
+    "column": "MealIncMAPInd",
+    "group": "Rooms,Restaurant & Meal Plan",
+    "label": "Modified American Plan"
+  },
+  {
+    "column": "CheckInTime",
+    "group": "Rates, Policy &Travel Agency Commission",
+    "label": "CheckIn Time"
+  },
+  {
+    "column": "CheckOutTime",
+    "group": "Rates, Policy &Travel Agency Commission",
+    "label": "CheckOut Time"
+  },
+  {
+    "column": "PolicyResvGtyInd",
+    "group": "Rates, Policy &Travel Agency Commission",
+    "label": "Policy Reservation Garentee"
+  },
+  {
+    "column": "PolicyResvHeld",
+    "group": "Rates, Policy &Travel Agency Commission",
+    "label": "Policy Reservation Held"
+  },
+  {
+    "column": "CreditCards",
+    "group": "Rates, Policy &Travel Agency Commission",
+    "label": "CreditCards"
+  },
+  {
+    "column": "AmenRmBroadbandInternetInd",
+    "group": "Amenities",
+    "label": "Amenities Room Broadband Internet"
+  },
+  {
+    "column": "AmenRmWirelessInternetInd",
+    "group": "Amenities",
+    "label": "Amenities Room Wireless Internet"
+  },
+  {
+    "column": "AmenHtlCommonInetBroadInd",
+    "group": "Amenities",
+    "label": "Amenities Common Area Broadband Internet"
+  },
+  {
+    "column": "AmenHtlCommonInetWirelessInd",
+    "group": "Amenities",
+    "label": "Amenities Common Area Wireless Internet"
+  },
+  {
+    "column": "AmenPrkgOnFreeInd",
+    "group": "Amenities",
+    "label": "Parking on Free"
+  },
+  {
+    "column": "AmenPrkgOnPaidInd",
+    "group": "Amenities",
+    "label": "Parking on Paid"
+  },
+  {
+    "column": "AmenHtlRmSvcInd",
+    "group": "Amenities",
+    "label": "Room Service"
+  },
+  {
+    "column": "AmenHtlWheelchairPublInd",
+    "group": "Amenities",
+    "label": "Wheelchair"
+  },
+  {
+    "column": "AmenHtlPetsInd",
+    "group": "Amenities",
+    "label": "Pets allowed"
+  },
+  {
+    "column": "AmenHtlBusCtrInd",
+    "group": "Amenities",
+    "label": "Business Centre"
+  },
+  {
+    "column": "AmenRecBeachInd",
+    "group": "Amenities",
+    "label": "Beach"
+  },
+  {
+    "column": "AmenRecGolfInd",
+    "group": "Amenities",
+    "label": "Golf"
+  },
+  {
+    "column": "AmenRecHealthInd",
+    "group": "Amenities",
+    "label": "Health Club"
+  },
+  {
+    "column": "AmenRecHealthSpaInd",
+    "group": "Amenities",
+    "label": "Health Spa"
+  },
+  {
+    "column": "AmenRecPoolIndoorInd",
+    "group": "Amenities",
+    "label": "Indoor Pool"
+  },
+  {
+    "column": "AmenRecPoolOutdoorInd",
+    "group": "Amenities",
+    "label": "Outdoor Pool"
+  },
+  {
+    "column": "AmenRmCoffeeMakerInd",
+    "group": "Amenities",
+    "label": "Coffee Maker"
+  },
+  {
+    "column": "AmenRmMicrowaveInd",
+    "group": "Amenities",
+    "label": "Microwave"
+  },
+  {
+    "column": "AmenRmRefrigeratorInd",
+    "group": "Amenities",
+    "label": "Refrigerator"
+  },
+  {
+    "column": "AmenRmNonSmokeInd",
+    "group": "Amenities",
+    "label": "Non Smoking Room"
+  },
+  {
+    "column": "AmenHtlLaundryRmInd",
+    "group": "Amenities",
+    "label": "Laundry Room"
+  },
+  {
+    "column": "AmenHtlLaundrySvcInd",
+    "group": "Amenities",
+    "label": "Laundry Services"
+  },
+  {
+    "column": "AmenHtlSmokeFreeInd",
+    "group": "Amenities",
+    "label": "Hotel Smoke Free"
+  },
+  {
+    "column": "AmenHtlNoPetsInd",
+    "group": "Amenities",
+    "label": "No Pets"
+  },
+  {
+    "column": "AmenHtlPetFeeInd",
+    "group": "Amenities",
+    "label": "Pet Fee"
+  },
+  {
+    "column": "TypeAllSteInd",
+    "group": "Property Type",
+    "label": "All-Suite Property"
+  },
+  {
+    "column": "TypeBBInd",
+    "group": "Property Type",
+    "label": "Bed & Breakfast"
+  },
+  {
+    "column": "TypeCondoInd",
+    "group": "Property Type",
+    "label": "Condo / Condo-Hotel"
+  },
+  {
+    "column": "TypeConfCtrInd",
+    "group": "Property Type",
+    "label": "Conference Center"
+  },
+  {
+    "column": "TypeExStayInd",
+    "group": "Property Type",
+    "label": "Extended Stay Property"
+  },
+  {
+    "column": "TypeHotelInd",
+    "group": "Property Type",
+    "label": "Hotel"
+  },
+  {
+    "column": "TypeLodgeInd",
+    "group": "Property Type",
+    "label": "Lodge"
+  },
+  {
+    "column": "TypeMotelInd",
+    "group": "Property Type",
+    "label": "Motel"
+  },
+  {
+    "column": "TypeResortInd",
+    "group": "Property Type",
+    "label": "Resort"
+  },
+  {
+    "column": "TypeCabinInd",
+    "group": "Property Type",
+    "label": "Cabin"
+  },
+  {
+    "column": "LocArptInd",
+    "group": "Location",
+    "label": "Airport"
+  },
+  {
+    "column": "LocBeachInd",
+    "group": "Location",
+    "label": "Beach"
+  },
+  {
+    "column": "LocCityInd",
+    "group": "Location",
+    "label": "City"
+  },
+  {
+    "column": "LocConvInd",
+    "group": "Location",
+    "label": "Convention Centre"
+  },
+  {
+    "column": "LocHwyInd",
+    "group": "Location",
+    "label": "Highway"
+  },
+  {
+    "column": "LocLakeInd",
+    "group": "Location",
+    "label": "Lake"
+  },
+  {
+    "column": "LocMtnInd",
+    "group": "Location",
+    "label": "Mountain"
+  },
+  {
+    "column": "LocRuralInd",
+    "group": "Location",
+    "label": "Rural"
+  },
+  {
+    "column": "LocSuburbanInd",
+    "group": "Location",
+    "label": "Suburban"
+  },
+  {
+    "column": "LocTouristInd",
+    "group": "Location",
+    "label": "Tourist"
+  },
+  {
+    "column": "ArptName1",
+    "group": "Location",
+    "label": "Nearest Airport 1 — Name"
+  },
+  {
+    "column": "ArptName1_Comments",
+    "group": "Location",
+    "label": "Nearest Airport 1 — Notes"
+  },
+  {
+    "column": "ArptFreeTransInd1",
+    "group": "Location",
+    "label": "Nearest Airport 1 — Free Transport"
+  },
+  {
+    "column": "ArptName2",
+    "group": "Location",
+    "label": "Nearest Airport 2 — Name"
+  },
+  {
+    "column": "ArptName2_Comments",
+    "group": "Location",
+    "label": "Nearest Airport 2 — Notes"
+  },
+  {
+    "column": "ArptFreeTransInd2",
+    "group": "Location",
+    "label": "Nearest Airport 2 — Free Transport"
+  },
+  {
+    "column": "GenMgrName",
+    "group": "Personal Information",
+    "label": "General Manager Name"
+  },
+  {
+    "column": "GenMgrEmail",
+    "group": "Personal Information",
+    "label": "General Manager Email"
+  },
+  {
+    "column": "SlsDirName",
+    "group": "Personal Information",
+    "label": "Sales Director Name"
+  },
+  {
+    "column": "SlsDirEmail",
+    "group": "Personal Information",
+    "label": "Sales Director Email"
+  },
+  {
+    "column": "DirMktgName",
+    "group": "Personal Information",
+    "label": "Director of Marketing Name"
+  },
+  {
+    "column": "DirMktgEmail",
+    "group": "Personal Information",
+    "label": "Director of Marketing Email"
+  },
+  {
+    "column": "SlsLeadName",
+    "group": "Personal Information",
+    "label": "Sales Lead — Name"
+  },
+  {
+    "column": "SlsLeadTitle",
+    "group": "Personal Information",
+    "label": "Sales Lead — Title"
+  },
+  {
+    "column": "SlsLeadEmail",
+    "group": "Personal Information",
+    "label": "Sales Lead — Email"
+  },
+  {
+    "column": "SlsLeadPhone",
+    "group": "Personal Information",
+    "label": "Sales Lead — Phone"
+  },
+  {
+    "column": "City_Comments",
+    "group": "Base Information",
+    "label": "City — Notes"
+  },
+  {
+    "column": "State_Comments",
+    "group": "Base Information",
+    "label": "State — Notes"
+  },
+  {
+    "column": "Country_Comments",
+    "group": "Base Information",
+    "label": "Country — Notes"
+  },
+  {
+    "column": "AmenRmWirelessInternetIndFee",
+    "group": "Amenities",
+    "label": "Amenities Wireless Internet Fee"
+  },
+  {
+    "column": "COVID19",
+    "group": "Rates, Policy &Travel Agency Commission",
+    "label": "COVID19"
+  },
+  {
+    "column": "AmenEnvCert",
+    "group": "Amenities",
+    "label": "Environmentally Certified"
+  },
+  {
+    "column": "AmenElecCarChrg",
+    "group": "Amenities",
+    "label": "Electric Car Charging"
+  }
+]

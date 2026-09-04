@@ -4,7 +4,8 @@ import { join, basename, dirname } from "path";
 import { fileURLToPath } from "url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const ROOT = join(__dirname, "..");
+// Source .xlsx files live at the project root, alongside this script.
+const ROOT = __dirname;
 const OUT = join(__dirname, "src", "data", "xlsx-data.json");
 
 const files = (await readdir(ROOT)).filter(f => f.endsWith(".xlsx"));
@@ -42,15 +43,19 @@ for (const file of files) {
   });
 }
 
-// Build compact version: metadata + first 10 sample rows per sheet
+// Build compact version: metadata + sample rows per sheet. Small sheets
+// (<=50 rows, e.g. the 25-hotel Monitoring dataset) keep every row so
+// features like "run all sources" have the complete set; larger sheets are
+// still capped at 10 sample rows to keep the bundle small.
 const compact = {};
 for (const [fileKey, sheets] of Object.entries(result)) {
   compact[fileKey] = {};
   for (const [sheetName, data] of Object.entries(sheets)) {
+    const sampleCap = data.rows.length <= 50 ? data.rows.length : 10;
     compact[fileKey][sheetName] = {
       totalRows: data.rows.length,
       headers: data.headers,
-      sampleRows: data.rows.slice(0, 10),
+      sampleRows: data.rows.slice(0, sampleCap),
     };
   }
 }
