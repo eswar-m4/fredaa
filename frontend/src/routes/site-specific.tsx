@@ -1321,9 +1321,9 @@ function ReviewStep({ sel, onBack }: { sel: Selection; onBack: () => void }) {
         if (
           typeof window !== "undefined" &&
           (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") &&
-          window.location.port !== "8131"
+          window.location.port !== "8000"
         ) {
-          return `http://${window.location.hostname}:8131`;
+          return `http://${window.location.hostname}:8000`;
         }
         return "";
       })();
@@ -1532,9 +1532,9 @@ function SampleModal({ bot, onClose }: { bot: Bot; onClose: () => void }) {
         if (
           typeof window !== "undefined" &&
           (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") &&
-          window.location.port !== "8131"
+          window.location.port !== "8000"
         ) {
-          baseApiUrl = `http://${window.location.hostname}:8131`;
+          baseApiUrl = `http://${window.location.hostname}:8000`;
         }
 
         const endpoint = isKeysight ? "keysight" : isWebMD ? "webmd" : (isTurkeyBrokers ? "turkeybrokers" : "sec");
@@ -1820,9 +1820,9 @@ function AddSourceModal({
       if (
         typeof window !== "undefined" &&
         (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") &&
-        window.location.port !== "8131"
+        window.location.port !== "8000"
       ) {
-        baseApiUrl = `http://${window.location.hostname}:8131`;
+        baseApiUrl = `http://${window.location.hostname}:8000`;
       }
 
       const response = await fetch(`${baseApiUrl}/api/v1/source-analysis/analyze`, {
@@ -1930,9 +1930,9 @@ function AddSourceModal({
       if (
         typeof window !== "undefined" &&
         (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") &&
-        window.location.port !== "8131"
+        window.location.port !== "8000"
       ) {
-        return `http://${window.location.hostname}:8131`;
+        return `http://${window.location.hostname}:8000`;
       }
       return "";
     })();

@@ -51,6 +51,9 @@ app.add_middleware(
         "http://localhost:8001",
         "http://localhost:8080",
         "http://127.0.0.1:8080",
+        # Actual Vite frontend dev port (see frontend/vite.config.ts / _frontend.bat).
+        "http://localhost:5433",
+        "http://127.0.0.1:5433",
     ],
     allow_credentials=True,
     allow_methods=["*"],

@@ -45,9 +45,13 @@ export function AdminLayout({ children }: { children: ReactNode }) {
     setSigningOut(true);
     try {
       await logoutRequest();
-      window.location.replace("/login");
+    } catch {
+      // logoutRequest() already clears the local session even on failure —
+      // still redirect below so a network hiccup can't leave the button
+      // looking unresponsive.
     } finally {
       setSigningOut(false);
+      window.location.replace("/login");
     }
   };
 

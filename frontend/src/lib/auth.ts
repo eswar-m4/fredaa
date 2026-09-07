@@ -89,6 +89,12 @@ export async function signupRequest(username: string, password: string, displayN
 }
 
 export async function logoutRequest() {
-  await apiFetch("/api/v1/auth/logout", { method: "POST" });
-  clearStoredSession();
+  // Always clear the local session, even if the backend call fails (e.g.
+  // the API is unreachable) — otherwise a network hiccup leaves the user
+  // stuck "logged in" with no way to sign out from the UI.
+  try {
+    await apiFetch("/api/v1/auth/logout", { method: "POST" });
+  } finally {
+    clearStoredSession();
+  }
 }

@@ -200,9 +200,9 @@ function Monitoring() {
     if (
       typeof window !== "undefined" &&
       (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") &&
-      window.location.port !== "8131"
+      window.location.port !== "8000"
     ) {
-      return `http://${window.location.hostname}:8131`;
+      return `http://${window.location.hostname}:8000`;
     }
     return "";
   })();

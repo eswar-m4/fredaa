@@ -80,9 +80,9 @@ export function AppLayout({ children }: { children: ReactNode }) {
     if (
       typeof window !== "undefined" &&
       (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") &&
-      window.location.port !== "8131"
+      window.location.port !== "8000"
     ) {
-      return `http://${window.location.hostname}:8131`;
+      return `http://${window.location.hostname}:8000`;
     }
     return "";
   })();
@@ -150,9 +150,13 @@ export function AppLayout({ children }: { children: ReactNode }) {
   async function handleLogout() {
     try {
       await logoutRequest();
-      window.location.replace("/login");
+    } catch {
+      // logoutRequest() already clears the local session even on failure —
+      // still redirect below so a network hiccup can't leave the button
+      // looking unresponsive.
     } finally {
       // Hard redirect keeps stale router/session state from bouncing back into the app.
+      window.location.replace("/login");
     }
   }
 
