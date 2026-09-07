@@ -15,7 +15,7 @@ import {
   XCircle,
 } from "lucide-react";
 import { AdminLayout } from "@/components/AdminLayout";
-import { Badge, Button, Card, Input, PageHeader, SectionTitle } from "@/components/ui-bits";
+import { Badge, Button, Card, Input, PageHeader, SectionTitle, StatCard } from "@/components/ui-bits";
 import { CUSTOMERS, fmt } from "@/data/customers";
 import {
   ONBOARDING_STEPS,
@@ -105,12 +105,9 @@ function AdminTicketsPage() {
           <AllProjects />
         ) : (
           <>
-            <div className="grid sm:grid-cols-4 gap-3">
+            <div className="grid sm:grid-cols-4 gap-2.5">
               {counts.map((c) => (
-                <Card key={c.lane} className="p-4">
-                  <div className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">{c.lane}</div>
-                  <div className="text-[24px] font-bold tabular-nums mt-1">{c.n}</div>
-                </Card>
+                <StatCard key={c.lane} label={c.lane} value={c.n} tone={TONE[c.lane]} />
               ))}
             </div>
 
@@ -197,14 +194,14 @@ function WorkPanel({ t }: { t: Ticket }) {
   const pct = Math.round((done.length / ONBOARDING_STEPS.length) * 100);
 
   return (
-    <Card className="p-5 space-y-4">
+    <Card className="p-4 space-y-3">
       <div className="flex items-start gap-3">
-        <span className="h-10 w-10 shrink-0 rounded-lg bg-purple-bg text-purple-token inline-flex items-center justify-center">
-          <TicketIcon className="h-5 w-5" />
+        <span className="h-9 w-9 shrink-0 rounded-lg bg-purple-bg text-purple-token inline-flex items-center justify-center">
+          <TicketIcon className="h-4.5 w-4.5" />
         </span>
         <div className="min-w-0 flex-1">
-          <div className="text-[15px] font-semibold leading-snug">{t.detail}</div>
-          <div className="text-[11.5px] text-muted-foreground mt-1 flex flex-wrap gap-x-2">
+          <div className="text-[14px] font-semibold leading-snug">{t.detail}</div>
+          <div className="text-[11.5px] text-muted-foreground mt-0.5 flex flex-wrap gap-x-2">
             <span className="font-mono">{t.id}</span>
             <span>· {t.workspaceName}</span>
             <span>· {t.project}</span>
@@ -221,15 +218,15 @@ function WorkPanel({ t }: { t: Ticket }) {
         </Badge>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-3">
-        <div className="rounded-lg border border-border p-3">
-          <div className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mb-2 inline-flex items-center gap-1.5">
+      <div className="grid md:grid-cols-2 gap-2.5">
+        <div className="rounded-lg border border-border p-2.5">
+          <div className="text-[10.5px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5 inline-flex items-center gap-1.5">
             <Database className="h-3.5 w-3.5" /> Sources to onboard · {t.sources.length}
           </div>
           {t.sources.length === 0 ? (
             <div className="text-[12px] text-muted-foreground">No source changes in this request.</div>
           ) : (
-            <ul className="space-y-1.5 max-h-[150px] overflow-y-auto pr-1">
+            <ul className="space-y-1 max-h-[110px] overflow-y-auto pr-1">
               {t.sources.map((s) => (
                 <li key={s} className="flex items-center gap-2 text-[12px]">
                   <Bot className="h-3.5 w-3.5 text-info shrink-0" />
@@ -243,15 +240,15 @@ function WorkPanel({ t }: { t: Ticket }) {
               ))}
             </ul>
           )}
-          {t.fileName && <div className="text-[11.5px] text-muted-foreground mt-2">Attachment: {t.fileName}</div>}
+          {t.fileName && <div className="text-[11.5px] text-muted-foreground mt-1.5">Attachment: {t.fileName}</div>}
           {typeof t.monthlyRecords === "number" && (
-            <div className="text-[11.5px] text-muted-foreground mt-1">Projected volume: {fmt(t.monthlyRecords)} records / month</div>
+            <div className="text-[11.5px] text-muted-foreground mt-0.5">Projected volume: {fmt(t.monthlyRecords)} records / month</div>
           )}
         </div>
 
-        <div className="rounded-lg border border-border p-3">
-          <div className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mb-2">Datapoints requested · {t.datapoints.length}</div>
-          <div className="flex flex-wrap gap-1.5 max-h-[150px] overflow-y-auto pr-1">
+        <div className="rounded-lg border border-border p-2.5">
+          <div className="text-[10.5px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5">Datapoints requested · {t.datapoints.length}</div>
+          <div className="flex flex-wrap gap-1.5 max-h-[110px] overflow-y-auto pr-1">
             {t.datapoints.length === 0 ? (
               <span className="text-[12px] text-muted-foreground">Inherits project datapoints.</span>
             ) : (
@@ -265,15 +262,15 @@ function WorkPanel({ t }: { t: Ticket }) {
         </div>
       </div>
 
-      <div className="rounded-lg border border-border p-3">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">Backend onboarding checklist</span>
+      <div className="rounded-lg border border-border p-2.5">
+        <div className="flex items-center justify-between mb-1.5">
+          <span className="text-[10.5px] uppercase tracking-wider text-muted-foreground font-semibold">Backend onboarding checklist</span>
           <span className="text-[11.5px] font-semibold tabular-nums">{pct}% complete</span>
         </div>
-        <div className="h-1.5 rounded-full bg-secondary overflow-hidden mb-3">
+        <div className="h-1.5 rounded-full bg-secondary overflow-hidden mb-2">
           <div className="h-full bg-primary transition-all" style={{ width: `${pct}%` }} />
         </div>
-        <div className="grid sm:grid-cols-2 gap-2">
+        <div className="grid sm:grid-cols-2 gap-1.5">
           {ONBOARDING_STEPS.map((s) => {
             const on = done.includes(s);
             return (
@@ -281,7 +278,7 @@ function WorkPanel({ t }: { t: Ticket }) {
                 key={s}
                 onClick={() => toggleOnboardingStep(t.id, s)}
                 className={cn(
-                  "flex items-center gap-2 rounded-md border px-3 py-2 text-[12px] font-medium text-left transition",
+                  "flex items-center gap-2 rounded-md border px-2.5 py-1.5 text-[12px] font-medium text-left transition",
                   on ? "border-success/40 bg-success-bg text-success" : "border-border hover:bg-secondary",
                 )}
               >
@@ -293,9 +290,9 @@ function WorkPanel({ t }: { t: Ticket }) {
         </div>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-3">
-        <div className="rounded-lg border border-border p-3">
-          <div className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mb-2 inline-flex items-center gap-1.5">
+      <div className="grid md:grid-cols-2 gap-2.5">
+        <div className="rounded-lg border border-border p-2.5">
+          <div className="text-[10.5px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5 inline-flex items-center gap-1.5">
             <UserCog className="h-3.5 w-3.5" /> Assigned engineer
           </div>
           <div className="flex items-center gap-2">
@@ -304,32 +301,32 @@ function WorkPanel({ t }: { t: Ticket }) {
               Assign
             </Button>
           </div>
-          {t.assignee && <div className="text-[11.5px] text-muted-foreground mt-2">Currently with {t.assignee}</div>}
+          {t.assignee && <div className="text-[11.5px] text-muted-foreground mt-1.5">Currently with {t.assignee}</div>}
         </div>
 
-        <div className="rounded-lg border border-border p-3">
-          <div className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mb-2">Note back to the customer</div>
+        <div className="rounded-lg border border-border p-2.5">
+          <div className="text-[10.5px] uppercase tracking-wider text-muted-foreground font-semibold mb-1.5">Note back to the customer</div>
           <div className="flex items-center gap-2">
             <Input placeholder="Visible in their request tracker…" value={note} onChange={(e) => setNote(e.target.value)} />
             <Button size="sm" className="shrink-0" disabled={!note.trim()} onClick={() => setTicketNote(t.id, note.trim())}>
               Save
             </Button>
           </div>
-          {t.adminNote && <div className="text-[11.5px] mt-2 rounded-md bg-secondary/50 px-2 py-1">Sent: {t.adminNote}</div>}
+          {t.adminNote && <div className="text-[11.5px] mt-1.5 rounded-md bg-secondary/50 px-2 py-1">Sent: {t.adminNote}</div>}
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-border/60">
-        <Button size="sm" variant="outline" className="mt-3" onClick={() => setTicketStatus(t.id, "Approved")}>
+      <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-border/60">
+        <Button size="sm" variant="outline" onClick={() => setTicketStatus(t.id, "Approved")}>
           <CheckCircle2 className="h-3.5 w-3.5" /> Approve request
         </Button>
-        <Button size="sm" variant="outline" className="mt-3" onClick={() => setTicketStatus(t.id, "In build")}>
+        <Button size="sm" variant="outline" onClick={() => setTicketStatus(t.id, "In build")}>
           <Hammer className="h-3.5 w-3.5" /> Start bot build
         </Button>
-        <Button size="sm" variant="outline" className="mt-3" onClick={() => setTicketStatus(t.id, "Delivered")}>
+        <Button size="sm" variant="outline" onClick={() => setTicketStatus(t.id, "Delivered")}>
           <PackageCheck className="h-3.5 w-3.5" /> Onboard & deliver
         </Button>
-        <Button size="sm" variant="ghost" className="mt-3" onClick={() => setTicketStatus(t.id, "Rejected")}>
+        <Button size="sm" variant="ghost" onClick={() => setTicketStatus(t.id, "Rejected")}>
           <XCircle className="h-3.5 w-3.5" /> Reject
         </Button>
       </div>

@@ -158,3 +158,10 @@ export async function signupRequest(username: string, password: string, displayN
 export async function logoutRequest() {
   clearStoredSession();
 }
+
+export type AccountSummary = { username: string; display_name: string; role: "user" | "admin" };
+
+/** Local accounts, safe to display — never includes the stored password. */
+export function listAccounts(): AccountSummary[] {
+  return readAccounts().map(({ username, display_name, role }) => ({ username, display_name, role }));
+}

@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { ReactNode, useEffect, useState } from "react";
-import { LogOut, Shield, Users, Activity, RefreshCw, Database, Ticket } from "lucide-react";
+import { LogOut, Shield, Users, Activity, RefreshCw, Database, Ticket, LayoutDashboard } from "lucide-react";
 
 import { Badge, Button } from "@/components/ui-bits";
 import { fetchSession, logoutRequest, type SessionInfo } from "@/lib/auth";
@@ -8,6 +8,7 @@ import { fetchSession, logoutRequest, type SessionInfo } from "@/lib/auth";
 type AdminNavItem = { to: string; label: string; icon: typeof Users };
 
 const NAV_ITEMS: AdminNavItem[] = [
+  { to: "/admin", label: "Overview", icon: LayoutDashboard },
   { to: "/admin-tickets", label: "Ticket queue", icon: Ticket },
   { to: "/admin-sources", label: "Sources", icon: Database },
   { to: "/admin-access", label: "Accounts & access", icon: Shield },
@@ -67,8 +68,8 @@ export function AdminLayout({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex">
-      <aside className="w-72 shrink-0 border-r border-border bg-card px-5 py-6 flex flex-col">
+    <div className="h-screen bg-background text-foreground flex overflow-hidden">
+      <aside className="w-72 shrink-0 h-full overflow-y-auto border-r border-border bg-card px-5 py-6 flex flex-col">
         <div className="flex items-center gap-3">
           <div className="h-11 w-11 rounded-xl bg-info-bg border border-info/20 flex items-center justify-center">
             <Shield className="h-5 w-5 text-info" />
@@ -120,8 +121,8 @@ export function AdminLayout({ children }: { children: ReactNode }) {
         </div>
       </aside>
 
-      <div className="flex-1 min-w-0">
-        <header className="h-16 border-b border-border bg-card px-6 flex items-center justify-between">
+      <div className="flex-1 min-w-0 h-full flex flex-col overflow-hidden">
+        <header className="h-16 shrink-0 border-b border-border bg-card px-6 flex items-center justify-between">
           <div>
             <div className="text-sm font-semibold text-foreground">Workflow Requests</div>
             <div className="text-xs text-muted-foreground">Agent and Solution request visibility</div>
@@ -131,7 +132,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
             Live polling enabled
           </div>
         </header>
-        <main className="bg-background p-6">{children}</main>
+        <main className="flex-1 min-h-0 overflow-y-auto bg-background p-6">{children}</main>
       </div>
     </div>
   );

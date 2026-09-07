@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { UserRound, LogIn, Loader2, UserPlus, Radar, Database, CheckCircle2, RefreshCw, Shield } from "lucide-react";
 import { toast } from "sonner";
 
@@ -42,18 +42,12 @@ function LoginPage() {
     };
   }, [navigate]);
 
-  const hint = useMemo(() => {
-    if (mode === "signup") return "Create a new account with your own username and password.";
-    if (role === "admin") return "Administrator access — all workspaces, sources and tickets.\n\nDefault username: admin";
-    return "Workspace access — your projects, review, monitoring and playbooks.\n\nDefault username: user";
-  }, [mode, role]);
-
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
     try {
       const cleanedUsername = username.trim();
-      const cleanedPassword = mode === "signup" ? password : "Freda@2024";
+      const cleanedPassword = password;
       const result =
         mode === "signup"
           ? await signupRequest(cleanedUsername, cleanedPassword, cleanedUsername)
@@ -80,24 +74,23 @@ function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex items-center justify-center px-4 py-10">
-      <div className="w-full max-w-5xl grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-        <div className="space-y-6">
+    <div className="h-screen overflow-hidden bg-background text-foreground flex items-center justify-center px-4 py-6">
+      <div className="w-full max-w-5xl max-h-full overflow-y-auto grid gap-5 lg:grid-cols-[1.1fr_0.9fr]">
+        <div className="space-y-4">
           <div className="flex items-center gap-4">
-            <img src={fredaLogo} alt="Freda logo" className="h-14 w-14 object-contain" />
+            <img src={fredaLogo} alt="Freda logo" className="h-12 w-12 object-contain" />
             <div>
-              <h1 className="text-5xl font-bold tracking-tight text-foreground">FreDA</h1>
-              <div className="text-lg font-semibold text-primary tracking-tight">Fresh Data Automation</div>
+              <h1 className="text-4xl font-bold tracking-tight text-foreground">FreDA</h1>
+              <div className="text-base font-semibold text-primary tracking-tight">Fresh Data Automation</div>
             </div>
           </div>
 
-          <p className="max-w-lg text-[15px] text-muted-foreground leading-relaxed">
+          <p className="max-w-lg text-[13.5px] text-muted-foreground leading-relaxed">
             FreDA runs agents on the web sources your business depends on, extracts the exact datapoints you asked for,
             scores every change, and puts the doubtful ones in front of a human before delivery — on a schedule you control.
           </p>
 
-
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid gap-2.5 sm:grid-cols-2">
             {[
               { icon: Radar, title: "Source", copy: "Agents mapped to the sites, portals and directories you trust." },
               { icon: Database, title: "Extract", copy: "Only the datapoints you specify — structured and deduplicated." },
@@ -106,51 +99,50 @@ function LoginPage() {
               { icon: Shield, title: "Review", copy: "Sampled batches with confidence gates and group approval." },
               { icon: Radar, title: "Deliver", copy: "Approved data exported or synced straight to your systems." },
             ].map((s) => (
-
-              <Card key={s.title} className="border-border bg-card p-4">
-                <div className="flex items-start gap-3">
-                  <div className="h-9 w-9 shrink-0 rounded-xl bg-info-bg border border-info/20 flex items-center justify-center">
-                    <s.icon className="h-4 w-4 text-info" />
+              <Card key={s.title} className="border-border bg-card p-3">
+                <div className="flex items-start gap-2.5">
+                  <div className="h-8 w-8 shrink-0 rounded-lg bg-info-bg border border-info/20 flex items-center justify-center">
+                    <s.icon className="h-3.5 w-3.5 text-info" />
                   </div>
                   <div>
-                    <div className="text-sm font-semibold">{s.title}</div>
-                    <div className="text-xs text-muted-foreground leading-5 mt-0.5">{s.copy}</div>
+                    <div className="text-[13px] font-semibold">{s.title}</div>
+                    <div className="text-[11.5px] text-muted-foreground leading-4 mt-0.5">{s.copy}</div>
                   </div>
                 </div>
               </Card>
             ))}
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Card className="border-border bg-card p-4">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-xl bg-info-bg border border-info/20 flex items-center justify-center">
-                  <UserRound className="h-5 w-5 text-info" />
+          <div className="grid gap-2.5 sm:grid-cols-2">
+            <Card className="border-border bg-card p-3">
+              <div className="flex items-center gap-2.5">
+                <div className="h-9 w-9 shrink-0 rounded-lg bg-info-bg border border-info/20 flex items-center justify-center">
+                  <UserRound className="h-4 w-4 text-info" />
                 </div>
                 <div>
-                  <div className="text-sm font-semibold">Workspace user</div>
-                  <div className="text-xs text-muted-foreground">Dashboard, review, monitoring and playbooks.</div>
+                  <div className="text-[13px] font-semibold">Workspace user</div>
+                  <div className="text-[11.5px] text-muted-foreground">Dashboard, review, monitoring and playbooks.</div>
                 </div>
               </div>
             </Card>
-            <Card className="border-border bg-card p-4">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center">
-                  <Database className="h-5 w-5 text-primary" />
+            <Card className="border-border bg-card p-3">
+              <div className="flex items-center gap-2.5">
+                <div className="h-9 w-9 shrink-0 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
+                  <Database className="h-4 w-4 text-primary" />
                 </div>
                 <div>
-                  <div className="text-sm font-semibold">Administrator</div>
-                  <div className="text-xs text-muted-foreground">All sources across workspaces, tickets and access control.</div>
+                  <div className="text-[13px] font-semibold">Administrator</div>
+                  <div className="text-[11.5px] text-muted-foreground">All sources across workspaces, tickets and access control.</div>
                 </div>
               </div>
             </Card>
           </div>
         </div>
 
-        <Card className="border-border bg-card p-6 shadow-sm">
-          <div className="mb-6">
-            <div className="text-lg font-semibold">{mode === "signup" ? "Sign Up" : "Sign In"}</div>
-            <div className="text-sm text-muted-foreground">
+        <Card className="border-border bg-card p-6 shadow-sm h-full flex flex-col justify-center">
+          <div className="mb-5">
+            <div className="text-xl font-semibold">{mode === "signup" ? "Sign Up" : "Sign In"}</div>
+            <div className="text-sm text-muted-foreground mt-1">
               {mode === "signup"
                 ? "Create a new account to keep jobs separate for each user."
                 : "Enter your credentials to continue."}
@@ -183,21 +175,16 @@ function LoginPage() {
               />
             </div>
 
-            {mode === "signup" && (
-              <div className="space-y-2">
-                <label className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Password</label>
-                <Input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="h-11 bg-background border-input text-foreground placeholder:text-muted-foreground"
-                  placeholder="Password"
-                />
-              </div>
-            )}
-
-            <div className="rounded-xl border border-info/20 bg-info-bg px-4 py-3 text-xs text-info whitespace-pre-line">
-              {hint}
+            <div className="space-y-2">
+              <label className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Password</label>
+              <Input
+                type="password"
+                autoComplete={mode === "signup" ? "new-password" : "current-password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="h-11 bg-background border-input text-foreground placeholder:text-muted-foreground"
+                placeholder="Password"
+              />
             </div>
 
             <Button

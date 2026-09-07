@@ -89,13 +89,14 @@ export function AppLayout({ children }: { children: ReactNode }) {
         navigate({ to: "/login", search: { next: pathname }, replace: true });
         return;
       }
-      if (session) {
-        setSession(session);
-        if (session.role === "admin") {
-          navigate({ to: "/admin", replace: true });
-          return;
-        }
-      }
+      // Being signed in as admin doesn't mean the workspace console is
+      // off-limits — admins can browse it same as any user. Previously this
+      // bounced every workspace page back to /admin on mount, which made an
+      // admin-role session unable to stay on the Dashboard/Monitor/Playbooks
+      // pages at all (looked like the app randomly "switching to admin").
+      // The one-time role-based landing redirect after login already lives
+      // in login.tsx — this layout shouldn't re-enforce it on every visit.
+      setSession(session);
     }
     void checkSession();
     return () => {

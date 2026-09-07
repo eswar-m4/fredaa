@@ -62,6 +62,26 @@ export function Badge({ children, tone = "neutral", className }: { children: Rea
   );
 }
 
+const statCardTones: Record<BadgeTone, string> = {
+  info: "from-info-bg to-card",
+  success: "from-success-bg to-card",
+  warning: "from-warning-bg to-card",
+  destructive: "from-destructive/10 to-card",
+  neutral: "from-secondary to-card",
+  purple: "from-purple-bg to-card",
+};
+
+/** A stat tile with a soft tone-tinted gradient background (fading into the
+ *  card color), matching the color-coded admin overview style. */
+export function StatCard({ label, value, tone = "neutral", className }: { label: string; value: string | number; tone?: BadgeTone; className?: string }) {
+  return (
+    <Card className={cn("border-border bg-gradient-to-br p-3", statCardTones[tone], className)}>
+      <div className="text-[10.5px] uppercase tracking-wider text-muted-foreground font-semibold">{label}</div>
+      <div className="text-[20px] font-bold tabular-nums mt-0.5 text-foreground">{value}</div>
+    </Card>
+  );
+}
+
 export function Button({
   variant = "primary",
   size = "md",

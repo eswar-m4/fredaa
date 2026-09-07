@@ -3,8 +3,8 @@ import { useState } from "react";
 import { Shield, UserPlus, Building2, Check } from "lucide-react";
 import { AdminLayout } from "@/components/AdminLayout";
 import { Badge, Button, Card, Input, PageHeader, SectionTitle, Select } from "@/components/ui-bits";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { CUSTOMERS } from "@/data/customers";
-import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/admin-access")({
   head: () => ({
@@ -72,12 +72,12 @@ function AdminAccessPage() {
     <AdminLayout>
       <PageHeader title="Accounts & access" subtitle="Accounts, users and per-workspace access levels" />
 
-      <div className="grid xl:grid-cols-[1.7fr_1fr] gap-5 items-start">
+      <div className="grid xl:grid-cols-[1.7fr_1fr] gap-4 items-start">
         <Card className="overflow-hidden">
-          <div className="px-5 py-3.5 border-b border-border flex flex-wrap items-center gap-3">
+          <div className="px-4 py-2.5 border-b border-border flex flex-wrap items-center gap-3">
             <div>
               <h3 className="text-[13px] font-semibold uppercase tracking-wider text-muted-foreground">Users</h3>
-              <p className="text-[12px] text-muted-foreground mt-0.5">Access level controls what each user can do inside a workspace.</p>
+              <p className="text-[11.5px] text-muted-foreground mt-0.5">Access level controls what each user can do inside a workspace.</p>
             </div>
             <Select className="ml-auto w-[220px]" value={account} onChange={(e) => setAccount(e.target.value)}>
               <option value="all">All accounts</option>
@@ -92,21 +92,21 @@ function AdminAccessPage() {
           <table className="w-full text-[12.5px]">
             <thead>
               <tr className="text-left text-[11px] uppercase tracking-wider text-muted-foreground border-b border-border">
-                <th className="px-5 py-2 font-semibold">User</th>
-                <th className="px-3 py-2 font-semibold">Account</th>
-                <th className="px-3 py-2 font-semibold w-[170px]">Access level</th>
-                <th className="px-5 py-2 font-semibold">Status</th>
+                <th className="px-4 py-1.5 font-semibold">User</th>
+                <th className="px-3 py-1.5 font-semibold">Account</th>
+                <th className="px-3 py-1.5 font-semibold w-[170px]">Access level</th>
+                <th className="px-4 py-1.5 font-semibold">Status</th>
               </tr>
             </thead>
             <tbody>
               {filtered.map((u) => (
                 <tr key={u.id} className="border-b border-border/60">
-                  <td className="px-5 py-3">
+                  <td className="px-4 py-2">
                     <div className="font-medium capitalize">{u.name}</div>
                     <div className="text-[11px] text-muted-foreground">{u.email}</div>
                   </td>
-                  <td className="px-3 py-3 text-muted-foreground">{u.account}</td>
-                  <td className="px-3 py-3">
+                  <td className="px-3 py-2 text-muted-foreground">{u.account}</td>
+                  <td className="px-3 py-2">
                     <Select value={u.role} onChange={(e) => setRole(u.id, e.target.value as AccessRole)}>
                       {ROLES.map((r) => (
                         <option key={r} value={r}>
@@ -115,7 +115,7 @@ function AdminAccessPage() {
                       ))}
                     </Select>
                   </td>
-                  <td className="px-5 py-3">
+                  <td className="px-4 py-2">
                     <Badge tone={u.status === "Active" ? "success" : "warning"}>{u.status}</Badge>
                   </td>
                 </tr>
@@ -124,24 +124,28 @@ function AdminAccessPage() {
           </table>
         </Card>
 
-        <div className="space-y-5">
-          <Card className="p-5">
-            <SectionTitle hint="access matrix">Role permissions</SectionTitle>
-            <div className="space-y-2 mt-3">
+        <div className="space-y-4">
+          <Card className="p-4">
+            <SectionTitle hint="click a role to expand">Role permissions</SectionTitle>
+            <Accordion type="single" collapsible className="mt-2">
               {ROLES.map((r) => (
-                <div key={r} className={cn("rounded-lg border border-border p-3")}>
-                  <div className="flex items-center gap-2 text-[13px] font-semibold">
-                    <Shield className="h-3.5 w-3.5 text-info" /> {r}
-                  </div>
-                  <div className="text-[11.5px] text-muted-foreground mt-1">{ROLE_RIGHTS[r]}</div>
-                </div>
+                <AccordionItem key={r} value={r} className="border-border">
+                  <AccordionTrigger className="py-2.5 text-[13px] font-semibold hover:no-underline">
+                    <span className="flex items-center gap-2">
+                      <Shield className="h-3.5 w-3.5 text-info" /> {r}
+                    </span>
+                  </AccordionTrigger>
+                  <AccordionContent className="pb-2.5 text-[11.5px] text-muted-foreground">
+                    {ROLE_RIGHTS[r]}
+                  </AccordionContent>
+                </AccordionItem>
               ))}
-            </div>
+            </Accordion>
           </Card>
 
-          <Card className="p-5">
+          <Card className="p-4">
             <SectionTitle hint="email invite">Invite a user</SectionTitle>
-            <div className="space-y-3 mt-3">
+            <div className="space-y-2.5 mt-2.5">
               <Input placeholder="name@company.com" value={invite.email} onChange={(e) => setInvite({ ...invite, email: e.target.value })} />
               <Select value={invite.account} onChange={(e) => setInvite({ ...invite, account: e.target.value })}>
                 {CUSTOMERS.map((c) => (
@@ -163,11 +167,11 @@ function AdminAccessPage() {
             </div>
           </Card>
 
-          <Card className="p-5">
+          <Card className="p-4">
             <SectionTitle>Accounts</SectionTitle>
-            <div className="space-y-2 mt-3">
+            <div className="space-y-1.5 mt-2.5">
               {CUSTOMERS.map((c) => (
-                <div key={c.id} className="flex items-center gap-2 rounded-lg border border-border px-3 py-2">
+                <div key={c.id} className="flex items-center gap-2 rounded-lg border border-border px-3 py-1.5">
                   <Building2 className="h-3.5 w-3.5 text-info shrink-0" />
                   <div className="min-w-0 flex-1">
                     <div className="text-[12.5px] font-medium truncate">{c.name}</div>
