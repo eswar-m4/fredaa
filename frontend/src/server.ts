@@ -1,3 +1,5 @@
+export const startInstance = undefined;
+
 import "./lib/error-capture";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
