@@ -2215,11 +2215,12 @@ function Review() {
                   <thead className="bg-secondary text-[10px] uppercase tracking-wider text-muted-foreground sticky top-0 z-10 dark:bg-secondary/80">
                     <tr>
                       <th className="text-left px-2.5 py-2 w-[5%]">ADMV</th>
-                      <th className="text-left px-2.5 py-2 w-[10%]">Record</th>
+                      <th className="text-left px-2.5 py-2 w-[11%]">Record ID</th>
+                      <th className="text-left px-2.5 py-2 w-[6%]">Batch</th>
                       <th className="text-left px-2.5 py-2 w-[12%]">Attribute</th>
-                      <th className="text-left px-2.5 py-2 w-[23%]">Previous</th>
-                      <th className="text-left px-2.5 py-2 w-[23%]">New value</th>
-                      <th className="text-left px-2.5 py-2 w-[7%]">Conf.</th>
+                      <th className="text-left px-2.5 py-2 w-[20%]">Previous</th>
+                      <th className="text-left px-2.5 py-2 w-[20%]">New value</th>
+                      <th className="text-left px-2.5 py-2 w-[6%]">Conf.</th>
                       <th className="text-left px-2.5 py-2 w-[10%]">Source</th>
                       <th className="text-right px-2.5 py-2 w-[10%]">Action</th>
                     </tr>
@@ -2234,7 +2235,12 @@ function Review() {
                       return (
                         <tr key={r.id} className={[recordGroupBg(r.record), status ? "opacity-60" : ""].join(" ")}>
                           <td className="px-2.5 py-1.5"><Badge tone={changeTone(r.changeType)}>{r.changeType}</Badge></td>
-                          <td className="px-2.5 py-1.5 font-medium">{r.record}</td>
+                          <td className="px-2.5 py-1.5 font-medium font-mono text-[11px] break-all" title={String(r.recordKey ?? r.record ?? r.id)}>
+                            {r.recordKey ?? r.record ?? r.id}
+                          </td>
+                          <td className="px-2.5 py-1.5 text-muted-foreground tabular-nums">
+                            {Math.floor((r.recordIndex ?? 0) / Math.max(1, recordsPerPage)) + 1}
+                          </td>
                           <td className="px-2.5 py-1.5 text-muted-foreground">{r.attribute}</td>
                           <td className="px-2.5 py-1.5 font-mono text-[11px] text-muted-foreground break-all whitespace-normal">{r.previous}</td>
                           <td className="px-2.5 py-1.5">
