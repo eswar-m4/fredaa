@@ -22,9 +22,7 @@ function devCrashGuardPlugin(): Plugin {
 export default defineConfig({
   server: { port: 5434, strictPort: true },
   plugins: [
-    tanstackStart({
-      start: { entry: "server" },
-    }),
+    tanstackStart(),
     tailwindcss(),
     tsConfigPaths(),
     devCrashGuardPlugin(),
