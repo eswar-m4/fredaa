@@ -28,7 +28,7 @@ const PORT = parseInt(process.env.NITRO_PORT || process.env.PORT || '8132', 10);
 const HOST = process.env.NITRO_HOST || process.env.HOST || '127.0.0.1';
 
 const __dir = fileURLToPath(new URL('.', import.meta.url));
-const CLIENT_DIR = resolve(__dir, '.output/public');
+const CLIENT_DIR = resolve(__dir, 'dist/client');
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -50,7 +50,7 @@ const MIME = {
 };
 
 // index.mjs exports default: { fetch } (Cloudflare Workers style)
-const { default: app } = await import('./.output/server/index.mjs');
+const { default: app } = await import('./dist/server/server.js');
 const fetchFn = typeof app === 'function' ? app : app?.fetch;
 
 if (typeof fetchFn !== 'function') {
