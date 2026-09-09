@@ -7,6 +7,7 @@
  */
 
 import rawData from "./xlsx-data.json";
+import { ESG_COLUMNS, ESG_SAMPLE_ROWS, NEWS_COLUMNS, NEWS_SAMPLE_ROWS } from "./eris-placeholder-data";
 
 type SheetData = {
   totalRows: number;
@@ -193,6 +194,38 @@ export const POI_DATA = {
 };
 
 /* ------------------------------------------------------------------ */
+/* ERIS (environmental / regulatory registries)                        */
+/* ------------------------------------------------------------------ */
+
+const erisSources = xlsx["ERIS_Sources"]?.["ERIS"];
+const erisEcaOn   = xlsx["ERIS_ECA_ON"]?.["Output"];
+const erisLustAz  = xlsx["ERIS_LUST_AZ"]?.["Output"];
+
+/** The full 87-source ERIS catalog (site code, real registry URL, country,
+ *  state, pipe-delimited real output attributes, estimated record volume) —
+ *  onboarded from ERIS_Sources.xlsx. Used to seed the "Agents" list. */
+export const ERIS_SOURCES_CATALOG = (erisSources?.sampleRows ?? []) as Record<string, string>[];
+
+/** ECA_ON — Ontario Environmental Compliance Approvals, a real single-
+ *  snapshot bulk registry export (not a per-row website — the whole
+ *  dataset comes from one ArcGIS query endpoint), onboarded from
+ *  ERIS_Output & Spec/ECA_ON/ECA_ON_04AUG2026.csv. */
+export const ERIS_ECA_ON = {
+  records: erisEcaOn?.totalRows ?? 0,
+  columns: erisEcaOn?.headers ?? [],
+  sampleRows: erisEcaOn?.sampleRows ?? [],
+};
+
+/** LUST_AZ — Arizona Leaking Underground Storage Tank registry, same
+ *  single-snapshot bulk-export shape, from
+ *  ERIS_Output & Spec/LUST_AZ/LUST_AZ_11AUG2026.csv. */
+export const ERIS_LUST_AZ = {
+  records: erisLustAz?.totalRows ?? 0,
+  columns: erisLustAz?.headers ?? [],
+  sampleRows: erisLustAz?.sampleRows ?? [],
+};
+
+/* ------------------------------------------------------------------ */
 /* Unified per-customer project overrides                              */
 /* ------------------------------------------------------------------ */
 
@@ -321,6 +354,69 @@ export const XLSX_PROJECT_OVERRIDES: Record<string, XlsxProjectOverride> = {
     columns:    POI_DATA.outputColumns,
     sampleRows: POI_DATA.outputSamples,
     sources:    sourcesFromRows("ntm-poi-src", POI_DATA.inputSamples, "POIName", "Website"),
+  },
+
+  // ERIS — real, first-time-onboarded snapshots of government regulatory
+  // registries. Each is a single bulk-query portal (not one URL per row like
+  // NTM's hotels), so "sources" is one real entry pointing at that portal —
+  // and since this is the first pass with no prior snapshot to diff against,
+  // admv is honestly all-Verified rather than fabricating Added/Modified.
+  "eris-p1": {
+    // Canada — primary reviewable data is ECA_ON (Ontario Environmental
+    // Compliance Approvals, 761 real approvals, fully parsed). EBR_ON,
+    // EPWN_AB, PES_BC and SPL_NT_NU are the other real Canadian registries
+    // from the same ERIS_Output & Spec batch, onboarded as source agents
+    // (real portal URLs + real estimated volumes from ERIS_Sources.xlsx)
+    // ahead of their own row-level extraction being built out.
+    records: ERIS_ECA_ON.records,
+    admv: { added: 0, deleted: 0, modified: 0, verified: ERIS_ECA_ON.records },
+    columns: ERIS_ECA_ON.columns,
+    sampleRows: ERIS_ECA_ON.sampleRows,
+    sources: [
+      { id: "eris-eca-on-src", label: "ECA_ON — Ontario Environmental Compliance Approvals", url: "https://ws.lioservices.lrc.gov.on.ca/arcgis1071a/rest/services/Access_Environment/Access_Environment_Map/MapServer/0/query", status: "Live", records: 761, addedOn: "Sep 2026" },
+      { id: "eris-ebr-on-src", label: "EBR_ON — Ontario Environmental Registry (ERO)", url: "https://ero.ontario.ca/search", status: "Live", records: 312, addedOn: "Sep 2026" },
+      { id: "eris-epwn-ab-src", label: "EPWN_AB — Alberta Public Notices Viewer", url: "https://avw.alberta.ca/PublicNoticesViewer.aspx?Click=ClearAndReturn", status: "Live", records: 4025, addedOn: "Sep 2026" },
+      { id: "eris-pes-bc-src", label: "PES_BC — BC Pesticide & Vendor Registry", url: "http://a100.gov.bc.ca/pub/apex/f?p=210:1:193981660561:", status: "Live", records: 1328, addedOn: "Sep 2026" },
+      { id: "eris-spl-nt-nu-src", label: "SPL_NT_NU — NWT/Nunavut Spill Reports", url: "https://www.enr.gov.nt.ca/en/spills", status: "Live", records: 15350, addedOn: "Sep 2026" },
+    ],
+  },
+  "eris-p2": {
+    // US — primary reviewable data is LUST_AZ (Arizona Leaking Underground
+    // Storage Tanks, 9606 real releases, fully parsed). The other 4 real
+    // US registries from the same batch are onboarded as source agents the
+    // same way as the Canada project above.
+    records: ERIS_LUST_AZ.records,
+    admv: { added: 0, deleted: 0, modified: 0, verified: ERIS_LUST_AZ.records },
+    columns: ERIS_LUST_AZ.columns,
+    sampleRows: ERIS_LUST_AZ.sampleRows,
+    sources: [
+      { id: "eris-lust-az-src", label: "LUST_AZ — Arizona DEQ LUST Search", url: "https://legacy.azdeq.gov/databases/lustsearch_drupal.html", status: "Live", records: 9606, addedOn: "Sep 2026" },
+      { id: "eris-spl-ct-src", label: "SPL_CT_HAZCONNECT — Connecticut Incident Reports", url: "https://connecticut.hazconnect.com/listincidentpublic.aspx", status: "Live", records: 7692, addedOn: "Sep 2026" },
+      { id: "eris-uic-tx-src", label: "UIC_TX — Texas Underground Injection Control", url: "https://www15.tceq.texas.gov/crpub/index.cfm?fuseaction=addnid.IdSearch", status: "Live", records: 1504, addedOn: "Sep 2026" },
+      { id: "eris-ust-sc-src", label: "UST_SC — South Carolina UST Registry", url: "http://www.scdhec.gov/Apps/Environment/USTRegistry/", status: "Live", records: 17617, addedOn: "Sep 2026" },
+      { id: "eris-vfc-in-src", label: "VFC_IN — Indiana Voluntary/Federal Cleanup Documents", url: "https://vfc.idem.in.gov/DocumentSearch.aspx", status: "Live", records: 160854, addedOn: "Sep 2026" },
+    ],
+  },
+  "eris-p3": {
+    // ESG Compliance Monitoring — no source file provided yet, so this is
+    // clearly-illustrative sample data (see eris-placeholder-data.ts), not a
+    // real onboarded registry. Gives the project real columns/rows to review
+    // and download instead of an empty/crashing project. admv is all-
+    // Verified for the same reason as eris-p1/p2: this schema has no real
+    // before/after pair to diff (see customers.ts's "plain" xlsx pattern) —
+    // any other split would let the generic fallback fabricate a false
+    // "Modified" row showing the same value as both old and new.
+    records: 24800,
+    admv: { added: 0, deleted: 0, modified: 0, verified: 24800 },
+    columns: ESG_COLUMNS,
+    sampleRows: ESG_SAMPLE_ROWS,
+  },
+  "eris-p4": {
+    // Regulatory News Monitoring — same as above, illustrative sample data.
+    records: 41300,
+    admv: { added: 0, deleted: 0, modified: 0, verified: 41300 },
+    columns: NEWS_COLUMNS,
+    sampleRows: NEWS_SAMPLE_ROWS,
   },
 
   // Cengage Learning

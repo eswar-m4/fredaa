@@ -24,6 +24,8 @@ export type Ticket = {
   adminNote?: string;
   assignee?: string;
   onboarding?: string[];
+  industry?: string;
+  geography?: string;
 };
 
 export const ONBOARDING_STEPS = [

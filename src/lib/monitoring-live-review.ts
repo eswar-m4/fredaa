@@ -173,15 +173,24 @@ function buildDispositionTable(project: Project, live: LiveReviewData | null, pr
 
 /** Reconstructs the full per-record table in the same column layout as the
  *  project's original Output template, with any live-refreshed field values
- *  overlaid on top of the source rows. Returns null for projects that
- *  aren't live-refreshable. */
+ *  overlaid on top of the source rows. Returns null for projects with no
+ *  real onboarded table data at all. */
 export function buildRefreshedMonitoringRows(project: Project): RefreshedMonitoringTable | null {
   const profile = getLiveRefreshProfile(project.id);
-  if (!profile || !isLiveCheckable(project)) return null;
-  const live = loadLiveReview(project.id);
-  return profile.outputFormat === "disposition"
-    ? buildDispositionTable(project, live, profile)
-    : buildFlatTable(project, live, profile);
+  if (profile && isLiveCheckable(project)) {
+    const live = loadLiveReview(project.id);
+    return profile.outputFormat === "disposition"
+      ? buildDispositionTable(project, live, profile)
+      : buildFlatTable(project, live, profile);
+  }
+  // No live-refresh profile (e.g. ERIS's ECA_ON/LUST_AZ — a bulk
+  // single-portal government registry snapshot, not a per-row website to
+  // re-visit) but real onboarded columns/rows exist — the second tab is
+  // just that dataset as-is, matching its real output format.
+  if (project.columns.length > 0 && project.sampleRows.length > 0) {
+    return { columns: project.columns, rows: project.sampleRows, sheetName: "Output" };
+  }
+  return null;
 }
 
 const POOL = 6000;

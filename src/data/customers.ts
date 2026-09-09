@@ -122,6 +122,12 @@ const DP_SETS: Record<string, string[]> = {
     "Review count", "Category", "Variant", "Colour", "Size",
     "Shipping fee", "Return window", "Product URL", "Image URL", "Last verified",
   ],
+  environmental: [
+    "Site / facility name", "Facility ID", "Site address", "City", "State / province",
+    "Regulatory agency", "Permit / approval number", "Approval or filing type", "Status",
+    "Filing date", "Latitude", "Longitude", "Contaminant / substance", "Release status",
+    "Source document URL", "County", "Program type", "Site type", "Case narrative", "Last verified",
+  ],
 };
 
 type Spec = {
@@ -241,6 +247,26 @@ const SPECS: Spec[] = [
       { name: "Court & Litigation Records", source: "court portals", url: "https://pacer.gov", records: 64200, freq: "Weekly" },
     ],
   },
+  {
+    id: "eris",
+    name: "ERIS",
+    shortName: "ERIS",
+    industry: "Environmental Risk & Regulatory Data",
+    accountManager: "Devika Menon",
+    since: "Sep 2026",
+    dpSet: "environmental",
+    projects: [
+      // Real government registry snapshots — see src/data/xlsx-customer-data.ts
+      // ERIS_ECA_ON / ERIS_LUST_AZ (onboarded from ERIS_Output & Spec files).
+      // Each project's reviewable data is its one fully-parsed primary
+      // registry; the other real registries in the region are onboarded as
+      // additional source agents (real URLs, not yet row-level extracted).
+      { name: "Canada Environmental & Regulatory Registries", source: "provincial environment ministries (ON/AB/BC/NU)", url: "https://ws.lioservices.lrc.gov.on.ca/arcgis1071a/rest/services/Access_Environment/Access_Environment_Map/MapServer/0/query", records: 761, freq: "Weekly" },
+      { name: "US Environmental & Regulatory Registries", source: "state environmental agencies (AZ/TX/SC/CT/IN)", url: "https://legacy.azdeq.gov/databases/lustsearch_drupal.html", records: 9606, freq: "Weekly" },
+      { name: "ESG Compliance Monitoring", source: "ESG disclosures & sustainability filings", url: "https://eris.example.com/esg", records: 24800, freq: "Monthly" },
+      { name: "Regulatory News Monitoring", source: "environmental enforcement bulletins & agency news", url: "https://eris.example.com/news", records: 41300, freq: "Daily" },
+    ],
+  },
 ];
 
 const SOURCE_SUFFIX = ["primary site", "regional mirror", "partner portal", "public registry", "listing directory", "press feed"];
@@ -349,6 +375,7 @@ const ENTITY_PREFIX: Record<string, string[]> = {
   b2b: ["Brightwave Systems", "Corvus Analytics", "Lumen Robotics", "Fernwood Health", "Atlas Freight", "Nimbus Cloudworks", "Petra Materials", "Skyline Retail Grp"],
   media: ["Foundations of Biology", "Applied Econometrics", "Modern World History", "Organic Chemistry 9e", "Intro to Psychology", "Calculus: Early Trans."],
   retail: ["Aurora Blender X2", "Trailhead Backpack 40L", "Nova Desk Lamp", "Peak Running Shoe", "Cedar Coffee Table"],
+  environmental: ["Meridian Industrial Park", "Cascade Refining Co", "Blackstone Terminal", "Harbor Point Facility", "Prairie Chemical Works", "Ironwood Manufacturing", "Silverline Logistics Yard", "Coastal Energy Depot"],
 };
 
 function entityPool(customerId: string) {
@@ -418,8 +445,8 @@ export function reviewRecordsFor(project: Project, count = 24): ReviewRecord[] {
 // Priority-ordered list for entity column detection in plain datasets
 const ENTITY_COLUMN_CANDIDATES = [
   "Hotel", "HotelName", "POIName", "CO_Name", "Organization Name",
-  "Company Name", "Company", "BusinessName", "Business Name",
-  "FDR Organization Name", "Name", "Title", "Facility Name",
+  "Company Name", "Company", "Company_Name", "BusinessName", "Business Name", "BUSINESS_NAME",
+  "FDR Organization Name", "Name", "Title", "Headline", "Facility Name", "Facility_Name",
   "Location Name", "Place Name", "PropertyName", "Property Name",
 ];
 

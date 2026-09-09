@@ -1,14 +1,43 @@
 import { useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Send, Sparkles, ArrowRight } from "lucide-react";
+import { Send, Sparkles, ArrowRight, Loader2 } from "lucide-react";
 import { Button, Card, SectionTitle } from "@/components/ui-bits";
 import { addTicket } from "@/lib/ticket-store";
 import { useActiveCustomer } from "@/lib/workspace";
 import { fmt, rollup, hrsAgo } from "@/data/customers";
 import { cn } from "@/lib/utils";
+import { getAskFredaFollowUp, getAskFredaIntakeSummary } from "@/lib/api/ask-freda-intake.functions";
+import type { QaTurn } from "@/lib/api/ask-freda-intake.core";
 
 type NavHint = { to: string; label: string };
-type Msg = { role: "user" | "freda"; text: string; nav?: NavHint };
+type Msg = { role: "user" | "freda"; text: string; nav?: NavHint; choices?: string[] };
+
+type FlowStage = "type" | "name" | "industry" | "geography" | "ai-followup" | "summarizing";
+
+type FlowState = {
+  stage: FlowStage;
+  requestType: "Agent" | "Solution" | null;
+  name: string;
+  industry: string;
+  geography: string;
+  qaHistory: QaTurn[];
+  currentAiQuestion: string | null;
+  awaitingOther: "industry" | "geography" | null;
+};
+
+const INITIAL_FLOW: FlowState = {
+  stage: "type",
+  requestType: null,
+  name: "",
+  industry: "",
+  geography: "",
+  qaHistory: [],
+  currentAiQuestion: null,
+  awaitingOther: null,
+};
+
+const INDUSTRY_CHOICES = ["Hospitality", "Retail", "Finance", "Healthcare", "Education", "Technology", "Manufacturing", "Other"];
+const GEOGRAPHY_CHOICES = ["Global", "North America", "Europe", "APAC", "LATAM", "Middle East & Africa", "Other"];
 
 export function AskFredaPanel() {
   const customer = useActiveCustomer();
@@ -32,13 +61,8 @@ export function AskFredaPanel() {
     },
   ]);
   const [input, setInput] = useState("");
-  const [flow, setFlow] = useState<number>(-1);
-  const [draft, setDraft] = useState<{ name: string; sources: string[]; datapoints: string[]; schedule: string }>({
-    name: "",
-    sources: [],
-    datapoints: [],
-    schedule: "Weekly",
-  });
+  const [flow, setFlow] = useState<FlowState | null>(null);
+  const [busy, setBusy] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
 
   function answer(q: string): { text: string; nav?: NavHint } {
@@ -152,64 +176,159 @@ export function AskFredaPanel() {
   }
 
 
-  const FLOW_PROMPTS = [
-    "Great — let's set it up. What should the new project or solution be called?",
-    "Which websites or sources should FreDA extract from? Paste them comma separated.",
-    "Which datapoints do you need? Comma separated (e.g. Company name, HQ city, Revenue).",
-    "How often should it refresh — Daily, Weekly, Monthly or a custom cadence?",
-  ];
+  function pushBot(text: string, extra?: Partial<Msg>) {
+    setMessages((m) => [...m, { role: "freda", text, ...extra }]);
+  }
 
-  function handleFlow(q: string): string {
-    if (flow === 0) {
-      setDraft((d) => ({ ...d, name: q }));
-      setFlow(1);
-      return FLOW_PROMPTS[1]!;
+  function scrollSoon() {
+    setTimeout(() => endRef.current?.scrollIntoView({ behavior: "smooth" }), 30);
+  }
+
+  function intakeContext(state: FlowState) {
+    return {
+      requestType: state.requestType!,
+      name: state.name,
+      industry: state.industry,
+      geography: state.geography,
+      qaHistory: state.qaHistory,
+    };
+  }
+
+  async function runFollowUp(state: FlowState) {
+    setBusy(true);
+    try {
+      const result = await getAskFredaFollowUp({ data: intakeContext(state) });
+      if (!result.done && result.question) {
+        setFlow({ ...state, stage: "ai-followup", currentAiQuestion: result.question });
+        pushBot(result.question);
+      } else {
+        await finishIntake(state);
+      }
+    } catch {
+      await finishIntake(state);
+    } finally {
+      setBusy(false);
+      scrollSoon();
     }
-    if (flow === 1) {
-      setDraft((d) => ({ ...d, sources: q.split(",").map((s) => s.trim()).filter(Boolean) }));
-      setFlow(2);
-      return FLOW_PROMPTS[2]!;
+  }
+
+  async function finishIntake(state: FlowState) {
+    setFlow({ ...state, stage: "summarizing" });
+    try {
+      const result = await getAskFredaIntakeSummary({ data: intakeContext(state) });
+      const days = Math.max(3, Math.round(result.sources.length * 1.5 + result.datapoints.length * 0.3 + 2));
+      const t = addTicket({
+        workspaceId: customer.id,
+        workspaceName: customer.name,
+        project: state.name || `New ${state.requestType}`,
+        type: "New project",
+        detail: result.summary,
+        raisedBy: `${customer.shortName.toLowerCase()} workspace user`,
+        estimateDays: days,
+        sources: result.sources,
+        datapoints: result.datapoints,
+        frequency: result.schedule,
+        industry: state.industry,
+        geography: state.geography,
+      });
+      pushBot(
+        `Done — ${t.id} raised with your FreDA admin.\n\n• ${state.requestType}: ${state.name}\n• Industry: ${state.industry}\n• Geography: ${state.geography}\n• Sources: ${result.sources.length || "to be scoped"}\n• Datapoints: ${result.datapoints.length || "to be scoped"}\n• Refresh: ${result.schedule}\n• Estimate: ${days} days to build and onboard\n\nAdmin will review it, build the bots in the backend and onboard it to your workspace. Track it in the Request tracker.`,
+        { nav: { to: "/requests", label: "Track this request" } },
+      );
+    } finally {
+      setFlow(null);
     }
-    if (flow === 2) {
-      setDraft((d) => ({ ...d, datapoints: q.split(",").map((s) => s.trim()).filter(Boolean) }));
-      setFlow(3);
-      return FLOW_PROMPTS[3]!;
-    }
-    const schedule = q;
-    const sources = draft.sources;
-    const datapoints = draft.datapoints;
-    const days = Math.max(3, Math.round(sources.length * 1.5 + datapoints.length * 0.2));
-    const t = addTicket({
-      workspaceId: customer.id,
-      workspaceName: customer.name,
-      project: draft.name || "New solution",
-      type: "New project",
-      detail: `Ask FreDA request — ${draft.name || "New solution"} · ${sources.length} sources · ${datapoints.length} datapoints · ${schedule}`,
-      raisedBy: `${customer.shortName.toLowerCase()} workspace user`,
-      estimateDays: days,
-      sources,
-      datapoints,
-      frequency: schedule,
+  }
+
+  async function startIntake() {
+    setFlow(INITIAL_FLOW);
+    pushBot("Great — let's scope it. Is this a new Agent (a single data source) or a Solution (a packaged multi-source dataset)?", {
+      choices: ["Agent", "Solution"],
     });
-    setFlow(-1);
-    return `Done — ${t.id} raised with your FreDA admin.\n\n• Project: ${draft.name}\n• Sources: ${sources.length}\n• Datapoints: ${datapoints.length}\n• Refresh: ${schedule}\n• Estimate: ${days} days to build and onboard\n\nAdmin will approve it, build the bots in the backend and onboard it to your workspace. Track it in the Request tracker.`;
+  }
+
+  async function advanceFlow(current: FlowState, q: string) {
+    if (/^(cancel|stop|never ?mind|nvm|quit|exit)$/i.test(q.trim())) {
+      setFlow(null);
+      pushBot("No problem — request cancelled. Ask me anything else, or say \"new project\" whenever you're ready.");
+      return;
+    }
+
+    if (current.stage === "type") {
+      const requestType = /solution/i.test(q) ? "Solution" : "Agent";
+      setFlow({ ...current, requestType, stage: "name" });
+      pushBot("What should we call it, and what's it for? A sentence or two is perfect.");
+      return;
+    }
+
+    if (current.stage === "name") {
+      setFlow({ ...current, name: q, stage: "industry" });
+      pushBot("Which industry does this serve?", {
+        choices: [customer.industry, ...INDUSTRY_CHOICES.filter((i) => i !== customer.industry)],
+      });
+      return;
+    }
+
+    if (current.stage === "industry") {
+      if (current.awaitingOther === "industry") {
+        setFlow({ ...current, industry: q, awaitingOther: null, stage: "geography" });
+        pushBot("Which geography should this cover?", { choices: GEOGRAPHY_CHOICES });
+        return;
+      }
+      if (/^other$/i.test(q)) {
+        setFlow({ ...current, awaitingOther: "industry" });
+        pushBot("No problem — what industry is it?");
+        return;
+      }
+      setFlow({ ...current, industry: q, stage: "geography" });
+      pushBot("Which geography should this cover?", { choices: GEOGRAPHY_CHOICES });
+      return;
+    }
+
+    if (current.stage === "geography") {
+      if (current.awaitingOther === "geography") {
+        const next = { ...current, geography: q, awaitingOther: null, stage: "ai-followup" as const };
+        setFlow(next);
+        await runFollowUp(next);
+        return;
+      }
+      if (/^other$/i.test(q)) {
+        setFlow({ ...current, awaitingOther: "geography" });
+        pushBot("Got it — which region, specifically?");
+        return;
+      }
+      const next = { ...current, geography: q, stage: "ai-followup" as const };
+      setFlow(next);
+      await runFollowUp(next);
+      return;
+    }
+
+    if (current.stage === "ai-followup") {
+      const qa: QaTurn = { question: current.currentAiQuestion ?? "", answer: q };
+      const next = { ...current, qaHistory: [...current.qaHistory, qa], currentAiQuestion: null };
+      setFlow(next);
+      await runFollowUp(next);
+    }
   }
 
   function send(text: string) {
     const q = text.trim();
-    if (!q) return;
-    let reply: { text: string; nav?: NavHint };
-    if (flow >= 0) {
-      reply = { text: handleFlow(q) };
-    } else if (/new (project|solution|dataset)|add (a )?(project|solution|dataset)|request a/i.test(q)) {
-      setFlow(0);
-      reply = { text: FLOW_PROMPTS[0]! };
-    } else {
-      reply = answer(q);
-    }
-    setMessages((m) => [...m, { role: "user", text: q }, { role: "freda", ...reply }]);
+    if (!q || busy) return;
+    setMessages((m) => [...m, { role: "user", text: q }]);
     setInput("");
-    setTimeout(() => endRef.current?.scrollIntoView({ behavior: "smooth" }), 30);
+    scrollSoon();
+
+    if (flow) {
+      void advanceFlow(flow, q).then(scrollSoon);
+      return;
+    }
+    if (/new (project|solution|dataset|agent)|add (a )?(project|solution|dataset|agent)|request a/i.test(q)) {
+      void startIntake().then(scrollSoon);
+      return;
+    }
+    const reply = answer(q);
+    setMessages((m) => [...m, { role: "freda", ...reply }]);
+    scrollSoon();
   }
 
   return (
@@ -233,9 +352,31 @@ export function AskFredaPanel() {
                     {m.nav.label} <ArrowRight className="h-3.5 w-3.5" />
                   </Link>
                 )}
+                {m.choices && i === messages.length - 1 && (
+                  <div className="mt-2.5 flex flex-wrap gap-1.5">
+                    {m.choices.map((c) => (
+                      <button
+                        key={c}
+                        type="button"
+                        disabled={busy}
+                        onClick={() => send(c)}
+                        className="rounded-md border border-border bg-card px-2.5 py-1 text-[12px] font-medium text-foreground hover:bg-secondary transition disabled:opacity-50"
+                      >
+                        {c}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           ))}
+          {busy && (
+            <div className="flex justify-start">
+              <div className="rounded-lg px-3.5 py-2.5 bg-secondary text-secondary-foreground inline-flex items-center gap-2 text-[12.5px]">
+                <Loader2 className="h-3.5 w-3.5 animate-spin" /> FreDA is thinking…
+              </div>
+            </div>
+          )}
           <div ref={endRef} />
         </div>
 
@@ -249,11 +390,12 @@ export function AskFredaPanel() {
           <input
             suppressHydrationWarning
             value={input}
+            disabled={busy}
             onChange={(e) => setInput(e.target.value)}
             placeholder={`Ask about ${customer.industry.toLowerCase()} data, reviews, sources…`}
-            className="h-10 flex-1 px-3 rounded-md border border-input bg-card text-[13px] outline-none focus:ring-2 focus:ring-ring/40"
+            className="h-10 flex-1 px-3 rounded-md border border-input bg-card text-[13px] outline-none focus:ring-2 focus:ring-ring/40 disabled:opacity-60"
           />
-          <Button type="submit" size="md">
+          <Button type="submit" size="md" disabled={busy}>
             <Send className="h-3.5 w-3.5" /> Send
           </Button>
         </form>
@@ -261,13 +403,14 @@ export function AskFredaPanel() {
 
       <div className="space-y-5">
         <Card className="p-5">
-          <SectionTitle hint={customer.industry}>Suggested questions</SectionTitle>
+          <SectionTitle hint={flow ? "finish the request first" : customer.industry}>Suggested questions</SectionTitle>
           <div className="space-y-2 mt-2">
             {suggestions.map((s) => (
               <button
                 key={s}
+                disabled={!!flow || busy}
                 onClick={() => send(s)}
-                className="w-full text-left text-[12.5px] rounded-md border border-border px-3 py-2 hover:bg-secondary transition inline-flex items-center gap-2"
+                className="w-full text-left text-[12.5px] rounded-md border border-border px-3 py-2 hover:bg-secondary transition inline-flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent"
               >
                 <Sparkles className="h-3.5 w-3.5 text-primary shrink-0" /> {s}
               </button>

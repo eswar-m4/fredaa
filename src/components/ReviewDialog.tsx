@@ -383,7 +383,8 @@ export function ReviewDialog({
                 <table className="w-full text-[12.5px]">
                   <thead className="sticky top-0 bg-card border-b border-border z-10">
                     <tr className="text-left text-[11px] uppercase tracking-wider text-muted-foreground">
-                      <th className="px-6 py-2 font-semibold">Entity</th>
+                      <th className="px-6 py-2 font-semibold">Record ID</th>
+                      <th className="px-3 py-2 font-semibold">Entity</th>
                       <th className="px-3 py-2 font-semibold">Datapoint</th>
                       <th className="px-3 py-2 font-semibold">Change</th>
                       <th className="px-3 py-2 font-semibold">Old → New</th>
@@ -398,12 +399,21 @@ export function ReviewDialog({
                       const d = decisions[r.id];
                       return (
                         <tr key={r.id} className="border-b border-border/60 hover:bg-secondary/40">
-                          <td className="px-6 py-2 font-medium">{r.entity}</td>
+                          <td className="px-6 py-2 w-[140px] max-w-[140px]">
+                            <span title={r.id} className="block truncate font-mono text-[11px] text-muted-foreground">
+                              {r.id}
+                            </span>
+                          </td>
+                          <td className="px-3 py-2 w-[170px] max-w-[170px]">
+                            <span title={r.entity} className="block truncate font-medium">
+                              {r.entity}
+                            </span>
+                          </td>
                           <td className="px-3 py-2 text-muted-foreground">{r.datapoint}</td>
                           <td className="px-3 py-2">
                             <Badge tone={toneFor(r.changeType) as any}>{r.changeType}</Badge>
                           </td>
-                          <td className="px-3 py-2 font-mono text-[11.5px] text-muted-foreground truncate max-w-[320px]">
+                          <td className="px-3 py-2 font-mono text-[11.5px] text-muted-foreground truncate max-w-[260px]">
                             {r.oldValue} → <span className="text-foreground">{r.newValue}</span>
                           </td>
                           <td className="px-3 py-2">

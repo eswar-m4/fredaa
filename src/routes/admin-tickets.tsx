@@ -207,6 +207,8 @@ function WorkPanel({ t }: { t: Ticket }) {
             <span>· {t.project}</span>
             <span>· {t.type}</span>
             <span>· raised by {t.raisedBy}</span>
+            {t.industry && <span>· {t.industry}</span>}
+            {t.geography && <span>· {t.geography}</span>}
             {t.frequency && <span>· {t.frequency}</span>}
             <span className="inline-flex items-center gap-1">
               <Clock className="h-3 w-3" /> {t.estimateDays} day estimate
