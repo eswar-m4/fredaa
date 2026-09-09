@@ -1,4 +1,5 @@
-import { defineConfig } from "@tanstack/react-start/config";
+import { defineConfig } from "vite";
+import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import tailwindcss from "@tailwindcss/vite";
 import tsConfigPaths from "vite-tsconfig-paths";
 import type { Plugin } from "vite";
@@ -19,12 +20,13 @@ function devCrashGuardPlugin(): Plugin {
 }
 
 export default defineConfig({
-  vite: {
-    server: { port: 5434, strictPort: true },
-    plugins: [tailwindcss(), tsConfigPaths(), devCrashGuardPlugin()],
-  },
-  server: {
-    entry: "server",
-    preset: "node-server",
-  },
+  server: { port: 5434, strictPort: true },
+  plugins: [
+    tanstackStart({
+      start: { entry: "server" },
+    }),
+    tailwindcss(),
+    tsConfigPaths(),
+    devCrashGuardPlugin(),
+  ],
 });
