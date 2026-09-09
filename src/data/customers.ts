@@ -263,8 +263,8 @@ const SPECS: Spec[] = [
       // additional source agents (real URLs, not yet row-level extracted).
       { name: "Canada Environmental & Regulatory Registries", source: "provincial environment ministries (ON/AB/BC/NU)", url: "https://ws.lioservices.lrc.gov.on.ca/arcgis1071a/rest/services/Access_Environment/Access_Environment_Map/MapServer/0/query", records: 761, freq: "Weekly" },
       { name: "US Environmental & Regulatory Registries", source: "state environmental agencies (AZ/TX/SC/CT/IN)", url: "https://legacy.azdeq.gov/databases/lustsearch_drupal.html", records: 9606, freq: "Weekly" },
-      { name: "ESG Compliance Monitoring", source: "ESG disclosures & sustainability filings", url: "https://eris.example.com/esg", records: 24800, freq: "Monthly" },
-      { name: "Regulatory News Monitoring", source: "environmental enforcement bulletins & agency news", url: "https://eris.example.com/news", records: 41300, freq: "Daily" },
+      { name: "ESG Compliance Monitoring", source: "real public company sustainability pages", url: "https://www.microsoft.com/en-us/corporate-responsibility/sustainability", records: 10, freq: "Monthly" },
+      { name: "Regulatory Incident & Spill Tracking", source: "Connecticut DEEP HazConnect spill/incident registry", url: "https://connecticut.hazconnect.com/listincidentpublic.aspx", records: 15753, freq: "Weekly" },
     ],
   },
 ];
@@ -313,9 +313,9 @@ function buildProject(spec: Spec, p: Spec["projects"][number], idx: number): Pro
     sources: xlsxOverride?.sources ?? buildSources(id, p, records),
     records,
     admv: { added, deleted, modified, verified },
-    freshness: Math.max(62, Math.round(100 - (lastRefreshHrs / gap) * 34)),
+    freshness: xlsxOverride?.freshness ?? Math.max(62, Math.min(99, Math.round(100 - (lastRefreshHrs / gap) * 34))),
     accuracy: Number(rnd(`${id}-acc`, 92.4, 99.3).toFixed(1)),
-    coverage: Number(rnd(`${id}-cov`, 86.5, 99.5).toFixed(1)),
+    coverage: xlsxOverride?.coverage ?? Number(rnd(`${id}-cov`, 86.5, 99.5).toFixed(1)),
     frequency: p.freq,
     lastRefreshHrs,
     nextRefreshHrs: Number((gap - lastRefreshHrs).toFixed(1)),
@@ -462,15 +462,35 @@ function detectPattern(columns: string[]): SchemaPattern {
   return "plain";
 }
 
-function guessEntityColumn(columns: string[]): string {
+/** Picks how to label each row's "entity" for the review table. Most
+ *  datasets have a real name/title column (a hotel, a company, a facility)
+ *  — those are matched directly. Case/incident-style registries (no single
+ *  entity name at all, e.g. ERIS's spill reports) instead synthesize a
+ *  readable label from a "type" column + a location column ("Petroleum
+ *  Incident — Darien") rather than falling back to a raw address, an
+ *  internal ID, or a bare document URL — none of which read as an identity. */
+function entityLabelPlan(columns: string[]): { kind: "column"; column: string } | { kind: "type-location"; typeCol: string; locationCol: string | null } {
   for (const candidate of ENTITY_COLUMN_CANDIDATES) {
-    if (columns.includes(candidate)) return candidate;
+    if (columns.includes(candidate)) return { kind: "column", column: candidate };
+  }
+  const typeCol = columns.find((c) => /type/i.test(c) && !/sub[_ ]?type/i.test(c));
+  if (typeCol) {
+    const locationCol = columns.find((c) => /city|town|municipal/i.test(c)) ?? null;
+    return { kind: "type-location", typeCol, locationCol };
   }
   const nonId = columns.filter((c) => {
     const l = c.toLowerCase();
-    return !l.includes("id") && !l.includes("key") && !l.includes("code") && !l.includes("nbr");
+    return !l.includes("id") && !l.includes("key") && !l.includes("code") && !l.includes("nbr") && l !== "url";
   });
-  return nonId[0] ?? columns[0] ?? "Entity";
+  return { kind: "column", column: nonId[0] ?? columns[0] ?? "Entity" };
+}
+
+function buildEntityLabel(row: Record<string, string>, plan: ReturnType<typeof entityLabelPlan>, rowIdx: number): string {
+  if (plan.kind === "column") return row[plan.column] || `Record ${rowIdx + 1}`;
+  const type = row[plan.typeCol];
+  if (!type) return `Record ${rowIdx + 1}`;
+  const location = plan.locationCol ? row[plan.locationCol] : "";
+  return location ? `${type} — ${location}` : type;
 }
 
 function dispToChangeType(d: string): ChangeType {
@@ -574,11 +594,12 @@ export function xlsxRowsToReviewRecords(project: Project): ReviewRecord[] {
 
   } else {
     // Plain: no disposition columns — NTM Hotel Matching, IBG, etc.
-    const entityCol = guessEntityColumn(columns);
-    const dataCols = columns.filter((c) => c !== entityCol);
+    const plan = entityLabelPlan(columns);
+    const usedCols = plan.kind === "column" ? [plan.column] : [plan.typeCol, plan.locationCol].filter((c): c is string => !!c);
+    const dataCols = columns.filter((c) => !usedCols.includes(c));
 
     sampleRows.forEach((row, rowIdx) => {
-      const entity = row[entityCol] || `Record ${rowIdx + 1}`;
+      const entity = buildEntityLabel(row, plan, rowIdx);
       for (const col of dataCols) {
         const val = row[col];
         if (!val) continue; // skip empty columns

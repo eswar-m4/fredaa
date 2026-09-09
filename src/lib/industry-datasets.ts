@@ -24,6 +24,10 @@ const FITS: Record<string, IndustryFit> = {
     ids: ["ds-registry", "ds-firmographic", "ds-financial", "ds-news", "ds-location"],
     why: "Entity identity, registry standing, beneficial-owner context and adverse-media signals for screening workflows.",
   },
+  "Environmental Risk & Regulatory Data": {
+    ids: ["ds-esg-compliance", "ds-regulatory-incident-tracking", "ds-registry", "ds-location"],
+    why: "ESG disclosure tracking and regulatory-agency news monitoring alongside the government registry sources already wired for your projects.",
+  },
 };
 
 const DEFAULT_FIT: IndustryFit = {

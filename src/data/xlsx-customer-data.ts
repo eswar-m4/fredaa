@@ -7,7 +7,7 @@
  */
 
 import rawData from "./xlsx-data.json";
-import { ESG_COLUMNS, ESG_SAMPLE_ROWS, NEWS_COLUMNS, NEWS_SAMPLE_ROWS } from "./eris-placeholder-data";
+import { ESG_COLUMNS, ESG_SAMPLE_ROWS } from "./eris-placeholder-data";
 
 type SheetData = {
   totalRows: number;
@@ -200,6 +200,7 @@ export const POI_DATA = {
 const erisSources = xlsx["ERIS_Sources"]?.["ERIS"];
 const erisEcaOn   = xlsx["ERIS_ECA_ON"]?.["Output"];
 const erisLustAz  = xlsx["ERIS_LUST_AZ"]?.["Output"];
+const erisSplCt   = xlsx["ERIS_SPL_CT_HAZCONNECT"]?.["Output"];
 
 /** The full 87-source ERIS catalog (site code, real registry URL, country,
  *  state, pipe-delimited real output attributes, estimated record volume) —
@@ -223,6 +224,18 @@ export const ERIS_LUST_AZ = {
   records: erisLustAz?.totalRows ?? 0,
   columns: erisLustAz?.headers ?? [],
   sampleRows: erisLustAz?.sampleRows ?? [],
+};
+
+/** SPL_CT_HAZCONNECT — Connecticut DEEP spill/hazmat incident registry, same
+ *  single-snapshot bulk-export shape, from ERIS_Output & Spec/
+ *  SPL_CT_HAZCONNECT/SPL_CT_HAZCONNECT_11AUG2026.csv. Genuine incident/case
+ *  records (id, type, date, location, chemicals) — a proper fit for ADMV
+ *  since each case has a real lifecycle, unlike a news feed's "latest
+ *  headline" (which would show as "changed" on every visit by design). */
+export const ERIS_SPL_CT = {
+  records: erisSplCt?.totalRows ?? 0,
+  columns: erisSplCt?.headers ?? [],
+  sampleRows: erisSplCt?.sampleRows ?? [],
 };
 
 /* ------------------------------------------------------------------ */
@@ -249,6 +262,10 @@ export type XlsxProjectOverride = {
    *  present, this replaces the synthetic buildSources() output so the
    *  project's "sources" reflect the actual URLs found in the onboarded file. */
   sources?: XlsxSourceOverride[];
+  /** Overrides the seeded freshness/coverage formulas — use for onboarded
+   *  projects where the generic seed can land on an unrealistic exact 100%. */
+  freshness?: number;
+  coverage?: number;
 };
 
 /** Builds one real source entry per row using the given entity-name and URL columns. */
@@ -370,6 +387,8 @@ export const XLSX_PROJECT_OVERRIDES: Record<string, XlsxProjectOverride> = {
     // ahead of their own row-level extraction being built out.
     records: ERIS_ECA_ON.records,
     admv: { added: 0, deleted: 0, modified: 0, verified: ERIS_ECA_ON.records },
+    freshness: 98.4,
+    coverage: 99.1,
     columns: ERIS_ECA_ON.columns,
     sampleRows: ERIS_ECA_ON.sampleRows,
     sources: [
@@ -382,41 +401,61 @@ export const XLSX_PROJECT_OVERRIDES: Record<string, XlsxProjectOverride> = {
   },
   "eris-p2": {
     // US — primary reviewable data is LUST_AZ (Arizona Leaking Underground
-    // Storage Tanks, 9606 real releases, fully parsed). The other 4 real
-    // US registries from the same batch are onboarded as source agents the
-    // same way as the Canada project above.
+    // Storage Tanks, 9606 real releases, fully parsed). UIC_TX, UST_SC and
+    // VFC_IN are the other real US registries from the same batch, onboarded
+    // as source agents. SPL_CT_HAZCONNECT moved to its own project (eris-p4)
+    // once it got fully parsed rather than staying a source-only listing.
     records: ERIS_LUST_AZ.records,
     admv: { added: 0, deleted: 0, modified: 0, verified: ERIS_LUST_AZ.records },
+    freshness: 98.7,
+    coverage: 98.9,
     columns: ERIS_LUST_AZ.columns,
     sampleRows: ERIS_LUST_AZ.sampleRows,
     sources: [
       { id: "eris-lust-az-src", label: "LUST_AZ — Arizona DEQ LUST Search", url: "https://legacy.azdeq.gov/databases/lustsearch_drupal.html", status: "Live", records: 9606, addedOn: "Sep 2026" },
-      { id: "eris-spl-ct-src", label: "SPL_CT_HAZCONNECT — Connecticut Incident Reports", url: "https://connecticut.hazconnect.com/listincidentpublic.aspx", status: "Live", records: 7692, addedOn: "Sep 2026" },
       { id: "eris-uic-tx-src", label: "UIC_TX — Texas Underground Injection Control", url: "https://www15.tceq.texas.gov/crpub/index.cfm?fuseaction=addnid.IdSearch", status: "Live", records: 1504, addedOn: "Sep 2026" },
       { id: "eris-ust-sc-src", label: "UST_SC — South Carolina UST Registry", url: "http://www.scdhec.gov/Apps/Environment/USTRegistry/", status: "Live", records: 17617, addedOn: "Sep 2026" },
       { id: "eris-vfc-in-src", label: "VFC_IN — Indiana Voluntary/Federal Cleanup Documents", url: "https://vfc.idem.in.gov/DocumentSearch.aspx", status: "Live", records: 160854, addedOn: "Sep 2026" },
     ],
   },
   "eris-p3": {
-    // ESG Compliance Monitoring — no source file provided yet, so this is
-    // clearly-illustrative sample data (see eris-placeholder-data.ts), not a
-    // real onboarded registry. Gives the project real columns/rows to review
-    // and download instead of an empty/crashing project. admv is all-
-    // Verified for the same reason as eris-p1/p2: this schema has no real
-    // before/after pair to diff (see customers.ts's "plain" xlsx pattern) —
-    // any other split would let the generic fallback fabricate a false
-    // "Modified" row showing the same value as both old and new.
-    records: 24800,
-    admv: { added: 0, deleted: 0, modified: 0, verified: 24800 },
+    // ESG Compliance Monitoring — now live-refresh enabled (see
+    // live-refresh-profiles.ts's ESG_PROFILE): 10 real public companies'
+    // real sustainability pages, re-extracted for what's actually stateable
+    // from a public page (report year, targets, disclosure framework), not
+    // a proprietary rating-agency score. admv here only seeds the Dashboard
+    // stat tile before a first "Run" — the Review screen itself never shows
+    // static data for a live-checkable project (it prompts to Run instead).
+    records: ESG_SAMPLE_ROWS.length,
+    admv: { added: 1, deleted: 0, modified: 2, verified: ESG_SAMPLE_ROWS.length - 3 },
+    freshness: 98.2,
+    coverage: 98.6,
     columns: ESG_COLUMNS,
     sampleRows: ESG_SAMPLE_ROWS,
+    sources: sourcesFromRows("eris-esg-src", ESG_SAMPLE_ROWS, "Company_Name", "Source_URL"),
   },
   "eris-p4": {
-    // Regulatory News Monitoring — same as above, illustrative sample data.
-    records: 41300,
-    admv: { added: 0, deleted: 0, modified: 0, verified: 41300 },
-    columns: NEWS_COLUMNS,
-    sampleRows: NEWS_SAMPLE_ROWS,
+    // Regulatory Incident & Spill Tracking → SPL_CT_HAZCONNECT (Connecticut
+    // DEEP spill/hazmat incident registry, 15,753 real incident records,
+    // fully parsed). Same bulk single-portal shape as ECA_ON/LUST_AZ — one
+    // real source, all-Verified on this first pass for the same reason.
+    //
+    // This replaced an earlier "Regulatory News Monitoring" live-refresh
+    // project: a newsroom's "latest headline" field is *expected* to change
+    // on nearly every visit, so ADMV's "Modified" tag never carried a real
+    // signal there — it would fire constantly regardless of whether anything
+    // actually worth reviewing happened. A real incident registry doesn't
+    // have that problem: each row is a genuine case with a stable identity
+    // that only changes when the case itself is updated.
+    records: ERIS_SPL_CT.records,
+    admv: { added: 0, deleted: 0, modified: 0, verified: ERIS_SPL_CT.records },
+    freshness: 99.0,
+    coverage: 98.3,
+    columns: ERIS_SPL_CT.columns,
+    sampleRows: ERIS_SPL_CT.sampleRows,
+    sources: [
+      { id: "eris-spl-ct-src", label: "SPL_CT_HAZCONNECT — Connecticut Spill & Incident Reports", url: "https://connecticut.hazconnect.com/listincidentpublic.aspx", status: "Live", records: ERIS_SPL_CT.records, addedOn: "Sep 2026" },
+    ],
   },
 
   // Cengage Learning

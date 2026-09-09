@@ -11,11 +11,13 @@ import {
   Clock,
   Database,
   FileSpreadsheet,
+  Gavel,
   GraduationCap,
   Globe,
   Hotel,
   Landmark,
   Layers,
+  Leaf,
   Newspaper,
   Plane,
   Plus,
@@ -62,6 +64,7 @@ export const Route = createFileRoute("/playbooks/solutions")({
 const ICONS: Record<string, typeof Boxes> = {
   Building2, Users, GraduationCap, ShoppingCart, Store, Car, Landmark, Plane, Hotel,
   Stethoscope, Scale, ShieldCheck, Newspaper, Globe, Layers, Boxes, UtensilsCrossed,
+  Leaf, Gavel,
 };
 
 type SetupItem = {

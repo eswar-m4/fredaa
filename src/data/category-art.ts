@@ -66,6 +66,20 @@ export const CATEGORY_ART: Record<string, CategoryArt> = {
     chip: "bg-violet-50 text-violet-700",
     blurb: "Shelf prices against the field",
   },
+  Environmental: {
+    icon: "Leaf",
+    gradient: "from-emerald-500 via-green-600 to-teal-700",
+    accent: "text-emerald-700",
+    chip: "bg-emerald-50 text-emerald-700",
+    blurb: "Emissions, disclosures and sustainability targets",
+  },
+  Regulatory: {
+    icon: "Gavel",
+    gradient: "from-slate-600 via-blue-800 to-slate-900",
+    accent: "text-blue-800",
+    chip: "bg-blue-50 text-blue-800",
+    blurb: "Registries, notices and enforcement actions",
+  },
   Company: {
     icon: "Building2",
     gradient: "from-blue-600 via-indigo-600 to-slate-800",

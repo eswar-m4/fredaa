@@ -5,6 +5,7 @@
 // here, one small profile per onboarded project.
 import attributeDictionary from "@/data/ntm-attribute-dictionary.json" with { type: "json" };
 import { NTM_MONITORING, NTM_MAINTENANCE, POI_DATA } from "@/data/xlsx-customer-data";
+import { ESG_COLUMNS, ESG_SAMPLE_ROWS } from "@/data/eris-placeholder-data";
 import type { FieldMeta, PromptConfig } from "@/lib/api/monitoring-refresh.core";
 
 export type LiveRefreshOutputFormat =
@@ -143,10 +144,59 @@ const POI_PROFILE: LiveRefreshProfile = {
   outputSheetName: "POI Output",
 };
 
+/* ------------------------------------------------------------------ */
+/* ERIS — ESG Compliance Monitoring: real public company sustainability    */
+/* pages, re-extracted for what's actually stateable from a public page   */
+/* (report year, targets, disclosure framework) — not a proprietary rating */
+/* agency score, which no public page states.                              */
+/* ------------------------------------------------------------------ */
+
+const ESG_META_COLUMNS = new Set(["Company_ID", "Source_URL"]);
+
+const ESG_FIELD_META: Record<string, FieldMeta> = {
+  Company_Name: { group: "Identity", label: "Company Name" },
+  Sector: { group: "Identity", label: "Sector / Industry" },
+  Sustainability_Report_Year: { group: "Disclosure", label: "Most Recent Sustainability Report Year" },
+  Disclosure_Framework: { group: "Disclosure", label: "Disclosure Framework Referenced (GRI / SASB / TCFD / CDP)" },
+  Net_Zero_Target_Year: { group: "Climate", label: "Stated Net-Zero / Carbon-Neutral Target Year" },
+  Renewable_Energy_Commitment: { group: "Climate", label: "Renewable Energy Commitment or Current Usage" },
+  Emissions_Disclosure: { group: "Climate", label: "Scope 1/2 Emissions Disclosure Summary" },
+  Board_Diversity_Statement: { group: "Governance", label: "Board / Workforce Diversity Statement" },
+  Key_Certifications: { group: "Governance", label: "Named Certifications (e.g. B Corp, ISO 14001)" },
+  ESG_Highlight_Summary: { group: "Summary", label: "One-Line Summary of the Page's Main Sustainability Message" },
+};
+
+const ESG_PROFILE: LiveRefreshProfile = {
+  projectId: "eris-p3",
+  idField: "Company_ID",
+  nameField: "Company_Name",
+  urlField: "Source_URL",
+  extractableFields: ESG_COLUMNS.filter((c) => !ESG_META_COLUMNS.has(c)),
+  currentValueRows: ESG_SAMPLE_ROWS,
+  promptConfig: {
+    entityLabel: "company",
+    fieldMeta: ESG_FIELD_META,
+    relevantLinkKeywords: [
+      "sustainability", "esg", "environment", "climate", "responsibility",
+      "impact", "report", "diversity", "carbon", "emissions",
+    ],
+  },
+  outputFormat: "flat",
+  outputSheetName: "ESG Output",
+};
+
+// eris-p4 (Regulatory Incident & Spill Tracking) deliberately has no
+// live-refresh profile — like ECA_ON/LUST_AZ, it's a bulk single-portal
+// registry snapshot (SPL_CT_HAZCONNECT), not a per-row website to revisit.
+// It previously held a "Regulatory News Monitoring" live-refresh profile,
+// but a newsroom's "latest headline" field is expected to change on nearly
+// every visit, so ADMV's "Modified" tag never carried a real signal there.
+
 export const LIVE_REFRESH_PROFILES: Record<string, LiveRefreshProfile> = {
   "ntm-p3": MAINTENANCE_PROFILE,
   "ntm-p6": MONITORING_PROFILE,
   "ntm-p7": POI_PROFILE,
+  "eris-p3": ESG_PROFILE,
 };
 
 export function getLiveRefreshProfile(projectId: string): LiveRefreshProfile | null {
