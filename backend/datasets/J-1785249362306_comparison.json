@@ -1,10 +1,10 @@
 {
   "baseline_file": "J-1785249362306_final.json",
-  "current_file": "J-1785249362306_run_2.json",
+  "current_file": "J-1785249362306_run_3.json",
   "records_compared": 30,
-  "added": 0,
+  "added": 4,
   "modified": 30,
-  "deleted": 0,
+  "deleted": 1,
   "verified": 0,
   "change_percentage": 100.0,
   "entrypoint_file": "run.py",

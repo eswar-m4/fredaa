@@ -37,11 +37,29 @@ export const Route = createFileRoute("/discover")({
 
 type AiAction = { label: string; route: string | null };
 
+/** A real, retrieved catalog item (solution or agent) — never derived from
+ *  the model's own prose, always the actual search result. */
+type CatalogMatch = {
+  type: "solution" | "agent";
+  id: string;
+  name: string;
+  category?: string | null;
+  description?: string | null;
+  coverage?: number | null;
+  refresh?: string | null;
+  sources?: string[];
+  url?: string | null;
+  route: string;
+};
+
+type NextQuestion = string | { text: string; options?: string[] };
+
 type AiResponse = {
   message: string;
   actions: AiAction[];
-  next_question: string | null;
+  next_question: NextQuestion | null;
   phase: string;
+  matches: CatalogMatch[];
 };
 
 type ChatMessage =
@@ -50,8 +68,8 @@ type ChatMessage =
 
 type Turn =
   | { kind: "user"; text: string }
-  | { kind: "freda"; text: string; actions: AiAction[]; note?: string }
-  | { kind: "question"; text: string };
+  | { kind: "freda"; text: string; actions: AiAction[]; matches?: CatalogMatch[]; note?: string }
+  | { kind: "question"; text: string; options?: string[] };
 
 const INITIAL_TURN: Turn = {
   kind: "freda",
@@ -97,9 +115,24 @@ function buildIntentContext(userMessage: string): string {
 // API call
 // ---------------------------------------------------------------------------
 
+// In local dev the frontend (port 5433) and backend (port 8000) are separate
+// servers with no proxy between them — a bare relative fetch("/api/...")
+// resolves against the frontend's own origin and 404s. Same pattern already
+// used by dashboard.tsx / monitoring.tsx / review.tsx for this reason.
+function getBaseApiUrl(): string {
+  if (
+    typeof window !== "undefined" &&
+    (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") &&
+    window.location.port !== "8000"
+  ) {
+    return `http://${window.location.hostname}:8000`;
+  }
+  return "";
+}
+
 async function callAI(messages: ChatMessage[]): Promise<AiResponse> {
   try {
-    const res = await fetch("/api/v1/demo/ask-freda/chat", {
+    const res = await fetch(`${getBaseApiUrl()}/api/v1/demo/ask-freda/chat`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -112,13 +145,16 @@ async function callAI(messages: ChatMessage[]): Promise<AiResponse> {
       actions: Array.isArray(data.actions) ? data.actions : [],
       next_question: data.next_question ?? null,
       phase: data.phase ?? "requirements_gathering",
+      matches: Array.isArray(data.matches) ? data.matches : [],
     };
-  } catch {
+  } catch (err) {
+    console.error("Ask Freda chat request failed:", err);
     return {
       message: "I encountered an error reaching the AI service. Please try again.",
       actions: [],
       next_question: null,
       phase: "requirements_gathering",
+      matches: [],
     };
   }
 }
@@ -151,30 +187,36 @@ function FredaAi() {
   function applyAiResponse(res: AiResponse) {
     setPhase(res.phase);
 
-    // Main message bubble
+    // Main message bubble — matches are the real, retrieved catalog results,
+    // rendered as clickable cards regardless of what the message text says.
     setTurns((prev) => [
       ...prev,
-      { kind: "freda", text: res.message, actions: res.actions },
+      { kind: "freda", text: res.message, actions: res.actions, matches: res.matches },
     ]);
 
-    // If AI wants to ask a follow-up question, add it as a separate turn
-    if (res.next_question) {
-      setTurns((prev) => [...prev, { kind: "question", text: res.next_question! }]);
+    // If AI wants to ask a follow-up question, add it as a separate turn.
+    // next_question can be a plain string or { text, options } for a
+    // choice-based question — normalize both into the question turn shape.
+    const questionText =
+      typeof res.next_question === "string" ? res.next_question : res.next_question?.text;
+    const questionOptions =
+      typeof res.next_question === "object" && res.next_question ? res.next_question.options : undefined;
+
+    if (questionText) {
+      setTurns((prev) => [...prev, { kind: "question", text: questionText, options: questionOptions }]);
     }
 
     // Mirror into AI history as assistant turn (combine message + question so
     // the model has full context on what it said)
-    const assistantContent = res.next_question
-      ? `${res.message}\n\n${res.next_question}`
-      : res.message;
+    const assistantContent = questionText ? `${res.message}\n\n${questionText}` : res.message;
     setHistory((prev) => [...prev, { role: "assistant", content: assistantContent }]);
   }
 
   // ------------------------------------------------------------------
   // Send a user message (first turn or follow-up)
   // ------------------------------------------------------------------
-  async function send() {
-    const text = draft.trim();
+  async function send(overrideText?: string) {
+    const text = (overrideText ?? draft).trim();
     if (!text || loading || submitted) return;
     setDraft("");
     setLoading(true);
@@ -218,7 +260,7 @@ function FredaAi() {
       .join("\n\n");
 
     try {
-      await fetch("/api/v1/demo/solution-request", {
+      await fetch(`${getBaseApiUrl()}/api/v1/demo/solution-request`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -327,13 +369,31 @@ function FredaAi() {
               }
 
               if (turn.kind === "question") {
+                const isLatest = i === turns.length - 1;
                 return (
                   <div key={i} className="flex gap-2.5">
                     <span className="h-7 w-7 shrink-0 rounded-md bg-secondary inline-flex items-center justify-center">
                       <Bot className="h-3.5 w-3.5 text-muted-foreground" />
                     </span>
-                    <div className="rounded-lg bg-secondary border border-primary/20 px-3.5 py-2.5 text-[13px] leading-relaxed max-w-[80%] text-foreground font-medium">
-                      {turn.text}
+                    <div className="max-w-[80%] space-y-2">
+                      <div className="rounded-lg bg-secondary border border-primary/20 px-3.5 py-2.5 text-[13px] leading-relaxed text-foreground font-medium">
+                        {turn.text}
+                      </div>
+                      {/* Choice options — click to answer instantly, or type a free-text reply instead */}
+                      {turn.options && turn.options.length > 0 && (
+                        <div className="flex flex-wrap gap-2">
+                          {turn.options.map((opt, oi) => (
+                            <button
+                              key={oi}
+                              disabled={!isLatest || loading || submitted}
+                              onClick={() => send(opt)}
+                              className="inline-flex items-center gap-1.5 rounded-full border border-primary/40 bg-card hover:bg-primary/10 disabled:opacity-50 disabled:cursor-default text-primary px-3 py-1.5 text-[12px] font-medium transition-colors"
+                            >
+                              {opt}
+                            </button>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
                 );
@@ -352,6 +412,49 @@ function FredaAi() {
                         <div className="text-[11.5px] text-muted-foreground mt-1.5">{turn.note}</div>
                       )}
                     </div>
+
+                    {/* Real catalog matches — retrieved data, not the model's prose.
+                        Each card is genuinely clickable and opens that exact
+                        solution/agent on its real screen. */}
+                    {turn.matches && turn.matches.length > 0 && (
+                      <div className="grid gap-2 sm:grid-cols-2">
+                        {turn.matches.map((m, mi) => (
+                          <Card key={mi} className="p-3 border-border">
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="min-w-0">
+                                <div className="flex items-center gap-1.5">
+                                  <Badge tone={m.type === "solution" ? "purple" : "info"} className="text-[10px]">
+                                    {m.type === "solution" ? "Solution" : "Agent"}
+                                  </Badge>
+                                  {m.category && (
+                                    <span className="text-[10.5px] text-muted-foreground truncate">{m.category}</span>
+                                  )}
+                                </div>
+                                <div className="text-[12.5px] font-semibold mt-1 truncate">{m.name}</div>
+                                {m.description && (
+                                  <div className="text-[11px] text-muted-foreground mt-0.5 line-clamp-2">
+                                    {m.description}
+                                  </div>
+                                )}
+                                <div className="flex flex-wrap gap-x-2.5 gap-y-0.5 mt-1 text-[10.5px] text-muted-foreground">
+                                  {typeof m.coverage === "number" && <span>{m.coverage}% coverage</span>}
+                                  {m.refresh && <span>{m.refresh} refresh</span>}
+                                  {m.sources && m.sources.length > 0 && (
+                                    <span className="truncate">Sources: {m.sources.slice(0, 2).join(", ")}</span>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                            <button
+                              onClick={() => navigate({ to: m.route })}
+                              className="mt-2 inline-flex items-center gap-1 text-[11.5px] font-medium text-primary hover:underline"
+                            >
+                              Open <ArrowRight className="h-3 w-3" />
+                            </button>
+                          </Card>
+                        ))}
+                      </div>
+                    )}
 
                     {/* Action buttons — clickable, navigate to actual platform routes */}
                     {turn.actions && turn.actions.length > 0 && (
@@ -440,7 +543,7 @@ function FredaAi() {
                 }
                 className="flex-1 resize-none rounded-md border border-input bg-card px-3 py-2 text-[13px] outline-none focus:ring-2 focus:ring-ring/40 placeholder:text-muted-foreground disabled:opacity-50"
               />
-              <Button disabled={!draft.trim() || loading || submitted} onClick={send}>
+              <Button disabled={!draft.trim() || loading || submitted} onClick={() => send()}>
                 <Send className="h-4 w-4" /> Send
               </Button>
             </div>

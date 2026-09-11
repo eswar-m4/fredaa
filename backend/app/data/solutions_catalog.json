@@ -1,0 +1,1511 @@
+{
+  "solutions": [
+    {
+      "id": "ds-firmographic",
+      "name": "Firmographic Data",
+      "category": "Company",
+      "tagline": "Full company profile — 30+ attributes",
+      "description": "Canonical B2B company record covering identity, industry, size, leadership, finance highlights, web presence, technographics and registry IDs.",
+      "refreshDefault": "Monthly",
+      "coverage": 92,
+      "accuracy": 96,
+      "countriesCovered": 64,
+      "rowsAvailable": "120M+ companies",
+      "sources": [
+        {
+          "name": "Company Website (target)",
+          "kind": null
+        },
+        {
+          "name": "LinkedIn Company Page",
+          "kind": null
+        },
+        {
+          "name": "Crunchbase",
+          "kind": null
+        },
+        {
+          "name": "SEC EDGAR",
+          "kind": null
+        },
+        {
+          "name": "Companies House",
+          "kind": null
+        },
+        {
+          "name": "MCA (Ministry of Corporate Affairs)",
+          "kind": null
+        },
+        {
+          "name": "BSE (Bombay Stock Exchange)",
+          "kind": null
+        },
+        {
+          "name": "NSE (National Stock Exchange)",
+          "kind": null
+        },
+        {
+          "name": "ASIC (Australia)",
+          "kind": null
+        },
+        {
+          "name": "ACRA (Singapore)",
+          "kind": null
+        },
+        {
+          "name": "SGX (Singapore Exchange)",
+          "kind": null
+        },
+        {
+          "name": "Bundesanzeiger",
+          "kind": null
+        },
+        {
+          "name": "INFOGREFFE",
+          "kind": null
+        },
+        {
+          "name": "Camera di Commercio",
+          "kind": null
+        },
+        {
+          "name": "Registro Mercantil",
+          "kind": null
+        },
+        {
+          "name": "Corporations Canada",
+          "kind": null
+        },
+        {
+          "name": "JCN (Japan)",
+          "kind": null
+        },
+        {
+          "name": "NTSC (China)",
+          "kind": null
+        },
+        {
+          "name": "Junta Comercial (Brazil)",
+          "kind": null
+        },
+        {
+          "name": "GLEIF (LEI registry)",
+          "kind": null
+        },
+        {
+          "name": "BuiltWith",
+          "kind": null
+        }
+      ],
+      "outputFieldLabels": [
+        "Legal Name",
+        "DBA / Trading Name",
+        "Description",
+        "Tagline",
+        "Logo URL",
+        "Year Founded",
+        "Company Type (Public/Private)",
+        "Ownership Status",
+        "Industry",
+        "Sub-industry",
+        "SIC Code",
+        "NAICS Code",
+        "Business Tags",
+        "Employee Count",
+        "Employee Range",
+        "Headcount Growth YoY",
+        "Annual Revenue (USD)",
+        "Revenue Range",
+        "EBITDA (USD)",
+        "Total Funding Raised",
+        "Latest Round",
+        "Latest Round Amount",
+        "Last Valuation",
+        "Investors",
+        "CEO Name",
+        "CEO Email",
+        "CEO LinkedIn",
+        "CFO Name",
+        "CTO Name",
+        "Executive Team",
+        "Board Members",
+        "HQ Address",
+        "HQ City",
+        "HQ State / Region",
+        "HQ Country",
+        "Office Locations",
+        "Website",
+        "LinkedIn URL",
+        "X / Twitter URL",
+        "Facebook URL",
+        "Phone",
+        "General Email",
+        "Technology Stack",
+        "CMS",
+        "Hosting Provider",
+        "Registry Number",
+        "LEI",
+        "VAT Number",
+        "Tax ID / EIN"
+      ],
+      "outputFieldCount": 49
+    },
+    {
+      "id": "ds-financial",
+      "name": "Financial Statements (Annual Reports)",
+      "category": "Financial",
+      "tagline": "100+ KPIs from 10-K / 10-Q / annual reports",
+      "description": "Deeply structured financials extracted from annual reports, 10-K/10-Q and investor filings — P&L, balance sheet, cash-flow, ratios and segment reporting per fiscal period.",
+      "refreshDefault": "Quarterly",
+      "coverage": 95,
+      "accuracy": 94,
+      "countriesCovered": 42,
+      "rowsAvailable": "8.4M filings",
+      "sources": [
+        {
+          "name": "SEC EDGAR",
+          "kind": null
+        },
+        {
+          "name": "Companies House Filings",
+          "kind": null
+        },
+        {
+          "name": "MCA Filings (India)",
+          "kind": null
+        },
+        {
+          "name": "BSE Corporate Filings",
+          "kind": null
+        },
+        {
+          "name": "NSE Corporate Filings",
+          "kind": null
+        },
+        {
+          "name": "SEDAR+ (Canada)",
+          "kind": null
+        },
+        {
+          "name": "ASX Announcements",
+          "kind": null
+        },
+        {
+          "name": "EUR-Lex / ESMA",
+          "kind": null
+        },
+        {
+          "name": "JPX / EDINET (Japan)",
+          "kind": null
+        },
+        {
+          "name": "HKEX (Hong Kong)",
+          "kind": null
+        },
+        {
+          "name": "Investor Relations Pages (target company IR)",
+          "kind": null
+        },
+        {
+          "name": "Annual Report PDFs (uploaded / fetched)",
+          "kind": null
+        }
+      ],
+      "outputFieldLabels": [
+        "Ticker",
+        "Filing Type",
+        "Fiscal Year",
+        "Fiscal Period",
+        "Filing Date",
+        "Auditor",
+        "Reporting Currency",
+        "Total Revenue",
+        "Cost of Revenue",
+        "Gross Profit",
+        "R&D Expense",
+        "SG&A Expense",
+        "Total Operating Expenses",
+        "Operating Income",
+        "EBITDA",
+        "EBIT",
+        "Interest Expense",
+        "Pre-tax Income",
+        "Income Tax Expense",
+        "Net Income",
+        "EPS (Basic)",
+        "EPS (Diluted)",
+        "Shares Outstanding",
+        "Cash & Equivalents",
+        "Short-term Investments",
+        "Accounts Receivable",
+        "Inventory",
+        "Total Current Assets",
+        "Property, Plant & Equipment",
+        "Goodwill",
+        "Intangible Assets",
+        "Total Assets",
+        "Accounts Payable",
+        "Short-term Debt",
+        "Long-term Debt",
+        "Total Debt",
+        "Total Current Liabilities",
+        "Total Liabilities",
+        "Retained Earnings",
+        "Total Shareholder Equity",
+        "Operating Cash Flow",
+        "Capital Expenditure",
+        "Free Cash Flow",
+        "Investing Cash Flow",
+        "Financing Cash Flow",
+        "Dividends Paid",
+        "Share Buybacks",
+        "Net Change in Cash",
+        "Gross Margin %",
+        "Operating Margin %",
+        "Net Margin %",
+        "Return on Assets",
+        "Return on Equity",
+        "Current Ratio",
+        "Quick Ratio",
+        "Debt-to-Equity",
+        "Interest Coverage",
+        "Revenue Growth YoY",
+        "Net Income Growth YoY",
+        "Revenue by Segment",
+        "Revenue by Geography",
+        "Revenue by Product",
+        "Employees (Reported)",
+        "Market Cap at Filing",
+        "Dividend per Share",
+        "Book Value per Share"
+      ],
+      "outputFieldCount": 66
+    },
+    {
+      "id": "ds-contacts",
+      "name": "People & Contacts",
+      "category": "People",
+      "tagline": "Decision-maker contact records — 20+ fields",
+      "description": "Verified contact records: full name, title, email, phone, LinkedIn, work history, location and seniority signals.",
+      "refreshDefault": "Monthly",
+      "coverage": 88,
+      "accuracy": 93,
+      "countriesCovered": 180,
+      "rowsAvailable": "780M+ profiles",
+      "sources": [
+        {
+          "name": "LinkedIn",
+          "kind": null
+        },
+        {
+          "name": "Company Website (Team pages)",
+          "kind": null
+        },
+        {
+          "name": "Hunter.io patterns",
+          "kind": null
+        },
+        {
+          "name": "Apollo-style enrichers",
+          "kind": null
+        }
+      ],
+      "outputFieldLabels": [
+        "Full Name",
+        "First Name",
+        "Last Name",
+        "Job Title",
+        "Seniority",
+        "Department",
+        "Function",
+        "Management Level",
+        "Email",
+        "Email Status (Verified/Pattern)",
+        "Direct Phone",
+        "Mobile",
+        "LinkedIn URL",
+        "X / Twitter URL",
+        "Company Name",
+        "Company Domain",
+        "Company Industry",
+        "Company Size",
+        "City",
+        "State / Region",
+        "Country",
+        "Years in Role",
+        "Years at Company",
+        "Previous Companies",
+        "Education",
+        "Skills"
+      ],
+      "outputFieldCount": 26
+    },
+    {
+      "id": "ds-us-public-school-district-workforce",
+      "name": "US Public School District Workforce",
+      "category": "Education",
+      "tagline": "K-12 district staff, contacts, and salary schedules",
+      "description": "US public K-12 district workforce records covering district identity, school assignments, staff profiles, contacts, and published compensation data when available.",
+      "refreshDefault": "Quarterly",
+      "coverage": 84,
+      "accuracy": 89,
+      "countriesCovered": 1,
+      "rowsAvailable": "~4–6.5M staff records",
+      "sources": [
+        {
+          "name": "State DOE / Transparency Portals",
+          "kind": null
+        },
+        {
+          "name": "District School Websites",
+          "kind": null
+        },
+        {
+          "name": "NCES Common Core of Data",
+          "kind": null
+        },
+        {
+          "name": "State Licensure Databases",
+          "kind": null
+        },
+        {
+          "name": "OpenGovPay / GovSalaries / Transparent California",
+          "kind": null
+        }
+      ],
+      "outputFieldLabels": [
+        "District Name",
+        "District NCES ID",
+        "State",
+        "County",
+        "District Website",
+        "School Name",
+        "School NCES ID",
+        "School Type",
+        "Grade Range",
+        "School Address",
+        "School Website",
+        "Full Name",
+        "First Name",
+        "Last Name",
+        "Staff Title",
+        "Role Category",
+        "Department",
+        "Subject Taught",
+        "Grade Level Taught",
+        "Qualification / Degree",
+        "Certifications / License IDs",
+        "Years Experience",
+        "Years in District",
+        "Tenure Status",
+        "Employment Type",
+        "Email",
+        "Phone",
+        "Phone Extension",
+        "Office Location",
+        "Salary Schedule URL",
+        "Salary Schedule Year",
+        "Pay Scale Type",
+        "Step",
+        "Lane",
+        "Base Salary Annual",
+        "Salary Currency",
+        "Salary Min Scale",
+        "Salary Max Scale",
+        "Stipends / Addenda",
+        "Contract Days",
+        "FTE",
+        "Reported Salary",
+        "Reported Salary Source",
+        "Reported Salary Year",
+        "Salary Last Updated",
+        "Salary Source Confidence",
+        "Source URL",
+        "Source Type",
+        "Extracted At",
+        "Confidence Score",
+        "ADMV Status",
+        "Record Hash"
+      ],
+      "outputFieldCount": 52
+    },
+    {
+      "id": "ds-funding",
+      "name": "Funding & Investment",
+      "category": "Financial",
+      "tagline": "Rounds, investors, valuations, cap table",
+      "description": "Funding history per company: round type, amount raised, lead investor, syndicate, post-money valuation, dilution and exit signals.",
+      "refreshDefault": "Weekly",
+      "coverage": 96,
+      "accuracy": 97,
+      "countriesCovered": 90,
+      "rowsAvailable": "1.2M funding rounds",
+      "sources": [
+        {
+          "name": "Crunchbase",
+          "kind": null
+        },
+        {
+          "name": "TechCrunch",
+          "kind": null
+        },
+        {
+          "name": "PR Newswire",
+          "kind": null
+        },
+        {
+          "name": "Bloomberg",
+          "kind": null
+        },
+        {
+          "name": "PitchBook",
+          "kind": null
+        }
+      ],
+      "outputFieldLabels": [
+        "Company",
+        "Company Domain",
+        "Round Type",
+        "Round Sequence #",
+        "Amount Raised (USD)",
+        "Currency",
+        "Announce Date",
+        "Close Date",
+        "Lead Investor",
+        "Co-Investors",
+        "Number of Investors",
+        "New Investors",
+        "Existing Investors",
+        "Pre-money Valuation",
+        "Post-money Valuation",
+        "Share Price",
+        "Dilution %",
+        "Total Raised To Date",
+        "Reported Burn Rate",
+        "Runway (Months)",
+        "Use of Funds",
+        "Source URL"
+      ],
+      "outputFieldCount": 22
+    },
+    {
+      "id": "ds-registry",
+      "name": "Company Registry / Compliance",
+      "category": "Company",
+      "tagline": "Registry IDs, directors, filings, beneficial owners",
+      "description": "Authoritative registry records across Companies House (UK), MCA (India), SOS (US states), GLEIF — registration, directors, filings, UBOs.",
+      "refreshDefault": "Monthly",
+      "coverage": 99,
+      "accuracy": 99,
+      "countriesCovered": 80,
+      "rowsAvailable": "210M+ entities",
+      "sources": [
+        {
+          "name": "Companies House (UK)",
+          "kind": null
+        },
+        {
+          "name": "MCA (India)",
+          "kind": null
+        },
+        {
+          "name": "California SOS",
+          "kind": null
+        },
+        {
+          "name": "Delaware Division of Corporations",
+          "kind": null
+        },
+        {
+          "name": "New York DOS",
+          "kind": null
+        },
+        {
+          "name": "GLEIF",
+          "kind": null
+        }
+      ],
+      "outputFieldLabels": [
+        "Registry Number",
+        "LEI",
+        "VAT Number",
+        "Tax ID",
+        "DUNS Number",
+        "Legal Name",
+        "Trading Names",
+        "Status",
+        "Incorporation Date",
+        "Dissolved Date",
+        "Company Type",
+        "Jurisdiction",
+        "Registered Address",
+        "Mailing Address",
+        "Directors",
+        "Secretaries",
+        "Beneficial Owners (UBOs)",
+        "Shareholders",
+        "Share Capital",
+        "Share Classes",
+        "Filings History",
+        "Last Accounts Date",
+        "Next Accounts Due",
+        "Last Confirmation Statement",
+        "SIC Codes",
+        "NAICS Codes",
+        "Charges / Mortgages",
+        "Insolvency History"
+      ],
+      "outputFieldCount": 28
+    },
+    {
+      "id": "ds-ecommerce",
+      "name": "E-commerce Product Data",
+      "category": "Commerce",
+      "tagline": "SKUs, price, stock, reviews — 25+ fields",
+      "description": "Product catalog records from any retail or marketplace site: SKU, title, price, currency, stock, ratings, seller, reviews, imagery, variants.",
+      "refreshDefault": "Daily",
+      "coverage": 90,
+      "accuracy": 95,
+      "countriesCovered": 55,
+      "rowsAvailable": "1.6B+ SKUs",
+      "sources": [
+        {
+          "name": "Amazon",
+          "kind": null
+        },
+        {
+          "name": "Walmart",
+          "kind": null
+        },
+        {
+          "name": "Wayfair",
+          "kind": null
+        },
+        {
+          "name": "John Lewis",
+          "kind": null
+        },
+        {
+          "name": "Best Buy",
+          "kind": null
+        },
+        {
+          "name": "Target",
+          "kind": null
+        }
+      ],
+      "outputFieldLabels": [
+        "SKU",
+        "GTIN / UPC / EAN",
+        "ASIN",
+        "Manufacturer Part #",
+        "Product Title",
+        "Brand",
+        "Manufacturer",
+        "Category",
+        "Subcategory",
+        "Description",
+        "Feature Bullets",
+        "Specifications",
+        "Variants (Size/Color)",
+        "Price",
+        "List Price (MSRP)",
+        "Currency",
+        "Discount %",
+        "Promo / Coupon",
+        "In Stock",
+        "Stock Count",
+        "Fulfillment",
+        "Ships From",
+        "Rating",
+        "Review Count",
+        "Top Review Text",
+        "Seller",
+        "Seller Rating",
+        "Primary Image URL",
+        "Image Gallery URLs",
+        "Video URL",
+        "Product URL",
+        "Captured At"
+      ],
+      "outputFieldCount": 32
+    },
+    {
+      "id": "ds-competitor-pricing",
+      "name": "Competitor Price Intelligence",
+      "category": "Competitive",
+      "tagline": "Daily matched prices, promos, MAP violations",
+      "description": "SKU-matched competitor price tracking with promotion detection, MAP violation alerts and historical trends.",
+      "refreshDefault": "Daily",
+      "coverage": 86,
+      "accuracy": 93,
+      "countriesCovered": 30,
+      "rowsAvailable": "Custom per project",
+      "sources": [
+        {
+          "name": "Amazon",
+          "kind": null
+        },
+        {
+          "name": "Walmart",
+          "kind": null
+        },
+        {
+          "name": "Best Buy",
+          "kind": null
+        },
+        {
+          "name": "Google Shopping",
+          "kind": null
+        },
+        {
+          "name": "Direct competitor sites",
+          "kind": null
+        }
+      ],
+      "outputFieldLabels": [
+        "Your SKU",
+        "Competitor",
+        "Matched SKU",
+        "Match Confidence",
+        "Matched Title",
+        "Your Price",
+        "Competitor Price",
+        "Currency",
+        "Price Δ",
+        "Price Δ %",
+        "7-day Price Change",
+        "30-day Price Change",
+        "Min Price (30d)",
+        "Max Price (30d)",
+        "Promo / Discount",
+        "Promo Ends",
+        "MAP Violation",
+        "MAP Threshold",
+        "Stock Status",
+        "Seller",
+        "Captured At"
+      ],
+      "outputFieldCount": 21
+    },
+    {
+      "id": "ds-dealer-inventory",
+      "name": "Car Dealer Inventory",
+      "category": "Automotive",
+      "tagline": "VIN-level inventory across dealers & marketplaces",
+      "description": "New, used & certified vehicle inventory across dealer websites and marketplaces — VIN, year/make/model/trim, price, mileage, features, photos.",
+      "refreshDefault": "Daily",
+      "coverage": 92,
+      "accuracy": 94,
+      "countriesCovered": 18,
+      "rowsAvailable": "12M+ listings",
+      "sources": [
+        {
+          "name": "Cars.com",
+          "kind": null
+        },
+        {
+          "name": "AutoTrader",
+          "kind": null
+        },
+        {
+          "name": "CarGurus",
+          "kind": null
+        },
+        {
+          "name": "Dealer.com sites",
+          "kind": null
+        },
+        {
+          "name": "TrueCar",
+          "kind": null
+        }
+      ],
+      "outputFieldLabels": [
+        "VIN",
+        "Stock Number",
+        "Listing URL",
+        "Year",
+        "Make",
+        "Model",
+        "Trim",
+        "Body Style",
+        "Exterior Color",
+        "Interior Color",
+        "Transmission",
+        "Drivetrain",
+        "Fuel Type",
+        "Engine",
+        "MPG City",
+        "MPG Highway",
+        "Condition",
+        "Asking Price",
+        "MSRP",
+        "Price Drop",
+        "Mileage",
+        "Days on Market",
+        "Features / Options",
+        "History Report Link",
+        "Dealer Name",
+        "Dealer Phone",
+        "Dealer City",
+        "Dealer State",
+        "Zip",
+        "Photo URLs"
+      ],
+      "outputFieldCount": 30
+    },
+    {
+      "id": "ds-location",
+      "name": "Location & POI Data",
+      "category": "Location",
+      "tagline": "Business locations, hours, addresses, geo",
+      "description": "Point-of-interest data for any business: NAP, opening hours, categories, geocoded coordinates, ratings, reviews — across Google, Yelp, Bing Places.",
+      "refreshDefault": "Monthly",
+      "coverage": 94,
+      "accuracy": 96,
+      "countriesCovered": 210,
+      "rowsAvailable": "240M+ POIs worldwide",
+      "sources": [
+        {
+          "name": "Google Maps",
+          "kind": null
+        },
+        {
+          "name": "Yelp",
+          "kind": null
+        },
+        {
+          "name": "Bing Places",
+          "kind": null
+        },
+        {
+          "name": "Apple Maps",
+          "kind": null
+        },
+        {
+          "name": "TripAdvisor",
+          "kind": null
+        }
+      ],
+      "outputFieldLabels": [
+        "Business Name",
+        "Brand / Chain",
+        "Primary Category",
+        "All Categories",
+        "Street Address",
+        "Address Line 2",
+        "City",
+        "State / Region",
+        "Postal Code",
+        "Country",
+        "Latitude",
+        "Longitude",
+        "Plus Code",
+        "Phone",
+        "Website",
+        "Email",
+        "Opening Hours",
+        "Is Open Now",
+        "Price Level ($-$$$$)",
+        "Rating",
+        "Review Count",
+        "Top Review",
+        "Amenities",
+        "Photo URLs",
+        "Place ID"
+      ],
+      "outputFieldCount": 25
+    },
+    {
+      "id": "ds-real-estate",
+      "name": "Real Estate Listings",
+      "category": "Real Estate",
+      "tagline": "Active listings with price history, agent, photos",
+      "description": "Active property listings from real-estate portals — list price, beds/baths, sqft, agent, listing history, photos, lot detail.",
+      "refreshDefault": "Daily",
+      "coverage": 89,
+      "accuracy": 93,
+      "countriesCovered": 28,
+      "rowsAvailable": "85M+ listings",
+      "sources": [
+        {
+          "name": "Zillow",
+          "kind": null
+        },
+        {
+          "name": "Realtor.com",
+          "kind": null
+        },
+        {
+          "name": "Rightmove",
+          "kind": null
+        },
+        {
+          "name": "Idealista",
+          "kind": null
+        },
+        {
+          "name": "Redfin",
+          "kind": null
+        }
+      ],
+      "outputFieldLabels": [
+        "Listing ID",
+        "MLS Number",
+        "Listing URL",
+        "Address",
+        "City",
+        "State",
+        "Postal Code",
+        "Country",
+        "Latitude",
+        "Longitude",
+        "List Price",
+        "Currency",
+        "Price per Sqft",
+        "Price History",
+        "Status",
+        "Property Type",
+        "Beds",
+        "Baths",
+        "Living Area (Sqft)",
+        "Lot Size",
+        "Year Built",
+        "Stories",
+        "Parking",
+        "HOA Fee",
+        "Tax Assessed Value",
+        "Features",
+        "Description",
+        "Listing Agent",
+        "Agent Phone",
+        "Brokerage",
+        "Listed Date",
+        "Days on Market",
+        "Photo URLs"
+      ],
+      "outputFieldCount": 33
+    },
+    {
+      "id": "ds-jobs",
+      "name": "Job Postings",
+      "category": "Jobs",
+      "tagline": "Open roles with JD, salary, location, posted date",
+      "description": "Job listings from career sites, ATS portals, LinkedIn & Indeed — title, location, JD, salary band, posted date, employment type, remote policy.",
+      "refreshDefault": "Daily",
+      "coverage": 91,
+      "accuracy": 94,
+      "countriesCovered": 72,
+      "rowsAvailable": "45M+ open roles",
+      "sources": [
+        {
+          "name": "LinkedIn Jobs",
+          "kind": null
+        },
+        {
+          "name": "Indeed",
+          "kind": null
+        },
+        {
+          "name": "Greenhouse ATS",
+          "kind": null
+        },
+        {
+          "name": "Lever ATS",
+          "kind": null
+        },
+        {
+          "name": "Company Careers Pages",
+          "kind": null
+        }
+      ],
+      "outputFieldLabels": [
+        "Job ID",
+        "Title",
+        "Normalized Title",
+        "Seniority",
+        "Function",
+        "Department",
+        "Employment Type",
+        "Remote Policy",
+        "Company",
+        "Company Domain",
+        "Company Industry",
+        "Location",
+        "City",
+        "Country",
+        "Salary Min",
+        "Salary Max",
+        "Salary Currency",
+        "Salary Period",
+        "Equity Offered",
+        "Benefits",
+        "Job Description",
+        "Requirements",
+        "Skills Required",
+        "Posted At",
+        "Expires At",
+        "JD URL",
+        "ATS / Source"
+      ],
+      "outputFieldCount": 27
+    },
+    {
+      "id": "ds-news",
+      "name": "News & Intent Signals",
+      "category": "News & Media",
+      "tagline": "Headlines, leadership changes, hiring spikes, M&A",
+      "description": "Real-time news monitoring per company or topic — headlines, sentiment, intent signals (M&A, leadership, hiring, funding, layoffs, product launches).",
+      "refreshDefault": "Hourly",
+      "coverage": 98,
+      "accuracy": 97,
+      "countriesCovered": 140,
+      "rowsAvailable": "Streaming feed",
+      "sources": [
+        {
+          "name": "Google News",
+          "kind": null
+        },
+        {
+          "name": "PR Newswire",
+          "kind": null
+        },
+        {
+          "name": "BusinessWire",
+          "kind": null
+        },
+        {
+          "name": "Reuters",
+          "kind": null
+        },
+        {
+          "name": "Bloomberg",
+          "kind": null
+        }
+      ],
+      "outputFieldLabels": [
+        "Headline",
+        "Summary",
+        "Body Excerpt",
+        "Language",
+        "Author",
+        "Publication",
+        "Source URL",
+        "Published At",
+        "Ingested At",
+        "Signal Type",
+        "Signal Strength",
+        "Sentiment",
+        "Sentiment Score",
+        "Entities Mentioned",
+        "Companies Mentioned",
+        "People Mentioned",
+        "Tickers Mentioned",
+        "Topics / Tags",
+        "Image URL"
+      ],
+      "outputFieldCount": 19
+    },
+    {
+      "id": "ds-travel",
+      "name": "Travel & Hospitality",
+      "category": "Travel",
+      "tagline": "Hotel/flight prices, availability, reviews",
+      "description": "Hotel & flight pricing, availability and reviews across OTA sites (Booking, Expedia, Kayak) by destination and date range.",
+      "refreshDefault": "Hourly",
+      "coverage": 90,
+      "accuracy": 92,
+      "countriesCovered": 65,
+      "rowsAvailable": "Dynamic per query",
+      "sources": [
+        {
+          "name": "Booking.com",
+          "kind": null
+        },
+        {
+          "name": "Expedia",
+          "kind": null
+        },
+        {
+          "name": "Hotels.com",
+          "kind": null
+        },
+        {
+          "name": "Kayak",
+          "kind": null
+        }
+      ],
+      "outputFieldLabels": [
+        "Property",
+        "Chain",
+        "Stars",
+        "Address",
+        "City",
+        "Country",
+        "Latitude",
+        "Longitude",
+        "Amenities",
+        "Room Type",
+        "Nightly Price",
+        "Total Price",
+        "Currency",
+        "Taxes & Fees",
+        "Cancellation Policy",
+        "Availability",
+        "Review Score",
+        "Review Count",
+        "OTA Source",
+        "Listing URL",
+        "Captured At"
+      ],
+      "outputFieldCount": 21
+    },
+    {
+      "id": "ds-healthcare-providers",
+      "name": "Hospitals, Clinics & Doctors",
+      "category": "Healthcare",
+      "tagline": "Providers, specialities, consult fees, accreditation",
+      "description": "Provider master for hospitals, clinics, diagnostic labs and individual practitioners — pulled from the hospital's own site first, then cross-verified against aggregators and medical councils.",
+      "refreshDefault": "Weekly",
+      "coverage": 91,
+      "accuracy": 95,
+      "countriesCovered": 12,
+      "rowsAvailable": "1.4M+ providers",
+      "sources": [
+        {
+          "name": "Hospital / clinic website (official)",
+          "kind": "Company website"
+        },
+        {
+          "name": "Practo",
+          "kind": "Third-party"
+        },
+        {
+          "name": "Apollo 24|7",
+          "kind": "Third-party"
+        },
+        {
+          "name": "Lybrate",
+          "kind": "Third-party"
+        },
+        {
+          "name": "Justdial Health",
+          "kind": "Directory"
+        },
+        {
+          "name": "Google Business Profile",
+          "kind": "Directory"
+        },
+        {
+          "name": "Bajaj Finserv Health",
+          "kind": "Third-party"
+        },
+        {
+          "name": "Credihealth",
+          "kind": "Third-party"
+        },
+        {
+          "name": "NABH accredited list",
+          "kind": "Regulator"
+        },
+        {
+          "name": "National Medical Commission registry",
+          "kind": "Regulator"
+        },
+        {
+          "name": "State health department directories",
+          "kind": "Regulator"
+        },
+        {
+          "name": "Yelp Health",
+          "kind": "Directory"
+        }
+      ],
+      "outputFieldLabels": [
+        "Provider Name",
+        "Type (Hospital / Clinic / Lab)",
+        "Website",
+        "Speciality",
+        "Departments",
+        "Bed Count",
+        "Doctors Listed",
+        "Accreditation (NABH / JCI)",
+        "Council Registration No.",
+        "Address",
+        "City",
+        "State",
+        "Pincode",
+        "Latitude",
+        "Longitude",
+        "Phone",
+        "Email",
+        "Emergency Number",
+        "Opening Hours",
+        "Consultation Fee",
+        "Insurance / Cashless Panels",
+        "Patient Rating",
+        "Review Count",
+        "Source URL"
+      ],
+      "outputFieldCount": 24
+    },
+    {
+      "id": "ds-hospitality-venues",
+      "name": "Hotels, Restaurants & Venues",
+      "category": "Hospitality",
+      "tagline": "Tariffs, menus, amenities, review scores",
+      "description": "Hotel, resort and restaurant profiles with live tariffs, menus, amenities and review scores — starting from the property's own booking page, then benchmarked against OTAs and food marketplaces.",
+      "refreshDefault": "Daily",
+      "coverage": 89,
+      "accuracy": 93,
+      "countriesCovered": 48,
+      "rowsAvailable": "3.2M+ venues",
+      "sources": [
+        {
+          "name": "Property website / direct booking page",
+          "kind": "Company website"
+        },
+        {
+          "name": "MakeMyTrip",
+          "kind": "Marketplace"
+        },
+        {
+          "name": "Booking.com",
+          "kind": "Marketplace"
+        },
+        {
+          "name": "Hotels.com",
+          "kind": "Marketplace"
+        },
+        {
+          "name": "Expedia",
+          "kind": "Marketplace"
+        },
+        {
+          "name": "Goibibo",
+          "kind": "Marketplace"
+        },
+        {
+          "name": "Agoda",
+          "kind": "Marketplace"
+        },
+        {
+          "name": "Airbnb",
+          "kind": "Marketplace"
+        },
+        {
+          "name": "TripAdvisor",
+          "kind": "Third-party"
+        },
+        {
+          "name": "Zomato",
+          "kind": "Marketplace"
+        },
+        {
+          "name": "Swiggy Dineout",
+          "kind": "Marketplace"
+        },
+        {
+          "name": "Google Business Profile",
+          "kind": "Directory"
+        },
+        {
+          "name": "FSSAI licence registry",
+          "kind": "Regulator"
+        }
+      ],
+      "outputFieldLabels": [
+        "Venue Name",
+        "Brand / Chain",
+        "Type (Hotel / Resort / Restaurant)",
+        "Star Rating",
+        "Cuisine / Category",
+        "Menu Items",
+        "Avg. Cost for Two",
+        "Room Types",
+        "Nightly Tariff",
+        "Currency",
+        "Cancellation Policy",
+        "Amenities",
+        "Banquet Capacity",
+        "Address",
+        "City",
+        "Latitude",
+        "Longitude",
+        "Phone",
+        "Booking URL",
+        "Review Score",
+        "Review Count",
+        "Food Licence No.",
+        "Captured At"
+      ],
+      "outputFieldCount": 23
+    },
+    {
+      "id": "ds-attorney-details",
+      "name": "Attorney & Law Firm Details",
+      "category": "Legal",
+      "tagline": "Advocates, practice areas, bar registration, fees",
+      "description": "Advocate and law-firm master covering practice areas, bar council registration, courts of practice, consultation fees and office locations — firm website first, then legal marketplaces and bar registries.",
+      "refreshDefault": "Monthly",
+      "coverage": 86,
+      "accuracy": 94,
+      "countriesCovered": 9,
+      "rowsAvailable": "820K+ advocates & firms",
+      "sources": [
+        {
+          "name": "Law firm website (official)",
+          "kind": "Company website"
+        },
+        {
+          "name": "LawRato",
+          "kind": "Third-party"
+        },
+        {
+          "name": "Vakilsearch",
+          "kind": "Third-party"
+        },
+        {
+          "name": "Justdial Legal",
+          "kind": "Directory"
+        },
+        {
+          "name": "Sulekha Legal",
+          "kind": "Directory"
+        },
+        {
+          "name": "Legal500",
+          "kind": "Third-party"
+        },
+        {
+          "name": "Chambers & Partners",
+          "kind": "Third-party"
+        },
+        {
+          "name": "Martindale-Hubbell",
+          "kind": "Third-party"
+        },
+        {
+          "name": "Avvo",
+          "kind": "Third-party"
+        },
+        {
+          "name": "FindLaw",
+          "kind": "Directory"
+        },
+        {
+          "name": "Bar Council of India roll",
+          "kind": "Regulator"
+        },
+        {
+          "name": "State bar council rolls",
+          "kind": "Regulator"
+        },
+        {
+          "name": "eCourts advocate listings",
+          "kind": "Regulator"
+        },
+        {
+          "name": "LinkedIn firm pages",
+          "kind": "Third-party"
+        }
+      ],
+      "outputFieldLabels": [
+        "Attorney Name",
+        "Firm Name",
+        "Designation (Partner / Associate)",
+        "Website",
+        "Practice Areas",
+        "Courts of Practice",
+        "Years of Experience",
+        "Languages",
+        "Bar Registration No.",
+        "Bar Council (State)",
+        "Enrolment Year",
+        "Office Address",
+        "City",
+        "State",
+        "Phone",
+        "Email",
+        "Consultation Fee",
+        "Consultation Mode",
+        "Client Rating",
+        "Review Count",
+        "Source URL"
+      ],
+      "outputFieldCount": 21
+    },
+    {
+      "id": "ds-insurance-plans",
+      "name": "Insurance Plans & Premiums",
+      "category": "Insurance",
+      "tagline": "Plans, premium bands, claim ratios, riders",
+      "description": "Health, motor, life and travel insurance plans with premium bands, sum-insured slabs, riders and claim-settlement ratios — insurer site first, then aggregator marketplaces and the regulator.",
+      "refreshDefault": "Weekly",
+      "coverage": 88,
+      "accuracy": 96,
+      "countriesCovered": 6,
+      "rowsAvailable": "45K+ plans",
+      "sources": [
+        {
+          "name": "Insurer website (official)",
+          "kind": "Company website"
+        },
+        {
+          "name": "PolicyBazaar",
+          "kind": "Marketplace"
+        },
+        {
+          "name": "Coverfox",
+          "kind": "Marketplace"
+        },
+        {
+          "name": "InsuranceDekho",
+          "kind": "Marketplace"
+        },
+        {
+          "name": "Ditto Insurance",
+          "kind": "Third-party"
+        },
+        {
+          "name": "Turtlemint",
+          "kind": "Marketplace"
+        },
+        {
+          "name": "BankBazaar Insurance",
+          "kind": "Marketplace"
+        },
+        {
+          "name": "PolicyX",
+          "kind": "Marketplace"
+        },
+        {
+          "name": "Paytm Insurance",
+          "kind": "Marketplace"
+        },
+        {
+          "name": "IRDAI product filings",
+          "kind": "Regulator"
+        },
+        {
+          "name": "GI Council statistics",
+          "kind": "Regulator"
+        },
+        {
+          "name": "Life Insurance Council",
+          "kind": "Regulator"
+        }
+      ],
+      "outputFieldLabels": [
+        "Insurer",
+        "Plan Name",
+        "Plan Type (Health / Motor / Life)",
+        "IRDAI UIN",
+        "Claim Settlement Ratio",
+        "Solvency Ratio",
+        "Sum Insured",
+        "Premium (min)",
+        "Premium (max)",
+        "Waiting Period",
+        "Room Rent Cap",
+        "Riders / Add-ons",
+        "Network Hospitals",
+        "Cashless Garages",
+        "Key Exclusions",
+        "Policy Wording URL",
+        "Brochure URL",
+        "Captured At"
+      ],
+      "outputFieldCount": 18
+    },
+    {
+      "id": "ds-automotive-network",
+      "name": "Automotive Dealers, Pricing & Rentals",
+      "category": "Automotive",
+      "tagline": "On-road pricing, dealer network, rental fleets",
+      "description": "Model and variant pricing, dealership networks, service centres and car-rental fleet availability — OEM site first, then classifieds, marketplaces and rental operators.",
+      "refreshDefault": "Daily",
+      "coverage": 93,
+      "accuracy": 95,
+      "countriesCovered": 21,
+      "rowsAvailable": "6.8M+ listings",
+      "sources": [
+        {
+          "name": "OEM / dealer website (official)",
+          "kind": "Company website"
+        },
+        {
+          "name": "CarDekho",
+          "kind": "Marketplace"
+        },
+        {
+          "name": "CarWale",
+          "kind": "Marketplace"
+        },
+        {
+          "name": "Cars24",
+          "kind": "Marketplace"
+        },
+        {
+          "name": "Spinny",
+          "kind": "Marketplace"
+        },
+        {
+          "name": "OLX Autos",
+          "kind": "Marketplace"
+        },
+        {
+          "name": "Zigwheels",
+          "kind": "Third-party"
+        },
+        {
+          "name": "Autocar India",
+          "kind": "Third-party"
+        },
+        {
+          "name": "Zoomcar (rentals)",
+          "kind": "Marketplace"
+        },
+        {
+          "name": "Revv (rentals)",
+          "kind": "Marketplace"
+        },
+        {
+          "name": "Avis / Hertz India (rentals)",
+          "kind": "Marketplace"
+        },
+        {
+          "name": "Savaari outstation rentals",
+          "kind": "Marketplace"
+        },
+        {
+          "name": "VAHAN registration data",
+          "kind": "Regulator"
+        }
+      ],
+      "outputFieldLabels": [
+        "Brand",
+        "Model",
+        "Variant",
+        "Fuel Type",
+        "Transmission",
+        "Mileage",
+        "Ex-showroom Price",
+        "On-road Price",
+        "Active Offers",
+        "Resale Estimate",
+        "Dealer Name",
+        "Dealer Address",
+        "Dealer Phone",
+        "Service Centres",
+        "Rental Daily Rate",
+        "Rental Fleet Size",
+        "Rental Availability",
+        "Listing URL",
+        "Captured At"
+      ],
+      "outputFieldCount": 19
+    }
+  ]
+}

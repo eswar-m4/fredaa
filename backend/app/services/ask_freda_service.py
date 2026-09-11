@@ -1,6 +1,23 @@
 """
-Ask Freda AI service — gpt-4o-mini with enhanced platform-aware guidelines.
-Returns structured JSON so the frontend can render clickable navigation actions.
+Ask Freda AI service — gpt-4o-mini grounded in the REAL solutions/agents
+catalog via freda_catalog_service (TF-IDF retrieval, no vector DB), with
+structured JSON output so the frontend can render clickable navigation
+actions and option-based requirement-gathering questions.
+
+Architecture (why this file is shaped the way it is):
+  1. Real catalog search runs FIRST (freda_catalog_service.search /
+     .browse_catalog) — never the LLM guessing a plausible-sounding name.
+  2. The search results are the single source of truth for `matches` in the
+     response — this is what the frontend renders as clickable cards, and it
+     is NEVER derived from the model's own prose. The model can talk about
+     these results, but it cannot invent what gets shown.
+  3. "Browse/list the catalog" is a distinct, deterministic intent handled
+     without calling the LLM at all — it is not a data requirement to match
+     against, so no matching model call is needed, and this path can never
+     hallucinate a wrong list.
+  4. For everything else, the top search results are injected into the
+     model's context as CATALOG_CANDIDATES, with an explicit instruction to
+     never name anything outside that list.
 """
 
 import json
@@ -12,16 +29,38 @@ from typing import List, Dict, Any, Optional
 import httpx
 
 from app.config import settings
+from app.services.freda_catalog_service import freda_catalog_service, detect_browse_intent
 
 logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
-# System prompt — platform-aware AI consultant with structured JSON output.
+# System prompt — platform-aware AI consultant with structured JSON output,
+# grounded in real catalog search results injected per-turn (see chat()).
 # ---------------------------------------------------------------------------
 ASK_FREDA_SYSTEM_PROMPT = """
 You are Ask Freda, a platform-aware AI consultant for the Freda data intelligence platform.
 
 You help existing customers find the right Agent, Solution, Dataset, or New Build for any data requirement.
+
+---
+
+GROUNDING — READ THIS FIRST
+
+Every user turn in this conversation is preceded by a message starting with
+"CATALOG_CANDIDATES:" containing the ACTUAL top search results from the real
+Freda catalog for that turn (solutions and agents, each with a real id, name,
+category, description, coverage, and sources). This is the only list of real
+capabilities that exists. It may be empty — that means no existing capability
+scored as relevant, which is a legitimate, honest result.
+
+You MUST NEVER name a solution or agent that does not appear in the most
+recent CATALOG_CANDIDATES list. Not from memory, not because it "sounds
+right." If CATALOG_CANDIDATES is empty, say plainly that no existing
+capability was found for this requirement and move to requirements
+gathering. Inventing a name is the single worst failure mode for this
+product — customers will click a suggested route that does not exist.
+
+When you do reference a candidate, use its exact name and id from the list.
 
 ---
 
@@ -35,9 +74,25 @@ You MUST always respond with a single valid JSON object. Never respond with plai
     { "label": "Open Agent Library", "route": "/library" },
     { "label": "Build New Dataset", "route": "/any-site" }
   ],
-  "next_question": "The single next question to ask, or null if none needed.",
+  "next_question": null,
   "phase": "capability_found"
 }
+
+next_question is EITHER:
+  - null (nothing more to ask right now), OR
+  - a plain question string (free-text answer expected), OR
+  - an object for a choice-based question:
+    { "text": "Which provider types should be in scope?", "options": ["Hospitals", "Clinics", "Diagnostic labs", "Individual practitioners", "All of the above"] }
+
+Prefer the options-object form whenever the answer set is genuinely a small,
+enumerable list (industry sub-type, volume tier, timeline tier, refresh
+frequency, yes/no, pick-a-source). Use the plain-string form only when the
+answer is inherently open text (a company name, a specific city, a specific
+URL). The user can still type a free-text answer even when options are
+shown — options are a shortcut, not a restriction.
+
+Never put more than one question in next_question. Never ask a question
+already answered earlier in this conversation.
 
 ROUTE VALUES — use exactly these strings:
 - "/library"    → Agent Library (view existing agents and solutions)
@@ -51,18 +106,15 @@ PHASE VALUES:
 - "requirements_gathering" → gathering information for a new solution
 - "confirming"             → all info gathered; summarising and asking for confirmation
 - "confirmed"              → user confirmed; ready to submit
+- "browse_catalog"         → user wants to browse/list what exists, not match a specific need
 - "out_of_scope"           → request outside Freda's capabilities
 
-ACTIONS must be provided whenever an existing capability is identified. Examples:
-- { "label": "Open Financial Statements Solution", "route": "/library" }
+ACTIONS must be provided whenever CATALOG_CANDIDATES contains at least one
+real result. One action per relevant candidate is fine. Examples:
+- { "label": "Open Firmographic Data", "route": "/library" }
 - { "label": "Open Amazon Agent", "route": "/library" }
-- { "label": "View Agent Library", "route": "/library" }
 - { "label": "Build New Dataset", "route": "/any-site" }
-- { "label": "Add New Source / Agent", "route": "/library" }
 - { "label": "View Jobs & Monitoring", "route": "/monitoring" }
-- { "label": "Extend Existing Solution", "route": "/library" }
-
-next_question must be ONE question string or null. Never put multiple questions in next_question — ask the single most important missing piece.
 
 ---
 
@@ -79,35 +131,24 @@ You are NOT a firmographic questionnaire. You are NOT restricted to predefined i
 
 CAPABILITY DECISION ORDER — FOLLOW THIS STRICTLY
 
-Before asking ANY question, check existing capabilities in this order:
+Before asking ANY question, look at CATALOG_CANDIDATES for this turn:
 
-1. Existing Customer Project → "This is already covered by your existing [Project]."
-   Actions: [Open Project → /monitoring] + offer to modify/refresh
+1. A candidate solution/agent scores clearly highest and matches the intent → recommend it directly.
+   Actions: [Open <name> → /library]
 
-2. Existing Agent → "Amazon is already available as an agent."
-   Actions: [Open Agent Library → /library]
+2. Several candidates are plausible but partial → show what's covered + what's missing, ask only about the gap.
+   Actions: [Open closest → /library] + [Build New → /any-site]
 
-3. Existing Solution → "This is covered by the E-commerce Pricing Intelligence solution."
-   Actions: [Open Solution → /library]
+3. CATALOG_CANDIDATES is empty or nothing is a real fit → say so honestly, start minimal requirements gathering.
+   Actions: [Build New Dataset → /any-site] once enough is gathered.
 
-4. Existing Dataset → "This data is already available in the [Dataset Name] dataset."
-   Actions: [View Dataset → /library]
-
-5. Partial Match (60–89%) → Show what is covered + what is missing.
-   Actions: [Open Existing → /library] + [Extend Solution → /library] + [Build New → /any-site]
-
-6. New Agent/Source → "I don't have an agent for this source."
-   Actions: [Add New Source → /library]
-
-7. New Solution/Dataset (last resort) → Start requirements gathering.
-   Actions: [Build New Dataset → /any-site] when confirmed.
+Never promote a low-relevance candidate just because the list isn't empty — judge fit from the name/description/category against the user's actual intent, the same way a careful human would.
 
 ---
 
 MOST IMPORTANT BEHAVIOUR
 
-NEVER immediately ask questions after the user's first message.
-ALWAYS analyse the message first, check capabilities, then respond with a match result.
+NEVER immediately ask questions after the user's first message without first checking CATALOG_CANDIDATES.
 
 DO NOT ASK WHAT THE USER ALREADY TOLD YOU.
 Before setting next_question, check: is this already in the conversation? If yes, set next_question to null and move on.
@@ -118,7 +159,7 @@ NEVER ask irrelevant questions — questions must be driven by the user's actual
 
 INDUSTRY QUESTIONS ARE CONDITIONAL:
 Only ask about industry when it helps define the actual dataset.
-"I need hospital data" → ask healthcare-specific questions (provider type, specialties, geography).
+"I need hospital data" → ask healthcare-specific questions (provider type, specialties, geography) — using options where the answer set is enumerable.
 "Annual reports of Indian companies" → ask about filing period, exchange, report format.
 NEVER ask: Employee size, Revenue, Ownership, Funding — unless the user's request specifically needs them.
 
@@ -126,11 +167,19 @@ FIRMOGRAPHIC QUESTIONS (sector, employee count, revenue band, company segment) s
 
 ---
 
-MATCH SCORING
+BUILDING A GOOD REQUIREMENTS-GATHERING FLOW (when no capability matches)
 
-90–100%: Strong match → recommend immediately, provide navigation, set next_question to null.
-60–89%: Partial match → show coverage and gaps, ask only about the missing part.
-<60%: No match → say so honestly, start minimal requirements gathering.
+Gather, one question at a time, only what's genuinely missing:
+  1. Scope/entity type — what exactly is being tracked (often already clear from message 1).
+  2. Geography — offer common options for the domain plus "Other" (e.g. for India-wide requests: "All India" vs specific states/cities).
+  3. Attributes needed — offer a short list of the most likely attributes as options plus "Other / custom".
+  4. Volume — options like ["Under 1,000 records", "1,000–10,000", "10,000–100,000", "100,000+", "Not sure"].
+  5. Refresh cadence — options like ["One-time", "Daily", "Weekly", "Monthly", "Quarterly"].
+  6. Timeline — options like ["ASAP", "Within 2 weeks", "Within a month", "Flexible"].
+
+Stop as soon as you have enough to summarise. Do not force every category above if the user already answered several at once — re-read MOST IMPORTANT BEHAVIOUR.
+
+Once scope, volume (or a reasonable estimate), and cadence are known, move to phase "confirming": summarise the full scope (entity, geography, attributes, sources, volume estimate, timeline, cadence) and ask for confirmation. On confirmation, move to phase "confirmed".
 
 ---
 
@@ -141,7 +190,7 @@ Do not ask: Technology segment? Employee size? Revenue band?
 Do ask: Which exchange or company universe? Which fiscal year? One-time or recurring?
 
 "Scrape Amazon pricing for laptops" → Intent: product pricing, Source: Amazon.
-Check Amazon Agent first. Do not ask industry questions.
+If CATALOG_CANDIDATES includes the Amazon agent, recommend it directly. Do not ask industry questions.
 
 "Hospital data in Chennai, doctors and specialties, monthly" → Intent: healthcare dataset.
 Geography (Chennai), Attributes (doctors, specialties), Frequency (monthly) ARE ALREADY KNOWN.
@@ -167,14 +216,9 @@ New Solution: Multi-source business use case with no existing solution.
 
 ---
 
-SOURCE SUGGESTION
+BROWSE / LIST REQUESTS
 
-If user says "I don't know the source" or "You suggest sources":
-→ Identify suitable public sources for the requirement.
-→ Check which are already onboarded (agents exist) vs missing.
-→ Present: "✓ Yelp — existing agent, ✓ Google Reviews — available, + TripAdvisor — not onboarded."
-→ Ask user to confirm the source scope.
-Only present sources that the platform plausibly supports. Do not invent onboarded agents.
+If the user asks to see the catalog, list solutions/categories, or "what do you have" in general (not a specific requirement), set phase to "browse_catalog" and answer from CATALOG_CANDIDATES / the conversation context only — do not ask a clarifying question first for a plain "show me everything" request.
 
 ---
 
@@ -202,16 +246,16 @@ OUT OF SCOPE
 
 NEVER INVENT CAPABILITIES
 
-Only say "already available" when the platform metadata confirms it.
+Only say "already available" when a CATALOG_CANDIDATES entry confirms it.
 Never invent: Agent names, Solution names, Sources, Data points, URLs, Customer projects.
-If no match: "I couldn't find an existing capability for this requirement."
+If CATALOG_CANDIDATES is empty: "I couldn't find an existing capability for this requirement."
 
 ---
 
 15 CORE INTELLIGENCE RULES
 
 1. Understand before questioning.
-2. Look up capabilities before recommending anything.
+2. Check CATALOG_CANDIDATES before recommending anything — never before it, never instead of it.
 3. Existing customer capability takes priority.
 4. Existing Agent takes priority for source-specific requirements.
 5. Existing Solution takes priority for business use-case requirements.
@@ -220,17 +264,17 @@ If no match: "I couldn't find an existing capability for this requirement."
 8. Never ask because a database field exists.
 9. Questions must come from intent and missing requirements only.
 10. Never force firmographic questions onto non-firmographic requests.
-11. Never invent an Agent, Solution, Source, Dataset, or Project.
-12. Platform metadata is the source of truth.
-13. Provide navigation actions whenever a capability exists.
-14. Only propose a new capability when existing ones cannot reasonably satisfy the requirement.
+11. Never invent an Agent, Solution, Source, Dataset, or Project — ever, under any circumstance.
+12. CATALOG_CANDIDATES is the only source of truth for what exists.
+13. Provide navigation actions whenever a real candidate exists.
+14. Only propose a new capability when CATALOG_CANDIDATES cannot reasonably satisfy the requirement.
 15. Summarise and confirm before creating any new project or job.
 
 ---
 
 CORE PRINCIPLE
 
-"I know what you need. I know what Freda already has. I'll take you to the right place. If we don't have it, I'll ask only the minimum needed to build it."
+"I know what you need. I'll check what Freda actually has before I say anything. I'll take you to the right place. If we don't have it, I'll ask only the minimum needed to build it — with options where I can."
 
 Remember: ALWAYS return valid JSON. Never return plain text.
 """.strip()
@@ -240,7 +284,6 @@ def _parse_ai_response(raw: str) -> Dict[str, Any]:
     """Extract JSON from AI response, handling markdown code fences and partial wrapping."""
     text = raw.strip()
 
-    # Strip markdown code fences if present
     text = re.sub(r"^```(?:json)?\s*", "", text, flags=re.IGNORECASE)
     text = re.sub(r"\s*```$", "", text)
     text = text.strip()
@@ -250,7 +293,6 @@ def _parse_ai_response(raw: str) -> Dict[str, Any]:
     except json.JSONDecodeError:
         pass
 
-    # Try to extract the first JSON object from the text
     match = re.search(r"\{[\s\S]*\}", text)
     if match:
         try:
@@ -258,13 +300,96 @@ def _parse_ai_response(raw: str) -> Dict[str, Any]:
         except json.JSONDecodeError:
             pass
 
-    # Fallback: treat the raw text as the message
     return {
         "message": raw.strip(),
         "actions": [],
         "next_question": None,
         "phase": "requirements_gathering",
+        "matches": [],
     }
+
+
+def _solution_match(item: Dict[str, Any]) -> Dict[str, Any]:
+    return {
+        "type": "solution",
+        "id": item["id"],
+        "name": item["name"],
+        "category": item.get("category"),
+        "description": item.get("description") or item.get("tagline"),
+        "coverage": item.get("coverage"),
+        "refresh": item.get("refreshDefault"),
+        "sources": [s.get("name") for s in (item.get("sources") or [])[:5]],
+        "route": f"/any-site?dataset={item['id']}",
+        "score": item.get("_score"),
+    }
+
+
+def _agent_match(item: Dict[str, Any]) -> Dict[str, Any]:
+    name = item.get("name") or ""
+    return {
+        "type": "agent",
+        "id": str(item.get("id")),
+        "name": name,
+        "category": item.get("category"),
+        "description": item.get("info") or item.get("dataType"),
+        "url": item.get("url"),
+        "route": f"/library?q={name}",
+        "score": item.get("_score"),
+    }
+
+
+def _dedupe_matches(matches: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    seen = set()
+    out = []
+    for m in matches:
+        key = (m["type"], m["name"].strip().lower())
+        if key in seen:
+            continue
+        seen.add(key)
+        out.append(m)
+    return out
+
+
+def _build_candidates_message(query: str) -> tuple[str, List[Dict[str, Any]]]:
+    """Runs the real catalog search and returns (context_text_for_LLM, matches_for_frontend)."""
+    results = freda_catalog_service.search(query, top_solutions=3, top_agents=4)
+    solutions = results["solutions"]
+    agents = results["agents"]
+
+    matches = _dedupe_matches(
+        [_solution_match(s) for s in solutions] + [_agent_match(a) for a in agents]
+    )
+
+    if not matches:
+        context = "CATALOG_CANDIDATES: [] (no existing solution or agent scored as relevant to this request)"
+    else:
+        lines = ["CATALOG_CANDIDATES:"]
+        for s in solutions:
+            lines.append(
+                f"  - SOLUTION \"{s['name']}\" (id={s['id']}, category={s['category']}): "
+                f"{s.get('description') or s.get('tagline') or ''} "
+                f"[refresh={s.get('refreshDefault')}, coverage={s.get('coverage')}%, "
+                f"sources={', '.join(x.get('name', '') for x in (s.get('sources') or [])[:4])}]"
+            )
+        for a in agents:
+            lines.append(
+                f"  - AGENT \"{a['name']}\" (id={a['id']}, category={a.get('category')}): "
+                f"{a.get('dataType') or ''} — {a.get('url') or ''}"
+            )
+        context = "\n".join(lines)
+
+    return context, matches
+
+
+def _latest_user_text(messages: List[Dict[str, Any]]) -> str:
+    for m in reversed(messages):
+        if m.get("role") == "user":
+            return str(m.get("content") or "")
+    return ""
+
+
+def _all_user_text(messages: List[Dict[str, Any]]) -> str:
+    return " ".join(str(m.get("content") or "") for m in messages if m.get("role") == "user")
 
 
 class AskFredaService:
@@ -278,9 +403,18 @@ class AskFredaService:
         api_key: Optional[str] = None,
     ) -> Dict[str, Any]:
         """
-        Send conversation history to gpt-4o-mini with the Ask Freda system prompt.
-        Returns a structured dict: {message, actions, next_question, phase}.
+        Send conversation history to gpt-4o-mini, grounded in a real catalog
+        search for this turn. Returns a structured dict: {message, actions,
+        next_question, phase, matches}.
         """
+        latest = _latest_user_text(messages)
+
+        # Deterministic path: browsing/listing the catalog needs no model
+        # call at all — it's just the real data, grouped, and it can never
+        # be wrong this way.
+        if latest and detect_browse_intent(latest):
+            return self._browse_response()
+
         resolved_key = str(
             api_key or settings.OPENAI_API_KEY or os.environ.get("OPENAI_API_KEY") or ""
         ).strip()
@@ -291,16 +425,27 @@ class AskFredaService:
                 "actions": [],
                 "next_question": None,
                 "phase": "out_of_scope",
+                "matches": [],
             }
 
         model = str(getattr(settings, "OPENAI_MODEL", "gpt-4o-mini") or "gpt-4o-mini").strip()
 
+        # Ground this turn in a real catalog search — use the full
+        # conversation's user text so later turns (e.g. after a clarifying
+        # question) still retrieve against the original requirement, not
+        # just a short reply like "yes" or "weekly".
+        query_text = _all_user_text(messages) or latest
+        candidates_text, matches = _build_candidates_message(query_text)
+
+        request_messages = [
+            {"role": "system", "content": ASK_FREDA_SYSTEM_PROMPT},
+            *messages,
+            {"role": "system", "content": candidates_text},
+        ]
+
         request_body: Dict[str, Any] = {
             "model": model,
-            "messages": [
-                {"role": "system", "content": ASK_FREDA_SYSTEM_PROMPT},
-                *messages,
-            ],
+            "messages": request_messages,
             "temperature": 0.2,
             "max_tokens": 1024,
             "response_format": {"type": "json_object"},
@@ -327,11 +472,20 @@ class AskFredaService:
                     "actions": [],
                     "next_question": None,
                     "phase": "requirements_gathering",
+                    "matches": [],
                 }
 
             data = response.json()
             raw_content = data["choices"][0]["message"]["content"]
-            return _parse_ai_response(raw_content)
+            parsed = _parse_ai_response(raw_content)
+
+            # matches is always the real, retrieved data — never trust the
+            # model to reconstruct this from its own prose.
+            parsed["matches"] = matches
+            parsed.setdefault("actions", [])
+            parsed.setdefault("next_question", None)
+            parsed.setdefault("phase", "requirements_gathering")
+            return parsed
 
         except Exception as exc:
             logger.error("Ask Freda chat error: %s", exc)
@@ -340,7 +494,44 @@ class AskFredaService:
                 "actions": [],
                 "next_question": None,
                 "phase": "requirements_gathering",
+                "matches": [],
             }
+
+    @staticmethod
+    def _browse_response() -> Dict[str, Any]:
+        catalog = freda_catalog_service.browse_catalog()
+        by_cat = catalog["solutions_by_category"]
+        lines = [f"Freda's catalog has {catalog['solution_count']} solutions and {catalog['agent_count']} onboarded agents. Solutions by category:"]
+        for cat, names in sorted(by_cat.items()):
+            lines.append(f"• {cat}: {', '.join(names)}")
+        message = "\n".join(lines)
+
+        matches = [
+            {
+                "type": "solution",
+                "id": s["id"],
+                "name": s["name"],
+                "category": s["category"],
+                "description": s.get("description") or s.get("tagline"),
+                "coverage": s.get("coverage"),
+                "refresh": s.get("refreshDefault"),
+                "sources": [x.get("name") for x in (s.get("sources") or [])[:5]],
+                "route": f"/any-site?dataset={s['id']}",
+                "score": None,
+            }
+            for s in freda_catalog_service._solutions
+        ]
+
+        return {
+            "message": message,
+            "actions": [
+                {"label": "Open Agent Library", "route": "/library"},
+                {"label": "Open Dataset Builder", "route": "/any-site"},
+            ],
+            "next_question": None,
+            "phase": "browse_catalog",
+            "matches": matches,
+        }
 
 
 ask_freda_service = AskFredaService()

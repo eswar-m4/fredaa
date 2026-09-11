@@ -7,16 +7,25 @@ import { Search } from "lucide-react";
 
 export const Route = createFileRoute("/library")({
   head: () => ({ meta: [{ title: "Agent Library – FreshData AI" }] }),
+  validateSearch: (search: Record<string, unknown>): { q?: string } =>
+    typeof search.q === "string" ? { q: search.q } : {},
   component: Library,
 });
 
 function Library() {
+  const { q: qParam } = Route.useSearch();
   const [all, setAll] = useState<BotCatalogEntry[]>([]);
   const [counts, setCounts] = useState<Record<string, number>>({});
   const cats = Object.keys(counts).sort();
-  const [q, setQ] = useState("");
+  const [q, setQ] = useState(qParam ?? "");
   const [cat, setCat] = useState<string>("All");
   const [comp, setComp] = useState<string>("All");
+
+  // Keep the search box in sync with ?q= even when navigating here while
+  // already mounted (e.g. from Ask Freda's "Open" button on an agent card).
+  useEffect(() => {
+    if (qParam) setQ(qParam);
+  }, [qParam]);
 
   useEffect(() => {
     let active = true;
