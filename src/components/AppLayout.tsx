@@ -1,5 +1,5 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { ReactNode, useState, useEffect } from "react";
+import { ReactNode, useState, useEffect, useMemo } from "react";
 import {
   LayoutDashboard,
   Activity,
@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { fetchSession, logoutRequest, type SessionInfo } from "@/lib/auth";
+import { useTickets } from "@/lib/ticket-store";
 import { CUSTOMERS } from "@/data/customers";
 import { setActiveCustomer, useActiveCustomer } from "@/lib/workspace";
 import fredaLogo from "@/assets/freda-mobius-bold.png";
@@ -43,28 +44,31 @@ export function AppLayout({ children }: { children: ReactNode }) {
 
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
-  const [notifications, setNotifications] = useState<Array<{ id: string; title: string; detail: string; tone: string }>>([]);
-  const [notificationsError, setNotificationsError] = useState("");
-  const [notificationsLoading, setNotificationsLoading] = useState(false);
   const [session, setSession] = useState<SessionInfo | null>(null);
 
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [mounted, setMounted] = useState(false);
 
-  const baseApiUrl = (() => {
-    if (
-      typeof window !== "undefined" &&
-      (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") &&
-      window.location.port !== "8131"
-    ) {
-      return `http://${window.location.hostname}:8131`;
-    }
-    return "";
-  })();
-
-
-
-
+  // Real local ticket activity — this app has no backend, so notifications
+  // are derived from the same ticket-store.ts data the Request tracker and
+  // admin console already read, not a fetch to a nonexistent API (the
+  // previous version called /api/v1/demo/jobs, which 404s in this build,
+  // the same class of dead-backend call already fixed for the admin
+  // dashboard earlier).
+  const tickets = useTickets();
+  const notifications = useMemo(
+    () =>
+      [...tickets]
+        .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+        .slice(0, 5)
+        .map((t) => ({
+          id: t.id,
+          title: `${t.project} · ${t.status}`,
+          detail: `${t.workspaceName} — ${formatRelativeTime(t.createdAt)}`,
+          tone: notificationTone(t.status),
+        })),
+    [tickets],
+  );
   useEffect(() => {
     setMounted(true);
     if (typeof window !== "undefined") {
@@ -129,44 +133,6 @@ export function AppLayout({ children }: { children: ReactNode }) {
       window.location.replace("/login");
     } finally {
       // Hard redirect keeps stale router/session state from bouncing back into the app.
-    }
-  }
-
-  async function loadNotifications() {
-    setNotificationsLoading(true);
-    setNotificationsError("");
-    try {
-      const response = await fetch(`${baseApiUrl}/api/v1/demo/jobs`, { credentials: "include" });
-      if (!response.ok) {
-        throw new Error(`Failed to load notifications (${response.status})`);
-      }
-      const data = await response.json();
-      const sorted = [...(Array.isArray(data) ? data : [])].sort((a, b) => {
-        const timeA = a.created_at ? new Date(a.created_at).getTime() : 0;
-        const timeB = b.created_at ? new Date(b.created_at).getTime() : 0;
-        return timeB - timeA;
-      });
-      const nextItems = sorted.slice(0, 5).map((job: any) => {
-        const status = String(job.status || "Unknown");
-        const title = `${job.source || "Job"} · ${status}`;
-        const detail = job.last_refresh
-          ? `Updated ${formatRelativeTime(job.last_refresh)}`
-          : job.created_at
-            ? `Created ${formatRelativeTime(job.created_at)}`
-            : "Recent activity";
-        return {
-          id: String(job.id || `${title}-${detail}`),
-          title,
-          detail,
-          tone: notificationTone(status),
-        };
-      });
-      setNotifications(nextItems);
-    } catch (err) {
-      setNotifications([]);
-      setNotificationsError(err instanceof Error ? err.message : "Failed to load notifications");
-    } finally {
-      setNotificationsLoading(false);
     }
   }
 
@@ -329,15 +295,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
                 </div>
               </PopoverContent>
             </Popover>
-            <Popover
-              open={notificationsOpen}
-              onOpenChange={(open) => {
-                setNotificationsOpen(open);
-                if (open && !notificationsLoading) {
-                  void loadNotifications();
-                }
-              }}
-            >
+            <Popover open={notificationsOpen} onOpenChange={setNotificationsOpen}>
               <PopoverTrigger asChild>
                 <button
                   suppressHydrationWarning
@@ -352,15 +310,11 @@ export function AppLayout({ children }: { children: ReactNode }) {
                 <div className="border-b border-border px-4 py-3">
                   <div className="text-sm font-semibold text-foreground">Recent activity</div>
                   <div className="text-xs text-muted-foreground mt-1">
-                    Latest job updates from Monitoring and Review.
+                    Latest requests raised across your workspace.
                   </div>
                 </div>
                 <div className="max-h-80 overflow-y-auto">
-                  {notificationsLoading ? (
-                    <div className="px-4 py-4 text-sm text-muted-foreground">Loading notifications…</div>
-                  ) : notificationsError ? (
-                    <div className="px-4 py-4 text-sm text-destructive">{notificationsError}</div>
-                  ) : notifications.length === 0 ? (
+                  {notifications.length === 0 ? (
                     <div className="px-4 py-4 text-sm text-muted-foreground">No recent notifications.</div>
                   ) : (
                     <div className="py-1">
@@ -461,10 +415,10 @@ function formatRelativeTime(isoStr: string) {
 }
 
 function notificationTone(status: string) {
-  if (status === "Running") return "info";
-  if (status === "Review" || status === "Review Pending") return "warning";
-  if (status === "Completed" || status === "Execution Completed") return "success";
-  if (status === "Failed") return "destructive";
+  if (status === "Estimating" || status === "In build") return "info";
+  if (status === "Awaiting admin approval") return "warning";
+  if (status === "Approved" || status === "Delivered") return "success";
+  if (status === "Rejected") return "destructive";
   return "muted";
 }
 

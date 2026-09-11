@@ -1,5 +1,6 @@
 import { defineConfig } from "vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
+import viteReact from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import tsConfigPaths from "vite-tsconfig-paths";
 import type { Plugin } from "vite";
@@ -22,7 +23,8 @@ function devCrashGuardPlugin(): Plugin {
 export default defineConfig({
   server: { port: 5434, strictPort: true },
   plugins: [
-    tanstackStart(),
+    tanstackStart(), // MUST come before viteReact() — required order per TanStack Start's own docs
+    viteReact(),
     tailwindcss(),
     tsConfigPaths(),
     devCrashGuardPlugin(),

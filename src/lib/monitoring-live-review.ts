@@ -1,5 +1,13 @@
 import { runMonitoringRefresh } from "@/lib/api/monitoring-refresh.functions";
-import { getLiveRefreshProfile, type LiveRefreshProfile } from "@/lib/live-refresh-profiles";
+import { runEcaOnRegistryRefresh } from "@/lib/api/registry-refresh.functions";
+import { diffRegistrySnapshot } from "@/lib/api/registry-refresh.core";
+import {
+  getLiveRefreshProfile,
+  CANADA_REGISTRY_PORTAL_CONFIG,
+  CANADA_REGISTRY_PORTAL_FIELDS,
+  type LiveRefreshProfile,
+  type RegistryLiveRefreshProfile,
+} from "@/lib/live-refresh-profiles";
 import { xlsxRowsToReviewRecords, reviewRecordsFor, type Project, type ReviewRecord, type ChangeType } from "@/data/customers";
 import type { LiveReviewData } from "@/components/ReviewDialog";
 
@@ -40,6 +48,8 @@ export function isLiveCheckable(p: Project): boolean {
 export async function fetchLiveReview(project: Project): Promise<LiveReviewData> {
   const profile = getLiveRefreshProfile(project.id);
   if (!profile) throw new Error(`"${project.name}" isn't set up for live refresh.`);
+
+  if (profile.kind === "registry") return fetchRegistryLiveReview(project, profile);
 
   const targets = profile.currentValueRows.map((row, i) => ({
     id: row[profile.idField] || `row-${i}`,
@@ -96,6 +106,107 @@ export async function fetchLiveReview(project: Project): Promise<LiveReviewData>
     aiConfigured: outcome.aiConfigured,
     reachableCount: outcome.reachableCount,
     totalCount: outcome.totalCount,
+    fetchErrors,
+  };
+  saveLiveReview(project.id, live);
+  return live;
+}
+
+/** "registry" kind — queries the live bulk database API directly (no LLM
+ *  involved, there's no page to read) and diffs the fresh rows against the
+ *  on-file snapshot by the profile's stable key field. Runs in parallel
+ *  with an AI-webpage check of the profile's companion registries (real
+ *  reachable pages without a structured API), so "Run" covers every real
+ *  source that actually responds, not just the one with a clean API. */
+async function fetchRegistryLiveReview(project: Project, profile: RegistryLiveRefreshProfile): Promise<LiveReviewData> {
+  const companions = profile.companionWebpages ?? [];
+
+  const [outcome, companionOutcome] = await Promise.all([
+    runEcaOnRegistryRefresh(),
+    companions.length > 0
+      ? runMonitoringRefresh({
+          data: {
+            config: CANADA_REGISTRY_PORTAL_CONFIG,
+            targets: companions.map((c) => ({ id: c.id, name: c.name, url: c.url, currentValues: {} })),
+            fields: CANADA_REGISTRY_PORTAL_FIELDS,
+          },
+        })
+      : Promise.resolve(null),
+  ]);
+
+  const records: ReviewRecord[] = [];
+  const fetchErrors: { entity: string; error: string }[] = [];
+  let reachableCount = 0;
+  const totalCount = 1 + companions.length;
+
+  if (!outcome.reachable) {
+    fetchErrors.push({ entity: "ECA_ON registry query", error: outcome.error ?? "Unknown error" });
+  } else {
+    reachableCount += 1;
+    const diffed = diffRegistrySnapshot(profile.currentValueRows, outcome.rows, profile.keyField, profile.nameField, profile.extractableFields);
+    for (const rec of diffed) {
+      for (const d of rec.diffs) {
+        records.push({
+          id: `${project.id}-live-${rec.key}-${d.field}`,
+          projectId: project.id,
+          entity: rec.name,
+          datapoint: d.field,
+          oldValue: d.oldValue || "—",
+          newValue: d.newValue || "—",
+          changeType: d.changeType,
+          confidence: 99,
+          source: rec.name,
+          sourceUrl: "",
+          detectedHrs: 0,
+        });
+      }
+    }
+  }
+
+  if (companionOutcome) {
+    for (const c of companionOutcome.results) {
+      if (!c.reachable) {
+        if (c.error) fetchErrors.push({ entity: c.name, error: c.error });
+        records.push({
+          id: `${project.id}-live-${c.id}-status`,
+          projectId: project.id,
+          entity: c.name,
+          datapoint: "Portal check",
+          oldValue: "Reachable",
+          newValue: c.error ?? "Unreachable",
+          changeType: "Deleted",
+          confidence: 99,
+          source: c.name,
+          sourceUrl: c.url,
+          detectedHrs: 0,
+        });
+        continue;
+      }
+      reachableCount += 1;
+      for (const d of c.diffs) {
+        records.push({
+          id: `${project.id}-live-${c.id}-${d.field}`,
+          projectId: project.id,
+          entity: c.name,
+          datapoint: d.field,
+          oldValue: d.oldValue || "—",
+          newValue: d.newValue || "—",
+          changeType: d.changeType === "Added" ? "Verified" : d.changeType, // no baseline for these — "found on the page" isn't a real Added
+          confidence: 92,
+          source: c.name,
+          sourceUrl: c.url,
+          detectedHrs: 0,
+        });
+      }
+    }
+  }
+
+  const live: LiveReviewData = {
+    records,
+    checkedAt: outcome.checkedAt,
+    aiConfigured: companions.length === 0 || (companionOutcome?.aiConfigured ?? true),
+    reachableCount,
+    totalCount,
     fetchErrors,
   };
   saveLiveReview(project.id, live);
@@ -179,7 +290,7 @@ export function buildRefreshedMonitoringRows(project: Project): RefreshedMonitor
   const profile = getLiveRefreshProfile(project.id);
   if (profile && isLiveCheckable(project)) {
     const live = loadLiveReview(project.id);
-    return profile.outputFormat === "disposition"
+    return profile.kind === "webpage" && profile.outputFormat === "disposition"
       ? buildDispositionTable(project, live, profile)
       : buildFlatTable(project, live, profile);
   }
