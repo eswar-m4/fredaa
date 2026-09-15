@@ -223,7 +223,7 @@ export function ReviewDialog({
           )}
         </DialogHeader>
 
-        <div className="flex-1 min-h-0 grid lg:grid-cols-[250px_1fr]">
+        <div className="flex-1 min-h-0 min-w-0 grid lg:grid-cols-[250px_1fr]">
           {/* filters rail */}
           <aside className="border-r border-border bg-secondary/30 p-5 flex flex-col gap-5 overflow-y-auto">
 
@@ -307,7 +307,7 @@ export function ReviewDialog({
 
 
           {/* batch queue */}
-          <div className="flex flex-col min-h-0">
+          <div className="flex flex-col min-h-0 min-w-0">
             <div className="px-6 py-3.5 border-b border-border bg-secondary/20 shrink-0 space-y-3">
               {/* group approval — top right */}
               <div className="flex flex-wrap items-center gap-2">
@@ -389,7 +389,7 @@ export function ReviewDialog({
             </div>
 
 
-            <div className="flex-1 min-h-0 overflow-y-auto">
+            <div className="flex-1 min-h-0 overflow-auto">
               {noLiveRunYet ? (
                 <div className="m-6 rounded-lg border border-dashed border-border p-8 text-center text-[13px] text-muted-foreground">
                   <div className="text-foreground font-medium mb-1">No live run yet for {project.name}</div>
@@ -421,12 +421,12 @@ export function ReviewDialog({
                       const d = decisions[r.id];
                       return (
                         <tr key={r.id} className="border-b border-border/60 hover:bg-secondary/40">
-                          <td className="px-6 py-2 w-[140px] max-w-[140px]">
+                          <td className="px-6 py-2 w-[110px] max-w-[110px]">
                             <span title={r.id} className="block truncate font-mono text-[11px] text-muted-foreground">
                               {r.id}
                             </span>
                           </td>
-                          <td className="px-3 py-2 w-[170px] max-w-[170px]">
+                          <td className="px-3 py-2 w-[150px] max-w-[150px]">
                             <span title={r.entity} className="block truncate font-medium">
                               {r.entity}
                             </span>
@@ -435,10 +435,10 @@ export function ReviewDialog({
                           <td className="px-3 py-2">
                             <Badge tone={toneFor(r.changeType) as any}>{r.changeType}</Badge>
                           </td>
-                          <td className="px-3 py-2 font-mono text-[11.5px] text-muted-foreground truncate max-w-[160px]" title={r.oldValue}>
+                          <td className="px-3 py-2 font-mono text-[11.5px] text-muted-foreground truncate max-w-[140px]" title={r.oldValue}>
                             {r.oldValue}
                           </td>
-                          <td className="px-3 py-2 font-mono text-[11.5px] text-foreground truncate max-w-[160px]" title={r.newValue}>
+                          <td className="px-3 py-2 font-mono text-[11.5px] text-foreground truncate max-w-[140px]" title={r.newValue}>
                             {r.newValue}
                           </td>
                           <td className="px-3 py-2">
@@ -448,14 +448,14 @@ export function ReviewDialog({
                                 target="_blank"
                                 rel="noreferrer"
                                 title={r.sourceUrl}
-                                className="inline-flex items-center gap-1 text-primary hover:underline max-w-[180px] truncate text-[11.5px]"
+                                className="inline-flex items-center gap-1 text-primary hover:underline max-w-[150px] truncate text-[11.5px]"
                               >
                                 <ExternalLink className="h-3 w-3 shrink-0" /> {r.source}
                               </a>
                             ) : (
                               // A blank href would resolve to this page itself, not an
                               // external source — show plain text instead of a fake link.
-                              <span className="text-muted-foreground max-w-[180px] truncate text-[11.5px] block">{r.source}</span>
+                              <span className="text-muted-foreground max-w-[150px] truncate text-[11.5px] block">{r.source}</span>
                             )}
                           </td>
                           <td className="px-3 py-2 tabular-nums">{r.confidence}%</td>

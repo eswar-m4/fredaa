@@ -287,7 +287,7 @@ const SPECS: Spec[] = [
       // instead). Order below is the display order (ids assigned by
       // position as abm-p1/abm-p2 — keep xlsx-customer-data.ts's abm-p#
       // entries and live-refresh-profiles.ts's projectId values in sync).
-      { name: "Government of Canada — Federally Registered Meat Establishments", source: "Canadian Food Inspection Agency (CFIA)", url: "https://apps.inspection.canada.ca/webapps/MeatList/Home/Results", records: 952, freq: "Weekly" },
+      { name: "Federally Registered Meat Establishments", source: "Canadian Food Inspection Agency (CFIA)", url: "https://apps.inspection.canada.ca/webapps/MeatList/Home/Results", records: 952, freq: "Weekly" },
       { name: "Meat & Produce Association Directories", source: "Canadian Meat Council, CPMA, OFVGA, Meat & Poultry Ontario, QPMA", url: "https://meatcouncil.ca/about-us/our-members/", records: 1093, freq: "Weekly" },
     ],
   },
