@@ -223,7 +223,13 @@ function DashboardPage() {
                   const a = scaleAdmv(p.admv, factor);
                   const ap = admvPct(a);
                   const rs = reviewStatusFor(p);
-                  const st = p.status === "Syncing" ? "Still running" : REVIEW_LABEL[rs];
+                  // Was gated on the static seeded p.status === "Syncing" —
+                  // a value that never reflects a real in-flight run (this
+                  // page doesn't track one), so it could get permanently
+                  // stuck showing "Still running" for a project whose seed
+                  // happened to land on "Syncing". Always show the real,
+                  // review-progress-derived status instead.
+                  const st = REVIEW_LABEL[rs];
                   const action = actionByProject[p.id];
                   return (
                     <tr
@@ -259,7 +265,7 @@ function DashboardPage() {
                         {rs === "Completed" ? `${p.accuracy}%` : <span className="text-muted-foreground">—</span>}
                       </td>
                       <td className="px-3 py-3 whitespace-nowrap">
-                        <Badge tone={st === "Still running" ? "info" : reviewTone[rs]}>{st}</Badge>
+                        <Badge tone={reviewTone[rs]}>{st}</Badge>
                       </td>
                       <td className="px-5 py-3 text-center">
                         <div className="flex items-center justify-center gap-1.5">
