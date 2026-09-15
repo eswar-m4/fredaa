@@ -30,6 +30,124 @@ logger = logging.getLogger(__name__)
 # Resolve workspace root directory relative to this file
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
+
+# ---------------------------------------------------------------------------
+# By Dataset uploads: any column header naming convention should work, not
+# just the exact literal names the app happens to use internally
+# (company_name / website / ...). Real customer files use every naming style
+# imaginable ("Company", "Business Name", "Web Address", "URL", "Organisation"
+# ...), so header matching needs broad synonyms plus a value-pattern fallback
+# for when no header matches anything — otherwise every upload that doesn't
+# use our exact template silently loses its identifying columns and the
+# pipeline has nothing real to work from.
+# ---------------------------------------------------------------------------
+
+_COLUMN_SYNONYMS: Dict[str, List[str]] = {
+    "company_name": [
+        "companyname", "legalname", "company", "businessname", "business",
+        "organization", "organizationname", "orgname", "organisation",
+        "organisationname", "firmname", "firm", "clientname", "client",
+        "accountname", "account", "entityname", "entity", "name",
+        "customername", "customer", "vendorname", "vendor", "employername",
+        "employer",
+    ],
+    "website": [
+        "website", "websiteurl", "url", "domain", "web", "site", "homepage",
+        "companywebsite", "weblink", "link", "companyurl", "siteurl",
+        "webaddress", "companydomain", "webpage", "weburl",
+    ],
+    "email": ["email", "emailaddress", "contactemail", "mail"],
+    "phone": ["phone", "phonenumber", "contactphone", "telephone", "tel", "mobile", "contactnumber"],
+    "linkedin_url": ["linkedin", "linkedinurl", "linkedinprofile"],
+    "registry_number": ["registrynumber", "regnumber", "companynumber", "registrationnumber", "cin", "companyid"],
+    "ticker": ["ticker", "tickersymbol", "stocksymbol", "symbol"],
+}
+
+_URL_VALUE_RE = re.compile(r"^(https?://)?([\w-]+\.)+[a-z]{2,}(/.*)?$", re.IGNORECASE)
+_EMAIL_VALUE_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[a-z]{2,}$", re.IGNORECASE)
+
+
+def _norm_header(value: Any) -> str:
+    return re.sub(r"[^a-z0-9]+", "", str(value or "").strip().lower())
+
+
+def _looks_like_url(value: Any) -> bool:
+    text = str(value or "").strip()
+    return bool(text) and bool(_URL_VALUE_RE.match(text)) and " " not in text
+
+
+def auto_detect_column_mapping(records: List[Dict[str, Any]], existing_mapping: Optional[Dict[str, str]] = None) -> Dict[str, str]:
+    """Best-effort {semantic_field: actual_uploaded_header} mapping, built
+    from a sample of the uploaded rows. Never overrides an explicit mapping
+    already supplied by the frontend column-mapping step — only fills gaps."""
+    mapping = dict(existing_mapping or {})
+    if not records:
+        return mapping
+
+    sample = [r for r in records[:25] if isinstance(r, dict)]
+    if not sample:
+        return mapping
+
+    headers = list(sample[0].keys())
+    normalized_headers = {h: _norm_header(h) for h in headers}
+    already_used = set(mapping.values())
+
+    # Pass 1 — synonym matching on headers.
+    for field, synonyms in _COLUMN_SYNONYMS.items():
+        if mapping.get(field):
+            continue
+        synonym_set = set(synonyms)
+        for header in headers:
+            if header in already_used:
+                continue
+            if normalized_headers[header] in synonym_set:
+                mapping[field] = header
+                already_used.add(header)
+                break
+
+    # Pass 2 — value-pattern fallback for the two fields that matter most.
+    # If no header matched "website" by name, pick whichever unused column's
+    # values look most like URLs/domains.
+    if not mapping.get("website"):
+        best_header, best_hits = None, 0
+        for header in headers:
+            if header in already_used:
+                continue
+            values = [row.get(header) for row in sample]
+            hits = sum(1 for v in values if _looks_like_url(v))
+            if hits > best_hits and hits >= max(1, len(values) // 3):
+                best_header, best_hits = header, hits
+        if best_header:
+            mapping["website"] = best_header
+            already_used.add(best_header)
+
+    # If no header matched "company_name" by name, pick the first remaining
+    # text column that isn't URL/email-shaped and has reasonably unique,
+    # short-ish values — the classic shape of a name column.
+    if not mapping.get("company_name"):
+        best_header, best_score = None, -1.0
+        for header in headers:
+            if header in already_used:
+                continue
+            values = [str(row.get(header) or "").strip() for row in sample]
+            non_blank = [v for v in values if v]
+            if not non_blank:
+                continue
+            if any(_looks_like_url(v) or _EMAIL_VALUE_RE.match(v) for v in non_blank):
+                continue
+            if any(len(v) > 100 for v in non_blank):
+                continue
+            uniqueness = len(set(non_blank)) / len(non_blank)
+            name_hint = 1.0 if "name" in normalized_headers[header] else 0.0
+            score = uniqueness + name_hint
+            if score > best_score:
+                best_header, best_score = header, score
+        if best_header:
+            mapping["company_name"] = best_header
+            already_used.add(best_header)
+
+    return mapping
+
 def _latest_run_number_for_job(job_id: str, refresh_count: Optional[int] = None) -> int:
     import glob
     dataset_dir = os.path.join(BASE_DIR, "datasets")
@@ -1428,15 +1546,33 @@ async def run_scraper_background(job_id: str):
             # 2. Load input rows
             input_file_path = os.path.join(BASE_DIR, "datasets", f"{job_id}_input.json")
             input_rows = []
-            if os.path.exists(input_file_path):
+            input_file_existed = os.path.exists(input_file_path)
+            if input_file_existed:
                 try:
                     with open(input_file_path, "r", encoding="utf-8") as f_in:
                         input_rows = json.load(f_in)
-                except Exception:
-                    pass
+                except Exception as exc:
+                    logger.error("Job %s: failed to read uploaded input file %s: %s", job_id, input_file_path, exc)
+                    raise RuntimeError(
+                        f"Could not read the uploaded input file for job {job_id}: {exc}"
+                    ) from exc
+
+            if not input_rows and input_file_existed:
+                # A real file was uploaded for this job but produced zero
+                # usable rows — never silently substitute demo company data
+                # for a real job the user actually launched with real input.
+                logger.error(
+                    "Job %s: uploaded input file %s exists but contains no rows.",
+                    job_id, input_file_path,
+                )
+                raise RuntimeError(
+                    f"Job {job_id}: the uploaded input file has no usable rows."
+                )
 
             if not input_rows:
-                # Default mock input records if none uploaded
+                # No input file was ever uploaded for this job at all — this
+                # is a genuine demo/preview run (no real data was provided),
+                # not a failure of real user input.
                 input_rows = [
                     {"company_name": "Acme Corp", "corp_site": "https://acme.com", "phone": "+1 555-0199", "email": "info@acme.com", "linkedin": "https://www.linkedin.com/company/acme"},
                     {"company_name": "Bolt.new", "corp_site": "https://bolt.new", "phone": "+1 555-0200", "email": "contact@bolt.new", "linkedin": "https://www.linkedin.com/company/boltdotnew"},
@@ -1616,6 +1752,12 @@ async def run_scraper_background(job_id: str):
                 # sub_industry: mirror industry when blank
                 if not row.get("sub_industry") and "sub_industry" in row and row.get("industry"):
                     row["sub_industry"] = row["industry"]
+
+            # Fill any gaps in the column mapping using header synonyms +
+            # value-pattern detection, so uploads that don't use our exact
+            # template column names (company_name/website/...) still resolve
+            # correctly instead of silently losing their identifying columns.
+            mapping = auto_detect_column_mapping(input_rows, mapping)
 
             # Concurrency limit and task definition
             sem = asyncio.Semaphore(5)
