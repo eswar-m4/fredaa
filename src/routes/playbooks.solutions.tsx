@@ -36,9 +36,9 @@ import {
   UtensilsCrossed,
   X,
 } from "lucide-react";
-import { AppLayout } from "@/components/AppLayout";
+import { AppLayout, WorkspaceLoadingFallback } from "@/components/AppLayout";
 import { Badge, Button, Card, Input, PageHeader, SectionTitle, Select, Steps } from "@/components/ui-bits";
-import { useActiveCustomer } from "@/lib/workspace";
+import { useActiveCustomer, useMounted } from "@/lib/workspace";
 import { addTicket } from "@/lib/ticket-store";
 import { readIntakeFile, type IntakeResult } from "@/lib/ai-intake";
 import { estimate, fmt, type Project } from "@/data/customers";
@@ -106,6 +106,7 @@ const WIZARD_STEPS = ["Configure", "Upload dataset", "Wired sources", "Attribute
 type Cadence = "Daily" | "Weekly" | "Monthly" | "Custom";
 
 function SolutionsPage() {
+  const mounted = useMounted();
   const customer = useActiveCustomer();
   const datasets = useMemo(() => DATASETS.map(fromDataset), []);
   const fit = useMemo(() => industryFit(customer.industry), [customer.industry]);
@@ -127,6 +128,8 @@ function SolutionsPage() {
     [pool, cat, q],
   );
 
+
+  if (!mounted) return <WorkspaceLoadingFallback />;
 
   if (active) return <DatasetSetup item={active} onBack={() => setActive(null)} />;
 

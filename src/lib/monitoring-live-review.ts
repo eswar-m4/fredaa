@@ -1,6 +1,6 @@
 import { runMonitoringRefresh } from "@/lib/api/monitoring-refresh.functions";
-import { runEcaOnRegistryRefresh } from "@/lib/api/registry-refresh.functions";
-import { diffRegistrySnapshot } from "@/lib/api/registry-refresh.core";
+import { runEcaOnRegistryRefresh, runMeatListRegistryRefresh } from "@/lib/api/registry-refresh.functions";
+import { diffRegistrySnapshot, type RegistryLiveOutcome } from "@/lib/api/registry-refresh.core";
 import {
   getLiveRefreshProfile,
   CANADA_REGISTRY_PORTAL_CONFIG,
@@ -8,8 +8,9 @@ import {
   type LiveRefreshProfile,
   type RegistryLiveRefreshProfile,
 } from "@/lib/live-refresh-profiles";
-import { xlsxRowsToReviewRecords, reviewRecordsFor, type Project, type ReviewRecord, type ChangeType } from "@/data/customers";
+import { xlsxRowsToReviewRecords, reviewRecordsFor, reviewStatusFor, type Project, type ProjectStatus, type ReviewRecord, type ChangeType } from "@/data/customers";
 import type { LiveReviewData } from "@/components/ReviewDialog";
+import { clearReviewProgress } from "@/lib/review-status";
 
 const STORAGE_PREFIX = "freda_live_review_";
 
@@ -24,12 +25,19 @@ export function saveLiveReview(projectId: string, data: LiveReviewData) {
   }
 }
 
-/** Reads back the last live "Run" result for a project, if one was ever saved. */
+/** Reads back the last live "Run" result for a project, if one was ever saved
+ *  AND it still matches the profile currently bound to that project id — a
+ *  run cached before a project reorder/rebind (a different real dataset now
+ *  sits at this id) is discarded rather than shown as if it were current. */
 export function loadLiveReview(projectId: string): LiveReviewData | null {
   if (typeof window === "undefined") return null;
   try {
     const raw = window.localStorage.getItem(`${STORAGE_PREFIX}${projectId}`);
-    return raw ? (JSON.parse(raw) as LiveReviewData) : null;
+    if (!raw) return null;
+    const data = JSON.parse(raw) as LiveReviewData;
+    const currentKind = getLiveRefreshProfile(projectId)?.kind;
+    if (data.profileKind && currentKind && data.profileKind !== currentKind) return null;
+    return data;
   } catch {
     return null;
   }
@@ -40,6 +48,20 @@ export function loadLiveReview(projectId: string): LiveReviewData | null {
  *  sample-file view. */
 export function isLiveCheckable(p: Project): boolean {
   return getLiveRefreshProfile(p.id) !== null && p.sampleRows.length > 0 && p.columns.length > 0;
+}
+
+/** The Monitor page's status badge, derived from the same real signals the
+ *  Review page uses — not the static seeded status, so the two pages can
+ *  never disagree about whether a project's review is actually done.
+ *    - actively running a live check right now → "Syncing"
+ *    - last live check had a source that failed/was unreachable → "Needs attention"
+ *    - review fully submitted (reviewStatusFor === "Completed") → "In sync"
+ *    - otherwise → "Review pending" (covers both "not started" and "partial") */
+export function monitorStatusFor(p: Project, isRunning = false): ProjectStatus {
+  if (isRunning) return "Syncing";
+  const live = loadLiveReview(p.id);
+  if (live && live.fetchErrors.length > 0) return "Needs attention";
+  return reviewStatusFor(p) === "Completed" ? "In sync" : "Review pending";
 }
 
 /** Runs the real live refresh for a live-checkable project and turns the
@@ -107,10 +129,23 @@ export async function fetchLiveReview(project: Project): Promise<LiveReviewData>
     reachableCount: outcome.reachableCount,
     totalCount: outcome.totalCount,
     fetchErrors,
+    profileKind: profile.kind,
   };
   saveLiveReview(project.id, live);
+  // A fresh live run can change the record set entirely — don't let a prior
+  // submission's progress against the old set keep reading as complete.
+  clearReviewProgress(project.id);
   return live;
 }
+
+/** Each registry has its own fetch shape (ArcGIS query vs. HTML table
+ *  scrape) — this is the one place that knows which server function to
+ *  call for a given profile's registryId, so fetchRegistryLiveReview below
+ *  stays agnostic to how any particular registry is actually fetched. */
+const REGISTRY_FETCHERS: Record<RegistryLiveRefreshProfile["registryId"], () => Promise<RegistryLiveOutcome>> = {
+  eca_on: runEcaOnRegistryRefresh,
+  meatlist: runMeatListRegistryRefresh,
+};
 
 /** "registry" kind — queries the live bulk database API directly (no LLM
  *  involved, there's no page to read) and diffs the fresh rows against the
@@ -122,7 +157,7 @@ async function fetchRegistryLiveReview(project: Project, profile: RegistryLiveRe
   const companions = profile.companionWebpages ?? [];
 
   const [outcome, companionOutcome] = await Promise.all([
-    runEcaOnRegistryRefresh(),
+    REGISTRY_FETCHERS[profile.registryId](),
     companions.length > 0
       ? runMonitoringRefresh({
           data: {
@@ -140,14 +175,14 @@ async function fetchRegistryLiveReview(project: Project, profile: RegistryLiveRe
   const totalCount = 1 + companions.length;
 
   if (!outcome.reachable) {
-    fetchErrors.push({ entity: "ECA_ON registry query", error: outcome.error ?? "Unknown error" });
+    fetchErrors.push({ entity: `${profile.registryId} registry query`, error: outcome.error ?? "Unknown error" });
   } else {
     reachableCount += 1;
     const diffed = diffRegistrySnapshot(profile.currentValueRows, outcome.rows, profile.keyField, profile.nameField, profile.extractableFields);
     for (const rec of diffed) {
       for (const d of rec.diffs) {
         records.push({
-          id: `${project.id}-live-${rec.key}-${d.field}`,
+          id: `${project.id}-live-${rec.key}-${rec.index}-${d.field}`,
           projectId: project.id,
           entity: rec.name,
           datapoint: d.field,
@@ -208,8 +243,10 @@ async function fetchRegistryLiveReview(project: Project, profile: RegistryLiveRe
     reachableCount,
     totalCount,
     fetchErrors,
+    profileKind: profile.kind,
   };
   saveLiveReview(project.id, live);
+  clearReviewProgress(project.id);
   return live;
 }
 

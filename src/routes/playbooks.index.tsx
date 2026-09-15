@@ -17,10 +17,10 @@ import {
   FileSpreadsheet,
   Search,
 } from "lucide-react";
-import { AppLayout } from "@/components/AppLayout";
+import { AppLayout, WorkspaceLoadingFallback } from "@/components/AppLayout";
 import { Button, Card, PageHeader } from "@/components/ui-bits";
 import { LegalNotice } from "@/components/LegalNotice";
-import { useActiveCustomer } from "@/lib/workspace";
+import { useActiveCustomer, useMounted } from "@/lib/workspace";
 import { solutionsFor } from "@/lib/playbook-solutions";
 
 export const Route = createFileRoute("/playbooks/")({
@@ -45,6 +45,7 @@ export const Route = createFileRoute("/playbooks/")({
 });
 
 function PlaybooksPage() {
+  const mounted = useMounted();
   const customer = useActiveCustomer();
   const solutions = solutionsFor(customer);
   const navigate = useNavigate();
@@ -86,6 +87,8 @@ function PlaybooksPage() {
 
   const totalSources = customer.projects.reduce((a, p) => a + p.sources.length, 0);
   const totalDatapoints = customer.projects.reduce((a, p) => a + p.datapoints.length, 0);
+
+  if (!mounted) return <WorkspaceLoadingFallback />;
 
   return (
     <AppLayout>

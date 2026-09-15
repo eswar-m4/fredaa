@@ -1,9 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight, Activity, FolderPlus, LayoutDashboard, Bot } from "lucide-react";
-import { AppLayout } from "@/components/AppLayout";
+import { AppLayout, WorkspaceLoadingFallback } from "@/components/AppLayout";
 import { Button, Card, PageHeader } from "@/components/ui-bits";
 import { AskFredaPanel } from "@/components/AskFredaPanel";
-import { useActiveCustomer } from "@/lib/workspace";
+import { useActiveCustomer, useMounted } from "@/lib/workspace";
 
 export const Route = createFileRoute("/playbooks/ask")({
   head: () => ({
@@ -27,7 +27,10 @@ const NAV = [
 ] as const;
 
 function AskPage() {
+  const mounted = useMounted();
   const customer = useActiveCustomer();
+
+  if (!mounted) return <WorkspaceLoadingFallback />;
 
   return (
     <AppLayout>

@@ -6,6 +6,7 @@ import { AlertTriangle, Check, X, ChevronLeft, ChevronRight, RotateCcw, Layers, 
 import { downloadCsv } from "@/lib/download";
 import { reviewRecordsFor, xlsxRowsToReviewRecords, fmt, hrsAgo, type Project, type ReviewRecord, type ChangeType } from "@/data/customers";
 import { isLiveCheckable } from "@/lib/monitoring-live-review";
+import { recordReviewSubmission } from "@/lib/review-status";
 
 type Decision = "approved" | "rejected";
 
@@ -26,6 +27,11 @@ export type LiveReviewData = {
   reachableCount: number;
   totalCount: number;
   fetchErrors: { entity: string; error: string }[];
+  /** Which live-refresh profile produced this run ("webpage" | "registry").
+   *  Stamped at save time and checked at load time so a run cached under a
+   *  project id before that id's profile changed (e.g. a project reorder)
+   *  is never mistaken for a real run of whatever now lives at that id. */
+  profileKind?: string;
 };
 
 export function ReviewDialog({
@@ -145,6 +151,15 @@ export function ReviewDialog({
         })),
     );
     setSubmitted(decided);
+    // Persist against the sampled set (what "review contour %" below is
+    // already measured against), not the full unsampled `all` — sampling is
+    // a deliberate review-scope choice, so fully deciding everything in a
+    // 2% sample and submitting should read as done, not stuck at "In
+    // progress" until every one of the underlying (unsampled) records is
+    // also decided. A secondary admv/confidence/search filter still counts
+    // honestly: records it hides from `sampled`'s decided count stay
+    // undecided, so submitting under a narrow filter won't misreport 100%.
+    if (project) recordReviewSubmission(project.id, sampled.filter((r) => decisions[r.id]).length, sampled.length);
     setDecisions({});
     setBatchIdx(0);
   }
@@ -387,7 +402,8 @@ export function ReviewDialog({
                       <th className="px-3 py-2 font-semibold">Entity</th>
                       <th className="px-3 py-2 font-semibold">Datapoint</th>
                       <th className="px-3 py-2 font-semibold">Change</th>
-                      <th className="px-3 py-2 font-semibold">Old → New</th>
+                      <th className="px-3 py-2 font-semibold">Old Value</th>
+                      <th className="px-3 py-2 font-semibold">New Value</th>
                       <th className="px-3 py-2 font-semibold">Source</th>
                       <th className="px-3 py-2 font-semibold">Conf.</th>
                       <th className="px-3 py-2 font-semibold">Detected</th>
@@ -413,8 +429,11 @@ export function ReviewDialog({
                           <td className="px-3 py-2">
                             <Badge tone={toneFor(r.changeType) as any}>{r.changeType}</Badge>
                           </td>
-                          <td className="px-3 py-2 font-mono text-[11.5px] text-muted-foreground truncate max-w-[260px]">
-                            {r.oldValue} → <span className="text-foreground">{r.newValue}</span>
+                          <td className="px-3 py-2 font-mono text-[11.5px] text-muted-foreground truncate max-w-[160px]" title={r.oldValue}>
+                            {r.oldValue}
+                          </td>
+                          <td className="px-3 py-2 font-mono text-[11.5px] text-foreground truncate max-w-[160px]" title={r.newValue}>
+                            {r.newValue}
                           </td>
                           <td className="px-3 py-2">
                             <a

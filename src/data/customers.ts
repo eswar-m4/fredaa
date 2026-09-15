@@ -6,6 +6,7 @@
  * are overridden via XLSX_PROJECT_OVERRIDES from xlsx-customer-data.ts.
  */
 import { XLSX_PROJECT_OVERRIDES } from "./xlsx-customer-data";
+import { getReviewProgress } from "@/lib/review-status";
 
 export type ProjectStatus = "In sync" | "Review pending" | "Syncing" | "Needs attention";
 
@@ -261,10 +262,33 @@ const SPECS: Spec[] = [
       // Each project's reviewable data is its one fully-parsed primary
       // registry; the other real registries in the region are onboarded as
       // additional source agents (real URLs, not yet row-level extracted).
-      { name: "Canada Environmental & Regulatory Registries", source: "provincial environment ministries (ON/AB/BC/NU)", url: "https://ws.lioservices.lrc.gov.on.ca/arcgis1071a/rest/services/Access_Environment/Access_Environment_Map/MapServer/0/query", records: 761, freq: "Weekly" },
-      { name: "US Environmental & Regulatory Registries", source: "state environmental agencies (AZ/TX/SC/CT/IN)", url: "https://legacy.azdeq.gov/databases/lustsearch_drupal.html", records: 9606, freq: "Weekly" },
+      // Order below is the intended display order (ids are assigned by
+      // position as eris-p1..p4 — keep xlsx-customer-data.ts's eris-p#
+      // entries and live-refresh-profiles.ts's projectId values in sync).
       { name: "ESG Compliance Monitoring", source: "real public company sustainability pages", url: "https://www.microsoft.com/en-us/corporate-responsibility/sustainability", records: 10, freq: "Monthly" },
       { name: "Regulatory Incident & Spill Tracking", source: "Connecticut DEEP HazConnect spill/incident registry", url: "https://connecticut.hazconnect.com/listincidentpublic.aspx", records: 15753, freq: "Weekly" },
+      { name: "Canada Environmental & Regulatory Registries", source: "provincial environment ministries (ON/AB/BC/NU)", url: "https://ws.lioservices.lrc.gov.on.ca/arcgis1071a/rest/services/Access_Environment/Access_Environment_Map/MapServer/0/query", records: 761, freq: "Weekly" },
+      { name: "US Environmental & Regulatory Registries", source: "state environmental agencies (AZ/TX/SC/CT/IN)", url: "https://legacy.azdeq.gov/databases/lustsearch_drupal.html", records: 9606, freq: "Weekly" },
+    ],
+  },
+  {
+    id: "abm",
+    name: "Annex Business Media",
+    shortName: "ABM",
+    industry: "Business Media & Trade Directories",
+    accountManager: "Karan Bhatt",
+    since: "Sep 2026",
+    dpSet: "b2b",
+    projects: [
+      // Real onboarded data — see src/data/abm-source-data.ts for exactly
+      // what was scraped from where, and why (the URL this project was
+      // originally named after is a decommissioned CFIA legacy endpoint;
+      // abm-source-data.ts documents the real, current replacement used
+      // instead). Order below is the display order (ids assigned by
+      // position as abm-p1/abm-p2 — keep xlsx-customer-data.ts's abm-p#
+      // entries and live-refresh-profiles.ts's projectId values in sync).
+      { name: "Government of Canada — Federally Registered Meat Establishments", source: "Canadian Food Inspection Agency (CFIA)", url: "https://apps.inspection.canada.ca/webapps/MeatList/Home/Results", records: 952, freq: "Weekly" },
+      { name: "Meat & Produce Association Directories", source: "Canadian Meat Council, CPMA, OFVGA, Meat & Poultry Ontario, QPMA", url: "https://meatcouncil.ca/about-us/our-members/", records: 1093, freq: "Weekly" },
     ],
   },
 ];
@@ -327,7 +351,14 @@ function buildProject(spec: Spec, p: Spec["projects"][number], idx: number): Pro
   };
 }
 
-export const CUSTOMERS: Customer[] = SPECS.map((spec) => ({
+// Only these customers appear in the workspace (switcher, dashboard, etc.),
+// in this order. Other SPECS entries stay defined (ids remain stable for
+// anything keyed off them) but are simply never surfaced.
+const WORKSPACE_ORDER = ["ntm", "eris", "nice", "cengage", "abm"];
+
+export const CUSTOMERS: Customer[] = WORKSPACE_ORDER.map(
+  (id) => SPECS.find((s) => s.id === id)!,
+).map((spec) => ({
   id: spec.id,
   name: spec.name,
   shortName: spec.shortName,
@@ -912,6 +943,15 @@ export function destinationsFor(customer: Customer): Destination[] {
 export type ReviewStatus = "Review pending" | "In progress" | "Completed";
 
 export function reviewStatusFor(p: Project): ReviewStatus {
+  // A real Submit in ReviewDialog persists progress via review-status.ts —
+  // prefer that over the seeded pendingReview count whenever it exists, so
+  // the badge reflects what was actually reviewed instead of a static demo
+  // number that never moves no matter how many records get submitted.
+  const progress = getReviewProgress(p.id);
+  if (progress && progress.total > 0) {
+    if (progress.decided >= progress.total) return "Completed";
+    if (progress.decided > 0) return "In progress";
+  }
   if (p.pendingReview === 0) return "Completed";
   if (p.pendingReview < 150) return "In progress";
   return "Review pending";

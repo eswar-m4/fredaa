@@ -6,6 +6,7 @@
 import attributeDictionary from "@/data/ntm-attribute-dictionary.json" with { type: "json" };
 import { NTM_MONITORING, NTM_MAINTENANCE, POI_DATA, ERIS_ECA_ON } from "@/data/xlsx-customer-data";
 import { ESG_COLUMNS, ESG_SAMPLE_ROWS } from "@/data/eris-placeholder-data";
+import { ABM_MEATLIST_COLUMNS, ABM_MEATLIST_ROWS, ABM_CMC_LIVE_ROWS } from "@/data/abm-source-data";
 import type { FieldMeta, PromptConfig } from "@/lib/api/monitoring-refresh.core";
 
 export type LiveRefreshOutputFormat =
@@ -39,6 +40,11 @@ export type WebpageLiveRefreshProfile = {
 export type RegistryLiveRefreshProfile = {
   kind: "registry";
   projectId: string;
+  /** Which bulk fetch function to call — see fetchRegistryLiveReview's
+   *  dispatch in monitoring-live-review.ts. Each registry has its own
+   *  fetch shape (ArcGIS query vs. HTML table scrape), so this is a small
+   *  fixed set rather than a free-form string. */
+  registryId: "eca_on" | "meatlist";
   keyField: string;
   nameField: string;
   extractableFields: string[];
@@ -195,7 +201,7 @@ const ESG_FIELD_META: Record<string, FieldMeta> = {
 
 const ESG_PROFILE: WebpageLiveRefreshProfile = {
   kind: "webpage",
-  projectId: "eris-p3",
+  projectId: "eris-p1",
   idField: "Company_ID",
   nameField: "Company_Name",
   urlField: "Source_URL",
@@ -214,7 +220,7 @@ const ESG_PROFILE: WebpageLiveRefreshProfile = {
 };
 
 /* ------------------------------------------------------------------ */
-/* ERIS — Canada Environmental & Regulatory Registries (eris-p1): ECA_ON's */
+/* ERIS — Canada Environmental & Regulatory Registries (eris-p3): ECA_ON's */
 /* live ArcGIS feature service is a genuine, unprotected structured query  */
 /* API (confirmed by direct testing) — "Run" queries it live for the most  */
 /* recent 25 real approvals and diffs them against the on-file snapshot by */
@@ -250,7 +256,8 @@ const ECA_ON_META_COLUMNS = new Set(["OBJECTID", "APPROVAL_NUMBER"]);
 
 const ECA_ON_REGISTRY_PROFILE: RegistryLiveRefreshProfile = {
   kind: "registry",
-  projectId: "eris-p1",
+  projectId: "eris-p3",
+  registryId: "eca_on",
   keyField: "APPROVAL_NUMBER",
   nameField: "BUSINESS_NAME",
   extractableFields: ERIS_ECA_ON.columns.filter((c) => !ECA_ON_META_COLUMNS.has(c)),
@@ -263,20 +270,73 @@ const ECA_ON_REGISTRY_PROFILE: RegistryLiveRefreshProfile = {
   ],
 };
 
-// eris-p4 (Regulatory Incident & Spill Tracking) deliberately has no
-// live-refresh profile — like LUST_AZ, it's a bulk single-portal registry
-// snapshot (SPL_CT_HAZCONNECT) behind Cloudflare bot protection, not a
-// per-row website to revisit and not a queryable open API like ECA_ON.
-// It previously held a "Regulatory News Monitoring" live-refresh profile,
-// but a newsroom's "latest headline" field is expected to change on nearly
-// every visit, so ADMV's "Modified" tag never carried a real signal there.
+/* ------------------------------------------------------------------ */
+/* ABM — Annex Business Media. See abm-source-data.ts for the full        */
+/* rationale/provenance of every row. Two projects:                       */
+/*  abm-p1: CFIA's MeatList app — a genuine, unprotected server-rendered  */
+/*  HTML table (confirmed by direct testing), scraped/diffed the same way */
+/*  ECA_ON's structured API is, just via HTML instead of JSON.            */
+/*  abm-p2: Canadian Meat Council's 170 real member companies have real   */
+/*  per-member websites — re-checked live via the same AI-webpage engine  */
+/*  NTM/ESG use. CPMA (909 names) and OFVGA (14 orgs) are real but have no */
+/*  per-row URLs, so they stay static rows in the same project (no live   */
+/*  profile needed for them specifically). Meat & Poultry Ontario and     */
+/*  QPMA/AQDFL gate their directories behind login/JS search widgets —    */
+/*  listed as source agents only, same treatment as EPWN_AB.              */
+/* ------------------------------------------------------------------ */
+
+const ABM_MEATLIST_META_COLUMNS = new Set(["Registration_Number"]);
+
+const ABM_MEATLIST_REGISTRY_PROFILE: RegistryLiveRefreshProfile = {
+  kind: "registry",
+  projectId: "abm-p1",
+  registryId: "meatlist",
+  keyField: "Registration_Number",
+  nameField: "Company_Name",
+  extractableFields: ABM_MEATLIST_COLUMNS.filter((c) => !ABM_MEATLIST_META_COLUMNS.has(c)),
+  currentValueRows: ABM_MEATLIST_ROWS,
+  outputSheetName: "MeatList Output",
+};
+
+const ABM_CMC_FIELD_META: Record<string, FieldMeta> = {
+  Company_Name: { group: "Identity", label: "Company Name" },
+  Business_Description: { group: "Identity", label: "One-Line Summary of What the Company Does" },
+};
+
+const ABM_CMC_WEBPAGE_PROFILE: WebpageLiveRefreshProfile = {
+  kind: "webpage",
+  projectId: "abm-p2",
+  idField: "Website",
+  nameField: "Company_Name",
+  urlField: "Website",
+  extractableFields: ["Company_Name", "Business_Description"],
+  currentValueRows: ABM_CMC_LIVE_ROWS,
+  promptConfig: {
+    entityLabel: "meat industry company",
+    fieldMeta: ABM_CMC_FIELD_META,
+    relevantLinkKeywords: ["about", "company", "products", "who-we-are", "home"],
+  },
+  outputFormat: "flat",
+  outputSheetName: "CMC Members Output",
+};
+
+// eris-p2 (Regulatory Incident & Spill Tracking) and eris-p4 (US) both
+// deliberately have no live-refresh profile — like LUST_AZ, they're bulk
+// single-portal registry snapshots (SPL_CT_HAZCONNECT / LUST_AZ) behind
+// Cloudflare bot protection, not a per-row website to revisit and not a
+// queryable open API like ECA_ON. eris-p2 previously held a "Regulatory
+// News Monitoring" live-refresh profile, but a newsroom's "latest headline"
+// field is expected to change on nearly every visit, so ADMV's "Modified"
+// tag never carried a real signal there.
 
 export const LIVE_REFRESH_PROFILES: Record<string, LiveRefreshProfile> = {
-  "eris-p1": ECA_ON_REGISTRY_PROFILE,
+  "eris-p1": ESG_PROFILE,
   "ntm-p3": MAINTENANCE_PROFILE,
   "ntm-p6": MONITORING_PROFILE,
   "ntm-p7": POI_PROFILE,
-  "eris-p3": ESG_PROFILE,
+  "eris-p3": ECA_ON_REGISTRY_PROFILE,
+  "abm-p1": ABM_MEATLIST_REGISTRY_PROFILE,
+  "abm-p2": ABM_CMC_WEBPAGE_PROFILE,
 };
 
 export function getLiveRefreshProfile(projectId: string): LiveRefreshProfile | null {

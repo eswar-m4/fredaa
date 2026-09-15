@@ -36,6 +36,14 @@ const WORKSPACE: NavGroup = {
 
 
 
+// Shown in place of AppLayout (sidebar, header, page content) until the
+// client has mounted and read the saved workspace from localStorage — see
+// useMounted() in workspace.ts. Keeps a hard page load from ever painting
+// the wrong workspace's name/projects before correcting itself.
+export function WorkspaceLoadingFallback() {
+  return <div className="h-screen w-full bg-background" />;
+}
+
 export function AppLayout({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });

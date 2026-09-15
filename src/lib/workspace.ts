@@ -1,4 +1,4 @@
-import { useSyncExternalStore } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { CUSTOMERS, getCustomer, type Customer } from "@/data/customers";
 
 const KEY = "freda_customer";
@@ -29,4 +29,17 @@ export function useActiveCustomerId(): string {
 
 export function useActiveCustomer(): Customer {
   return getCustomer(useActiveCustomerId());
+}
+
+// The server (and the very first client paint, to avoid a hydration
+// mismatch) always render CUSTOMERS[0] here, since localStorage isn't
+// readable until the browser has mounted. If a different workspace was
+// last selected, the next render corrects it — visible as a flash of the
+// wrong workspace's name/projects for a frame. Pages that show
+// customer-dependent content should gate on this and render a lightweight
+// placeholder until mounted, so that "wrong" render never paints at all.
+export function useMounted(): boolean {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  return mounted;
 }

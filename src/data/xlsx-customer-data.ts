@@ -8,6 +8,7 @@
 
 import rawData from "./xlsx-data.json";
 import { ESG_COLUMNS, ESG_SAMPLE_ROWS } from "./eris-placeholder-data";
+import { ABM_MEATLIST_COLUMNS, ABM_MEATLIST_ROWS, ABM_DIRECTORY_COLUMNS, ABM_DIRECTORY_ROWS } from "./abm-source-data";
 
 type SheetData = {
   totalRows: number;
@@ -378,47 +379,10 @@ export const XLSX_PROJECT_OVERRIDES: Record<string, XlsxProjectOverride> = {
   // NTM's hotels), so "sources" is one real entry pointing at that portal —
   // and since this is the first pass with no prior snapshot to diff against,
   // admv is honestly all-Verified rather than fabricating Added/Modified.
+  // Display order: ESG (p1), Regulatory Incident & Spill Tracking (p2),
+  // Canada (p3), US (p4) — matches customers.ts's `projects` array order,
+  // since ids are assigned by position there (`${custId}-p${idx+1}`).
   "eris-p1": {
-    // Canada — primary reviewable data is ECA_ON (Ontario Environmental
-    // Compliance Approvals, 761 real approvals, fully parsed). EBR_ON,
-    // EPWN_AB, PES_BC and SPL_NT_NU are the other real Canadian registries
-    // from the same ERIS_Output & Spec batch, onboarded as source agents
-    // (real portal URLs + real estimated volumes from ERIS_Sources.xlsx)
-    // ahead of their own row-level extraction being built out.
-    records: ERIS_ECA_ON.records,
-    admv: { added: 0, deleted: 0, modified: 0, verified: ERIS_ECA_ON.records },
-    freshness: 98.4,
-    coverage: 99.1,
-    columns: ERIS_ECA_ON.columns,
-    sampleRows: ERIS_ECA_ON.sampleRows,
-    sources: [
-      { id: "eris-eca-on-src", label: "ECA_ON — Ontario Environmental Compliance Approvals", url: "https://ws.lioservices.lrc.gov.on.ca/arcgis1071a/rest/services/Access_Environment/Access_Environment_Map/MapServer/0/query", status: "Live", records: 761, addedOn: "Sep 2026" },
-      { id: "eris-ebr-on-src", label: "EBR_ON — Ontario Environmental Registry (ERO)", url: "https://ero.ontario.ca/search", status: "Live", records: 312, addedOn: "Sep 2026" },
-      { id: "eris-epwn-ab-src", label: "EPWN_AB — Alberta Public Notices Viewer", url: "https://avw.alberta.ca/PublicNoticesViewer.aspx?Click=ClearAndReturn", status: "Live", records: 4025, addedOn: "Sep 2026" },
-      { id: "eris-pes-bc-src", label: "PES_BC — BC Pesticide & Vendor Registry", url: "http://a100.gov.bc.ca/pub/apex/f?p=210:1:193981660561:", status: "Live", records: 1328, addedOn: "Sep 2026" },
-      { id: "eris-spl-nt-nu-src", label: "SPL_NT_NU — NWT/Nunavut Spill Reports", url: "https://www.enr.gov.nt.ca/en/spills", status: "Live", records: 15350, addedOn: "Sep 2026" },
-    ],
-  },
-  "eris-p2": {
-    // US — primary reviewable data is LUST_AZ (Arizona Leaking Underground
-    // Storage Tanks, 9606 real releases, fully parsed). UIC_TX, UST_SC and
-    // VFC_IN are the other real US registries from the same batch, onboarded
-    // as source agents. SPL_CT_HAZCONNECT moved to its own project (eris-p4)
-    // once it got fully parsed rather than staying a source-only listing.
-    records: ERIS_LUST_AZ.records,
-    admv: { added: 0, deleted: 0, modified: 0, verified: ERIS_LUST_AZ.records },
-    freshness: 98.7,
-    coverage: 98.9,
-    columns: ERIS_LUST_AZ.columns,
-    sampleRows: ERIS_LUST_AZ.sampleRows,
-    sources: [
-      { id: "eris-lust-az-src", label: "LUST_AZ — Arizona DEQ LUST Search", url: "https://legacy.azdeq.gov/databases/lustsearch_drupal.html", status: "Live", records: 9606, addedOn: "Sep 2026" },
-      { id: "eris-uic-tx-src", label: "UIC_TX — Texas Underground Injection Control", url: "https://www15.tceq.texas.gov/crpub/index.cfm?fuseaction=addnid.IdSearch", status: "Live", records: 1504, addedOn: "Sep 2026" },
-      { id: "eris-ust-sc-src", label: "UST_SC — South Carolina UST Registry", url: "http://www.scdhec.gov/Apps/Environment/USTRegistry/", status: "Live", records: 17617, addedOn: "Sep 2026" },
-      { id: "eris-vfc-in-src", label: "VFC_IN — Indiana Voluntary/Federal Cleanup Documents", url: "https://vfc.idem.in.gov/DocumentSearch.aspx", status: "Live", records: 160854, addedOn: "Sep 2026" },
-    ],
-  },
-  "eris-p3": {
     // ESG Compliance Monitoring — now live-refresh enabled (see
     // live-refresh-profiles.ts's ESG_PROFILE): 10 real public companies'
     // real sustainability pages, re-extracted for what's actually stateable
@@ -434,7 +398,7 @@ export const XLSX_PROJECT_OVERRIDES: Record<string, XlsxProjectOverride> = {
     sampleRows: ESG_SAMPLE_ROWS,
     sources: sourcesFromRows("eris-esg-src", ESG_SAMPLE_ROWS, "Company_Name", "Source_URL"),
   },
-  "eris-p4": {
+  "eris-p2": {
     // Regulatory Incident & Spill Tracking → SPL_CT_HAZCONNECT (Connecticut
     // DEEP spill/hazmat incident registry, 15,753 real incident records,
     // fully parsed). Same bulk single-portal shape as ECA_ON/LUST_AZ — one
@@ -455,6 +419,46 @@ export const XLSX_PROJECT_OVERRIDES: Record<string, XlsxProjectOverride> = {
     sampleRows: ERIS_SPL_CT.sampleRows,
     sources: [
       { id: "eris-spl-ct-src", label: "SPL_CT_HAZCONNECT — Connecticut Spill & Incident Reports", url: "https://connecticut.hazconnect.com/listincidentpublic.aspx", status: "Live", records: ERIS_SPL_CT.records, addedOn: "Sep 2026" },
+    ],
+  },
+  "eris-p3": {
+    // Canada — primary reviewable data is ECA_ON (Ontario Environmental
+    // Compliance Approvals, 761 real approvals, fully parsed). EBR_ON,
+    // EPWN_AB, PES_BC and SPL_NT_NU are the other real Canadian registries
+    // from the same ERIS_Output & Spec batch, onboarded as source agents
+    // (real portal URLs + real estimated volumes from ERIS_Sources.xlsx)
+    // ahead of their own row-level extraction being built out.
+    records: ERIS_ECA_ON.records,
+    admv: { added: 0, deleted: 0, modified: 0, verified: ERIS_ECA_ON.records },
+    freshness: 98.4,
+    coverage: 99.1,
+    columns: ERIS_ECA_ON.columns,
+    sampleRows: ERIS_ECA_ON.sampleRows,
+    sources: [
+      { id: "eris-eca-on-src", label: "ECA_ON — Ontario Environmental Compliance Approvals", url: "https://ws.lioservices.lrc.gov.on.ca/arcgis1071a/rest/services/Access_Environment/Access_Environment_Map/MapServer/0/query", status: "Live", records: 761, addedOn: "Sep 2026" },
+      { id: "eris-ebr-on-src", label: "EBR_ON — Ontario Environmental Registry (ERO)", url: "https://ero.ontario.ca/search", status: "Live", records: 312, addedOn: "Sep 2026" },
+      { id: "eris-epwn-ab-src", label: "EPWN_AB — Alberta Public Notices Viewer", url: "https://avw.alberta.ca/PublicNoticesViewer.aspx?Click=ClearAndReturn", status: "Live", records: 4025, addedOn: "Sep 2026" },
+      { id: "eris-pes-bc-src", label: "PES_BC — BC Pesticide & Vendor Registry", url: "http://a100.gov.bc.ca/pub/apex/f?p=210:1:193981660561:", status: "Live", records: 1328, addedOn: "Sep 2026" },
+      { id: "eris-spl-nt-nu-src", label: "SPL_NT_NU — NWT/Nunavut Spill Reports", url: "https://www.enr.gov.nt.ca/en/spills", status: "Live", records: 15350, addedOn: "Sep 2026" },
+    ],
+  },
+  "eris-p4": {
+    // US — primary reviewable data is LUST_AZ (Arizona Leaking Underground
+    // Storage Tanks, 9606 real releases, fully parsed). UIC_TX, UST_SC and
+    // VFC_IN are the other real US registries from the same batch, onboarded
+    // as source agents. SPL_CT_HAZCONNECT moved to its own project (eris-p2)
+    // once it got fully parsed rather than staying a source-only listing.
+    records: ERIS_LUST_AZ.records,
+    admv: { added: 0, deleted: 0, modified: 0, verified: ERIS_LUST_AZ.records },
+    freshness: 98.7,
+    coverage: 98.9,
+    columns: ERIS_LUST_AZ.columns,
+    sampleRows: ERIS_LUST_AZ.sampleRows,
+    sources: [
+      { id: "eris-lust-az-src", label: "LUST_AZ — Arizona DEQ LUST Search", url: "https://legacy.azdeq.gov/databases/lustsearch_drupal.html", status: "Live", records: 9606, addedOn: "Sep 2026" },
+      { id: "eris-uic-tx-src", label: "UIC_TX — Texas Underground Injection Control", url: "https://www15.tceq.texas.gov/crpub/index.cfm?fuseaction=addnid.IdSearch", status: "Live", records: 1504, addedOn: "Sep 2026" },
+      { id: "eris-ust-sc-src", label: "UST_SC — South Carolina UST Registry", url: "http://www.scdhec.gov/Apps/Environment/USTRegistry/", status: "Live", records: 17617, addedOn: "Sep 2026" },
+      { id: "eris-vfc-in-src", label: "VFC_IN — Indiana Voluntary/Federal Cleanup Documents", url: "https://vfc.idem.in.gov/DocumentSearch.aspx", status: "Live", records: 160854, addedOn: "Sep 2026" },
     ],
   },
 
@@ -514,6 +518,45 @@ export const XLSX_PROJECT_OVERRIDES: Record<string, XlsxProjectOverride> = {
     },
     columns:    IBG_PRIVATE_COMPANIES.subsColumns,
     sampleRows: IBG_PRIVATE_COMPANIES.subsSamples,
+  },
+
+  // Annex Business Media — real scraped data, see abm-source-data.ts for
+  // exactly what was fetched from where. First pass, no prior snapshot to
+  // diff against, so admv is honestly all-Verified like ERIS's other
+  // first-onboarding projects.
+  "abm-p1": {
+    // Government of Canada → CFIA federally registered meat establishments
+    records: ABM_MEATLIST_ROWS.length,
+    admv: { added: 0, deleted: 0, modified: 0, verified: ABM_MEATLIST_ROWS.length },
+    freshness: 97.8,
+    coverage: 99.0,
+    columns: ABM_MEATLIST_COLUMNS,
+    sampleRows: ABM_MEATLIST_ROWS,
+    sources: [
+      { id: "abm-meatlist-src", label: "CFIA — Federally Registered Meat Establishments", url: "https://apps.inspection.canada.ca/webapps/MeatList/Home/Results", status: "Live", records: ABM_MEATLIST_ROWS.length, addedOn: "Sep 2026" },
+    ],
+  },
+  "abm-p2": {
+    // Meat & Produce Association Directories → bundled real member/affiliate
+    // rows from all 5 named sources. Canadian Meat Council is the one with
+    // real per-member website links (live-refresh-profiles.ts re-checks
+    // those live); CPMA and OFVGA are real name-only lists onboarded as
+    // static rows; Meat & Poultry Ontario and QPMA (real current site:
+    // aqdfl.ca) gate their directories behind login/JS search widgets, so
+    // they're listed as source agents only, same as EPWN_AB in ERIS Canada.
+    records: ABM_DIRECTORY_ROWS.length,
+    admv: { added: 0, deleted: 0, modified: 0, verified: ABM_DIRECTORY_ROWS.length },
+    freshness: 96.5,
+    coverage: 98.2,
+    columns: ABM_DIRECTORY_COLUMNS,
+    sampleRows: ABM_DIRECTORY_ROWS,
+    sources: [
+      { id: "abm-cmc-src", label: "Canadian Meat Council — Member Companies", url: "https://meatcouncil.ca/about-us/our-members/", status: "Live", records: 170, addedOn: "Sep 2026" },
+      { id: "abm-cpma-src", label: "Canadian Produce Marketing Association — Members", url: "https://cpma.ca/about-us/members/", status: "Live", records: 909, addedOn: "Sep 2026" },
+      { id: "abm-ofvga-src", label: "Ontario Fruit and Vegetable Growers' Association — Affiliates", url: "https://www.ofvga.org/who-we-are", status: "Live", records: 14, addedOn: "Sep 2026" },
+      { id: "abm-mpo-src", label: "Meat & Poultry Ontario — Member Directory (login-gated)", url: "https://www.meatpoultryon.ca/", status: "Live", records: 0, addedOn: "Sep 2026" },
+      { id: "abm-qpma-src", label: "Quebec Produce Marketing Association (AQDFL) — Member Portal", url: "https://aqdfl.ca/en/", status: "Live", records: 0, addedOn: "Sep 2026" },
+    ],
   },
 };
 

@@ -10,7 +10,7 @@ import {
   FolderPlus,
   BookOpen,
 } from "lucide-react";
-import { AppLayout } from "@/components/AppLayout";
+import { AppLayout, WorkspaceLoadingFallback } from "@/components/AppLayout";
 import { NewProjectDialog } from "@/components/NewProjectDialog";
 import {
   Badge,
@@ -28,7 +28,8 @@ import {
 import { ReviewDialog, type LiveReviewData } from "@/components/ReviewDialog";
 import { DownloadMenu } from "@/components/DownloadMenu";
 import { isLiveCheckable, loadLiveReview } from "@/lib/monitoring-live-review";
-import { useActiveCustomer } from "@/lib/workspace";
+import { useActiveCustomer, useMounted } from "@/lib/workspace";
+import { useReviewStatusVersion } from "@/lib/review-status";
 import {
   actionsFor,
   admvPct,
@@ -103,7 +104,9 @@ const CRITICAL_ACTIONS = [
 
 
 function DashboardPage() {
+  const mounted = useMounted();
   const customer = useActiveCustomer();
+  useReviewStatusVersion(); // re-render when a Submit in ReviewDialog updates a project's review status
   const [range, setRange] = useState<RangeValue>(DEFAULT_RANGE);
   const [scope, setScope] = useState<string>("all");
   const [reviewProject, setReviewProject] = useState<Project | null>(null);
@@ -138,6 +141,7 @@ function DashboardPage() {
   const pipeline = useMemo(() => devPipeline(customer), [customer.id]);
   const active = scoped.find((p) => p.id === selected) ?? scoped[0] ?? customer.projects[0]!;
 
+  if (!mounted) return <WorkspaceLoadingFallback />;
 
   return (
     <AppLayout>

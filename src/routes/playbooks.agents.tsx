@@ -1,9 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { ArrowLeft, Bot, CalendarClock, Clock, Globe, Plus, Search, Trash2, ExternalLink, CheckCircle2, Ticket } from "lucide-react";
-import { AppLayout } from "@/components/AppLayout";
+import { AppLayout, WorkspaceLoadingFallback } from "@/components/AppLayout";
 import { Badge, Button, Card, Input, PageHeader, SectionTitle, Select } from "@/components/ui-bits";
-import { useActiveCustomer } from "@/lib/workspace";
+import { useActiveCustomer, useMounted } from "@/lib/workspace";
 import { estimate, fmt, type Project, type SourceRef } from "@/data/customers";
 import { addTicket } from "@/lib/ticket-store";
 import { ATTRIBUTES } from "@/data/attributes";
@@ -35,6 +35,7 @@ const NEUTRAL_ART = {
 type Cadence = "Daily" | "Weekly" | "Monthly" | "Custom";
 
 function AgentsPage() {
+  const mounted = useMounted();
   const customer = useActiveCustomer();
   const [q, setQ] = useState("");
   const [projectId, setProjectId] = useState<string>(customer.projects[0]!.id);
@@ -103,6 +104,8 @@ function AgentsPage() {
     const label = currentCadence === "Custom" ? `Custom — ${currentRule}` : currentCadence;
     raise("Schedule change", `Run schedule for “${project.name}” set to ${label}`, 1, [], []);
   }
+
+  if (!mounted) return <WorkspaceLoadingFallback />;
 
   return (
     <AppLayout>

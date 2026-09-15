@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Clock, Info, Search, Ticket } from "lucide-react";
-import { AppLayout } from "@/components/AppLayout";
+import { AppLayout, WorkspaceLoadingFallback } from "@/components/AppLayout";
 import { Badge, Card, Input, PageHeader, SectionTitle } from "@/components/ui-bits";
-import { useActiveCustomer } from "@/lib/workspace";
+import { useActiveCustomer, useMounted } from "@/lib/workspace";
 import { requestsFor } from "@/data/customers";
 import { useTickets, type TicketStatus } from "@/lib/ticket-store";
 import { cn } from "@/lib/utils";
@@ -32,6 +32,7 @@ const TONE: Record<string, "info" | "warning" | "success" | "purple" | "destruct
 };
 
 function RequestsPage() {
+  const mounted = useMounted();
   const customer = useActiveCustomer();
   const live = useTickets().filter((t) => t.workspaceId === customer.id);
   const [q, setQ] = useState("");
@@ -66,6 +67,8 @@ function RequestsPage() {
   }, [live, customer, q, status]);
 
   const open = rows.filter((r) => r.status === "Awaiting admin approval" || r.status === "Estimating").length;
+
+  if (!mounted) return <WorkspaceLoadingFallback />;
 
   return (
     <AppLayout>

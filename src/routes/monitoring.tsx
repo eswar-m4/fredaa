@@ -12,7 +12,7 @@ import {
   Pause,
   Play,
 } from "lucide-react";
-import { AppLayout } from "@/components/AppLayout";
+import { AppLayout, WorkspaceLoadingFallback } from "@/components/AppLayout";
 import {
   Badge,
   Button,
@@ -25,13 +25,14 @@ import {
   Select,
   type RangeValue,
 } from "@/components/ui-bits";
-import { useActiveCustomer } from "@/lib/workspace";
+import { useActiveCustomer, useMounted } from "@/lib/workspace";
 import { destinationsFor, fmt, hrsAgo, inHrs, jobsFor, rollupProjects, type JobRun, type Project } from "@/data/customers";
 import { statusTone } from "@/routes/index";
 import { cn } from "@/lib/utils";
 import { ReviewDialog, type LiveReviewData } from "@/components/ReviewDialog";
 import { DownloadMenu } from "@/components/DownloadMenu";
-import { isLiveCheckable, fetchLiveReview } from "@/lib/monitoring-live-review";
+import { isLiveCheckable, fetchLiveReview, monitorStatusFor } from "@/lib/monitoring-live-review";
+import { useReviewStatusVersion } from "@/lib/review-status";
 
 export const Route = createFileRoute("/monitoring")({
   head: () => ({
@@ -61,7 +62,9 @@ const jobTone: Record<JobRun["state"], "info" | "neutral" | "success" | "destruc
 };
 
 function MonitoringPage() {
+  const mounted = useMounted();
   const customer = useActiveCustomer();
+  useReviewStatusVersion(); // re-render when a Submit in ReviewDialog (here or on the Dashboard) changes a project's status
   const [range, setRange] = useState<RangeValue>(DEFAULT_RANGE);
   const [scope, setScope] = useState("all");
   const [filter, setFilter] = useState("all");
@@ -76,7 +79,7 @@ function MonitoringPage() {
 
   const days = rangeDays(range);
   const visibleJobs = jobs.filter((j) => (scope === "all" || j.projectId === scope) && j.startedHrs <= days * 24);
-  const projects = scoped.filter((p) => filter === "all" || p.status === filter);
+  const projects = scoped.filter((p) => filter === "all" || monitorStatusFor(p, running[p.id] !== undefined) === filter);
 
   function refresh(id: string) {
     const project = customer.projects.find((p) => p.id === id);
@@ -126,6 +129,8 @@ function MonitoringPage() {
   const live = visibleJobs.filter((j) => j.state === "Running").length;
   const failed = visibleJobs.filter((j) => j.state === "Failed").length;
 
+  if (!mounted) return <WorkspaceLoadingFallback />;
+
   return (
     <AppLayout>
       <PageHeader
@@ -157,7 +162,7 @@ function MonitoringPage() {
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <Tile icon={PlayCircle} label="Automations running" value={String(live)} tone="info" />
-          <Tile icon={CheckCircle2} label="In sync datasets" value={String(scoped.filter((p) => p.status === "In sync").length)} tone="success" />
+          <Tile icon={CheckCircle2} label="In sync datasets" value={String(scoped.filter((p) => monitorStatusFor(p, running[p.id] !== undefined) === "In sync").length)} tone="success" />
           <Tile icon={AlertTriangle} label="Failed runs" value={String(failed)} tone="warning" />
           <Tile icon={Activity} label="Changes in window" value={fmt(stats.admv.added + stats.admv.deleted + stats.admv.modified)} tone="purple" />
         </div>
@@ -286,7 +291,10 @@ function MonitoringPage() {
                       <span className="text-warning">~{fmt(p.admv.modified)}</span>
                     </td>
                     <td className="px-3 py-3">
-                      <Badge tone={statusTone[p.status]}>{p.status}</Badge>
+                      {(() => {
+                        const status = monitorStatusFor(p, pct !== undefined);
+                        return <Badge tone={statusTone[status]}>{status}</Badge>;
+                      })()}
                     </td>
                     <td className="px-5 py-3 text-right">
                       {pct === undefined ? (
