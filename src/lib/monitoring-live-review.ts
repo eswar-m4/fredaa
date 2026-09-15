@@ -1,5 +1,5 @@
 import { runMonitoringRefresh } from "@/lib/api/monitoring-refresh.functions";
-import { runEcaOnRegistryRefresh, runMeatListRegistryRefresh } from "@/lib/api/registry-refresh.functions";
+import { runEcaOnRegistryRefresh, runMeatListRegistryRefresh, runAbmDirectoryRegistryRefresh } from "@/lib/api/registry-refresh.functions";
 import { diffRegistrySnapshot, type RegistryLiveOutcome } from "@/lib/api/registry-refresh.core";
 import {
   getLiveRefreshProfile,
@@ -14,27 +14,36 @@ import { clearReviewProgress } from "@/lib/review-status";
 
 const STORAGE_PREFIX = "freda_live_review_";
 
+// Bump whenever a fix changes how live-refresh records are built in a way
+// that would make an already-cached run look wrong (e.g. today's sourceUrl
+// fix) — see cacheVersion on LiveReviewData.
+const CACHE_VERSION = 5;
+
 /** Persists the result of a live "Run" so other screens (e.g. the Dashboard's
  *  Review button) can show the same data without re-running it. */
 export function saveLiveReview(projectId: string, data: LiveReviewData) {
   if (typeof window === "undefined") return;
   try {
-    window.localStorage.setItem(`${STORAGE_PREFIX}${projectId}`, JSON.stringify(data));
+    window.localStorage.setItem(`${STORAGE_PREFIX}${projectId}`, JSON.stringify({ ...data, cacheVersion: CACHE_VERSION }));
   } catch {
     // Storage full or unavailable — the run still succeeded, just won't persist.
   }
 }
 
 /** Reads back the last live "Run" result for a project, if one was ever saved
- *  AND it still matches the profile currently bound to that project id — a
- *  run cached before a project reorder/rebind (a different real dataset now
- *  sits at this id) is discarded rather than shown as if it were current. */
+ *  AND it's still trustworthy: it must match the profile currently bound to
+ *  that project id (a run cached before a project reorder/rebind is
+ *  discarded rather than shown as if it were current), and it must have
+ *  been produced by the current CACHE_VERSION of this code (a run cached
+ *  before a fix to how records are built is discarded the same way, rather
+ *  than surfacing the old, now-wrong shape forever). */
 export function loadLiveReview(projectId: string): LiveReviewData | null {
   if (typeof window === "undefined") return null;
   try {
     const raw = window.localStorage.getItem(`${STORAGE_PREFIX}${projectId}`);
     if (!raw) return null;
     const data = JSON.parse(raw) as LiveReviewData;
+    if (data.cacheVersion !== CACHE_VERSION) return null;
     const currentKind = getLiveRefreshProfile(projectId)?.kind;
     if (data.profileKind && currentKind && data.profileKind !== currentKind) return null;
     return data;
@@ -145,6 +154,7 @@ export async function fetchLiveReview(project: Project): Promise<LiveReviewData>
 const REGISTRY_FETCHERS: Record<RegistryLiveRefreshProfile["registryId"], () => Promise<RegistryLiveOutcome>> = {
   eca_on: runEcaOnRegistryRefresh,
   meatlist: runMeatListRegistryRefresh,
+  abm_directory: runAbmDirectoryRegistryRefresh,
 };
 
 /** "registry" kind — queries the live bulk database API directly (no LLM
@@ -178,6 +188,10 @@ async function fetchRegistryLiveReview(project: Project, profile: RegistryLiveRe
     fetchErrors.push({ entity: `${profile.registryId} registry query`, error: outcome.error ?? "Unknown error" });
   } else {
     reachableCount += 1;
+    // Some registry fetchers merge several real sub-sources (e.g. ABM's
+    // directory listings) — reachable=true just means at least one
+    // succeeded, so a partial failure still needs surfacing honestly.
+    if (outcome.error) fetchErrors.push({ entity: `${profile.registryId} registry query`, error: outcome.error });
     const diffed = diffRegistrySnapshot(profile.currentValueRows, outcome.rows, profile.keyField, profile.nameField, profile.extractableFields);
     for (const rec of diffed) {
       for (const d of rec.diffs) {
@@ -191,7 +205,7 @@ async function fetchRegistryLiveReview(project: Project, profile: RegistryLiveRe
           changeType: d.changeType,
           confidence: 99,
           source: rec.name,
-          sourceUrl: "",
+          sourceUrl: profile.buildSourceUrl?.(rec.row) || profile.sourceUrl,
           detectedHrs: 0,
         });
       }

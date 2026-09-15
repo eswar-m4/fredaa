@@ -32,6 +32,12 @@ export type LiveReviewData = {
    *  project id before that id's profile changed (e.g. a project reorder)
    *  is never mistaken for a real run of whatever now lives at that id. */
   profileKind?: string;
+  /** Bumped whenever a change to the live-refresh code itself (not just
+   *  which profile a project uses) would make an already-cached run stale
+   *  or wrong in a way profileKind alone can't detect — e.g. a fix to how
+   *  sourceUrl gets built. A cached run stamped with an older/missing
+   *  version is discarded on load instead of being shown as if current. */
+  cacheVersion?: number;
 };
 
 export function ReviewDialog({
@@ -436,15 +442,21 @@ export function ReviewDialog({
                             {r.newValue}
                           </td>
                           <td className="px-3 py-2">
-                            <a
-                              href={r.sourceUrl}
-                              target="_blank"
-                              rel="noreferrer"
-                              title={r.sourceUrl}
-                              className="inline-flex items-center gap-1 text-primary hover:underline max-w-[180px] truncate text-[11.5px]"
-                            >
-                              <ExternalLink className="h-3 w-3 shrink-0" /> {r.source}
-                            </a>
+                            {r.sourceUrl ? (
+                              <a
+                                href={r.sourceUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                title={r.sourceUrl}
+                                className="inline-flex items-center gap-1 text-primary hover:underline max-w-[180px] truncate text-[11.5px]"
+                              >
+                                <ExternalLink className="h-3 w-3 shrink-0" /> {r.source}
+                              </a>
+                            ) : (
+                              // A blank href would resolve to this page itself, not an
+                              // external source — show plain text instead of a fake link.
+                              <span className="text-muted-foreground max-w-[180px] truncate text-[11.5px] block">{r.source}</span>
+                            )}
                           </td>
                           <td className="px-3 py-2 tabular-nums">{r.confidence}%</td>
                           <td className="px-3 py-2 text-[11.5px] text-muted-foreground whitespace-nowrap">{hrsAgo(r.detectedHrs)}</td>

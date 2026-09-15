@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { fetchEcaOnLive, fetchMeatListLive } from "./registry-refresh.core";
+import { fetchEcaOnLive, fetchMeatListLive, fetchAbmDirectoryLive } from "./registry-refresh.core";
 
 // RPC boundary — the ArcGIS endpoint is public/CORS-open, but this stays
 // server-side for consistency with the rest of the live-refresh plumbing.
@@ -11,4 +11,9 @@ export const runEcaOnRegistryRefresh = createServerFn({ method: "POST" }).handle
 // server-side for consistency.
 export const runMeatListRegistryRefresh = createServerFn({ method: "POST" }).handler(async () => {
   return fetchMeatListLive();
+});
+
+// Same idea for ABM's 3 scrapable directory listing pages.
+export const runAbmDirectoryRegistryRefresh = createServerFn({ method: "POST" }).handler(async () => {
+  return fetchAbmDirectoryLive();
 });

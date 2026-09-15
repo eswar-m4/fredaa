@@ -538,12 +538,13 @@ export const XLSX_PROJECT_OVERRIDES: Record<string, XlsxProjectOverride> = {
   },
   "abm-p2": {
     // Meat & Produce Association Directories → bundled real member/affiliate
-    // rows from all 5 named sources. Canadian Meat Council is the one with
-    // real per-member website links (live-refresh-profiles.ts re-checks
-    // those live); CPMA and OFVGA are real name-only lists onboarded as
-    // static rows; Meat & Poultry Ontario and QPMA (real current site:
-    // aqdfl.ca) gate their directories behind login/JS search widgets, so
-    // they're listed as source agents only, same as EPWN_AB in ERIS Canada.
+    // rows from all 5 named sources (170 Canadian Meat Council + 909 CPMA +
+    // 14 OFVGA — real company/org names, all shown here as static rows).
+    // "Run" re-checks the 4 directory portals themselves, not each
+    // individual company — see ABM_DIRECTORY_PORTALS_PROFILE in
+    // live-refresh-profiles.ts. QPMA (real current site: aqdfl.ca) gates its
+    // directory behind a login/JS search widget, so it's listed as a source
+    // agent only, same as EPWN_AB in ERIS Canada.
     records: ABM_DIRECTORY_ROWS.length,
     admv: { added: 0, deleted: 0, modified: 0, verified: ABM_DIRECTORY_ROWS.length },
     freshness: 96.5,

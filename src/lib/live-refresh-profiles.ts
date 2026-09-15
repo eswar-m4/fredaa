@@ -6,7 +6,7 @@
 import attributeDictionary from "@/data/ntm-attribute-dictionary.json" with { type: "json" };
 import { NTM_MONITORING, NTM_MAINTENANCE, POI_DATA, ERIS_ECA_ON } from "@/data/xlsx-customer-data";
 import { ESG_COLUMNS, ESG_SAMPLE_ROWS } from "@/data/eris-placeholder-data";
-import { ABM_MEATLIST_COLUMNS, ABM_MEATLIST_ROWS, ABM_CMC_LIVE_ROWS } from "@/data/abm-source-data";
+import { ABM_MEATLIST_COLUMNS, ABM_MEATLIST_ROWS, ABM_DIRECTORY_ROWS } from "@/data/abm-source-data";
 import type { FieldMeta, PromptConfig } from "@/lib/api/monitoring-refresh.core";
 
 export type LiveRefreshOutputFormat =
@@ -44,12 +44,23 @@ export type RegistryLiveRefreshProfile = {
    *  dispatch in monitoring-live-review.ts. Each registry has its own
    *  fetch shape (ArcGIS query vs. HTML table scrape), so this is a small
    *  fixed set rather than a free-form string. */
-  registryId: "eca_on" | "meatlist";
+  registryId: "eca_on" | "meatlist" | "abm_directory";
   keyField: string;
   nameField: string;
   extractableFields: string[];
   currentValueRows: Record<string, string>[];
   outputSheetName: string;
+  /** The real external registry page — fallback "Source" link for a
+   *  record when buildSourceUrl (below) can't produce a real per-row link
+   *  for it, so the link never falls back to "" (which resolves to the
+   *  app's own current page rather than anywhere external). */
+  sourceUrl: string;
+  /** Builds the real per-row reference URL from that row's own fresh live
+   *  data — e.g. ECA_ON's own PDF_URL column, or a registry search
+   *  narrowed to just this one entry — so "Source" points at the specific
+   *  page an entry's data actually came from, not a generic listing.
+   *  Return "" to fall back to sourceUrl for that row. */
+  buildSourceUrl?: (row: Record<string, string>) => string;
   /** Other real registries in this project that don't expose a structured
    *  query API but ARE reachable public pages — checked via the same
    *  AI-webpage-reading engine ESG/NTM use, in addition to (not instead of)
@@ -263,6 +274,11 @@ const ECA_ON_REGISTRY_PROFILE: RegistryLiveRefreshProfile = {
   extractableFields: ERIS_ECA_ON.columns.filter((c) => !ECA_ON_META_COLUMNS.has(c)),
   currentValueRows: ERIS_ECA_ON.sampleRows,
   outputSheetName: "ECA_ON Output",
+  sourceUrl: "https://ws.lioservices.lrc.gov.on.ca/arcgis1071a/rest/services/Access_Environment/Access_Environment_Map/MapServer/0/query",
+  // Each approval's own PDF_URL (built from the live row's PDF_LINK) is a
+  // real, specific document — the actual page an entry's data came from,
+  // not just the generic query endpoint.
+  buildSourceUrl: (row) => row.PDF_URL || "",
   companionWebpages: [
     { id: "ebr-on", name: "EBR_ON — Ontario Environmental Registry", url: "https://ero.ontario.ca/search" },
     { id: "pes-bc", name: "PES_BC — BC Pesticide Licenses", url: "http://a100.gov.bc.ca/pub/apex/f?p=210:1:193981660561:" },
@@ -276,13 +292,21 @@ const ECA_ON_REGISTRY_PROFILE: RegistryLiveRefreshProfile = {
 /*  abm-p1: CFIA's MeatList app — a genuine, unprotected server-rendered  */
 /*  HTML table (confirmed by direct testing), scraped/diffed the same way */
 /*  ECA_ON's structured API is, just via HTML instead of JSON.            */
-/*  abm-p2: Canadian Meat Council's 170 real member companies have real   */
-/*  per-member websites — re-checked live via the same AI-webpage engine  */
-/*  NTM/ESG use. CPMA (909 names) and OFVGA (14 orgs) are real but have no */
-/*  per-row URLs, so they stay static rows in the same project (no live   */
-/*  profile needed for them specifically). Meat & Poultry Ontario and     */
-/*  QPMA/AQDFL gate their directories behind login/JS search widgets —    */
-/*  listed as source agents only, same treatment as EPWN_AB.              */
+/*  abm-p2: "Run" re-scrapes the 3 directory listing pages that actually    */
+/*  publish a real member/affiliate list (Canadian Meat Council, CPMA,      */
+/*  OFVGA) and diffs the combined company-level rows against the onboarded  */
+/*  snapshot — same registry-style bulk scrape as MeatList above, not a     */
+/*  per-company AI webpage check. An earlier version visited each of 170    */
+/*  real Canadian Meat Council member sites individually (one HTTP + one    */
+/*  LLM call each); that realistically took many minutes and looked        */
+/*  permanently "stuck" rather than actually broken. Scraping the 3         */
+/*  directory pages themselves is 3 plain HTTP GETs — seconds, not minutes  */
+/*  — and is genuinely what's re-extracted: none of these 3 pages publish   */
+/*  email or mailing address for their members, so those fields aren't      */
+/*  fabricated here. Meat & Poultry Ontario is checked as a companion       */
+/*  reachability page (its directory is login-gated, no list to scrape);    */
+/*  QPMA's real current site (aqdfl.ca — qpma.ca itself is dead) is listed  */
+/*  as a source agent only, matching EPWN_AB's treatment in ERIS Canada.    */
 /* ------------------------------------------------------------------ */
 
 const ABM_MEATLIST_META_COLUMNS = new Set(["Registration_Number"]);
@@ -296,28 +320,43 @@ const ABM_MEATLIST_REGISTRY_PROFILE: RegistryLiveRefreshProfile = {
   extractableFields: ABM_MEATLIST_COLUMNS.filter((c) => !ABM_MEATLIST_META_COLUMNS.has(c)),
   currentValueRows: ABM_MEATLIST_ROWS,
   outputSheetName: "MeatList Output",
+  sourceUrl: "https://apps.inspection.canada.ca/webapps/MeatList/Home/Results",
+  // Confirmed via direct testing: ?enum=<registration number> filters the
+  // same live results page down to just that one establishment — a real,
+  // specific reference for e.g. Royal Delight Foods (7014), not the whole
+  // 952-row table.
+  buildSourceUrl: (row) =>
+    row.Registration_Number
+      ? `https://apps.inspection.canada.ca/webapps/MeatList/Home/Results?enum=${encodeURIComponent(row.Registration_Number)}`
+      : "",
 };
 
-const ABM_CMC_FIELD_META: Record<string, FieldMeta> = {
-  Company_Name: { group: "Identity", label: "Company Name" },
-  Business_Description: { group: "Identity", label: "One-Line Summary of What the Company Does" },
-};
-
-const ABM_CMC_WEBPAGE_PROFILE: WebpageLiveRefreshProfile = {
-  kind: "webpage",
+const ABM_DIRECTORY_REGISTRY_PROFILE: RegistryLiveRefreshProfile = {
+  kind: "registry",
   projectId: "abm-p2",
-  idField: "Website",
+  registryId: "abm_directory",
+  keyField: "Company_Name",
   nameField: "Company_Name",
-  urlField: "Website",
-  extractableFields: ["Company_Name", "Business_Description"],
-  currentValueRows: ABM_CMC_LIVE_ROWS,
-  promptConfig: {
-    entityLabel: "meat industry company",
-    fieldMeta: ABM_CMC_FIELD_META,
-    relevantLinkKeywords: ["about", "company", "products", "who-we-are", "home"],
+  // Company_Name included here (not just used as nameField) so it shows as
+  // a reviewable attribute too, same as ECA_ON's BUSINESS_NAME. Address
+  // isn't published by any of the 3 directories — stays blank rather than
+  // guessed, same honest-blank pattern as ECA_ON's PDF_SITE_LOCATION.
+  extractableFields: ["Company_Name", "Website", "Address", "Business_Description"],
+  currentValueRows: ABM_DIRECTORY_ROWS,
+  outputSheetName: "Directory Output",
+  sourceUrl: "https://meatcouncil.ca/about-us/our-members/",
+  // Each company's real source: its own website when the directory
+  // publishes one (Canadian Meat Council), otherwise the directory page it
+  // was found in (CPMA / OFVGA don't publish per-member links).
+  buildSourceUrl: (row) => {
+    if (row.Website) return row.Website;
+    if (row.Source_Association === "Canadian Produce Marketing Association") return "https://cpma.ca/about-us/members/";
+    if (row.Source_Association === "Ontario Fruit and Vegetable Growers' Association") return "https://www.ofvga.org/who-we-are";
+    return "";
   },
-  outputFormat: "flat",
-  outputSheetName: "CMC Members Output",
+  companionWebpages: [
+    { id: "mpo", name: "Meat & Poultry Ontario — Member Directory (login-gated)", url: "https://www.meatpoultryon.ca/" },
+  ],
 };
 
 // eris-p2 (Regulatory Incident & Spill Tracking) and eris-p4 (US) both
@@ -336,7 +375,7 @@ export const LIVE_REFRESH_PROFILES: Record<string, LiveRefreshProfile> = {
   "ntm-p7": POI_PROFILE,
   "eris-p3": ECA_ON_REGISTRY_PROFILE,
   "abm-p1": ABM_MEATLIST_REGISTRY_PROFILE,
-  "abm-p2": ABM_CMC_WEBPAGE_PROFILE,
+  "abm-p2": ABM_DIRECTORY_REGISTRY_PROFILE,
 };
 
 export function getLiveRefreshProfile(projectId: string): LiveRefreshProfile | null {
