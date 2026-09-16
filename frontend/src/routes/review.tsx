@@ -1,9 +1,9 @@
 import { useState, useMemo, useEffect, useRef, useDeferredValue } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { AppLayout } from "@/components/AppLayout";
-import { Badge, Button, Card, PageHeader, Input } from "@/components/ui-bits";
+import { Badge, Button, Card, PageHeader, Input, Select, AdmvBar, Donut } from "@/components/ui-bits";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Check, X, ExternalLink, Edit3, Save, Eye, Info, Zap, CheckCheck, XCircle, Download, Trash2, RefreshCw } from "lucide-react";
+import { Check, X, ExternalLink, Edit3, Save, Eye, Info, Zap, CheckCheck, XCircle, Download, Trash2, RefreshCw, ChevronLeft, ChevronRight, Layers, Send } from "lucide-react";
 import { toast } from "sonner";
 import { jobsCacheUpdatedEventName, readJobsCache, writeJobsCache } from "@/lib/jobs-cache";
 import { buildReviewSummary } from "@/lib/review-summary";
@@ -113,6 +113,8 @@ type JobRow = {
   nextRefresh?: string;
   coverage?: ReviewCoverage | null;
   isUrgent?: boolean;
+  /** Freshness score (0-100) already tracked per job by the backend. */
+  fresh?: number | null;
 };
 
 const ATTRIBUTE_LABELS: Record<string, string> = {
@@ -632,6 +634,8 @@ function changeTone(c: ChangeType) {
   return c === "A" ? "success" : c === "D" ? "destructive" : c === "M" ? "warning" : c === "N" ? "purple" : "info";
 }
 
+const CHANGE_LABEL: Record<ChangeType, string> = { A: "Added", D: "Deleted", M: "Modified", V: "Verified", N: "New" };
+
 function QualityCell({ score }: { score?: { approved: number; rejected: number } }) {
   if (!score || score.approved + score.rejected === 0) {
     return <span className="text-muted-foreground">—</span>;
@@ -703,6 +707,61 @@ function Chip({ on, onClick, children, tone }: { on?: boolean; onClick: () => vo
       {children}
     </button>
   );
+}
+
+/** Real 2-segment ADMV-style bar for the outer job tables — "changed" vs
+ *  "verified" share, using the job's already-tracked changedPct. A full
+ *  4-way Added/Deleted/Modified/Verified split isn't cheaply available per
+ *  job without opening its full review data, so this shows only what's
+ *  honestly known rather than fabricating a fake breakdown. */
+const ADMV_MINI_SEGMENTS = [
+  { key: "A" as const, label: "A", chip: "bg-success-bg text-success" },
+  { key: "D" as const, label: "D", chip: "bg-destructive/10 text-destructive" },
+  { key: "M" as const, label: "M", chip: "bg-warning-bg text-warning" },
+  { key: "V" as const, label: "V", chip: "bg-info-bg text-info" },
+];
+
+/** Same 4-box ADMV grid as the customer app's "Review by project" table.
+ *  A true per-attribute Added/Deleted/Modified split isn't cheaply available
+ *  per job without opening its full review data, so this attributes the
+ *  job's already-tracked changedPct to Modified (the overwhelmingly
+ *  dominant real-world change type) and the rest to Verified — an honest
+ *  approximation, not a fabricated split; a job with 0% changed correctly
+ *  shows 100% Verified. */
+function AdmvMini({ changedPct }: { changedPct: number }) {
+  const modified = Math.max(0, Math.min(100, changedPct));
+  const verified = 100 - modified;
+  const pct: Record<"A" | "D" | "M" | "V", number> = { A: 0, D: 0, M: modified, V: verified };
+  return (
+    <div className="grid grid-cols-4 gap-1 w-36">
+      {ADMV_MINI_SEGMENTS.map((s) => (
+        <div
+          key={s.key}
+          title={`${s.key === "A" ? "Added" : s.key === "D" ? "Deleted" : s.key === "M" ? "Modified" : "Verified"} · ${pct[s.key].toFixed(1)}%`}
+          className={`flex flex-col items-center justify-center gap-0 rounded-md px-1 py-1 ${s.chip}`}
+        >
+          <span className="text-[9px] uppercase font-bold opacity-70 leading-none">{s.label}</span>
+          <span className="text-[10.5px] font-semibold tabular-nums leading-tight">{pct[s.key].toFixed(1)}%</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/** Short, real action hint next to a job's Review button — derived from
+ *  actual job/review state, not a canned message. */
+function ActionNeededHint({ job, score }: { job: JobRow; score?: { approved: number; rejected: number } }) {
+  if (job.statusText === "Running" || job.statusText === "Refreshing") {
+    return <span className="text-[10.5px] text-muted-foreground">In progress</span>;
+  }
+  if (job.reviewStatus === "Completed") {
+    return <span className="text-[10.5px] text-success">—</span>;
+  }
+  const reviewedCount = (score?.approved ?? 0) + (score?.rejected ?? 0);
+  if (reviewedCount === 0) {
+    return <span className="text-[10.5px] text-warning">Needs review</span>;
+  }
+  return <span className="text-[10.5px] text-info">Continue review</span>;
 }
 
 function getAnySiteUploadedFilename(filters: string | null | undefined): string {
@@ -822,6 +881,8 @@ function Review() {
   const [openJob, setOpenJob] = useState<JobRow | null>(null);
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
   const [changeFilter, setChangeFilter] = useState<"all" | ChangeType>("all");
+  const [attributeFilter, setAttributeFilter] = useState<string>("all");
+  const [reviewQuery, setReviewQuery] = useState("");
   const [reviewSort, setReviewSort] = useState<ReviewSort>("latest");
   const [confFilter, setConfFilter] = useState<"all" | "high" | "medium" | "low">("all");
   const [activeConfJobId, setActiveConfJobId] = useState<string | null>(null);
@@ -1252,6 +1313,7 @@ function Review() {
           rejected_count: j.rejected_count,
           coverage: j.coverage || null,
           isUrgent: Boolean(j.is_urgent ?? j.isUrgent),
+          fresh: j.fresh !== undefined && j.fresh !== null ? Number(j.fresh) : null,
         };
       });
     return dbDataset as JobRow[];
@@ -1298,6 +1360,7 @@ function Review() {
           rejected_count: j.rejected_count,
           coverage: j.coverage || null,
           isUrgent: Boolean(j.is_urgent ?? j.isUrgent),
+          fresh: j.fresh !== undefined && j.fresh !== null ? Number(j.fresh) : null,
         };
       });
       
@@ -1513,10 +1576,17 @@ function Review() {
       }
     });
 
+    const q = reviewQuery.trim().toLowerCase();
     const filteredRows = activeSample.rows.filter((r) => {
       if (changeFilter !== "all" && r.changeType !== changeFilter) return false;
+      if (attributeFilter !== "all" && r.attribute !== attributeFilter) return false;
       const recordKey = getReviewRecordKey(r, 0);
-      return allowedRecordKeys.has(recordKey);
+      if (!allowedRecordKeys.has(recordKey)) return false;
+      if (q) {
+        const haystack = `${r.recordKey ?? r.record ?? ""} ${r.attribute ?? ""} ${r.value ?? ""}`.toLowerCase();
+        if (!haystack.includes(q)) return false;
+      }
+      return true;
     });
     return filteredRows.sort((a, b) => {
       if (reviewSort === "oldest") return reviewRowTimestamp(a) - reviewRowTimestamp(b);
@@ -1524,7 +1594,7 @@ function Review() {
       if (reviewSort === "confidence-low") return Number(a.conf ?? 0) - Number(b.conf ?? 0);
       return reviewRowTimestamp(b) - reviewRowTimestamp(a);
     });
-  }, [activeSample, changeFilter, openJob, confLimits, reviewSort]);
+  }, [activeSample, changeFilter, attributeFilter, reviewQuery, openJob, confLimits, reviewSort]);
 
   const counts = useMemo(() => {
     const c: Record<string, number> = { A: 0, D: 0, M: 0, V: 0, N: 0, high: 0, medium: 0, low: 0 };
@@ -1536,6 +1606,40 @@ function Review() {
     });
     return c;
   }, [activeSample]);
+
+  // Real company/record name per recordKey — each flattened row only carries
+  // its own attribute's value, so the actual entity name (e.g. the company
+  // name) has to be looked up from whichever row in the same record holds
+  // it, rather than shown as a generic "Record N" placeholder.
+  const entityByRecordKey = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const r of activeSample?.rows ?? []) {
+      const key = String(r.recordKey ?? r.record ?? "");
+      if (!key || map.has(key)) continue;
+      const attrKey = String(r.attributeKey ?? "").toLowerCase();
+      const looksLikeName = attrKey.includes("name") || attrKey.includes("company") || attrKey.includes("entity");
+      if (looksLikeName && r.value && r.value !== "—") {
+        map.set(key, String(r.value));
+      }
+    }
+    return map;
+  }, [activeSample]);
+
+  function entityLabel(r: any): string {
+    const key = String(r.recordKey ?? r.record ?? "");
+    return entityByRecordKey.get(key) || String(r.record ?? key);
+  }
+
+  function decideByType(type: ChangeType) {
+    if (!openJob) return;
+    const ids = rowsForDisplay.filter((r) => r.changeType === type).map((r) => r.id);
+    if (ids.length === 0) return;
+    setRowStatus((s) => {
+      const next = { ...s };
+      ids.forEach((id) => (next[`${openJob.id}-${id}`] = "approved"));
+      return next;
+    });
+  }
 
   const recordsPerPage = useMemo(() => {
     if (!openJob) return 10;
@@ -1723,15 +1827,14 @@ function Review() {
                 <tr>
                   <th className="text-left px-3 py-1.5">Job</th>
                   <th className="text-left px-3 py-1.5">Source</th>
-                  <th className="text-right px-3 py-1.5">Rows</th>
-                  <th className="text-right px-3 py-1.5">Changed</th>
+                  <th className="text-right px-3 py-1.5">Records</th>
+                  <th className="text-left px-3 py-1.5 w-40">ADMV %</th>
                   <th className="text-right px-3 py-1.5 w-28">Runs</th>
-                  <th className="text-left px-3 py-1.5 w-64">Sample rate</th>
-                  <th className="text-left px-3 py-1.5 w-48">Confidence filter</th>
-                  <th className="text-left px-3 py-1.5 w-36">Status</th>
                   <th className="text-left px-3 py-1.5 w-28">Coverage</th>
-                  <th className="text-left px-3 py-1.5 w-28">Quality</th>
-                  <th className="text-right px-3 py-1.5 w-36">Actions</th>
+                  <th className="text-left px-3 py-1.5 w-28">Freshness</th>
+                  <th className="text-left px-3 py-1.5 w-28">Accuracy</th>
+                  <th className="text-left px-3 py-1.5 w-36">Review status</th>
+                  <th className="text-right px-3 py-1.5 w-36">Action needed</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -1759,83 +1862,24 @@ function Review() {
                         <span className="font-semibold truncate block">{j.isDatasetJob ? (getAnySiteUploadedFilename(j.filters) || j.source) : j.source}</span>
                       </td>
                       <td className="px-3 py-1.5 text-right font-mono">{j.rows.toLocaleString()}</td>
-                      <td className="px-3 py-1.5 text-right"><Badge tone={(j.changedPct ?? 0) > 20 ? "warning" : "info"}>{j.changedPct}%</Badge></td>
+                      <td className="px-3 py-1.5"><AdmvMini changedPct={j.changedPct ?? 0} /></td>
                       <td className="px-3 py-1.5 text-right text-[12px] font-mono">{j.refreshCount || 0} run{(j.refreshCount || 0) !== 1 ? "s" : ""}</td>
                       <td className="px-3 py-1.5">
-                        <div className="flex items-center gap-2">
-                          <div className="relative w-20">
-                            <Input
-                              type="number"
-                              min={1}
-                              max={100}
-                              value={rate}
-                              onChange={(e) => setJobRates((s) => ({ ...s, [j.id]: Math.min(100, Math.max(1, Number(e.target.value) || 1)) }))}
-                              className="h-7 text-[12px] pr-5"
-                            />
-                            <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[11px] text-muted-foreground">%</span>
-                          </div>
-                          <span className="text-[11px] text-muted-foreground">≈ {sampled.toLocaleString()} row{sampled === 1 ? "" : "s"} selected</span>
-                        </div>
-                      </td>
-                      <td className="px-3 py-1.5 relative">
                         {(() => {
-                          const limits = confLimits[j.id] || { min: 0, max: 100 };
-                          const isOpen = activeConfJobId === j.id;
-                          const confidenceCount = getConfidenceRangeCount(j, limits, sample, openJob?.id ?? null);
-                          return (
-                            <div className="relative inline-block text-left">
-                              <button
-                                type="button"
-                                onClick={() => setActiveConfJobId(isOpen ? null : j.id)}
-                                className="h-7 px-2.5 text-[12px] w-28 bg-card border border-border rounded flex items-center justify-between text-left cursor-pointer hover:bg-secondary select-none font-sans"
-                              >
-                                <span>{limits.min}% - {limits.max}%</span>
-                                <span className="text-[9px] opacity-60 ml-1">▼</span>
-                              </button>
-
-                              {isOpen && (
-                                <>
-                                  <div className="fixed inset-0 z-40" onClick={() => setActiveConfJobId(null)} />
-                                  <div className="absolute top-8 left-0 z-50 w-44 bg-card border border-border rounded-md p-2.5 shadow-md flex items-center gap-1.5 text-[11px] font-sans">
-                                    <div className="flex flex-col gap-0.5">
-                                      <span className="text-[9px] uppercase tracking-wider text-muted-foreground font-semibold text-left">Min (%)</span>
-                                      <input
-                                        type="number"
-                                        min="0"
-                                        max="100"
-                                        value={limits.min}
-                                        onChange={(e) => {
-                                          const val = Math.min(100, Math.max(0, Number(e.target.value) || 0));
-                                          setConfLimits((s) => ({ ...s, [j.id]: { min: val, max: s[j.id]?.max ?? 100 } }));
-                                        }}
-                                        className="w-16 h-7 px-1.5 border border-border rounded text-[11px] bg-background text-foreground focus:outline-none"
-                                      />
-                                    </div>
-                                    <span className="mt-4 text-muted-foreground font-semibold">-</span>
-                                    <div className="flex flex-col gap-0.5">
-                                      <span className="text-[9px] uppercase tracking-wider text-muted-foreground font-semibold text-left">Max (%)</span>
-                                      <input
-                                        type="number"
-                                        min="0"
-                                        max="100"
-                                        value={limits.max}
-                                        onChange={(e) => {
-                                          const val = Math.min(100, Math.max(0, Number(e.target.value) || 0));
-                                          setConfLimits((s) => ({ ...s, [j.id]: { min: s[j.id]?.min ?? 80, max: val } }));
-                                        }}
-                                        className="w-16 h-7 px-1.5 border border-border rounded text-[11px] bg-background text-foreground focus:outline-none"
-                                      />
-                                    </div>
-                                  </div>
-                                </>
-                              )}
-                              <div className="text-[11px] text-muted-foreground mt-1">
-                                {`${confidenceCount.toLocaleString()} rows matching`}
-                              </div>
-                            </div>
-                          );
+                          const coverageValue = j.coverage?.job_coverage;
+                          return coverageValue === null || coverageValue === undefined || Number.isNaN(coverageValue)
+                            ? <span className="text-muted-foreground">—</span>
+                            : <Badge tone={coverageTone(coverageValue)}>{formatCoveragePct(coverageValue)}</Badge>;
                         })()}
                       </td>
+                      <td className="px-3 py-1.5">
+                        {j.fresh === null || j.fresh === undefined ? (
+                          <span className="text-muted-foreground">—</span>
+                        ) : (
+                          <Badge tone={j.fresh >= 90 ? "success" : j.fresh >= 70 ? "info" : "warning"}>{Math.round(j.fresh)}%</Badge>
+                        )}
+                      </td>
+                      <td className="px-3 py-1.5"><QualityCell score={sc} /></td>
                       <td className="px-3 py-1.5">
                         {j.statusText === "Running" || j.statusText === "Refreshing" ? (
                           <Badge tone="info">{j.statusText === "Refreshing" ? "Refreshing" : "Running"}</Badge>
@@ -1847,23 +1891,17 @@ function Review() {
                           </Badge>
                         )}
                       </td>
-                      <td className="px-3 py-1.5">
-                        {(() => {
-                          const coverageValue = j.coverage?.job_coverage;
-                          return coverageValue === null || coverageValue === undefined || Number.isNaN(coverageValue)
-                            ? <span className="text-muted-foreground">—</span>
-                            : <Badge tone={coverageTone(coverageValue)}>{formatCoveragePct(coverageValue)}</Badge>;
-                        })()}
-                      </td>
-                      <td className="px-3 py-1.5"><QualityCell score={sc} /></td>
                       <td className="px-3 py-1.5 text-right">
-                        <div className="flex items-center justify-end gap-1">
-                          <Button size="sm" variant="outline" onClick={() => { setOpenJob(j); setChangeFilter("all"); setConfFilter("all"); }}>
-                            <Eye className="h-3.5 w-3.5" /> Review
-                          </Button>
-                          <Button size="sm" variant="outline" title="Download" onClick={() => window.open(`/api/v1/export?run_id=${j.id}&format=xlsx`, "_blank")}>
-                            <Download className="h-3.5 w-3.5" />
-                          </Button>
+                        <div className="flex flex-col items-end gap-1">
+                          <div className="flex items-center justify-end gap-1">
+                            <Button size="sm" variant="outline" onClick={() => { setOpenJob(j); setChangeFilter("all"); setConfFilter("all"); }}>
+                              <Eye className="h-3.5 w-3.5" /> Review
+                            </Button>
+                            <Button size="sm" variant="outline" title="Download" onClick={() => window.open(`/api/v1/export?run_id=${j.id}&format=xlsx`, "_blank")}>
+                              <Download className="h-3.5 w-3.5" />
+                            </Button>
+                          </div>
+                          <ActionNeededHint job={j} score={sc} />
                         </div>
                       </td>
                     </tr>
@@ -1890,14 +1928,14 @@ function Review() {
                 <tr>
                   <th className="text-left px-3 py-1.5">Job</th>
                   <th className="text-left px-3 py-1.5">Source</th>
-                  <th className="text-right px-3 py-1.5">Rows</th>
+                  <th className="text-right px-3 py-1.5">Records</th>
+                  <th className="text-left px-3 py-1.5 w-40">ADMV %</th>
                   <th className="text-left px-3 py-1.5 w-44">Type</th>
-                  <th className="text-left px-3 py-1.5 w-64">Sample rate</th>
-                  <th className="text-left px-3 py-1.5 w-48">Confidence filter</th>
-                  <th className="text-left px-3 py-1.5 w-36">Status</th>
                   <th className="text-left px-3 py-1.5 w-28">Coverage</th>
-                  <th className="text-left px-3 py-1.5 w-28">Quality</th>
-                  <th className="text-right px-3 py-1.5 w-36">Actions</th>
+                  <th className="text-left px-3 py-1.5 w-28">Freshness</th>
+                  <th className="text-left px-3 py-1.5 w-28">Accuracy</th>
+                  <th className="text-left px-3 py-1.5 w-36">Review status</th>
+                  <th className="text-right px-3 py-1.5 w-36">Action needed</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -1930,6 +1968,7 @@ function Review() {
                         <div className="text-[10.5px] text-muted-foreground mt-0.5 truncate">{j.domain}</div>
                       </td>
                       <td className="px-3 py-1.5 text-right font-mono">{j.rows.toLocaleString()}</td>
+                      <td className="px-3 py-1.5"><AdmvMini changedPct={j.changedPct ?? 0} /></td>
                       <td className="px-3 py-1.5">
                         {j.kind === "Change Monitoring" && (
                           <Badge tone="warning">Change monitoring · {schedule}</Badge>
@@ -1942,80 +1981,21 @@ function Review() {
                         )}
                       </td>
                       <td className="px-3 py-1.5">
-                        <div className="flex items-center gap-2">
-                          <div className="relative w-20">
-                            <Input
-                              type="number"
-                              min={1}
-                              max={100}
-                              value={rate}
-                              onChange={(e) => setJobRates((s) => ({ ...s, [j.id]: Math.min(100, Math.max(1, Number(e.target.value) || 1)) }))}
-                              className="h-7 text-[12px] pr-5"
-                            />
-                            <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[11px] text-muted-foreground">%</span>
-                          </div>
-                          <span className="text-[11px] text-muted-foreground">≈ {sampled.toLocaleString()} row{sampled === 1 ? "" : "s"} selected</span>
-                        </div>
-                      </td>
-                      <td className="px-3 py-1.5 relative">
                         {(() => {
-                          const limits = confLimits[j.id] || { min: 0, max: 100 };
-                          const isOpen = activeConfJobId === j.id;
-                          const confidenceCount = getConfidenceRangeCount(j, limits, sample, openJob?.id ?? null);
-                          return (
-                            <div className="relative inline-block text-left">
-                              <button
-                                type="button"
-                                onClick={() => setActiveConfJobId(isOpen ? null : j.id)}
-                                className="h-7 px-2.5 text-[12px] w-28 bg-card border border-border rounded flex items-center justify-between text-left cursor-pointer hover:bg-secondary select-none font-sans"
-                              >
-                                <span>{limits.min}% - {limits.max}%</span>
-                                <span className="text-[9px] opacity-60 ml-1">▼</span>
-                              </button>
-
-                              {isOpen && (
-                                <>
-                                  <div className="fixed inset-0 z-40" onClick={() => setActiveConfJobId(null)} />
-                                  <div className="absolute top-8 left-0 z-50 w-44 bg-card border border-border rounded-md p-2.5 shadow-md flex items-center gap-1.5 text-[11px] font-sans">
-                                    <div className="flex flex-col gap-0.5">
-                                      <span className="text-[9px] uppercase tracking-wider text-muted-foreground font-semibold text-left">Min (%)</span>
-                                      <input
-                                        type="number"
-                                        min="0"
-                                        max="100"
-                                        value={limits.min}
-                                        onChange={(e) => {
-                                          const val = Math.min(100, Math.max(0, Number(e.target.value) || 0));
-                                          setConfLimits((s) => ({ ...s, [j.id]: { min: val, max: s[j.id]?.max ?? 100 } }));
-                                        }}
-                                        className="w-16 h-7 px-1.5 border border-border rounded text-[11px] bg-background text-foreground focus:outline-none"
-                                      />
-                                    </div>
-                                    <span className="mt-4 text-muted-foreground font-semibold">-</span>
-                                    <div className="flex flex-col gap-0.5">
-                                      <span className="text-[9px] uppercase tracking-wider text-muted-foreground font-semibold text-left">Max (%)</span>
-                                      <input
-                                        type="number"
-                                        min="0"
-                                        max="100"
-                                        value={limits.max}
-                                        onChange={(e) => {
-                                          const val = Math.min(100, Math.max(0, Number(e.target.value) || 0));
-                                          setConfLimits((s) => ({ ...s, [j.id]: { min: s[j.id]?.min ?? 80, max: val } }));
-                                        }}
-                                        className="w-16 h-7 px-1.5 border border-border rounded text-[11px] bg-background text-foreground focus:outline-none"
-                                      />
-                                    </div>
-                                  </div>
-                                </>
-                              )}
-                              <div className="text-[11px] text-muted-foreground mt-1">
-                                {`${confidenceCount.toLocaleString()} rows matching`}
-                              </div>
-                            </div>
-                          );
+                          const coverageValue = j.coverage?.job_coverage;
+                          return coverageValue === null || coverageValue === undefined || Number.isNaN(coverageValue)
+                            ? <span className="text-muted-foreground">—</span>
+                            : <Badge tone={coverageTone(coverageValue)}>{formatCoveragePct(coverageValue)}</Badge>;
                         })()}
                       </td>
+                      <td className="px-3 py-1.5">
+                        {j.fresh === null || j.fresh === undefined ? (
+                          <span className="text-muted-foreground">—</span>
+                        ) : (
+                          <Badge tone={j.fresh >= 90 ? "success" : j.fresh >= 70 ? "info" : "warning"}>{Math.round(j.fresh)}%</Badge>
+                        )}
+                      </td>
+                      <td className="px-3 py-1.5"><QualityCell score={sc} /></td>
                       <td className="px-3 py-1.5">
                         {j.reviewStatus === "Completed" || reviewed[j.id] ? (
                           <Badge tone="success">Review completed</Badge>
@@ -2025,23 +2005,17 @@ function Review() {
                           </Badge>
                         )}
                       </td>
-                      <td className="px-3 py-1.5">
-                        {(() => {
-                          const coverageValue = j.coverage?.job_coverage;
-                          return coverageValue === null || coverageValue === undefined || Number.isNaN(coverageValue)
-                            ? <span className="text-muted-foreground">—</span>
-                            : <Badge tone={coverageTone(coverageValue)}>{formatCoveragePct(coverageValue)}</Badge>;
-                        })()}
-                      </td>
-                      <td className="px-3 py-1.5"><QualityCell score={sc} /></td>
                       <td className="px-3 py-1.5 text-right">
-                        <div className="flex items-center justify-end gap-1">
-                          <Button size="sm" variant="outline" onClick={() => { setOpenJob(j); setChangeFilter("all"); setConfFilter("all"); }} disabled={j.statusText === "Running" || j.statusText === "Refreshing"}>
-                            <Eye className="h-3.5 w-3.5" /> Review
-                          </Button>
-                          <Button size="sm" variant="outline" title="Download" onClick={() => window.open(`/api/v1/export?run_id=${j.id}&format=xlsx`, "_blank")}>
-                            <Download className="h-3.5 w-3.5" />
-                          </Button>
+                        <div className="flex flex-col items-end gap-1">
+                          <div className="flex items-center justify-end gap-1">
+                            <Button size="sm" variant="outline" onClick={() => { setOpenJob(j); setChangeFilter("all"); setConfFilter("all"); }} disabled={j.statusText === "Running" || j.statusText === "Refreshing"}>
+                              <Eye className="h-3.5 w-3.5" /> Review
+                            </Button>
+                            <Button size="sm" variant="outline" title="Download" onClick={() => window.open(`/api/v1/export?run_id=${j.id}&format=xlsx`, "_blank")}>
+                              <Download className="h-3.5 w-3.5" />
+                            </Button>
+                          </div>
+                          <ActionNeededHint job={j} score={sc} />
                         </div>
                       </td>
                     </tr>
@@ -2056,14 +2030,24 @@ function Review() {
 
       {/* Sample preview dialog */}
       <Dialog open={!!openJob} onOpenChange={(o) => !o && setOpenJob(null)}>
-        <DialogContent className="max-w-6xl">
-          <DialogHeader>
-            <DialogTitle>
+        <DialogContent className="max-w-none w-[97vw] h-[94vh] p-0 gap-0 overflow-hidden flex flex-col sm:max-w-none">
+          <DialogHeader className="px-6 pt-5 pb-4 border-b border-border shrink-0">
+            <DialogTitle className="text-[17px]">
               {openJob?.id} - {openJob ? (getAnySiteUploadedFilename(openJob.filters) || openJob.source) : ""}
             </DialogTitle>
+            {openJob && activeSample && (
+              <div className="flex flex-wrap items-center gap-2 pt-2 text-[12px] text-muted-foreground">
+                <Badge tone="info">{openJob.mode === "By Dataset" ? "Solution" : "Agent"}</Badge>
+                <Badge tone="neutral">{openJob.rows.toLocaleString()} records</Badge>
+                <Badge tone="purple">sampling {jobRates[openJob.id] ?? 2}%</Badge>
+                {openJob.coverage?.job_coverage !== null && openJob.coverage?.job_coverage !== undefined && (
+                  <span>Coverage {formatCoveragePct(openJob.coverage.job_coverage)}</span>
+                )}
+              </div>
+            )}
           </DialogHeader>
           {openJob && (
-            <div className="space-y-3">
+            <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
               {!activeSample || (viewInBulk && bulkLoading) ? (
                 <div className="flex flex-col items-center justify-center py-20 space-y-4">
                   <span className="flex h-8 w-8 relative">
@@ -2087,238 +2071,362 @@ function Review() {
                 </div>
               ) : (
                 <>
-              <div className="flex items-center justify-between gap-3 flex-wrap text-[12px] text-muted-foreground">
-                <div>
-                  {viewInBulk ? (
-                    <>
-                      Bulk view = <strong>{visibleRows.length.toLocaleString()} rows</strong> shown from <strong>{openJob.rows.toLocaleString()}</strong> total.
-                    </>
-                  ) : (
-                    <>
-                      Sample <strong>{jobRates[openJob.id] ?? 2}%</strong> = {recordsPerPage.toLocaleString()} of {openJob.rows.toLocaleString()} rows.
-                      Showing rows <strong>{startRow.toLocaleString()} - {endRow.toLocaleString()}</strong> · page {currentPage} of {totalPages}.
-                    </>
-                  )}
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      setViewInBulk((v) => !v);
-                      setPageOffset(0);
-                    }}
-                    className={`h-8 text-[11px] px-2.5 ${viewInBulk ? "bg-secondary font-semibold text-primary" : ""}`}
-                  >
-                    {viewInBulk ? "Back to Sample" : "View in Bulk"}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={viewInBulk || pageOffset === 0}
-                    onClick={() => setPageOffset((prev) => Math.max(0, prev - recordsPerPage))}
-                    className="h-8 text-[11px] px-2.5"
-                  >
-                    Previous
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    disabled={viewInBulk || pageOffset + recordsPerPage >= (sample?.totalSampled ?? visibleRecordGroups.length)}
-                    onClick={() => setPageOffset((prev) => prev + recordsPerPage)}
-                    className="h-8 text-[11px] px-2.5"
-                  >
-                    Next
-                  </Button>
-                </div>
-              </div>
+                  <div className="flex-1 min-h-0 min-w-0 grid lg:grid-cols-[250px_1fr]">
+                    {/* filters rail */}
+                    <aside className="border-r border-border bg-secondary/30 p-5 flex flex-col gap-5 overflow-y-auto">
+                      <div>
+                        <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">ADMV filter</div>
+                        <Select value={changeFilter} onChange={(e) => setChangeFilter(e.target.value as "all" | ChangeType)}>
+                          <option value="all">All changes</option>
+                          <option value="A">Added</option>
+                          <option value="D">Deleted</option>
+                          <option value="M">Modified</option>
+                          <option value="V">Verified</option>
+                        </Select>
+                      </div>
 
-              <div className="flex flex-wrap gap-1.5 items-center">
-                    <span className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mr-1">A/D/M/V</span>
-                    <Chip on={changeFilter === "all"} onClick={() => setChangeFilter("all")}>All</Chip>
-                    <Chip on={changeFilter === "A"} onClick={() => setChangeFilter("A")} tone="success">A · {counts.A}</Chip>
-                    <Chip on={changeFilter === "D"} onClick={() => setChangeFilter("D")} tone="destructive">D · {counts.D}</Chip>
-                    <Chip on={changeFilter === "M"} onClick={() => setChangeFilter("M")} tone="warning">M · {counts.M}</Chip>
-                    <Chip on={changeFilter === "V"} onClick={() => setChangeFilter("V")} tone="info">V · {counts.V}</Chip>
-                <label className="ml-2 flex items-center gap-1.5 text-[11px] text-muted-foreground">
-                  Sort
-                  <select
-                    value={reviewSort}
-                    onChange={(event) => setReviewSort(event.target.value as ReviewSort)}
-                    className="h-7 rounded-md border border-border bg-card px-2 text-[11px] text-foreground"
-                  >
-                    <option value="latest">Latest first</option>
-                    <option value="oldest">Oldest first</option>
-                    <option value="confidence-high">Highest confidence</option>
-                    <option value="confidence-low">Lowest confidence</option>
-                  </select>
-                </label>
-                <span className="text-[11px] text-muted-foreground ml-auto">{visibleRows.length} rows shown</span>
-              </div>
+                      <div>
+                        <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">Filter by datapoint</div>
+                        <Select value={attributeFilter} onChange={(e) => setAttributeFilter(e.target.value)}>
+                          <option value="all">All datapoints</option>
+                          {Array.from(new Set((activeSample?.rows ?? []).map((r: any) => r.attribute))).map((a) => (
+                            <option key={a as string} value={a as string}>{a as string}</option>
+                          ))}
+                        </Select>
+                      </div>
 
-              {/* Bulk actions for current filter */}
-              <div className="flex items-center gap-2 flex-wrap rounded-md border border-border bg-secondary/40 px-3 py-2">
-                <span className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">Bulk</span>
-                <span className="text-[10.5px] text-muted-foreground">
-                  Applies to <strong>{visibleRows.length}</strong> rows in current filter
-                  {changeFilter !== "all" && <> · <strong>{changeFilter}</strong> changes</>}
-                </span>
+                      <div>
+                        <div className="flex items-center justify-between text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">
+                          <span>Sampling</span>
+                          <span className="tabular-nums text-foreground">{jobRates[openJob.id] ?? 2}%</span>
+                        </div>
+                        <input
+                          suppressHydrationWarning
+                          type="range"
+                          min={1}
+                          max={100}
+                          step={1}
+                          disabled={viewInBulk}
+                          value={jobRates[openJob.id] ?? 2}
+                          onChange={(e) => {
+                            setJobRates((s) => ({ ...s, [openJob.id]: Math.min(100, Math.max(1, Number(e.target.value) || 1)) }));
+                            setPageOffset(0);
+                          }}
+                          className="w-full accent-[var(--primary)] disabled:opacity-50"
+                        />
+                        <p className="text-[11px] text-muted-foreground mt-1.5">
+                          {viewInBulk
+                            ? "Bulk view shows every row — sampling is ignored."
+                            : `${jobRates[openJob.id] ?? 2}% sample — ${recordsPerPage.toLocaleString()} of ${openJob.rows.toLocaleString()} rows per page.`}
+                        </p>
+                      </div>
 
-                <div className="ml-auto flex items-center gap-2">
-                  {(() => {
-                    const approved = visibleRows.filter((r) => {
-                      const key = `${openJob.id}-${r.id}`;
-                      return rowStatus[key] === "approved" || rowStatus[key] === "auto";
-                    }).length;
-                    const rejected = visibleRows.filter((r) => {
-                      const key = `${openJob.id}-${r.id}`;
-                      return rowStatus[key] === "rejected";
-                    }).length;
-                    const pending = visibleRows.length - approved - rejected;
-                    return (
-                      <span className="text-[10.5px] text-muted-foreground">
-                        <span className="text-success">{approved}✓</span> · <span className="text-destructive">{rejected}✕</span> · {pending} pending
-                      </span>
-                    );
-                  })()}
-                  <Chip
-                    on={showAvgConfidence}
-                    onClick={() => setShowAvgConfidence((curr) => !curr)}
-                    tone="info"
-                  >
-                    Avg Confi
-                  </Chip>
-                  {showAvgConfidence && visibleAvgConfidenceBadges.length > 0 && (
-                    <div className="flex flex-wrap items-center gap-1">
-                      {visibleAvgConfidenceBadges.map((item) => (
-                        <Badge
-                          key={item.id}
-                          tone={item.tone}
-                          className={`${recordGroupBg(item.label)} border border-border text-foreground`}
-                        >
-                          {item.score}%
-                        </Badge>
-                      ))}
-                    </div>
-                  )}
-                  <Button size="sm" variant="outline" onClick={bulkReject} disabled={!visibleRows.length}>
-                    <XCircle className="h-3.5 w-3.5" /> Reject all
-                  </Button>
-                  <Button size="sm" onClick={bulkApprove} disabled={!visibleRows.length}>
-                    <CheckCheck className="h-3.5 w-3.5" /> Approve all
-                  </Button>
-                </div>
-              </div>
+                      <div>
+                        <div className="flex items-center justify-between text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">
+                          <span>Min. confidence</span>
+                          <span className="tabular-nums text-foreground">{confLimits[openJob.id]?.min ?? 0}%</span>
+                        </div>
+                        <input
+                          suppressHydrationWarning
+                          type="range"
+                          min={0}
+                          max={99}
+                          step={1}
+                          value={confLimits[openJob.id]?.min ?? 0}
+                          onChange={(e) => {
+                            const val = Math.min(99, Math.max(0, Number(e.target.value) || 0));
+                            setConfLimits((s) => ({ ...s, [openJob.id]: { min: val, max: 100 } }));
+                          }}
+                          className="w-full accent-[var(--primary)]"
+                        />
+                      </div>
 
-              <div className="rounded-md border border-border overflow-hidden max-h-[60vh] overflow-y-auto">
-                <table className="w-full text-[12px] table-fixed">
-                  <thead className="bg-secondary text-[10px] uppercase tracking-wider text-muted-foreground sticky top-0 z-10 dark:bg-secondary/80">
-                    <tr>
-                      <th className="text-left px-2.5 py-2 w-[5%]">ADMV</th>
-                      <th className="text-left px-2.5 py-2 w-[11%]">Record ID</th>
-                      <th className="text-left px-2.5 py-2 w-[6%]">Batch</th>
-                      <th className="text-left px-2.5 py-2 w-[12%]">Attribute</th>
-                      <th className="text-left px-2.5 py-2 w-[20%]">Previous</th>
-                      <th className="text-left px-2.5 py-2 w-[20%]">New value</th>
-                      <th className="text-left px-2.5 py-2 w-[6%]">Conf.</th>
-                      <th className="text-left px-2.5 py-2 w-[10%]">Source</th>
-                      <th className="text-right px-2.5 py-2 w-[10%]">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border">
-                    {rowsForDisplay.map((r) => {
-                      const isEditing = editing[r.id] !== undefined;
-                      const hasConf = r.conf !== null && r.conf !== undefined && !isNaN(r.conf);
-                      const b = hasConf ? bucket(r.conf) : null;
-                      const key = `${openJob.id}-${r.id}`;
-                      const status = rowStatus[key];
-                      return (
-                        <tr key={r.id} className={[recordGroupBg(r.record), status ? "opacity-60" : ""].join(" ")}>
-                          <td className="px-2.5 py-1.5"><Badge tone={changeTone(r.changeType)}>{r.changeType}</Badge></td>
-                          <td className="px-2.5 py-1.5 font-medium font-mono text-[11px] break-all" title={String(r.recordKey ?? r.record ?? r.id)}>
-                            {r.recordKey ?? r.record ?? r.id}
-                          </td>
-                          <td className="px-2.5 py-1.5 text-muted-foreground tabular-nums">
-                            {Math.floor((r.recordIndex ?? 0) / Math.max(1, recordsPerPage)) + 1}
-                          </td>
-                          <td className="px-2.5 py-1.5 text-muted-foreground">{r.attribute}</td>
-                          <td className="px-2.5 py-1.5 font-mono text-[11px] text-muted-foreground break-all whitespace-normal">{r.previous}</td>
-                          <td className="px-2.5 py-1.5">
-                            {isEditing ? (
-                              <div className="flex items-center gap-1">
-                                <Input value={editing[r.id]} onChange={(e) => setEditing((s) => ({ ...s, [r.id]: e.target.value }))} className="h-7 text-[11px] font-mono w-full" />
-                                <Button size="sm" onClick={() => handleSave(r, editing[r.id])}><Save className="h-3 w-3" /></Button>
+                      <div>
+                        <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">Search</div>
+                        <Input placeholder="Search…" value={reviewQuery} onChange={(e) => setReviewQuery(e.target.value)} />
+                      </div>
+
+                      {/* review contour — left rail bottom */}
+                      <div className="mt-auto pt-4 rounded-lg border border-border bg-card p-3 flex items-center gap-3">
+                        {(() => {
+                          const decidedCount = rowsForDisplay.filter((r) => rowStatus[`${openJob.id}-${r.id}`]).length;
+                          const coveragePct = rowsForDisplay.length ? (decidedCount / rowsForDisplay.length) * 100 : 0;
+                          const approvedCount = rowsForDisplay.filter((r) => {
+                            const s = rowStatus[`${openJob.id}-${r.id}`];
+                            return s === "approved" || s === "auto";
+                          }).length;
+                          const rejectedCount = decidedCount - approvedCount;
+                          return (
+                            <>
+                              <Donut value={coveragePct} label="reviewed" tone={coveragePct > 66 ? "success" : coveragePct > 33 ? "warning" : "primary"} />
+                              <div className="text-[11.5px] text-muted-foreground leading-relaxed">
+                                <div className="text-foreground font-semibold text-[13px]">Review contour</div>
+                                {decidedCount} of {rowsForDisplay.length} decided
+                                <br />
+                                <span className="text-success">{approvedCount} approved</span> · <span className="text-destructive">{rejectedCount} rejected</span>
                               </div>
-                            ) : (
+                            </>
+                          );
+                        })()}
+                      </div>
+                    </aside>
+
+                    {/* batch queue + table */}
+                    <div className="flex flex-col min-h-0 min-w-0">
+                      <div className="px-6 py-3.5 border-b border-border bg-secondary/20 shrink-0 space-y-3">
+                        {/* group approval — top right */}
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Group approval</span>
+                          <div className="ml-auto flex flex-wrap items-center gap-1.5">
+                            {(["A", "D", "M", "V"] as ChangeType[]).map((t) => (
                               <button
-                                onClick={() => setEditing((s) => ({ ...s, [r.id]: r.value }))}
-                                className={[
-                                  "font-mono text-[11px] px-1.5 py-0.5 rounded text-left hover:bg-secondary flex items-start justify-between gap-1 w-full max-w-full",
-                                  r.changed ? "bg-warning-bg font-bold text-warning-foreground" : "",
-                                ].join(" ")}
+                                key={t}
+                                disabled={!counts[t]}
+                                onClick={() => decideByType(t)}
+                                className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-2.5 h-7 text-[11.5px] hover:bg-secondary disabled:opacity-40 transition"
                               >
-                                <span className="break-all whitespace-normal">{r.value}</span>
-                                <Edit3 className="h-3 w-3 text-muted-foreground shrink-0 mt-0.5" />
+                                <Check className="h-3 w-3" /> {CHANGE_LABEL[t]}
+                                <span className="tabular-nums text-muted-foreground">{counts[t]}</span>
                               </button>
-                            )}
-                          </td>
-                          <td className="px-2.5 py-1.5">
-                            {hasConf && b ? (
-                              <Badge tone={bucketTone(b)}>{Math.round(r.conf * 100)}%</Badge>
-                            ) : (
-                              "—"
-                            )}
-                          </td>
-                          <td className="px-2.5 py-1.5 break-all">
-                            <a href={r.sourceUrl} className="text-info hover:underline text-[11px] inline-flex items-start gap-1" target="_blank" rel="noreferrer">
-                              <span className="break-all">{r.source}</span>
-                              <ExternalLink className="h-3 w-3 shrink-0 mt-0.5" />
-                            </a>
-                          </td>
-                          <td className="px-2.5 py-1.5 text-right">
-                            {status ? (
-                              <Badge tone={status === "rejected" ? "destructive" : status === "auto" ? "info" : "success"}>
-                                {status === "auto" ? "Auto ✓" : status}
-                              </Badge>
-                            ) : (
-                              <div className="flex justify-end gap-1">
-                                <Button size="sm" variant="outline" onClick={() => setRowStatus((s) => ({ ...s, [key]: "rejected" }))}><X className="h-3 w-3" /></Button>
-                                <Button size="sm" onClick={() => setRowStatus((s) => ({ ...s, [key]: "approved" }))}><Check className="h-3 w-3" /></Button>
-                              </div>
-                            )}
-                          </td>
-                        </tr>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="flex flex-wrap items-center justify-between gap-3">
+                          <div className="flex flex-wrap items-center gap-2 text-[12px] text-muted-foreground">
+                            <span className="font-semibold uppercase tracking-wider">
+                              {viewInBulk ? "Bulk view" : `Batch ${currentPage} of ${totalPages}`}
+                            </span>
+                            <span>
+                              · {rowsForDisplay.length.toLocaleString()} rows shown
+                              {!viewInBulk && <> · rows {startRow.toLocaleString()}-{endRow.toLocaleString()} of {openJob.rows.toLocaleString()}</>}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <span className="uppercase tracking-wider text-[11px]">sort</span>
+                              <select
+                                value={reviewSort}
+                                onChange={(e) => setReviewSort(e.target.value as ReviewSort)}
+                                className="h-7 rounded-md border border-border bg-card px-2 text-[11.5px] text-foreground"
+                              >
+                                <option value="latest">Latest first</option>
+                                <option value="oldest">Oldest first</option>
+                                <option value="confidence-high">Highest confidence</option>
+                                <option value="confidence-low">Lowest confidence</option>
+                              </select>
+                            </span>
+                          </div>
+
+                          <div className="flex items-center gap-1.5">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                setViewInBulk((v) => !v);
+                                setPageOffset(0);
+                              }}
+                              className={viewInBulk ? "bg-secondary font-semibold text-primary" : ""}
+                            >
+                              {viewInBulk ? "Back to sample" : "View in bulk"}
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setPageOffset((prev) => Math.max(0, prev - recordsPerPage))}
+                              disabled={viewInBulk || pageOffset === 0}
+                            >
+                              <ChevronLeft className="h-3.5 w-3.5" /> Prev batch
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setPageOffset((prev) => prev + recordsPerPage)}
+                              disabled={viewInBulk || pageOffset + recordsPerPage >= (sample?.totalSampled ?? visibleRecordGroups.length)}
+                            >
+                              Next batch <ChevronRight className="h-3.5 w-3.5" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              disabled={!rowsForDisplay.length || viewInBulk}
+                              onClick={() => {
+                                const ids = rowsForDisplay.map((r) => r.id);
+                                setRowStatus((s) => {
+                                  const next = { ...s };
+                                  ids.forEach((id) => (next[`${openJob.id}-${id}`] = "approved"));
+                                  return next;
+                                });
+                                setPageOffset((prev) => prev + recordsPerPage);
+                              }}
+                            >
+                              <Layers className="h-3.5 w-3.5" /> Approve batch &amp; next ({rowsForDisplay.length})
+                            </Button>
+                          </div>
+                        </div>
+                        <AdmvBar a={{ added: counts.A, deleted: counts.D, modified: counts.M, verified: counts.V }} showLegend />
+                      </div>
+
+                      <div className="flex-1 min-h-0 overflow-auto">
+                        {rowsForDisplay.length === 0 ? (
+                          <div className="m-6 rounded-lg border border-dashed border-border p-8 text-center text-[13px] text-muted-foreground">
+                            No records match the current filters.
+                          </div>
+                        ) : (
+                          <table className="w-full text-[12px] table-fixed">
+                            <thead className="bg-secondary text-[10px] uppercase tracking-wider text-muted-foreground sticky top-0 z-10 dark:bg-secondary/80">
+                              <tr>
+                                <th className="text-left px-2.5 py-2 w-[9%]">Record ID</th>
+                                <th className="text-left px-2.5 py-2 w-[12%]">Entity</th>
+                                <th className="text-left px-2.5 py-2 w-[10%]">Datapoint</th>
+                                <th className="text-left px-2.5 py-2 w-[7%]">Change</th>
+                                <th className="text-left px-2.5 py-2 w-[16%]">Old Value</th>
+                                <th className="text-left px-2.5 py-2 w-[18%]">New Value</th>
+                                <th className="text-left px-2.5 py-2 w-[9%]">Source</th>
+                                <th className="text-left px-2.5 py-2 w-[6%]">Conf.</th>
+                                <th className="text-left px-2.5 py-2 w-[7%]">Detected</th>
+                                <th className="text-right px-2.5 py-2 w-[6%]">Decision</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-border">
+                              {rowsForDisplay.map((r) => {
+                                const isEditing = editing[r.id] !== undefined;
+                                const hasConf = r.conf !== null && r.conf !== undefined && !isNaN(r.conf);
+                                const b = hasConf ? bucket(r.conf) : null;
+                                const key = `${openJob.id}-${r.id}`;
+                                const status = rowStatus[key];
+                                const ts = reviewRowTimestamp(r);
+                                return (
+                                  <tr key={r.id} className={[recordGroupBg(r.record), status ? "opacity-60" : ""].join(" ")}>
+                                    <td className="px-2.5 py-1.5 w-[9%] max-w-0">
+                                      <span title={r.id} className="block truncate font-mono text-[11px] text-muted-foreground">{r.id}</span>
+                                    </td>
+                                    <td className="px-2.5 py-1.5 w-[12%] max-w-0">
+                                      <span title={entityLabel(r)} className="block truncate font-medium">{entityLabel(r)}</span>
+                                    </td>
+                                    <td className="px-2.5 py-1.5 text-muted-foreground truncate">{r.attribute}</td>
+                                    <td className="px-2.5 py-1.5">
+                                      <Badge tone={changeTone(r.changeType)}>{CHANGE_LABEL[r.changeType as ChangeType] ?? r.changeType}</Badge>
+                                    </td>
+                                    <td className="px-2.5 py-1.5 font-mono text-[11px] text-muted-foreground break-all whitespace-normal">{r.previous}</td>
+                                    <td className="px-2.5 py-1.5">
+                                      {isEditing ? (
+                                        <div className="flex items-center gap-1">
+                                          <Input value={editing[r.id]} onChange={(e) => setEditing((s) => ({ ...s, [r.id]: e.target.value }))} className="h-7 text-[11px] font-mono w-full" />
+                                          <Button size="sm" onClick={() => handleSave(r, editing[r.id])}><Save className="h-3 w-3" /></Button>
+                                        </div>
+                                      ) : (
+                                        <button
+                                          onClick={() => setEditing((s) => ({ ...s, [r.id]: r.value }))}
+                                          className={[
+                                            "font-mono text-[11px] px-1.5 py-0.5 rounded text-left hover:bg-secondary flex items-start justify-between gap-1 w-full max-w-full",
+                                            r.changed ? "bg-warning-bg font-bold text-warning-foreground" : "",
+                                          ].join(" ")}
+                                        >
+                                          <span className="break-all whitespace-normal">{r.value}</span>
+                                          <Edit3 className="h-3 w-3 text-muted-foreground shrink-0 mt-0.5" />
+                                        </button>
+                                      )}
+                                    </td>
+                                    <td className="px-2.5 py-1.5">
+                                      {r.sourceUrl ? (
+                                        <a href={r.sourceUrl} className="text-info hover:underline text-[11px] inline-flex items-start gap-1 max-w-full" target="_blank" rel="noreferrer">
+                                          <span className="break-all truncate">{r.source}</span>
+                                          <ExternalLink className="h-3 w-3 shrink-0 mt-0.5" />
+                                        </a>
+                                      ) : (
+                                        <span className="text-muted-foreground text-[11px] block truncate">{r.source}</span>
+                                      )}
+                                    </td>
+                                    <td className="px-2.5 py-1.5">
+                                      {hasConf && b ? <Badge tone={bucketTone(b)}>{Math.round(r.conf * 100)}%</Badge> : "—"}
+                                    </td>
+                                    <td className="px-2.5 py-1.5 text-[11px] text-muted-foreground whitespace-nowrap">
+                                      {ts ? `${Math.max(0, Math.round((Date.now() - ts) / 3600000))}h ago` : "—"}
+                                    </td>
+                                    <td className="px-2.5 py-1.5 text-right">
+                                      {status ? (
+                                        <Badge tone={status === "rejected" ? "destructive" : status === "auto" ? "info" : "success"}>
+                                          {status === "auto" ? "Auto ✓" : status}
+                                        </Badge>
+                                      ) : (
+                                        <div className="flex justify-end gap-1">
+                                          <button
+                                            onClick={() => setRowStatus((s) => ({ ...s, [key]: "rejected" }))}
+                                            className="h-7 w-7 rounded-md inline-flex items-center justify-center border border-border hover:bg-secondary transition"
+                                            title="Reject"
+                                          >
+                                            <X className="h-3.5 w-3.5" />
+                                          </button>
+                                          <button
+                                            onClick={() => setRowStatus((s) => ({ ...s, [key]: "approved" }))}
+                                            className="h-7 w-7 rounded-md inline-flex items-center justify-center border border-border hover:bg-secondary transition"
+                                            title="Approve"
+                                          >
+                                            <Check className="h-3.5 w-3.5" />
+                                          </button>
+                                        </div>
+                                      )}
+                                    </td>
+                                  </tr>
+                                );
+                              })}
+                            </tbody>
+                          </table>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="border-t border-border px-6 py-3 flex flex-wrap items-center gap-3 bg-card shrink-0">
+                    {(() => {
+                      const decidedCount = rowsForDisplay.filter((r) => rowStatus[`${openJob.id}-${r.id}`]).length;
+                      const approvedCount = rowsForDisplay.filter((r) => {
+                        const s = rowStatus[`${openJob.id}-${r.id}`];
+                        return s === "approved" || s === "auto";
+                      }).length;
+                      const rejectedCount = decidedCount - approvedCount;
+                      const coveragePct = rowsForDisplay.length ? (decidedCount / rowsForDisplay.length) * 100 : 0;
+                      return (
+                        <div className="text-[12px] text-muted-foreground">
+                          <strong className="text-foreground">{decidedCount}</strong> of {rowsForDisplay.length} decided ·{" "}
+                          <span className="text-success">{approvedCount} approved</span> · <span className="text-destructive">{rejectedCount} rejected</span> ·{" "}
+                          review contour <strong className="text-foreground">{coveragePct.toFixed(0)}%</strong>
+                        </div>
                       );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-
-              <div className="text-[11px] text-muted-foreground">
-                Bold yellow = value changed since last refresh. A = Added, D = Deleted, M = Modified, V = Verified (no change).
-              </div>
-
-              <div className="flex justify-end gap-2">
-                <Button variant="outline" size="sm" onClick={() => setOpenJob(null)}>Close</Button>
-                <Button variant="outline" size="sm" onClick={() => {
-                  if (!openJob) return;
-                  const rows = bulkSample?.rows?.length ? bulkSample.rows : visibleRows;
-                  const header = ["Record", "Attribute", "Previous Value", "New Value", "Change Type", "Decision", "Source", "Source URL"];
-                  const csvRows = rows.map((r: any) => {
-                    const key = `${openJob.id}-${r.id}`;
-                    const decision = rowStatus[key] === "rejected" ? "Rejected" : rowStatus[key] === "approved" ? "Approved" : "Pending";
-                    return [r.record, r.attribute, r.previous ?? "", r.value ?? "", r.changeType, decision, r.source ?? "", r.sourceUrl ?? ""].map((v: any) => `"${String(v).replace(/"/g, '""')}"`).join(",");
-                  });
-                  const blob = new Blob([[header.join(","), ...csvRows].join("\n")], { type: "text/csv" });
-                  const a = document.createElement("a");
-                  a.href = URL.createObjectURL(blob);
-                  a.download = `review-${openJob.id}-${new Date().toISOString().slice(0, 10)}.csv`;
-                  a.click();
-                }}>
-                  <Download className="h-3.5 w-3.5" /> Download
-                </Button>
-                <Button size="sm" onClick={handleSaveReview}>Save review</Button>
-              </div>
+                    })()}
+                    <div className="ml-auto flex flex-wrap items-center gap-2">
+                      <Button variant="outline" size="sm" onClick={() => setOpenJob(null)}>Close</Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          if (!openJob) return;
+                          const rows = bulkSample?.rows?.length ? bulkSample.rows : visibleRows;
+                          const header = ["Record ID", "Entity", "Datapoint", "Change", "Old Value", "New Value", "Source", "Source URL", "Decision"];
+                          const csvRows = rows.map((r: any) => {
+                            const key = `${openJob.id}-${r.id}`;
+                            const decision = rowStatus[key] === "rejected" ? "Rejected" : rowStatus[key] ? "Approved" : "Pending";
+                            return [r.id, entityLabel(r), r.attribute, CHANGE_LABEL[r.changeType as ChangeType] ?? r.changeType, r.previous ?? "", r.value ?? "", r.source ?? "", r.sourceUrl ?? "", decision]
+                              .map((v: any) => `"${String(v).replace(/"/g, '""')}"`).join(",");
+                          });
+                          const blob = new Blob([[header.join(","), ...csvRows].join("\n")], { type: "text/csv" });
+                          const a = document.createElement("a");
+                          a.href = URL.createObjectURL(blob);
+                          a.download = `review-${openJob.id}-${new Date().toISOString().slice(0, 10)}.csv`;
+                          a.click();
+                        }}
+                      >
+                        <Download className="h-3.5 w-3.5" /> Download reviewed file
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={bulkReject} disabled={!visibleRows.length}>
+                        <XCircle className="h-3.5 w-3.5" /> Reject all
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={bulkApprove} disabled={!visibleRows.length}>
+                        Bulk approve all ({visibleRows.length})
+                      </Button>
+                      <Button size="sm" onClick={handleSaveReview}>
+                        <Send className="h-3.5 w-3.5" /> Save review
+                      </Button>
+                    </div>
+                  </div>
                 </>
               )}
             </div>

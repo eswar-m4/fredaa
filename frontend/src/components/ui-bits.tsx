@@ -158,3 +158,72 @@ export function Steps({ steps, current }: { steps: string[]; current: number }) 
     </ol>
   );
 }
+
+// ---------------------------------------------------------------------------
+// Ported from the fredaa-customer review popup — same ADMV visual language,
+// reused here so the review workspace matches size/colour/font exactly.
+// ---------------------------------------------------------------------------
+
+export function AdmvBar({
+  a,
+  className,
+  showLegend = false,
+}: {
+  a: { added: number; deleted: number; modified: number; verified: number };
+  className?: string;
+  showLegend?: boolean;
+}) {
+  const total = a.added + a.deleted + a.modified + a.verified || 1;
+  const seg = [
+    { k: "Added", v: a.added, cls: "bg-success" },
+    { k: "Deleted", v: a.deleted, cls: "bg-destructive" },
+    { k: "Modified", v: a.modified, cls: "bg-warning" },
+    { k: "Verified", v: a.verified, cls: "bg-primary/60" },
+  ];
+  return (
+    <div className={className}>
+      <div className="flex h-2 w-full rounded-full overflow-hidden bg-secondary">
+        {seg.map((s) => (
+          <div key={s.k} className={s.cls} style={{ width: `${(s.v / total) * 100}%` }} title={`${s.k} ${((s.v / total) * 100).toFixed(1)}%`} />
+        ))}
+      </div>
+      {showLegend && (
+        <div className="flex flex-wrap gap-x-3 gap-y-1 mt-1.5 text-[10.5px] text-muted-foreground">
+          {seg.map((s) => (
+            <span key={s.k} className="inline-flex items-center gap-1">
+              <span className={cn("h-2 w-2 rounded-sm", s.cls)} /> {s.k} {((s.v / total) * 100).toFixed(1)}%
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export function Donut({ value, label, tone = "primary" }: { value: number; label?: string; tone?: string }) {
+  const r = 26;
+  const c = 2 * Math.PI * r;
+  return (
+    <div className="flex flex-col items-center gap-1 shrink-0">
+    <div className="relative h-[68px] w-[68px]">
+      <svg viewBox="0 0 64 64" className="h-full w-full -rotate-90">
+        <circle cx="32" cy="32" r={r} fill="none" strokeWidth="7" className="stroke-secondary" />
+        <circle
+          cx="32"
+          cy="32"
+          r={r}
+          fill="none"
+          strokeWidth="7"
+          strokeLinecap="round"
+          className={cn(tone === "success" ? "stroke-success" : tone === "warning" ? "stroke-warning" : "stroke-primary")}
+          strokeDasharray={`${(value / 100) * c} ${c}`}
+        />
+      </svg>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className="text-[13px] font-semibold tabular-nums">{Math.round(value)}%</span>
+      </div>
+    </div>
+    {label && <span className="text-[10px] text-muted-foreground uppercase tracking-wide">{label}</span>}
+    </div>
+  );
+}

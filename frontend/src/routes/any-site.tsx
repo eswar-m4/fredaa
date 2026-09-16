@@ -51,6 +51,9 @@ function AnySite() {
   // Step 2 state
   const [sourceMode, setSourceMode] = useState<"upload" | "sources">("upload");
   const [pickedSources, setPickedSources] = useState<string[]>([]);
+  // Sources explicitly marked "never use" — distinct from simply not-picked,
+  // since select-all / region auto-detect must never silently re-add one.
+  const [excludedSources, setExcludedSources] = useState<string[]>([]);
   const [seedFile, setSeedFile] = useState<string | null>(null);
   const [seedHeaders, setSeedHeaders] = useState<string[]>([]);
   const [seedRecords, setSeedRecords] = useState<Record<string, string>[]>([]);
@@ -142,6 +145,7 @@ function AnySite() {
     setDatasetId(d.id);
     setSelectedOutputs(d.outputAttributes.map((o) => o.key));
     setPickedSources(defaultSources(d, "Auto"));
+    setExcludedSources([]);
     setFrequency(d.refreshDefault);
     setSeedFile(null);
     setSeedHeaders([]);
@@ -155,6 +159,12 @@ function AnySite() {
 
   function toggleOutput(k: string) {
     setSelectedOutputs((s) => (s.includes(k) ? s.filter((x) => x !== k) : [...s, k]));
+  }
+  // Excluding a source always wins over it being picked — never leave a
+  // source both "avoided" and active at the same time.
+  function toggleExcludeSource(name: string) {
+    setExcludedSources((s) => (s.includes(name) ? s.filter((x) => x !== name) : [...s, name]));
+    setPickedSources((s) => s.filter((x) => x !== name));
   }
   function toggleSource(name: string) {
     setPickedSources((s) => (s.includes(name) ? s.filter((x) => x !== name) : [...s, name]));
@@ -501,6 +511,7 @@ function AnySite() {
       workflowId: ds.workflowId,
       selectedOutputs,
       pickedSources,
+      excludedSources,
       seedRows,
       frequency,
       customCron,
@@ -647,6 +658,8 @@ function AnySite() {
             pickedSources={pickedSources}
             toggleSource={toggleSource}
             setPickedSources={setPickedSources}
+            excludedSources={excludedSources}
+            toggleExcludeSource={toggleExcludeSource}
             defaultSources={defaultSources}
             detectedRegion={detectedRegion}
             setDetectedRegion={setDetectedRegion}
@@ -715,6 +728,8 @@ function MapStep(p: {
   pickedSources: string[];
   toggleSource: (n: string) => void;
   setPickedSources: (v: string[]) => void;
+  excludedSources: string[];
+  toggleExcludeSource: (n: string) => void;
   defaultSources: (d: Dataset, region: string) => string[];
   detectedRegion: string;
   setDetectedRegion: (r: string) => void;
@@ -783,8 +798,15 @@ function MapStep(p: {
     setOpenGroups((s) => ({ ...s, [name]: !s[name] }));
   }
 
+  const [openAvoidGroups, setOpenAvoidGroups] = useState<Record<string, boolean>>({});
+
+  function toggleAvoidGroup(name: string) {
+    setOpenAvoidGroups((s) => ({ ...s, [name]: !s[name] }));
+  }
+
   function selectGroup(arr: typeof ds.sources, on: boolean) {
-    const names = arr.map((s) => s.name);
+    // "Select all" must never re-add a source the user explicitly excluded.
+    const names = arr.map((s) => s.name).filter((n) => !p.excludedSources.includes(n));
     const next = on
       ? Array.from(new Set([...p.pickedSources, ...names]))
       : p.pickedSources.filter((n) => !names.includes(n));
@@ -844,30 +866,57 @@ function MapStep(p: {
                     <OverviewList title="Output Attributes" items={workflow.outputAttributes ?? workflow.outputs ?? workflow.attributes} tone="success" />
                   </div>
 
-                  <div>
-                    <div className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mb-2">Pipeline preview</div>
-                    <div className="flex items-center gap-1.5 overflow-x-auto">
-                      {workflow.steps.map((stepName, index) => (
-                        <div key={stepName} className="flex items-center gap-1.5 shrink-0">
-                          <div className="h-7 px-2.5 rounded-md bg-info-bg text-info text-[11px] font-medium inline-flex items-center">
-                            {stepName}
-                          </div>
-                          {index < workflow.steps.length - 1 && <ArrowRight className="h-3 w-3 text-muted-foreground" />}
+                  {workflow.screenshot ? (
+                    <div className="flex flex-wrap items-start gap-5">
+                      <div>
+                        <div className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mb-2">Workflow</div>
+                        <div className="inline-block rounded-lg border border-border overflow-hidden bg-secondary/20">
+                          <img
+                            src={workflow.screenshot}
+                            alt={`${workflow.name} workflow diagram`}
+                            className="max-w-full sm:max-w-[550px] h-auto block"
+                          />
                         </div>
-                      ))}
+                      </div>
+                      <div className="flex-1 min-w-[160px]">
+                        <div className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mb-2">
+                          Sources ({workflow.sources.length})
+                        </div>
+                        <div className="flex flex-col gap-1.5">
+                          {workflow.sources.map((source) => (
+                            <Badge key={source} tone="info" className="justify-start w-fit">{source}</Badge>
+                          ))}
+                        </div>
+                      </div>
                     </div>
-                  </div>
+                  ) : (
+                    <>
+                      <div>
+                        <div className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mb-2">Pipeline preview</div>
+                        <div className="flex items-center gap-1.5 overflow-x-auto">
+                          {workflow.steps.map((stepName, index) => (
+                            <div key={stepName} className="flex items-center gap-1.5 shrink-0">
+                              <div className="h-7 px-2.5 rounded-md bg-info-bg text-info text-[11px] font-medium inline-flex items-center">
+                                {stepName}
+                              </div>
+                              {index < workflow.steps.length - 1 && <ArrowRight className="h-3 w-3 text-muted-foreground" />}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
 
-                  <div>
-                    <div className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mb-2">
-                      Sources ({workflow.sources.length})
-                    </div>
-                    <div className="flex flex-wrap gap-1.5">
-                      {workflow.sources.map((source) => (
-                        <Badge key={source} tone="info">{source}</Badge>
-                      ))}
-                    </div>
-                  </div>
+                      <div>
+                        <div className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold mb-2">
+                          Sources ({workflow.sources.length})
+                        </div>
+                        <div className="flex flex-wrap gap-1.5">
+                          {workflow.sources.map((source) => (
+                            <Badge key={source} tone="info">{source}</Badge>
+                          ))}
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
               ) : (
                 <div className="mt-4 rounded-md border border-dashed border-border bg-card px-3 py-3 text-[12px] text-muted-foreground">
@@ -994,6 +1043,7 @@ function MapStep(p: {
                   {sourceGroups.map(([groupName, arr]) => {
                     const open = openGroups[groupName] ?? false;
                     const onCount = arr.filter((s) => p.pickedSources.includes(s.name)).length;
+                    const excludedCount = arr.filter((s) => p.excludedSources.includes(s.name)).length;
                     const allOn = onCount === arr.length;
                     return (
                       <div key={groupName} className="border border-border rounded-md overflow-hidden">
@@ -1006,6 +1056,7 @@ function MapStep(p: {
                             <ChevronRight className={`h-4 w-4 transition-transform ${open ? "rotate-90" : ""}`} />
                             <span className="font-semibold text-[13px]">{groupName}</span>
                             <Badge tone="info">{onCount} / {arr.length}</Badge>
+                            {excludedCount > 0 && <Badge tone="destructive">{excludedCount} avoided</Badge>}
                           </div>
                           <span
                             role="button"
@@ -1021,25 +1072,99 @@ function MapStep(p: {
                           <div className="divide-y divide-border">
                             {arr.map((s) => {
                               const on = p.pickedSources.includes(s.name);
+                              const excluded = p.excludedSources.includes(s.name);
                               const isDefault = /target|auto-derived/i.test(s.url);
+                              return (
+                                <div
+                                  key={s.name}
+                                  className={`flex items-center gap-2 px-3 py-2 text-[12.5px] ${
+                                    excluded ? "bg-destructive/5" : on ? "bg-info-bg/30" : "hover:bg-secondary/60"
+                                  }`}
+                                >
+                                  <label className="flex items-center gap-2 flex-1 min-w-0 cursor-pointer">
+                                    <input
+                                      type="checkbox"
+                                      checked={on}
+                                      disabled={excluded}
+                                      onChange={() => p.toggleSource(s.name)}
+                                      className="accent-primary disabled:opacity-40"
+                                    />
+                                    <div className="flex-1 min-w-0">
+                                      <div className={`font-medium truncate ${excluded ? "line-through text-muted-foreground" : ""}`}>
+                                        {s.name}
+                                        {isDefault && !excluded && <Badge tone="success" className="ml-1.5">default</Badge>}
+                                        {excluded && <Badge tone="destructive" className="ml-1.5">avoided</Badge>}
+                                      </div>
+                                      <div className="text-[10.5px] text-muted-foreground truncate">{s.url}</div>
+                                    </div>
+                                  </label>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </Card>
+            )}
+
+            {configTab === "sources" && (
+              <Card className="p-5 mt-4">
+                <div className="flex items-start justify-between gap-3 mb-3 flex-wrap">
+                  <div>
+                    <h3 className="font-semibold text-[15px] flex items-center gap-2">
+                      <Icons.Ban className="h-4 w-4 text-destructive" />
+                      Sources to avoid ({p.excludedSources.length} selected)
+                    </h3>
+                    <p className="text-[12px] text-muted-foreground">
+                      Freda will never pull data from a source checked here, even if it's picked above.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-2 max-h-[480px] overflow-y-auto pr-1">
+                  {sourceGroups.map(([groupName, arr]) => {
+                    const open = openAvoidGroups[groupName] ?? false;
+                    const excludedCount = arr.filter((s) => p.excludedSources.includes(s.name)).length;
+                    return (
+                      <div key={groupName} className="border border-border rounded-md overflow-hidden">
+                        <button
+                          type="button"
+                          onClick={() => toggleAvoidGroup(groupName)}
+                          className="w-full flex items-center justify-between px-3 py-2 bg-secondary/50 hover:bg-secondary text-left"
+                        >
+                          <div className="flex items-center gap-2">
+                            <ChevronRight className={`h-4 w-4 transition-transform ${open ? "rotate-90" : ""}`} />
+                            <span className="font-semibold text-[13px]">{groupName}</span>
+                            {excludedCount > 0 && <Badge tone="destructive">{excludedCount} avoided</Badge>}
+                          </div>
+                        </button>
+                        {open && (
+                          <div className="divide-y divide-border">
+                            {arr.map((s) => {
+                              const excluded = p.excludedSources.includes(s.name);
                               return (
                                 <label
                                   key={s.name}
-                                  className={`flex items-center gap-2 px-3 py-2 text-[12.5px] cursor-pointer ${on ? "bg-info-bg/30" : "hover:bg-secondary/60"}`}
+                                  className={`flex items-center gap-2 px-3 py-2 text-[12.5px] cursor-pointer ${
+                                    excluded ? "bg-destructive/5" : "hover:bg-secondary/60"
+                                  }`}
                                 >
                                   <input
                                     type="checkbox"
-                                    checked={on}
-                                    onChange={() => p.toggleSource(s.name)}
-                                    className="accent-primary"
+                                    checked={excluded}
+                                    onChange={() => p.toggleExcludeSource(s.name)}
+                                    className="accent-destructive"
                                   />
                                   <div className="flex-1 min-w-0">
-                                    <div className="font-medium truncate">
+                                    <div className={`font-medium truncate ${excluded ? "text-destructive" : ""}`}>
                                       {s.name}
-                                      {isDefault && <Badge tone="success" className="ml-1.5">default</Badge>}
                                     </div>
                                     <div className="text-[10.5px] text-muted-foreground truncate">{s.url}</div>
                                   </div>
+                                  {excluded && <Badge tone="destructive">avoided</Badge>}
                                 </label>
                               );
                             })}
