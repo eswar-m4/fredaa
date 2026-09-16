@@ -21,6 +21,7 @@ import {
   Newspaper,
   Plane,
   Plus,
+  RefreshCw,
   Rocket,
   Scale,
   Search,
@@ -42,7 +43,7 @@ import { Badge, Button, Card, Input, PageHeader, SectionTitle, Select, Steps } f
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useActiveCustomer, useMounted } from "@/lib/workspace";
 import { readIntakeFile, type IntakeResult } from "@/lib/ai-intake";
-import { launchSelfServiceProject } from "@/lib/custom-projects";
+import { launchSelfServiceProject, launchDirectoryProject } from "@/lib/custom-projects";
 import { estimate, fmt, type Project } from "@/data/customers";
 import { DATASETS, DATASET_CATEGORIES, type Dataset } from "@/data/datasets";
 import { categoryArt } from "@/data/category-art";
@@ -268,11 +269,15 @@ function DatasetSetup({ item, onBack }: { item: SetupItem; onBack: () => void })
   const [intake, setIntake] = useState<IntakeResult | null>(null);
   const [readError, setReadError] = useState<string | null>(null);
   const [extraUrls, setExtraUrls] = useState<string[]>([]);
+  const [directoryMode, setDirectoryMode] = useState(false);
   const [wired, setWired] = useState<string[]>(item.sources.slice(0, Math.min(4, item.sources.length)).map((s) => s.name));
   const [attrs, setAttrs] = useState<string[]>(item.attributes.slice(0, Math.min(12, item.attributes.length)).map((a) => a.key));
   const [cadence, setCadence] = useState<Cadence>((["Daily", "Weekly", "Monthly"].includes(item.refresh) ? item.refresh : "Weekly") as Cadence);
   const [customRule, setCustomRule] = useState("Every 2 weeks · Tuesday 06:00 UTC");
   const [launchedProject, setLaunchedProject] = useState<Project | null>(null);
+  const [launching, setLaunching] = useState(false);
+  const [launchError, setLaunchError] = useState<string | null>(null);
+  const [launchFetchErrors, setLaunchFetchErrors] = useState<{ entity: string; error: string }[]>([]);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const entityUrlCount = extraUrls.filter((u) => u.trim()).length;
@@ -304,7 +309,7 @@ function DatasetSetup({ item, onBack }: { item: SetupItem; onBack: () => void })
     }
   }
 
-  function launch() {
+  async function launch() {
     // Catalog datasets are self-service: no admin ticket, no wait — this
     // provisions the project directly into the workspace right now, using
     // the customer's own uploaded/typed entity URLs and chosen attributes.
@@ -315,17 +320,45 @@ function DatasetSetup({ item, onBack }: { item: SetupItem; onBack: () => void })
     // Dashboard's "+ New project", both unchanged.
     const dataset = DATASETS.find((d) => d.id === item.id);
     if (!dataset) return;
-    const project = launchSelfServiceProject({
-      customerId: customer.id,
-      projectName: name,
-      dataset,
-      entityUrls: extraUrls.filter((u) => u.trim()),
-      selectedAttributeKeys: attrs,
-      selectedSourceNames: wired,
-      cadence,
-    });
-    setLaunchedProject(project);
-    setStep(WIZARD_STEPS.length - 1);
+    const urls = extraUrls.filter((u) => u.trim());
+
+    if (!directoryMode) {
+      const project = launchSelfServiceProject({
+        customerId: customer.id,
+        projectName: name,
+        dataset,
+        entityUrls: urls,
+        selectedAttributeKeys: attrs,
+        selectedSourceNames: wired,
+        cadence,
+      });
+      setLaunchedProject(project);
+      setStep(WIZARD_STEPS.length - 1);
+      return;
+    }
+
+    // Directory mode does the first real extraction now (a genuine fetch +
+    // AI read of each directory page), so this can take a while — up to a
+    // couple of minutes for a large real directory.
+    setLaunching(true);
+    setLaunchError(null);
+    try {
+      const { project, fetchErrors } = await launchDirectoryProject({
+        customerId: customer.id,
+        projectName: name,
+        dataset,
+        directoryUrls: urls,
+        selectedAttributeKeys: attrs,
+        cadence,
+      });
+      setLaunchedProject(project);
+      setLaunchFetchErrors(fetchErrors);
+      setStep(WIZARD_STEPS.length - 1);
+    } catch (err) {
+      setLaunchError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setLaunching(false);
+    }
   }
 
   return (
@@ -471,15 +504,44 @@ function DatasetSetup({ item, onBack }: { item: SetupItem; onBack: () => void })
                     );
                   })}
                 </div>
+                <button
+                  onClick={() => setDirectoryMode((v) => !v)}
+                  className={cn(
+                    "w-full flex items-start gap-2.5 rounded-lg border p-3 text-left transition",
+                    directoryMode ? "border-primary bg-primary/5" : "border-border hover:bg-secondary",
+                  )}
+                >
+                  <span
+                    className={cn(
+                      "mt-0.5 h-4 w-4 shrink-0 rounded border flex items-center justify-center",
+                      directoryMode ? "bg-primary border-primary" : "border-border",
+                    )}
+                  >
+                    {directoryMode && <CheckCircle2 className="h-3 w-3 text-primary-foreground" />}
+                  </span>
+                  <span>
+                    <span className="block text-[12.5px] font-medium">These are directory / listing pages</span>
+                    <span className="block text-[11px] text-muted-foreground mt-0.5">
+                      Turn on when each URL below is a page that lists many companies or people (a business directory, a member list) — Run will pull out
+                      every entity that page actually names, instead of treating each URL as one company. Takes longer (real extraction, not instant).
+                    </span>
+                  </span>
+                </button>
                 <div>
-                  <Label>Your own entity URLs · {extraUrls.length}</Label>
+                  <Label>{directoryMode ? "Directory URLs" : "Your own entity URLs"} · {extraUrls.length}</Label>
                   <p className="text-[11px] text-muted-foreground -mt-1 mb-2">
-                    These are what "Run" actually re-checks live — one row per URL (e.g. each company's own website).
+                    {directoryMode
+                      ? 'These are what "Run" actually re-scrapes live — every company/person each page names becomes its own row.'
+                      : 'These are what "Run" actually re-checks live — one row per URL (e.g. each company\'s own website).'}
                   </p>
                   <div className="space-y-2 max-h-[140px] overflow-y-auto pr-1">
                     {extraUrls.map((u, i) => (
                       <div key={i} className="flex items-center gap-2">
-                        <Input placeholder="https://source.example.com" value={u} onChange={(e) => setExtraUrls(extraUrls.map((x, k) => (k === i ? e.target.value : x)))} />
+                        <Input
+                          placeholder={directoryMode ? "https://example.com/directory" : "https://source.example.com"}
+                          value={u}
+                          onChange={(e) => setExtraUrls(extraUrls.map((x, k) => (k === i ? e.target.value : x)))}
+                        />
                         <button onClick={() => setExtraUrls(extraUrls.filter((_, k) => k !== i))} className="h-9 w-9 shrink-0 rounded-md border border-border inline-flex items-center justify-center hover:bg-secondary">
                           <Trash2 className="h-3.5 w-3.5" />
                         </button>
@@ -487,7 +549,7 @@ function DatasetSetup({ item, onBack }: { item: SetupItem; onBack: () => void })
                     ))}
                   </div>
                   <Button size="sm" variant="outline" className="mt-2" onClick={() => setExtraUrls([...extraUrls, ""])}>
-                    <Plus className="h-3.5 w-3.5" /> Add source URL
+                    <Plus className="h-3.5 w-3.5" /> Add {directoryMode ? "directory" : "source"} URL
                   </Button>
                 </div>
               </div>
@@ -560,16 +622,31 @@ function DatasetSetup({ item, onBack }: { item: SetupItem; onBack: () => void })
             {step === 5 && (
               <div className="space-y-3">
                 <SectionTitle hint="live in your workspace immediately, no approval needed">Launch</SectionTitle>
-                {launchedProject ? (
+                {launching ? (
+                  <div className="rounded-lg border border-border bg-secondary/30 p-4 text-[12.5px] text-muted-foreground flex items-center gap-2.5">
+                    <RefreshCw className="h-4 w-4 animate-spin shrink-0" />
+                    Extracting real data from {entityUrlCount} directory {entityUrlCount === 1 ? "page" : "pages"} — pulling out every company/person each
+                    one names can take a minute or two for a large directory. Don&apos;t close this.
+                  </div>
+                ) : launchedProject ? (
                   <div className="rounded-lg border border-success/40 bg-success-bg p-4 text-[12.5px] text-success space-y-1">
                     <div className="font-semibold inline-flex items-center gap-1.5">
                       <CheckCircle2 className="h-4 w-4" /> {launchedProject.name} is live in your workspace
                     </div>
                     <div>
-                      {launchedProject.records > 0
-                        ? `Go to Monitor and click "Run now" to fetch real data for the ${launchedProject.records} ${launchedProject.records === 1 ? "entity" : "entities"} you added.`
-                        : "No entity URLs were added, so there's nothing to run yet — open Agents on this project to add some, then Run from Monitor."}
+                      {directoryMode
+                        ? launchedProject.records > 0
+                          ? `Found ${fmt(launchedProject.records)} real ${launchedProject.records === 1 ? "entry" : "entries"} across your directory pages — already in Review, ready to approve.`
+                          : "No entries were found on those pages — double-check the URLs actually list companies/people, or that they're reachable."
+                        : launchedProject.records > 0
+                          ? `Go to Monitor and click "Run now" to fetch real data for the ${launchedProject.records} ${launchedProject.records === 1 ? "entity" : "entities"} you added.`
+                          : "No entity URLs were added, so there's nothing to run yet — open Agents on this project to add some, then Run from Monitor."}
                     </div>
+                    {launchFetchErrors.length > 0 && (
+                      <div className="pt-1 text-warning">
+                        {launchFetchErrors.length} page(s) had an issue: {launchFetchErrors.map((f) => f.error).slice(0, 2).join("; ")}
+                      </div>
+                    )}
                     <div className="flex items-center gap-3 pt-1">
                       <Link to="/monitoring" className="inline-block underline">
                         Go to Monitor
@@ -582,16 +659,22 @@ function DatasetSetup({ item, onBack }: { item: SetupItem; onBack: () => void })
                 ) : (
                   <div className="space-y-2">
                     <Summary label="Project" value={name} />
-                    <Summary label="Entity URLs" value={`${entityUrlCount} added`} />
+                    <Summary label={directoryMode ? "Directory URLs" : "Entity URLs"} value={`${entityUrlCount} added`} />
                     <Summary label="Datapoints" value={`${attrs.length} attributes`} />
                     <Summary label="Schedule" value={scheduleLabel} />
                     {intake && <Summary label="Uploaded file" value={intake.fileName} />}
                     {entityUrlCount === 0 && (
                       <div className="rounded-lg border border-warning/40 bg-warning-bg px-3 py-2.5 text-[11.5px] text-warning">
-                        Add at least one entity URL (Upload dataset, or type one in on the Wired sources step) — that's what "Run" actually fetches. Without one, there's nothing to launch.
+                        Add at least one {directoryMode ? "directory" : "entity"} URL (Upload dataset, or type one in on the Wired sources step) — that's
+                        what "Run" actually fetches. Without one, there's nothing to launch.
                       </div>
                     )}
-                    <Button className="w-full mt-2" onClick={launch} disabled={!name.trim() || attrs.length === 0 || entityUrlCount === 0}>
+                    {launchError && (
+                      <div className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2.5 text-[11.5px] text-destructive">
+                        Launch failed: {launchError}
+                      </div>
+                    )}
+                    <Button className="w-full mt-2" onClick={() => void launch()} disabled={!name.trim() || attrs.length === 0 || entityUrlCount === 0}>
                       <Rocket className="h-4 w-4" /> Launch now
                     </Button>
                   </div>
@@ -600,7 +683,7 @@ function DatasetSetup({ item, onBack }: { item: SetupItem; onBack: () => void })
             )}
 
             <div className="mt-auto pt-5 flex items-center justify-between">
-              <Button size="sm" variant="outline" disabled={step === 0} onClick={() => setStep((s) => Math.max(0, s - 1))}>
+              <Button size="sm" variant="outline" disabled={step === 0 || launching} onClick={() => setStep((s) => Math.max(0, s - 1))}>
                 <ArrowLeft className="h-3.5 w-3.5" /> Back
               </Button>
               {step < WIZARD_STEPS.length - 1 ? (

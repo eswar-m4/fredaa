@@ -8,12 +8,25 @@ import {
 import { Button } from "@/components/ui-bits";
 import { downloadCsv, downloadXlsxMultiSheet, type XlsxSheetSpec } from "@/lib/download";
 import { recordsForDownload, buildRefreshedMonitoringRows } from "@/lib/monitoring-live-review";
+import { isCustomProjectId } from "@/lib/custom-projects";
 import type { Project } from "@/data/customers";
+
+// live-check records carry the raw field key as `datapoint` (see
+// ReviewDialog.tsx's columnLabel comment) — map back to the pretty label
+// from project.datapoints so the downloaded file reads the same as the
+// review screen, not raw slugified keys.
+function labelForDatapoint(project: Project, dp: string): string {
+  const offset = project.columns.length - project.datapoints.length;
+  if (offset < 0) return dp;
+  const idx = project.columns.indexOf(dp);
+  if (idx < offset) return dp;
+  return project.datapoints[idx - offset] ?? dp;
+}
 
 function toReviewRows(project: Project) {
   return recordsForDownload(project).map((r) => ({
     entity: r.entity,
-    datapoint: r.datapoint,
+    datapoint: labelForDatapoint(project, r.datapoint),
     change_type: r.changeType,
     old_value: r.oldValue,
     new_value: r.newValue,
@@ -36,11 +49,29 @@ export function DownloadMenu({ project }: { project: Project }) {
     const sheets: XlsxSheetSpec[] = [{ name: "Review", rows: toReviewRows(project) }];
     const refreshed = buildRefreshedMonitoringRows(project);
     if (refreshed) {
-      sheets.push({
-        name: refreshed.sheetName,
-        headers: refreshed.columns,
-        rows: refreshed.rows,
-      });
+      // Self-provisioned projects' columns are slugified field keys
+      // (organization_name) rather than a real template's own header text,
+      // so the Output sheet relabels them to the same pretty names the
+      // Review sheet/screen use. Onboarded real projects (NTM/ERIS/ABM/...)
+      // already carry their real source template's column names — leave
+      // those exactly as-is.
+      if (isCustomProjectId(project.id)) {
+        const offset = project.columns.length - project.datapoints.length;
+        const prettyHeaders = refreshed.columns.map((c) => {
+          const idx = project.columns.indexOf(c);
+          return offset >= 0 && idx >= offset ? (project.datapoints[idx - offset] ?? c) : c;
+        });
+        const prettyRows = refreshed.rows.map((row) => {
+          const out: Record<string, string | number> = {};
+          refreshed.columns.forEach((c, i) => {
+            out[prettyHeaders[i]!] = row[c] ?? "";
+          });
+          return out;
+        });
+        sheets.push({ name: refreshed.sheetName, headers: prettyHeaders, rows: prettyRows });
+      } else {
+        sheets.push({ name: refreshed.sheetName, headers: refreshed.columns, rows: refreshed.rows });
+      }
     }
     void downloadXlsxMultiSheet(`${baseName}-review.xlsx`, sheets);
   }

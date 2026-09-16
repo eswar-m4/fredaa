@@ -13,11 +13,15 @@
 // ticket flow in ticket-store.ts — this store is only for the
 // self-provisioned catalog-dataset case.
 import { useSyncExternalStore } from "react";
-import type { Project, SourceRef } from "@/data/customers";
-import type { WebpageLiveRefreshProfile } from "@/lib/live-refresh-types";
+import type { Project, SourceRef, ReviewRecord } from "@/data/customers";
+import type { WebpageLiveRefreshProfile, DirectoryLiveRefreshProfile } from "@/lib/live-refresh-types";
 import type { Dataset } from "@/data/datasets";
+import { runDirectoryExtraction } from "@/lib/api/directory-extract.functions";
+import { diffRegistrySnapshot } from "@/lib/api/registry-refresh.core";
+import { saveLiveReview } from "@/lib/live-review-store";
+import type { LiveReviewData } from "@/components/ReviewDialog";
 
-export type CustomProjectEntry = { project: Project; profile: WebpageLiveRefreshProfile };
+export type CustomProjectEntry = { project: Project; profile: WebpageLiveRefreshProfile | DirectoryLiveRefreshProfile };
 
 const KEY = "freda_custom_projects_v1";
 const listeners = new Set<() => void>();
@@ -244,10 +248,158 @@ export function launchSelfServiceProject(params: {
   return project;
 }
 
+/** Same idea as launchSelfServiceProject, but for directory/listing
+ *  sources (a business directory, a member list — one page names MANY
+ *  entities) rather than one URL per entity. Runs the real extraction
+ *  immediately (synchronously, before returning) so the project lands in
+ *  the workspace with real rows already in Review/Output, not an empty
+ *  shell waiting for a first "Run" — matches how ERIS/ABM's other
+ *  first-time-onboarded real datasets already work (a real snapshot,
+ *  all-Verified, no fabricated Added). A later "Run" in Monitor re-scrapes
+ *  the same directory URLs and diffs against this baseline. */
+export async function launchDirectoryProject(params: {
+  customerId: string;
+  projectName: string;
+  dataset: Dataset;
+  directoryUrls: string[];
+  selectedAttributeKeys: string[];
+  cadence: string;
+}): Promise<{ project: Project; fetchErrors: { entity: string; error: string }[] }> {
+  const { customerId, projectName, dataset, directoryUrls, selectedAttributeKeys, cadence } = params;
+  const id = nextCustomProjectId(customerId);
+  const urls = [...new Set(directoryUrls.map((u) => u.trim()).filter(Boolean))];
+  const entityLabel = dataset.category.toLowerCase();
+
+  const attrsByKey = new Map(dataset.outputAttributes.map((a) => [a.key, a]));
+  const requestedFields = selectedAttributeKeys.filter((k) => attrsByKey.has(k)).slice(0, 30);
+  const requestedFieldMeta: Record<string, { label: string }> = {};
+  for (const f of requestedFields) requestedFieldMeta[f] = { label: attrsByKey.get(f)!.label };
+
+  const outcome = await runDirectoryExtraction({ data: { urls, fields: requestedFields, fieldMeta: requestedFieldMeta, entityLabel } });
+
+  // Real directory pages are almost always a plain HTML table — when one is
+  // found, its own column headers (Organization Name, Address, Telephone,
+  // Email, Website, ...) become the project's real fields instead of the
+  // dataset's generic catalog attributes, since the page's own schema is
+  // the ground truth for what it actually publishes. Only when nothing was
+  // extracted at all (blocked page, empty page) do we keep the customer's
+  // originally-requested fields, so the wizard's summary still shows what
+  // they asked for.
+  const fields = outcome.fields.length > 0 ? outcome.fields : requestedFields;
+  const fieldLabels: Record<string, string> =
+    outcome.fields.length > 0 ? outcome.fieldLabels : Object.fromEntries(requestedFields.map((f) => [f, requestedFieldMeta[f]!.label]));
+
+  // Prefer a discovered field that plainly looks like the entity's own
+  // name/title (organization, company, name, contact) over whichever field
+  // happened to come first in the table — falls back to the first column
+  // when nothing matches, and to the dataset's own declared name-like field
+  // when we kept the customer's requested fields instead.
+  const nameField =
+    fields.find((f) => /name|organi[sz]ation|company|title/i.test(f)) ??
+    (outcome.fields.length > 0 ? fields[0] : dataset.outputAttributes.find((a) => fields.includes(a.key))?.key) ??
+    fields[0] ??
+    "name";
+
+  const sampleRows = outcome.rows.filter((r) => (r[nameField] ?? "").trim());
+  const fetchErrors: { entity: string; error: string }[] = [];
+  for (const page of outcome.perPage) {
+    if (page.error) fetchErrors.push({ entity: page.url, error: page.error });
+  }
+
+  const profile: DirectoryLiveRefreshProfile = {
+    kind: "directory",
+    projectId: id,
+    directoryUrls: urls,
+    keyField: nameField,
+    nameField,
+    extractableFields: fields,
+    fieldLabels,
+    currentValueRows: sampleRows,
+    outputSheetName: `${dataset.name} Output`,
+    entityLabel,
+  };
+
+  const sources: SourceRef[] = outcome.perPage.map((page, i) => ({
+    id: `${id}-src-${i}`,
+    label: nameFromUrl(page.url),
+    url: page.url,
+    status: "Live",
+    records: page.rows.length,
+    addedOn: new Date().toLocaleDateString("en-US", { month: "short", year: "numeric" }),
+  }));
+
+  const project: Project = {
+    id,
+    customerId,
+    name: projectName,
+    source: dataset.tagline,
+    websiteUrl: urls[0] ?? "",
+    datapoints: fields.map((f) => fieldLabels[f] ?? f),
+    sources,
+    records: sampleRows.length,
+    admv: { added: 0, deleted: 0, modified: 0, verified: sampleRows.length },
+    freshness: sampleRows.length > 0 ? 96 : 0,
+    accuracy: sampleRows.length > 0 ? 94 : 0,
+    coverage: sampleRows.length > 0 ? 95 : 0,
+    frequency: FREQ_MAP[cadence] ?? "Weekly",
+    lastRefreshHrs: 0,
+    nextRefreshHrs: 0,
+    status: "Review pending",
+    pendingReview: sampleRows.length,
+    history: [],
+    sampleRows,
+    columns: fields,
+  };
+
+  // The Review screen (and the downloadable Review file) only ever show a
+  // live-checkable project's *saved* live-review run — never the sampleRows
+  // baseline directly — so without this, Review would sit empty until the
+  // customer separately clicked "Run" in Monitor, even though the real
+  // first-pass data (every field, every org, straight from the real page)
+  // is already sitting right here. Diffing sampleRows against itself is
+  // exactly the "first real snapshot" case: every field naturally comes
+  // back Verified with its real value, nothing fabricated.
+  const diffed = diffRegistrySnapshot(sampleRows, sampleRows, nameField, nameField, fields);
+  const records: ReviewRecord[] = [];
+  for (const rec of diffed) {
+    const sourceUrl = outcome.perPage.find((p) => p.rows.includes(rec.row))?.url ?? urls[0] ?? "";
+    for (const d of rec.diffs) {
+      records.push({
+        id: `${id}-live-${rec.key}-${rec.index}-${d.field}`,
+        projectId: id,
+        entity: rec.name,
+        datapoint: d.field,
+        oldValue: d.oldValue || "—",
+        newValue: d.newValue || "—",
+        changeType: d.changeType,
+        confidence: 90,
+        source: rec.name,
+        sourceUrl,
+        detectedHrs: 0,
+      });
+    }
+  }
+  const live: LiveReviewData = {
+    records,
+    checkedAt: outcome.checkedAt,
+    aiConfigured: true,
+    reachableCount: outcome.perPage.filter((p) => p.reachable).length,
+    totalCount: urls.length,
+    fetchErrors,
+    profileKind: "directory",
+  };
+  saveLiveReview(id, live);
+
+  const all = readAll();
+  const existing = all[customerId] ?? [];
+  persist({ ...all, [customerId]: [...existing, { project, profile }] });
+  return { project, fetchErrors };
+}
+
 /** Looked up by monitoring-live-review.ts / live-refresh-profiles.ts when a
  *  project id isn't one of the hand-built static profiles — the dynamic
  *  counterpart to LIVE_REFRESH_PROFILES. */
-export function getCustomLiveRefreshProfile(projectId: string): WebpageLiveRefreshProfile | null {
+export function getCustomLiveRefreshProfile(projectId: string): WebpageLiveRefreshProfile | DirectoryLiveRefreshProfile | null {
   const all = readAll();
   for (const entries of Object.values(all)) {
     const hit = entries.find((e) => e.project.id === projectId);

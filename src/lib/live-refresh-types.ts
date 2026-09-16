@@ -75,4 +75,30 @@ export type RegistryLiveRefreshProfile = {
   companionWebpages?: { id: string; name: string; url: string }[];
 };
 
-export type LiveRefreshProfile = WebpageLiveRefreshProfile | RegistryLiveRefreshProfile;
+/** A directory/listing profile is a THIRD shape, distinct from both above:
+ *  each configured URL is not one entity, but one page that lists MANY
+ *  entities (a business directory, a member list) — "Run" re-scrapes every
+ *  listed URL, asks the AI to pull out every distinct entity it names, and
+ *  diffs the combined result against the on-file rows by a stable key
+ *  (e.g. company name). Used by self-service Solutions projects where the
+ *  customer uploaded directory pages rather than individual entity URLs —
+ *  see custom-projects.ts's launchDirectoryProject. */
+export type DirectoryLiveRefreshProfile = {
+  kind: "directory";
+  projectId: string;
+  directoryUrls: string[];
+  keyField: string;
+  nameField: string;
+  extractableFields: string[];
+  /** Human-readable label for each extractableFields key — from the real
+   *  page's own table headers when the source is a plain HTML table
+   *  ("organization_name" -> "Organization Name"), so the review screen and
+   *  the downloadable output file show real column names instead of raw
+   *  slugified keys. */
+  fieldLabels: Record<string, string>;
+  currentValueRows: Record<string, string>[];
+  outputSheetName: string;
+  entityLabel: string;
+};
+
+export type LiveRefreshProfile = WebpageLiveRefreshProfile | RegistryLiveRefreshProfile | DirectoryLiveRefreshProfile;
