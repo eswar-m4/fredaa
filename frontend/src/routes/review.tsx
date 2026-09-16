@@ -903,6 +903,9 @@ function Review() {
   const [sample, setSample] = useState<{ rows: any[]; totalSampled: number; sampledCount: number; coverage?: ReviewCoverage | null } | null>(null);
   const [sampleJobId, setSampleJobId] = useState<string | null>(null);
   const [sampleRevision, setSampleRevision] = useState(0);
+  const [sampleFetching, setSampleFetching] = useState(false);
+  const [sliderDraft, setSliderDraft] = useState<number | null>(null);
+  const sliderCommitTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const forceRefreshRef = useRef(false);
   const sampleCacheRef = useRef<Record<string, { rows: any[]; totalSampled: number; sampledCount: number; coverage?: ReviewCoverage | null }>>({});
   const [queueMetrics, setQueueMetrics] = useState<ReviewQueueMetrics>({
@@ -1458,16 +1461,26 @@ function Review() {
       sampleCacheRef.current[sampleKey] = sharedCachedSample;
       setSample(sharedCachedSample);
       setSampleJobId(jobId);
+      setSampleFetching(false);
       return;
     }
-    setSample(null);
-    setSampleJobId(null);
+
+    // Only blank the grid out for a brand-new job. When it's the same job and
+    // just the sample rate changed, keep the previous rows on screen (with a
+    // small "Updating sample..." indicator) instead of flashing to the
+    // full-page spinner on every rate change.
+    if (sampleJobId !== jobId) {
+      setSample(null);
+      setSampleJobId(null);
+    }
+    setSampleFetching(true);
 
     if (!openJob.isDbJob) {
       const generated = generateSample(openJob, sampleRate);
       sampleCacheRef.current[sampleKey] = generated;
       setSample(generated);
       setSampleJobId(jobId);
+      setSampleFetching(false);
       return;
     }
 
@@ -1491,6 +1504,7 @@ function Review() {
         REVIEW_SAMPLE_CACHE.set(sampleKey, data);
         setSample(data);
         setSampleJobId(jobId);
+        setSampleFetching(false);
       })
       .catch((err) => {
         clearTimeout(timeoutId);
@@ -1498,6 +1512,7 @@ function Review() {
         console.error("Failed to load review data:", err);
         setSample({ rows: [], totalSampled: 0, sampledCount: 0 });
         setSampleJobId(jobId);
+        setSampleFetching(false);
       });
 
     return () => {
@@ -1506,6 +1521,15 @@ function Review() {
       controller.abort();
     };
   }, [openJob, jobRates, baseApiUrl, pageOffset, viewInBulk, sampleRevision]);
+
+  // Drop any pending debounced slider commit when the dialog switches jobs / closes.
+  useEffect(() => {
+    setSliderDraft(null);
+    if (sliderCommitTimer.current) {
+      clearTimeout(sliderCommitTimer.current);
+      sliderCommitTimer.current = null;
+    }
+  }, [openJob?.id]);
 
   useEffect(() => {
     if (!openJob || !viewInBulk) {
@@ -2043,6 +2067,11 @@ function Review() {
                 {openJob.coverage?.job_coverage !== null && openJob.coverage?.job_coverage !== undefined && (
                   <span>Coverage {formatCoveragePct(openJob.coverage.job_coverage)}</span>
                 )}
+                {sampleFetching && sample && (
+                  <span className="inline-flex items-center gap-1 text-info">
+                    <RefreshCw className="h-3 w-3 animate-spin" /> Updating sample...
+                  </span>
+                )}
               </div>
             )}
           </DialogHeader>
@@ -2098,7 +2127,7 @@ function Review() {
                       <div>
                         <div className="flex items-center justify-between text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">
                           <span>Sampling</span>
-                          <span className="tabular-nums text-foreground">{jobRates[openJob.id] ?? 2}%</span>
+                          <span className="tabular-nums text-foreground">{sliderDraft ?? jobRates[openJob.id] ?? 2}%</span>
                         </div>
                         <input
                           suppressHydrationWarning
@@ -2107,10 +2136,21 @@ function Review() {
                           max={100}
                           step={1}
                           disabled={viewInBulk}
-                          value={jobRates[openJob.id] ?? 2}
+                          value={sliderDraft ?? jobRates[openJob.id] ?? 2}
                           onChange={(e) => {
-                            setJobRates((s) => ({ ...s, [openJob.id]: Math.min(100, Math.max(1, Number(e.target.value) || 1)) }));
-                            setPageOffset(0);
+                            const jobId = openJob.id;
+                            const next = Math.min(100, Math.max(1, Number(e.target.value) || 1));
+                            // Update the visible number immediately, but debounce the
+                            // commit that actually triggers a refetch so dragging the
+                            // slider doesn't fire a request (and a loading flash) per tick.
+                            setSliderDraft(next);
+                            if (sliderCommitTimer.current) clearTimeout(sliderCommitTimer.current);
+                            sliderCommitTimer.current = setTimeout(() => {
+                              setJobRates((s) => ({ ...s, [jobId]: next }));
+                              setPageOffset(0);
+                              setSliderDraft(null);
+                              sliderCommitTimer.current = null;
+                            }, 350);
                           }}
                           className="w-full accent-[var(--primary)] disabled:opacity-50"
                         />

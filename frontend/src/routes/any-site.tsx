@@ -24,7 +24,6 @@ import {
   FileSpreadsheet,
   Database,
   ChevronRight,
-  Download,
   Globe,
 } from "lucide-react";
 import * as Icons from "lucide-react";
@@ -255,254 +254,6 @@ function AnySite() {
     toast.success(`Downloaded ${a.download}`);
   }
 
-  function toExcelColumnName(index: number) {
-    let n = index;
-    let col = "";
-    while (n > 0) {
-      const rem = (n - 1) % 26;
-      col = String.fromCharCode(65 + rem) + col;
-      n = Math.floor((n - 1) / 26);
-    }
-    return col;
-  }
-
-  async function downloadInputTemplate() {
-    if (!ds) return;
-
-    if (!ds.inputTemplateColumns?.length) {
-      downloadSample("csv", `${ds.name}-template`);
-      return;
-    }
-
-    const { default: ExcelJS } = await import("exceljs");
-    const workbook = new ExcelJS.Workbook();
-    workbook.creator = "Freda";
-    workbook.created = new Date();
-
-    const worksheet = workbook.addWorksheet("Template", {
-      views: [{ state: "frozen", ySplit: 1 }],
-    });
-
-    const columns =
-      ds.id === "ds-firmographic"
-        ? Array.from(
-            new Map(
-              [...ds.inputAttributes, ...ds.outputAttributes.map((field) => ({
-                ...field,
-                role: "input" as const,
-                required: false,
-              }))].map((column) => [column.key, column]),
-            ).values(),
-          )
-        : ds.inputTemplateColumns;
-    const templateRows: Record<string, string>[] =
-      ds.id === "ds-firmographic"
-        ? [
-            {
-              company_name: "Acme Corp",
-              domain: "acmecorp.com",
-              website: "https://acmecorp.com",
-              linkedin_url: "https://www.linkedin.com/company/acme-corp",
-              country: "United States",
-              hq_city: "San Francisco",
-              hq_state: "California",
-              industry: "Software",
-              sub_industry: "B2B SaaS",
-              ticker: "ACME",
-              registry_number: "CA-2026-ACME-001",
-            },
-            {
-              company_name: "Northstar Systems",
-              domain: "northstarsystems.io",
-              website: "https://northstarsystems.io",
-              linkedin_url: "https://www.linkedin.com/company/northstar-systems",
-              country: "United States",
-              hq_city: "Austin",
-              hq_state: "Texas",
-              industry: "Information Technology",
-              sub_industry: "Cloud Infrastructure",
-              ticker: "NSTR",
-              registry_number: "TX-2026-NS-204",
-            },
-            {
-              company_name: "BluePeak Analytics",
-              domain: "bluepeakanalytics.com",
-              website: "https://bluepeakanalytics.com",
-              linkedin_url: "https://www.linkedin.com/company/bluepeak-analytics",
-              country: "United Kingdom",
-              hq_city: "London",
-              hq_state: "England",
-              industry: "Data & Analytics",
-              sub_industry: "Business Intelligence",
-              ticker: "BPAK",
-              registry_number: "UK-2026-BPA-778",
-            },
-            {
-              company_name: "Vertex Health Labs",
-              domain: "vertexhealthlabs.com",
-              website: "https://vertexhealthlabs.com",
-              linkedin_url: "https://www.linkedin.com/company/vertex-health-labs",
-              country: "Canada",
-              hq_city: "Toronto",
-              hq_state: "Ontario",
-              industry: "Healthcare",
-              sub_industry: "Health Tech",
-              ticker: "VHL",
-              registry_number: "ON-2026-VHL-019",
-            },
-            {
-              company_name: "Summit Retail Group",
-              domain: "summitretailgroup.com",
-              website: "https://summitretailgroup.com",
-              linkedin_url: "https://www.linkedin.com/company/summit-retail-group",
-              country: "Singapore",
-              hq_city: "Singapore",
-              hq_state: "Singapore",
-              industry: "Retail",
-              sub_industry: "Omnichannel Commerce",
-              ticker: "SMRT",
-              registry_number: "SG-2026-SRG-552",
-            },
-          ]
-        : ds.id === "ds-contacts"
-          ? [
-              {
-                full_name: "Jane Park",
-                company_name: "Acme Corp",
-                company_domain: "acmecorp.com",
-                title: "Chief Marketing Officer",
-                department: "Marketing",
-                seniority: "C-level",
-                email: "jane.park@acmecorp.com",
-                phone: "+1 415 555 0101",
-                linkedin_url: "https://www.linkedin.com/in/jane-park-acme",
-                country: "United States",
-                city: "San Francisco",
-                state: "California",
-              },
-              {
-                full_name: "Daniel Brooks",
-                company_name: "Northstar Systems",
-                company_domain: "northstarsystems.io",
-                title: "VP Sales",
-                department: "Sales",
-                seniority: "VP",
-                email: "daniel.brooks@northstarsystems.io",
-                phone: "+1 512 555 0144",
-                linkedin_url: "https://www.linkedin.com/in/daniel-brooks-northstar",
-                country: "United States",
-                city: "Austin",
-                state: "Texas",
-              },
-              {
-                full_name: "Priya Nair",
-                company_name: "BluePeak Analytics",
-                company_domain: "bluepeakanalytics.com",
-                title: "Director of Operations",
-                department: "Operations",
-                seniority: "Director",
-                email: "priya.nair@bluepeakanalytics.com",
-                phone: "+44 20 5555 0188",
-                linkedin_url: "https://www.linkedin.com/in/priya-nair-bluepeak",
-                country: "United Kingdom",
-                city: "London",
-                state: "England",
-              },
-              {
-                full_name: "Ethan Chen",
-                company_name: "Vertex Health Labs",
-                company_domain: "vertexhealthlabs.com",
-                title: "Senior Product Manager",
-                department: "Product",
-                seniority: "Senior Manager",
-                email: "ethan.chen@vertexhealthlabs.com",
-                phone: "+1 416 555 0177",
-                linkedin_url: "https://www.linkedin.com/in/ethan-chen-vertex",
-                country: "Canada",
-                city: "Toronto",
-                state: "Ontario",
-              },
-              {
-                full_name: "Sofia Tan",
-                company_name: "Summit Retail Group",
-                company_domain: "summitretailgroup.com",
-                title: "Head of Finance",
-                department: "Finance",
-                seniority: "Head",
-                email: "sofia.tan@summitretailgroup.com",
-                phone: "+65 5555 0199",
-                linkedin_url: "https://www.linkedin.com/in/sofia-tan-summit",
-                country: "Singapore",
-                city: "Singapore",
-                state: "Singapore",
-              },
-            ]
-          : [];
-
-    worksheet.columns = columns.map((column) => ({
-      key: column.key,
-      width: Math.max(16, column.key.length + 4),
-    }));
-
-    const headerRow = worksheet.getRow(1);
-    headerRow.height = 22;
-
-    columns.forEach((column, index) => {
-      const cell = headerRow.getCell(index + 1);
-      const isRequired = !!column.required;
-      cell.value = column.key;
-      cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
-      cell.border = {
-        top: { style: "thin", color: { argb: "FFD1D5DB" } },
-        left: { style: "thin", color: { argb: "FFD1D5DB" } },
-        bottom: { style: "thin", color: { argb: "FFD1D5DB" } },
-        right: { style: "thin", color: { argb: "FFD1D5DB" } },
-      };
-      cell.fill = {
-        type: "pattern",
-        pattern: "solid",
-        fgColor: { argb: isRequired ? "FF1D4ED8" : "FFDBEAFE" },
-      };
-      cell.font = {
-        name: "Aptos",
-        size: 11,
-        bold: isRequired,
-        color: { argb: isRequired ? "FFFFFFFF" : "FF1E3A8A" },
-      };
-    });
-
-    templateRows.forEach((rowData) => {
-      const row = worksheet.addRow(columns.map((column) => rowData[column.key] ?? ""));
-      row.height = 20;
-      row.eachCell((cell) => {
-        cell.alignment = { vertical: "middle", wrapText: true };
-        cell.border = {
-          top: { style: "thin", color: { argb: "FFE5E7EB" } },
-          left: { style: "thin", color: { argb: "FFE5E7EB" } },
-          bottom: { style: "thin", color: { argb: "FFE5E7EB" } },
-          right: { style: "thin", color: { argb: "FFE5E7EB" } },
-        };
-      });
-    });
-
-    worksheet.autoFilter = {
-      from: "A1",
-      to: `${toExcelColumnName(columns.length)}1`,
-    };
-
-    const buffer = await workbook.xlsx.writeBuffer();
-    const blob = new Blob([buffer], {
-      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${ds.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-input-template.xlsx`;
-    a.click();
-    URL.revokeObjectURL(url);
-    toast.success(`Downloaded ${a.download}`);
-  }
-
   async function handleLaunch(): Promise<boolean> {
     if (!ds) return false;
 
@@ -672,7 +423,6 @@ function AnySite() {
             toggleOutput={toggleOutput}
             setSelectedOutputs={setSelectedOutputs}
             downloadSample={downloadSample}
-            downloadInputTemplate={downloadInputTemplate}
             onBack={() => setStep(0)}
             onNext={() => setStep(2)}
           />
@@ -720,6 +470,18 @@ function SectionLabel({ children, className }: { children: React.ReactNode; clas
   );
 }
 
+// Any CSV/Excel works — columns are auto-detected server-side by header
+// synonym + value pattern, not by matching a fixed template. This line just
+// tells the user which real-world column(s) to include, derived from the
+// dataset's own input fields (not a fabricated example list).
+function describeInputRequirement(ds: Dataset): string {
+  const required = ds.inputAttributes.filter((a) => a.required).map((a) => a.label);
+  const optional = ds.inputAttributes.filter((a) => !a.required).map((a) => a.label);
+  const need = required.length ? required.join(" or ") : ds.inputAttributes[0]?.label ?? "a name column";
+  const extra = optional.length ? ` (${optional.join(", ")} helps too)` : "";
+  return `Any spreadsheet works — include a ${need} column${extra}. Header names don't need to match exactly; columns are auto-detected.`;
+}
+
 /* ───────── Step 2: pick source + map fields ───────── */
 function MapStep(p: {
   ds: Dataset;
@@ -742,7 +504,6 @@ function MapStep(p: {
   toggleOutput: (k: string) => void;
   setSelectedOutputs: React.Dispatch<React.SetStateAction<string[]>>;
   downloadSample: (kind: "csv" | "json", name: string) => void;
-  downloadInputTemplate: () => void | Promise<void>;
   onBack: () => void;
   onNext: () => void;
 }) {
@@ -1017,13 +778,7 @@ function MapStep(p: {
                       ? `${p.seedFile} · ${p.seedRows.toLocaleString()} rows · ${p.seedColumnCount || p.seedHeaders.length} columns`
                       : "Upload your dataset to get started."}
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => void p.downloadInputTemplate()}
-                    className="mt-3 inline-flex items-center gap-1 text-[12px] text-info hover:underline"
-                  >
-                    <Download className="h-3 w-3" /> Download input template
-                  </button>
+                  <div className="mt-3 text-[12px] text-muted-foreground">{describeInputRequirement(p.ds)}</div>
                 </div>
               </Card>
             )}
