@@ -478,7 +478,7 @@ const ENTITY_COLUMN_CANDIDATES = [
   "Hotel", "HotelName", "POIName", "CO_Name", "Organization Name",
   "Company Name", "Company", "Company_Name", "BusinessName", "Business Name", "BUSINESS_NAME",
   "FDR Organization Name", "Name", "Title", "Headline", "Facility Name", "Facility_Name",
-  "Location Name", "Place Name", "PropertyName", "Property Name",
+  "Location Name", "Place Name", "PropertyName", "Property Name", "Entity_Name",
 ];
 
 type SchemaPattern = "cengage_ab" | "poi_newdisp" | "plain";

@@ -34,13 +34,15 @@ import {
   Upload,
   Users,
   UtensilsCrossed,
+  Workflow as WorkflowIcon,
   X,
 } from "lucide-react";
 import { AppLayout, WorkspaceLoadingFallback } from "@/components/AppLayout";
 import { Badge, Button, Card, Input, PageHeader, SectionTitle, Select, Steps } from "@/components/ui-bits";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useActiveCustomer, useMounted } from "@/lib/workspace";
-import { addTicket } from "@/lib/ticket-store";
 import { readIntakeFile, type IntakeResult } from "@/lib/ai-intake";
+import { launchSelfServiceProject } from "@/lib/custom-projects";
 import { estimate, fmt, type Project } from "@/data/customers";
 import { DATASETS, DATASET_CATEGORIES, type Dataset } from "@/data/datasets";
 import { categoryArt } from "@/data/category-art";
@@ -81,6 +83,7 @@ type SetupItem = {
   sources: { name: string; url: string; kind?: string; attributes: number }[];
   attributes: { key: string; label: string; group?: string }[];
   origin: "Dataset" | "Industry solution";
+  screenshot?: string;
 };
 
 function fromDataset(d: Dataset): SetupItem {
@@ -98,11 +101,12 @@ function fromDataset(d: Dataset): SetupItem {
     sources: d.sources.map((s) => ({ name: s.name, url: s.url, kind: s.kind ?? "Third-party", attributes: s.attributes })),
     attributes: d.outputAttributes.map((a) => ({ key: a.key, label: a.label, ...(a.group ? { group: a.group } : {}) })),
     origin: "Dataset",
+    ...(d.screenshot ? { screenshot: d.screenshot } : {}),
   };
 }
 
 
-const WIZARD_STEPS = ["Configure", "Upload dataset", "Wired sources", "Attributes", "Schedule", "Launch"];
+const WIZARD_STEPS = ["Upload dataset", "Configure", "Wired sources", "Attributes", "Schedule", "Launch"];
 type Cadence = "Daily" | "Weekly" | "Monthly" | "Custom";
 
 function SolutionsPage() {
@@ -259,8 +263,8 @@ function DatasetSetup({ item, onBack }: { item: SetupItem; onBack: () => void })
   const Icon = ICONS[item.icon] ?? ICONS[art.icon] ?? Boxes;
 
   const [step, setStep] = useState(0);
+  const [workflowOpen, setWorkflowOpen] = useState(false);
   const [name, setName] = useState(`${item.name} — ${customer.shortName}`);
-  const [owner, setOwner] = useState("");
   const [intake, setIntake] = useState<IntakeResult | null>(null);
   const [readError, setReadError] = useState<string | null>(null);
   const [extraUrls, setExtraUrls] = useState<string[]>([]);
@@ -268,10 +272,11 @@ function DatasetSetup({ item, onBack }: { item: SetupItem; onBack: () => void })
   const [attrs, setAttrs] = useState<string[]>(item.attributes.slice(0, Math.min(12, item.attributes.length)).map((a) => a.key));
   const [cadence, setCadence] = useState<Cadence>((["Daily", "Weekly", "Monthly"].includes(item.refresh) ? item.refresh : "Weekly") as Cadence);
   const [customRule, setCustomRule] = useState("Every 2 weeks · Tuesday 06:00 UTC");
-  const [ticketId, setTicketId] = useState("");
+  const [launchedProject, setLaunchedProject] = useState<Project | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const sourceCount = wired.length + extraUrls.filter((u) => u.trim()).length;
+  const entityUrlCount = extraUrls.filter((u) => u.trim()).length;
+  const sourceCount = wired.length + entityUrlCount;
   const est = estimate(Math.max(1, sourceCount), Math.max(1, attrs.length), cadence === "Custom" ? "Weekly" : (cadence as Project["frequency"]));
   const scheduleLabel = cadence === "Custom" ? `Custom — ${customRule}` : cadence;
 
@@ -300,21 +305,26 @@ function DatasetSetup({ item, onBack }: { item: SetupItem; onBack: () => void })
   }
 
   function launch() {
-    const t = addTicket({
-      workspaceId: customer.id,
-      workspaceName: customer.name,
-      project: name,
-      type: "New project",
-      detail: `${item.origin} setup — ${item.name} · ${sourceCount} sources · ${attrs.length} datapoints · ${scheduleLabel}${intake ? ` · from ${intake.fileName}` : ""}`,
-      raisedBy: owner.trim() || `${customer.shortName.toLowerCase()} workspace user`,
-      estimateDays: est.setupDays,
-      monthlyRecords: est.monthlyRecords,
-      sources: [...wired, ...extraUrls.filter((u) => u.trim())],
-      datapoints: item.attributes.filter((a) => attrs.includes(a.key)).map((a) => a.label),
-      frequency: scheduleLabel,
-      ...(intake ? { fileName: intake.fileName } : {}),
+    // Catalog datasets are self-service: no admin ticket, no wait — this
+    // provisions the project directly into the workspace right now, using
+    // the customer's own uploaded/typed entity URLs and chosen attributes.
+    // It re-checks live via the same generic AI webpage-read engine
+    // NTM/ESG already use (see custom-projects.ts), not a bespoke script.
+    // A genuinely new/custom request (not one of these datasets) still
+    // goes through the ticket flow — that's Agents' "add source" and the
+    // Dashboard's "+ New project", both unchanged.
+    const dataset = DATASETS.find((d) => d.id === item.id);
+    if (!dataset) return;
+    const project = launchSelfServiceProject({
+      customerId: customer.id,
+      projectName: name,
+      dataset,
+      entityUrls: extraUrls.filter((u) => u.trim()),
+      selectedAttributeKeys: attrs,
+      selectedSourceNames: wired,
+      cadence,
     });
-    setTicketId(t.id);
+    setLaunchedProject(project);
     setStep(WIZARD_STEPS.length - 1);
   }
 
@@ -337,7 +347,17 @@ function DatasetSetup({ item, onBack }: { item: SetupItem; onBack: () => void })
               <Icon className="h-5 w-5" />
             </span>
             <div className="min-w-0">
-              <div className="text-[15px] font-semibold">{item.name}</div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <div className="text-[15px] font-semibold">{item.name}</div>
+                {item.screenshot && (
+                  <button
+                    onClick={() => setWorkflowOpen(true)}
+                    className="inline-flex items-center gap-1 rounded-full bg-white/15 hover:bg-white/25 px-2.5 py-0.5 text-[11px] font-medium transition"
+                  >
+                    <WorkflowIcon className="h-3 w-3" /> Click here to view the workflow
+                  </button>
+                )}
+              </div>
               <p className="text-[12.5px] text-white/85 mt-1 max-w-3xl leading-relaxed">{item.description}</p>
               <div className="flex flex-wrap gap-2 mt-3 text-[11px]">
                 <span className="rounded bg-white/20 px-2 py-0.5">{item.sources.length} wired sources</span>
@@ -350,6 +370,26 @@ function DatasetSetup({ item, onBack }: { item: SetupItem; onBack: () => void })
           </div>
         </div>
 
+        {item.screenshot && (
+          <Dialog open={workflowOpen} onOpenChange={setWorkflowOpen}>
+            <DialogContent className="max-w-none w-[90vw] h-[88vh] p-0 gap-0 overflow-hidden flex flex-col sm:max-w-none">
+              <DialogHeader className="px-6 pt-5 pb-4 border-b border-border shrink-0">
+                <DialogTitle className="text-[16px]">{item.name} — Workflow</DialogTitle>
+                <p className="text-[12px] text-muted-foreground mt-1">
+                  What runs behind the scenes when this dataset is wired up and refreshed.
+                </p>
+              </DialogHeader>
+              <div className="flex-1 min-h-0 overflow-auto bg-secondary/30 p-6 flex items-center justify-center">
+                <img
+                  src={item.screenshot}
+                  alt={`${item.name} workflow diagram`}
+                  className="max-w-full h-auto rounded-lg border border-border shadow-sm"
+                />
+              </div>
+            </DialogContent>
+          </Dialog>
+        )}
+
         <Card className="p-4">
           <Steps steps={WIZARD_STEPS} current={step} />
         </Card>
@@ -358,27 +398,7 @@ function DatasetSetup({ item, onBack }: { item: SetupItem; onBack: () => void })
           <Card className="p-5 min-h-[380px] flex flex-col">
             {step === 0 && (
               <div className="space-y-3">
-                <SectionTitle hint="name it and assign an owner">Configure</SectionTitle>
-                <div className="grid md:grid-cols-2 gap-3">
-                  <div>
-                    <Label>Project name</Label>
-                    <Input value={name} onChange={(e) => setName(e.target.value)} />
-                  </div>
-                  <div>
-                    <Label>Business owner</Label>
-                    <Input placeholder="name@company.com" value={owner} onChange={(e) => setOwner(e.target.value)} />
-                  </div>
-                </div>
-                <div className="rounded-lg border border-border bg-secondary/30 p-3.5 text-[12px] text-muted-foreground leading-relaxed">
-                  A workflow runs behind the scenes: crawl → extract → normalise → validate → dedupe → publish. You only choose the sources, the datapoints and how often
-                  it should run — FreDA admin builds and onboards the bots, then the data lands in your workspace for review and refresh.
-                </div>
-              </div>
-            )}
-
-            {step === 1 && (
-              <div className="space-y-3">
-                <SectionTitle hint="optional — bring your own entity list">Upload dataset</SectionTitle>
+                <SectionTitle hint="bring your own entity list">Upload dataset</SectionTitle>
                 <div onClick={() => fileRef.current?.click()} className="rounded-lg border border-dashed border-primary/40 bg-primary/5 p-6 text-center cursor-pointer hover:bg-primary/10 transition">
                   <Upload className="h-6 w-6 mx-auto text-primary" />
                   <div className="text-[13px] font-medium mt-2">Upload your source / entity list</div>
@@ -400,13 +420,35 @@ function DatasetSetup({ item, onBack }: { item: SetupItem; onBack: () => void })
                     ))}
                   </div>
                 )}
-                <p className="text-[11.5px] text-muted-foreground">No file? Skip this step — FreDA runs the dataset against its own wired sources.</p>
+                <p className="text-[11.5px] text-muted-foreground">
+                  No file? Add entity URLs manually on the next step instead — this is what Run actually re-checks, so at least one is needed for live data.
+                </p>
+              </div>
+            )}
+
+            {step === 1 && (
+              <div className="space-y-3">
+                <SectionTitle hint="name it">Configure</SectionTitle>
+                <div>
+                  <Label>Project name</Label>
+                  <Input value={name} onChange={(e) => setName(e.target.value)} />
+                </div>
+                <div className="rounded-lg border border-border bg-secondary/30 p-3.5 text-[12px] text-muted-foreground leading-relaxed">
+                  A workflow runs behind the scenes: crawl → extract → normalise → validate → dedupe → publish. Pick your entity URLs, the datapoints and
+                  how often it should run, then launch — the project appears in Monitor and Review immediately, no approval needed.
+                </div>
               </div>
             )}
 
             {step === 2 && (
               <div className="space-y-3">
                 <SectionTitle hint={`${wired.length} of ${item.sources.length} selected`}>Wired sources</SectionTitle>
+                <div className="rounded-lg border border-border bg-secondary/30 p-3 text-[11.5px] text-muted-foreground leading-relaxed">
+                  Each entity's own website is always checked as the default source. The other sources below (LinkedIn, Crunchbase, SEC EDGAR, etc.) aren't
+                  independently fetched in this build — no API access to those platforms yet — but selecting the ones relevant to what you're tracking does
+                  change which pages on the entity's <em>own</em> site get pulled in (e.g. selecting a Financials source steers it toward an Investors page).
+                  Fields that genuinely only live on an external platform will stay blank until that source is wired in for real.
+                </div>
                 <div className="grid md:grid-cols-2 gap-2 max-h-[320px] overflow-y-auto pr-1">
                   {item.sources.map((s) => {
                     const on = wired.includes(s.name);
@@ -430,7 +472,10 @@ function DatasetSetup({ item, onBack }: { item: SetupItem; onBack: () => void })
                   })}
                 </div>
                 <div>
-                  <Label>Your own source URLs · {extraUrls.length}</Label>
+                  <Label>Your own entity URLs · {extraUrls.length}</Label>
+                  <p className="text-[11px] text-muted-foreground -mt-1 mb-2">
+                    These are what "Run" actually re-checks live — one row per URL (e.g. each company's own website).
+                  </p>
                   <div className="space-y-2 max-h-[140px] overflow-y-auto pr-1">
                     {extraUrls.map((u, i) => (
                       <div key={i} className="flex items-center gap-2">
@@ -507,33 +552,47 @@ function DatasetSetup({ item, onBack }: { item: SetupItem; onBack: () => void })
                   </div>
                 )}
                 <div className="rounded-lg border border-border bg-secondary/30 p-3.5 text-[12px] text-muted-foreground">
-                  Runs start after admin approves and onboards the bots. You can change the cadence at any time from Agents.
+                  This just sets the label shown in Monitor — nothing runs automatically on a timer yet, so click "Run now" there whenever you want fresh data. You can change the cadence at any time from Agents.
                 </div>
               </div>
             )}
 
             {step === 5 && (
               <div className="space-y-3">
-                <SectionTitle hint="hand-off to your FreDA admin">Launch</SectionTitle>
-                {ticketId ? (
+                <SectionTitle hint="live in your workspace immediately, no approval needed">Launch</SectionTitle>
+                {launchedProject ? (
                   <div className="rounded-lg border border-success/40 bg-success-bg p-4 text-[12.5px] text-success space-y-1">
                     <div className="font-semibold inline-flex items-center gap-1.5">
-                      <CheckCircle2 className="h-4 w-4" /> Submitted as {ticketId}
+                      <CheckCircle2 className="h-4 w-4" /> {launchedProject.name} is live in your workspace
                     </div>
-                    <div>Admin approves the request, builds and onboards the bots, then the dataset appears in your workspace to review and refresh.</div>
-                    <Link to="/requests" className="inline-block pt-1 underline">
-                      Track it in the request tracker
-                    </Link>
+                    <div>
+                      {launchedProject.records > 0
+                        ? `Go to Monitor and click "Run now" to fetch real data for the ${launchedProject.records} ${launchedProject.records === 1 ? "entity" : "entities"} you added.`
+                        : "No entity URLs were added, so there's nothing to run yet — open Agents on this project to add some, then Run from Monitor."}
+                    </div>
+                    <div className="flex items-center gap-3 pt-1">
+                      <Link to="/monitoring" className="inline-block underline">
+                        Go to Monitor
+                      </Link>
+                      <Link to="/" className="inline-block underline">
+                        Go to Dashboard
+                      </Link>
+                    </div>
                   </div>
                 ) : (
                   <div className="space-y-2">
                     <Summary label="Project" value={name} />
-                    <Summary label="Sources" value={`${sourceCount} selected`} />
+                    <Summary label="Entity URLs" value={`${entityUrlCount} added`} />
                     <Summary label="Datapoints" value={`${attrs.length} attributes`} />
                     <Summary label="Schedule" value={scheduleLabel} />
                     {intake && <Summary label="Uploaded file" value={intake.fileName} />}
-                    <Button className="w-full mt-2" onClick={launch} disabled={!name.trim() || attrs.length === 0}>
-                      <Rocket className="h-4 w-4" /> Launch & send to admin
+                    {entityUrlCount === 0 && (
+                      <div className="rounded-lg border border-warning/40 bg-warning-bg px-3 py-2.5 text-[11.5px] text-warning">
+                        Add at least one entity URL (Upload dataset, or type one in on the Wired sources step) — that's what "Run" actually fetches. Without one, there's nothing to launch.
+                      </div>
+                    )}
+                    <Button className="w-full mt-2" onClick={launch} disabled={!name.trim() || attrs.length === 0 || entityUrlCount === 0}>
+                      <Rocket className="h-4 w-4" /> Launch now
                     </Button>
                   </div>
                 )}
@@ -566,7 +625,7 @@ function DatasetSetup({ item, onBack }: { item: SetupItem; onBack: () => void })
               <div>{scheduleLabel} refresh</div>
             </div>
             <div className="rounded-lg border border-border bg-secondary/30 p-3 text-[11px] text-muted-foreground leading-relaxed">
-              Next steps: admin approves → bots built and onboarded → first run QA → dataset published to your workspace for review, monitoring and refresh.
+              Next steps: launch → project appears in Monitor right away → click "Run now" to fetch real data → review and download from there. No admin approval in this flow.
             </div>
           </Card>
         </div>

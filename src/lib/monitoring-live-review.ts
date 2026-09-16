@@ -1,6 +1,9 @@
 import { runMonitoringRefresh } from "@/lib/api/monitoring-refresh.functions";
 import { runEcaOnRegistryRefresh, runMeatListRegistryRefresh, runAbmDirectoryRegistryRefresh } from "@/lib/api/registry-refresh.functions";
 import { diffRegistrySnapshot, type RegistryLiveOutcome } from "@/lib/api/registry-refresh.core";
+import { runSecEdgarLookup } from "@/lib/api/sec-edgar.functions";
+import type { SecEdgarProfile } from "@/lib/api/sec-edgar.core";
+import type { FieldDiff, RefreshTarget } from "@/lib/api/monitoring-refresh.core";
 import {
   getLiveRefreshProfile,
   CANADA_REGISTRY_PORTAL_CONFIG,
@@ -73,6 +76,48 @@ export function monitorStatusFor(p: Project, isRunning = false): ProjectStatus {
   return reviewStatusFor(p) === "Completed" ? "In sync" : "Review pending";
 }
 
+// Which of a webpage-kind profile's own field keys SEC EDGAR can actually
+// answer — this only works because custom-projects.ts's Firmographic/
+// Registry profiles use these exact key names (matching the real dataset's
+// own output attributes), so no per-dataset mapping table is needed.
+const SEC_EDGAR_FIELD_KEYS = new Set([
+  "legal_name", "sic_code", "industry", "registry_number",
+  "hq_address", "hq_city", "hq_state", "hq_country", "phone", "company_type",
+]);
+
+/** Looks up every target's entity name in the real SEC EDGAR registry, in
+ *  parallel — misses (private company, no confident match, SEC rate limit)
+ *  come back as null and simply leave the AI-webpage result untouched. */
+async function fetchSecEdgarOverlays(targets: RefreshTarget[]): Promise<Map<string, SecEdgarProfile | null>> {
+  const entries = await Promise.all(
+    targets.map(async (t) => [t.id, await runSecEdgarLookup({ data: { companyName: t.name } })] as const),
+  );
+  return new Map(entries);
+}
+
+/** Merges a real SEC EDGAR profile into an AI-webpage diff set — SEC wins
+ *  for the fields it's actually authoritative for (a marketing page is not
+ *  a reliable source for a SIC code), everything else stays exactly what
+ *  the webpage check found. Only touches fields the project actually
+ *  tracks (extractableFields), and only when SEC returned a real value. */
+function applySecEdgarOverlay(
+  diffs: FieldDiff[],
+  secProfile: SecEdgarProfile,
+  baseline: Record<string, string>,
+  extractableFields: string[],
+): (FieldDiff & { fromRegistry?: boolean })[] {
+  const byField = new Map(diffs.map((d) => [d.field, d as FieldDiff & { fromRegistry?: boolean }]));
+  for (const field of extractableFields) {
+    if (!SEC_EDGAR_FIELD_KEYS.has(field)) continue;
+    const secValue = (secProfile as unknown as Record<string, string>)[field];
+    if (!secValue || !secValue.trim()) continue;
+    const oldValue = (baseline[field] ?? byField.get(field)?.oldValue ?? "").trim();
+    const changeType: ChangeType = !oldValue ? "Added" : oldValue.trim() === secValue.trim() ? "Verified" : "Modified";
+    byField.set(field, { field, oldValue, newValue: secValue, changeType, fromRegistry: true });
+  }
+  return [...byField.values()];
+}
+
 /** Runs the real live refresh for a live-checkable project and turns the
  *  result into the ReviewRecord[] shape ReviewDialog already knows how to
  *  render (Old → New, tagged Added/Deleted/Modified/Verified). */
@@ -89,15 +134,24 @@ export async function fetchLiveReview(project: Project): Promise<LiveReviewData>
     currentValues: row,
   }));
 
-  const outcome = await runMonitoringRefresh({
-    data: { config: profile.promptConfig, targets, fields: profile.extractableFields },
-  });
+  const [outcome, secProfiles] = await Promise.all([
+    runMonitoringRefresh({
+      data: { config: profile.promptConfig, targets, fields: profile.extractableFields },
+    }),
+    profile.usesSecEdgarOverlay ? fetchSecEdgarOverlays(targets) : Promise.resolve(null),
+  ]);
 
   const records: ReviewRecord[] = [];
   const fetchErrors: { entity: string; error: string }[] = [];
 
   for (const record of outcome.results) {
-    if (!record.reachable || record.diffs.length === 0) {
+    const target = targets.find((t) => t.id === record.id);
+    const secProfile = secProfiles?.get(record.id) ?? null;
+    const diffs: (FieldDiff & { fromRegistry?: boolean })[] = secProfile
+      ? applySecEdgarOverlay(record.diffs, secProfile, target?.currentValues ?? {}, profile.extractableFields)
+      : record.diffs;
+
+    if (diffs.length === 0) {
       if (record.error) fetchErrors.push({ entity: record.name, error: record.error });
       records.push({
         id: `${project.id}-live-${record.id}-status`,
@@ -114,7 +168,12 @@ export async function fetchLiveReview(project: Project): Promise<LiveReviewData>
       });
       continue;
     }
-    for (const d of record.diffs) {
+    if (!record.reachable && record.error) {
+      // The company's own site failed, but SEC EDGAR still answered some
+      // fields — surface both: the failure, and what SEC did find.
+      fetchErrors.push({ entity: record.name, error: record.error });
+    }
+    for (const d of diffs) {
       records.push({
         id: `${project.id}-live-${record.id}-${d.field}`,
         projectId: project.id,
@@ -123,9 +182,9 @@ export async function fetchLiveReview(project: Project): Promise<LiveReviewData>
         oldValue: d.oldValue || "—",
         newValue: d.newValue || "—",
         changeType: d.changeType,
-        confidence: 95,
-        source: record.name,
-        sourceUrl: record.url,
+        confidence: d.fromRegistry ? 99 : 95,
+        source: d.fromRegistry ? "SEC EDGAR (registry lookup)" : record.name,
+        sourceUrl: d.fromRegistry ? `https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=${secProfile?.registry_number ?? ""}` : record.url,
         detectedHrs: 0,
       });
     }
