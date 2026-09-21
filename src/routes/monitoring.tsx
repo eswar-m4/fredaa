@@ -15,6 +15,7 @@ import {
   RotateCcw,
 } from "lucide-react";
 import { AppLayout, WorkspaceLoadingFallback } from "@/components/AppLayout";
+import { logActivity } from "@/lib/logger";
 import {
   Badge,
   Button,
@@ -92,6 +93,7 @@ function MonitoringPage() {
   function refresh(id: string) {
     const project = customer.projects.find((p) => p.id === id);
     if (project && isLiveCheckable(project)) {
+      logActivity("job_run", `Run now: ${project.name}`, "/monitoring");
       runLiveCheck(project);
       return;
     }

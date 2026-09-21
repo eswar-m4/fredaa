@@ -44,6 +44,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { useActiveCustomer, useMounted } from "@/lib/workspace";
 import { readIntakeFile, type IntakeResult } from "@/lib/ai-intake";
 import { launchSelfServiceProject, launchDirectoryProject } from "@/lib/custom-projects";
+import { logActivity } from "@/lib/logger";
 import { estimate, fmt, type Project } from "@/data/customers";
 import { DATASETS, DATASET_CATEGORIES, type Dataset } from "@/data/datasets";
 import { categoryArt } from "@/data/category-art";
@@ -212,7 +213,7 @@ function SolutionsPage() {
             const art = categoryArt(d.category);
             const Icon = ICONS[d.icon] ?? ICONS[art.icon] ?? Boxes;
             return (
-              <button key={d.id} onClick={() => setActive(d)} className="text-left group">
+              <button key={d.id} onClick={() => { logActivity("dataset_selected", `Selected dataset: ${d.name}`, "/playbooks/solutions"); setActive(d); }} className="text-left group">
                 <Card className="h-full flex flex-col overflow-hidden transition group-hover:border-primary/50 group-hover:shadow-lg">
                   <div className={cn("bg-gradient-to-br p-4 text-white", art.gradient)}>
                     <div className="flex items-start justify-between gap-2">
@@ -310,16 +311,9 @@ function DatasetSetup({ item, onBack }: { item: SetupItem; onBack: () => void })
   }
 
   async function launch() {
-    // Catalog datasets are self-service: no admin ticket, no wait — this
-    // provisions the project directly into the workspace right now, using
-    // the customer's own uploaded/typed entity URLs and chosen attributes.
-    // It re-checks live via the same generic AI webpage-read engine
-    // NTM/ESG already use (see custom-projects.ts), not a bespoke script.
-    // A genuinely new/custom request (not one of these datasets) still
-    // goes through the ticket flow — that's Agents' "add source" and the
-    // Dashboard's "+ New project", both unchanged.
     const dataset = DATASETS.find((d) => d.id === item.id);
     if (!dataset) return;
+    logActivity("workflow_launched", `Launched dataset: ${item.name} · ${attrs.length} attributes · ${cadence} schedule`, "/playbooks/solutions");
     const urls = extraUrls.filter((u) => u.trim());
 
     if (!directoryMode) {
