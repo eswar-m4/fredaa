@@ -27,6 +27,7 @@ import {
   SOLUTION_CATEGORY_COUNT,
 } from "@/lib/portal-stats";
 import { setUseCase, useUseCase, USE_CASES, type UseCase } from "@/lib/useCase";
+import { logActivity } from "@/lib/logger";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -93,6 +94,7 @@ function Home() {
 
   const pick = (mode: Exclude<UseCase, null>, to: string) => {
     setUseCase(mode);
+    logActivity("playbook_selected", `Selected playbook: ${USE_CASES[mode]?.name ?? mode}`, "/");
     navigate({ to });
   };
 

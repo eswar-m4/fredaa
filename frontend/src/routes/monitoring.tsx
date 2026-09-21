@@ -4,6 +4,7 @@ import { AppLayout } from "@/components/AppLayout";
 import { Badge, Card, PageHeader, Button } from "@/components/ui-bits";
 import { Download, Trash2, Star, RefreshCw, Timer, Filter } from "lucide-react";
 import { apiFetch } from "@/lib/api";
+import { logActivity } from "@/lib/logger";
 import { clearDeletedJob, jobsCacheUpdatedEventName, markJobDeleted, readJobsCache, writeJobsCache } from "@/lib/jobs-cache";
 import { fetchBotCatalog, getBotDisplayName, type BotCatalogEntry } from "@/lib/bot-catalog";
 
@@ -257,6 +258,8 @@ function Monitoring() {
   }, []);
 
   async function deleteJob(jobId: string) {
+    const job = customJobs.find((j) => j.id === jobId);
+    logActivity("job_deleted", `Deleted job: ${job?.source || jobId}`, "/monitoring");
     let previousJobs: any[] = [];
     markJobDeleted(jobId);
     setCustomJobs((current) => {
@@ -286,6 +289,7 @@ function Monitoring() {
 
   async function toggleUrgent(job: any) {
     const nextUrgent = !Boolean(job.isUrgent);
+    logActivity("job_urgent_toggled", `${nextUrgent ? "Marked urgent" : "Removed urgent"}: ${job.source || job.id}`, "/monitoring");
     setUrgentBusyId(job.id);
     setCustomJobs((current) => {
       const next = current.map((item) =>
@@ -314,6 +318,7 @@ function Monitoring() {
   }
 
   async function rerunWeeklyJob(job: any, scheduledFor?: string) {
+    logActivity("job_run", scheduledFor ? `Scheduled job: ${job.source || job.id} for ${scheduledFor}` : `Run now: ${job.source || job.id}`, "/monitoring");
     setRerunBusyId(job.id);
     try {
       const response = await apiFetch(`/api/v1/demo/jobs/${job.id}/weekly-rerun`, {
