@@ -1,5 +1,6 @@
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { CUSTOMERS, getCustomer, type Customer } from "@/data/customers";
+import { useCustomProjects } from "@/lib/custom-projects";
 
 const KEY = "freda_customer";
 const listeners = new Set<() => void>();
@@ -28,7 +29,14 @@ export function useActiveCustomerId(): string {
 }
 
 export function useActiveCustomer(): Customer {
-  return getCustomer(useActiveCustomerId());
+  const id = useActiveCustomerId();
+  const base = getCustomer(id);
+  // Self-service projects launched from Solutions (see custom-projects.ts)
+  // aren't part of the static seeded CUSTOMERS array — merge them in here
+  // so every page that reads useActiveCustomer().projects sees them
+  // automatically, with zero changes needed in each of those pages.
+  const custom = useCustomProjects(id);
+  return custom.length === 0 ? base : { ...base, projects: [...base.projects, ...custom] };
 }
 
 // The server (and the very first client paint, to avoid a hydration

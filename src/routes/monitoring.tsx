@@ -11,6 +11,8 @@ import {
   Download,
   Pause,
   Play,
+  Trash2,
+  RotateCcw,
 } from "lucide-react";
 import { AppLayout, WorkspaceLoadingFallback } from "@/components/AppLayout";
 import {
@@ -32,7 +34,10 @@ import { cn } from "@/lib/utils";
 import { ReviewDialog, type LiveReviewData } from "@/components/ReviewDialog";
 import { DownloadMenu } from "@/components/DownloadMenu";
 import { isLiveCheckable, fetchLiveReview, monitorStatusFor } from "@/lib/monitoring-live-review";
-import { useReviewStatusVersion } from "@/lib/review-status";
+import { useReviewStatusVersion, clearReviewProgress } from "@/lib/review-status";
+import { useDeletedJobIds, deleteJob, deleteJobs, restoreAllJobs } from "@/lib/deleted-jobs";
+import { removeCustomProject, isCustomProjectId } from "@/lib/custom-projects";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/monitoring")({
   head: () => ({
@@ -65,12 +70,14 @@ function MonitoringPage() {
   const mounted = useMounted();
   const customer = useActiveCustomer();
   useReviewStatusVersion(); // re-render when a Submit in ReviewDialog (here or on the Dashboard) changes a project's status
+  const deletedJobIds = useDeletedJobIds();
   const [range, setRange] = useState<RangeValue>(DEFAULT_RANGE);
   const [scope, setScope] = useState("all");
   const [filter, setFilter] = useState("all");
   const [running, setRunning] = useState<Record<string, number>>({});
   const [liveReview, setLiveReview] = useState<LiveReviewData | null>(null);
   const [liveReviewProject, setLiveReviewProject] = useState<Project | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Project | null>(null);
 
   const scoped = scope === "all" ? customer.projects : customer.projects.filter((p) => p.id === scope);
   const stats = useMemo(() => rollupProjects(scoped), [customer.id, scope]);
@@ -78,7 +85,8 @@ function MonitoringPage() {
   const destinations = useMemo(() => destinationsFor(customer), [customer.id]);
 
   const days = rangeDays(range);
-  const visibleJobs = jobs.filter((j) => (scope === "all" || j.projectId === scope) && j.startedHrs <= days * 24);
+  const visibleJobs = jobs.filter((j) => (scope === "all" || j.projectId === scope) && j.startedHrs <= days * 24 && !deletedJobIds.has(j.id));
+  const hiddenJobCount = jobs.filter((j) => deletedJobIds.has(j.id)).length;
   const projects = scoped.filter((p) => filter === "all" || monitorStatusFor(p, running[p.id] !== undefined) === filter);
 
   function refresh(id: string) {
@@ -126,6 +134,14 @@ function MonitoringPage() {
     }
   }
 
+  function confirmDeleteProject() {
+    if (!deleteTarget) return;
+    removeCustomProject(customer.id, deleteTarget.id);
+    clearReviewProgress(deleteTarget.id);
+    if (scope === deleteTarget.id) setScope("all");
+    setDeleteTarget(null);
+  }
+
   const live = visibleJobs.filter((j) => j.state === "Running").length;
   const failed = visibleJobs.filter((j) => j.state === "Failed").length;
 
@@ -133,6 +149,30 @@ function MonitoringPage() {
 
   return (
     <AppLayout>
+      <Dialog open={!!deleteTarget} onOpenChange={(v) => !v && setDeleteTarget(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="inline-flex items-center gap-2 text-[16px]">
+              <Trash2 className="h-5 w-5 text-destructive" /> Delete project
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-2 text-[13px] text-muted-foreground leading-relaxed pb-2">
+            <p>
+              Delete <strong className="text-foreground">{deleteTarget?.name}</strong>? This removes it from your workspace — Dashboard, Monitor,
+              Agents and Review — along with any saved live-run results. This can't be undone.
+            </p>
+          </div>
+          <div className="flex items-center justify-end gap-2 pt-1">
+            <Button size="sm" variant="outline" onClick={() => setDeleteTarget(null)}>
+              Cancel
+            </Button>
+            <Button size="sm" className="bg-destructive text-destructive-foreground hover:bg-destructive/90" onClick={confirmDeleteProject}>
+              <Trash2 className="h-3.5 w-3.5" /> Delete
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <PageHeader
         title="Monitor"
         subtitle={`${customer.name} · job automation, schedule health and sync destinations`}
@@ -169,14 +209,31 @@ function MonitoringPage() {
 
         {/* Job automation */}
         <Card className="overflow-hidden">
-          <div className="px-5 pt-4 pb-3 border-b border-border">
-            <h3 className="text-[13px] font-semibold uppercase tracking-wider text-muted-foreground">Job automation status</h3>
-            <p className="text-[12px] text-muted-foreground mt-1">Every crawl, parse and publish run triggered in the selected window.</p>
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-[11px] text-muted-foreground">
-              <span className="font-semibold uppercase tracking-wider">Trigger legend</span>
-              <span><strong className="text-foreground">Scheduled</strong> — fired by the project run schedule set in Projects</span>
-              <span><strong className="text-foreground">On demand</strong> — someone pressed “Run now” here</span>
-              <span><strong className="text-foreground">Source change</strong> — change watcher detected a page/layout change and auto-queued a run</span>
+          <div className="px-5 pt-4 pb-3 border-b border-border flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h3 className="text-[13px] font-semibold uppercase tracking-wider text-muted-foreground">Job automation status</h3>
+              <p className="text-[12px] text-muted-foreground mt-1">Every crawl, parse and publish run triggered in the selected window.</p>
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-[11px] text-muted-foreground">
+                <span className="font-semibold uppercase tracking-wider">Trigger legend</span>
+                <span><strong className="text-foreground">Scheduled</strong> — fired by the project run schedule set in Projects</span>
+                <span><strong className="text-foreground">On demand</strong> — someone pressed “Run now” here</span>
+                <span><strong className="text-foreground">Source change</strong> — change watcher detected a page/layout change and auto-queued a run</span>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              {hiddenJobCount > 0 && (
+                <Button size="sm" variant="outline" onClick={restoreAllJobs}>
+                  <RotateCcw className="h-3.5 w-3.5" /> Restore {hiddenJobCount} deleted
+                </Button>
+              )}
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={visibleJobs.every((j) => j.state !== "Succeeded")}
+                onClick={() => deleteJobs(visibleJobs.filter((j) => j.state === "Succeeded").map((j) => j.id))}
+              >
+                <Trash2 className="h-3.5 w-3.5" /> Clear completed
+              </Button>
             </div>
           </div>
           <div className="max-h-[340px] overflow-y-auto">
@@ -189,13 +246,14 @@ function MonitoringPage() {
                   <th className="px-3 py-2 font-semibold">Stage</th>
                   <th className="px-3 py-2 font-semibold">Started</th>
                   <th className="px-3 py-2 font-semibold">Records</th>
-                  <th className="px-5 py-2 font-semibold text-right">State</th>
+                  <th className="px-3 py-2 font-semibold text-right">State</th>
+                  <th className="px-5 py-2 font-semibold text-right">Action</th>
                 </tr>
               </thead>
               <tbody>
                 {visibleJobs.length === 0 && (
                   <tr>
-                    <td colSpan={7} className="px-5 py-8 text-center text-muted-foreground">
+                    <td colSpan={8} className="px-5 py-8 text-center text-muted-foreground">
                       No automation runs in this window.
                     </td>
                   </tr>
@@ -219,8 +277,17 @@ function MonitoringPage() {
                       {hrsAgo(j.startedHrs)} · {j.durationMin}m
                     </td>
                     <td className="px-3 py-2.5 tabular-nums">{fmt(j.records)}</td>
-                    <td className="px-5 py-2.5 text-right">
+                    <td className="px-3 py-2.5 text-right">
                       <Badge tone={jobTone[j.state]}>{j.state}</Badge>
+                    </td>
+                    <td className="px-5 py-2.5 text-right">
+                      <button
+                        onClick={() => deleteJob(j.id)}
+                        title="Delete this job"
+                        className="h-7 w-7 rounded-md inline-flex items-center justify-center text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -303,6 +370,15 @@ function MonitoringPage() {
                             <RefreshCw className="h-3.5 w-3.5" /> Run now
                           </Button>
                           <DownloadMenu project={p} />
+                          {isCustomProjectId(p.id) && (
+                            <button
+                              onClick={() => setDeleteTarget(p)}
+                              title="Delete this project"
+                              className="h-9 w-9 shrink-0 rounded-md border border-border inline-flex items-center justify-center text-muted-foreground hover:bg-destructive/10 hover:text-destructive hover:border-destructive/40 transition"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
+                          )}
                         </div>
                       ) : (
                         <div className="flex items-center gap-2 justify-end">

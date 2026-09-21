@@ -323,7 +323,7 @@ export async function callOpenAI(apiKey: string, model: string, prompt: string, 
           },
           { role: "user", content: prompt },
         ],
-        temperature: 0.1,
+        temperature: 0,
         response_format: { type: "json_object" },
       }),
     });

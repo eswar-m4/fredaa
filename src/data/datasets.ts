@@ -69,10 +69,17 @@ export type Dataset = {
   outputAttributes: DatasetField[];
   sources: DatasetSource[]; // system sources wired for this dataset
   workflowId: string; // single embedded workflow (hidden from user)
+  /** Diagram of the workflow that runs behind the scenes for this dataset —
+   *  shown via a "Click here to view the workflow" expand on the Solutions
+   *  setup screen. Not every dataset has one yet. */
+  screenshot?: string;
   sampleRow: Record<string, string | number | boolean>;
 };
 
 import { VERTICAL_DATASETS } from "./vertical-datasets";
+import companyShot from "@/assets/workflows/company-data-enrichment.png";
+import annualReportShot from "@/assets/workflows/annual-report-financials.png";
+import registryShot from "@/assets/workflows/registry-lookup.png";
 
 const FREQ = ["Real-time", "Hourly", "Daily", "Weekly", "Monthly", "Quarterly", "On-demand", "Custom"];
 
@@ -188,6 +195,7 @@ export const DATASETS: Dataset[] = [
       { name: "BuiltWith", url: "builtwith.com", attributes: 6 },
     ],
     workflowId: "wf-company-extraction",
+    screenshot: companyShot,
     sampleRow: { domain: "acme.com", legal_name: "Acme, Inc.", industry: "SaaS", employee_count: 412, annual_revenue: 86000000, ceo_name: "Jane Park" },
   },
 
@@ -300,6 +308,7 @@ export const DATASETS: Dataset[] = [
       { name: "Annual Report PDFs (uploaded / fetched)", url: "(auto-derived from input)", attributes: 65 },
     ],
     workflowId: "wf-financial-extraction",
+    screenshot: annualReportShot,
     sampleRow: { ticker: "AAPL", fiscal_year: 2024, revenue: 394328000000, net_income: 99803000000, ebitda: 130700000000 },
   },
 
@@ -598,6 +607,7 @@ export const DATASETS: Dataset[] = [
       { name: "GLEIF", url: "gleif.org", attributes: 4 },
     ],
     workflowId: "wf-registry-multi",
+    screenshot: registryShot,
     sampleRow: { registry_number: "08842713", legal_name: "Polaris Renewables Ltd", status: "Active", directors: "4 active" },
   },
 

@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { ArrowLeft, Bot, CalendarClock, Clock, Globe, Plus, Search, Trash2, ExternalLink, CheckCircle2, Ticket } from "lucide-react";
 import { AppLayout, WorkspaceLoadingFallback } from "@/components/AppLayout";
 import { Badge, Button, Card, Input, PageHeader, SectionTitle, Select } from "@/components/ui-bits";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useActiveCustomer, useMounted } from "@/lib/workspace";
 import { estimate, fmt, type Project, type SourceRef } from "@/data/customers";
 import { addTicket } from "@/lib/ticket-store";
@@ -48,7 +49,7 @@ function AgentsPage() {
   const [sourceAttrs, setSourceAttrs] = useState<string[]>([]);
   const [cadence, setCadence] = useState<Record<string, Cadence>>({});
   const [customRule, setCustomRule] = useState<Record<string, string>>({});
-  const [notice, setNotice] = useState("");
+  const [confirmed, setConfirmed] = useState<{ id: string; type: string } | null>(null);
 
   const currentCadence: Cadence = cadence[project.id] ?? project.frequency;
   const currentRule = customRule[project.id] ?? "Every 2 weeks · Tuesday 06:00 UTC";
@@ -78,7 +79,7 @@ function AgentsPage() {
       datapoints: dps,
       frequency: currentCadence === "Custom" ? currentRule : currentCadence,
     });
-    setNotice(`${ticket.id} raised — sent to your FreDA admin for approval.`);
+    setConfirmed({ id: ticket.id, type });
   }
 
   function addSource() {
@@ -128,12 +129,33 @@ function AgentsPage() {
         }
       />
 
-      <div className="px-7 pb-8 space-y-4">
-        {notice && (
-          <div className="rounded-lg border border-success/40 bg-success-bg px-4 py-2.5 text-[12.5px] text-success flex items-center gap-2">
-            <CheckCircle2 className="h-4 w-4 shrink-0" /> {notice}
+      <Dialog open={!!confirmed} onOpenChange={(v) => !v && setConfirmed(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="inline-flex items-center gap-2 text-[16px]">
+              <CheckCircle2 className="h-5 w-5 text-success" /> Request submitted
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 text-[13px] text-muted-foreground leading-relaxed pb-2">
+            <p>
+              <strong className="text-foreground">{confirmed?.id}</strong> ({confirmed?.type}) has been created and sent to your FreDA admin for approval.
+            </p>
+            <p>You can track its status — Estimating, Awaiting approval, Approved, In build, Delivered — any time from the Request tracker.</p>
           </div>
-        )}
+          <div className="flex items-center justify-end gap-2 pt-1">
+            <Button size="sm" variant="outline" onClick={() => setConfirmed(null)}>
+              Close
+            </Button>
+            <Link to="/requests">
+              <Button size="sm" onClick={() => setConfirmed(null)}>
+                <Ticket className="h-3.5 w-3.5" /> Go to Request tracker
+              </Button>
+            </Link>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <div className="px-7 pb-8 space-y-4">
 
         <div className="grid lg:grid-cols-2 gap-4 items-stretch">
           {/* manage project sources */}

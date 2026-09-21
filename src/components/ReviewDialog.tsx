@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { AlertTriangle, Check, X, ChevronLeft, ChevronRight, RotateCcw, Layers, Send, ExternalLink, Download } from "lucide-react";
 import { downloadCsv } from "@/lib/download";
 import { reviewRecordsFor, xlsxRowsToReviewRecords, fmt, hrsAgo, type Project, type ReviewRecord, type ChangeType } from "@/data/customers";
-import { isLiveCheckable } from "@/lib/monitoring-live-review";
+import { isLiveCheckable, baselineReviewRecords } from "@/lib/monitoring-live-review";
 import { recordReviewSubmission } from "@/lib/review-status";
 
 type Decision = "approved" | "rejected";
@@ -56,18 +56,21 @@ export function ReviewDialog({
   // fall back to the synthetic sample-file/seeded generators below — those
   // fabricate a changeType label without any real before/after comparison
   // (the "plain" xlsx path literally reuses the same value for old and new),
-  // which reads as a real but broken diff instead of "no run yet".
-  const noLiveRunYet = !live && !!project && isLiveCheckable(project);
-
+  // which reads as a real but broken diff instead of "no run yet". When a
+  // real on-file baseline exists (e.g. a self-service project's launch-time
+  // extraction) but no "Run" has been cached yet, that real baseline is
+  // shown instead — never fabricated, and never silently empty just
+  // because a live-review cache entry hasn't been written yet.
   const all = useMemo(() => {
     if (!project) return [];
     if (live) return live.records;
-    if (isLiveCheckable(project)) return [];
+    if (isLiveCheckable(project)) return baselineReviewRecords(project);
     if (project.sampleRows && project.sampleRows.length > 0) {
       return xlsxRowsToReviewRecords(project);
     }
     return reviewRecordsFor(project, Math.min(POOL, Math.max(1200, project.pendingReview)));
   }, [project?.id, live]);
+  const noLiveRunYet = !live && !!project && isLiveCheckable(project) && all.length === 0;
   const [batchSize, setBatchSize] = useState(25);
 
 
@@ -80,6 +83,27 @@ export function ReviewDialog({
   const [batchIdx, setBatchIdx] = useState(0);
   const [submitted, setSubmitted] = useState(0);
   const [completedFile, setCompletedFile] = useState<Array<Record<string, string | number>>>([]);
+
+  // Live-check records carry the raw field key as `datapoint` (needed so
+  // the output-template overlay in monitoring-live-review.ts can match it
+  // back to project.columns) — project.datapoints holds the pretty label
+  // for the same fields, in the same order, so this maps key -> label for
+  // display only. columns/datapoints aren't always the same length (webpage
+  // projects prefix Entity_Name/Source_URL onto columns) so this aligns
+  // from the tail, where the tracked fields always live.
+  const columnLabel = useMemo(() => {
+    if (!project) return {} as Record<string, string>;
+    const map: Record<string, string> = {};
+    const offset = project.columns.length - project.datapoints.length;
+    if (offset >= 0) {
+      project.datapoints.forEach((label, i) => {
+        const col = project.columns[offset + i];
+        if (col) map[col] = label;
+      });
+    }
+    return map;
+  }, [project]);
+  const labelFor = (dp: string) => columnLabel[dp] ?? dp;
 
   const sampled = useMemo(() => all.slice(0, Math.max(1, Math.round((all.length * sampling) / 100))), [all, sampling]);
 
@@ -147,7 +171,7 @@ export function ReviewDialog({
         .filter((r) => decisions[r.id])
         .map((r) => ({
           entity: r.entity,
-          datapoint: r.datapoint,
+          datapoint: labelFor(r.datapoint),
           change: r.changeType,
           old_value: r.oldValue,
           new_value: r.newValue,
@@ -245,7 +269,7 @@ export function ReviewDialog({
                 <option value="all">All datapoints</option>
                 {datapoints.map((d) => (
                   <option key={d} value={d}>
-                    {d}
+                    {labelFor(d)}
                   </option>
                 ))}
               </Select>
@@ -431,7 +455,7 @@ export function ReviewDialog({
                               {r.entity}
                             </span>
                           </td>
-                          <td className="px-3 py-2 text-muted-foreground">{r.datapoint}</td>
+                          <td className="px-3 py-2 text-muted-foreground">{labelFor(r.datapoint)}</td>
                           <td className="px-3 py-2">
                             <Badge tone={toneFor(r.changeType) as any}>{r.changeType}</Badge>
                           </td>

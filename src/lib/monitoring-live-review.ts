@@ -1,34 +1,24 @@
 import { runMonitoringRefresh } from "@/lib/api/monitoring-refresh.functions";
 import { runEcaOnRegistryRefresh, runMeatListRegistryRefresh, runAbmDirectoryRegistryRefresh } from "@/lib/api/registry-refresh.functions";
 import { diffRegistrySnapshot, type RegistryLiveOutcome } from "@/lib/api/registry-refresh.core";
+import { runSecEdgarLookup } from "@/lib/api/sec-edgar.functions";
+import type { SecEdgarProfile } from "@/lib/api/sec-edgar.core";
+import { runDirectoryExtraction } from "@/lib/api/directory-extract.functions";
+import type { FieldDiff, RefreshTarget } from "@/lib/api/monitoring-refresh.core";
 import {
   getLiveRefreshProfile,
   CANADA_REGISTRY_PORTAL_CONFIG,
   CANADA_REGISTRY_PORTAL_FIELDS,
   type LiveRefreshProfile,
   type RegistryLiveRefreshProfile,
+  type DirectoryLiveRefreshProfile,
 } from "@/lib/live-refresh-profiles";
 import { xlsxRowsToReviewRecords, reviewRecordsFor, reviewStatusFor, type Project, type ProjectStatus, type ReviewRecord, type ChangeType } from "@/data/customers";
 import type { LiveReviewData } from "@/components/ReviewDialog";
 import { clearReviewProgress } from "@/lib/review-status";
+import { saveLiveReview, LIVE_REVIEW_STORAGE_PREFIX as STORAGE_PREFIX, LIVE_REVIEW_CACHE_VERSION as CACHE_VERSION } from "@/lib/live-review-store";
 
-const STORAGE_PREFIX = "freda_live_review_";
-
-// Bump whenever a fix changes how live-refresh records are built in a way
-// that would make an already-cached run look wrong (e.g. today's sourceUrl
-// fix) — see cacheVersion on LiveReviewData.
-const CACHE_VERSION = 5;
-
-/** Persists the result of a live "Run" so other screens (e.g. the Dashboard's
- *  Review button) can show the same data without re-running it. */
-export function saveLiveReview(projectId: string, data: LiveReviewData) {
-  if (typeof window === "undefined") return;
-  try {
-    window.localStorage.setItem(`${STORAGE_PREFIX}${projectId}`, JSON.stringify({ ...data, cacheVersion: CACHE_VERSION }));
-  } catch {
-    // Storage full or unavailable — the run still succeeded, just won't persist.
-  }
-}
+export { saveLiveReview } from "@/lib/live-review-store";
 
 /** Reads back the last live "Run" result for a project, if one was ever saved
  *  AND it's still trustworthy: it must match the profile currently bound to
@@ -73,6 +63,48 @@ export function monitorStatusFor(p: Project, isRunning = false): ProjectStatus {
   return reviewStatusFor(p) === "Completed" ? "In sync" : "Review pending";
 }
 
+// Which of a webpage-kind profile's own field keys SEC EDGAR can actually
+// answer — this only works because custom-projects.ts's Firmographic/
+// Registry profiles use these exact key names (matching the real dataset's
+// own output attributes), so no per-dataset mapping table is needed.
+const SEC_EDGAR_FIELD_KEYS = new Set([
+  "legal_name", "sic_code", "industry", "registry_number",
+  "hq_address", "hq_city", "hq_state", "hq_country", "phone", "company_type",
+]);
+
+/** Looks up every target's entity name in the real SEC EDGAR registry, in
+ *  parallel — misses (private company, no confident match, SEC rate limit)
+ *  come back as null and simply leave the AI-webpage result untouched. */
+async function fetchSecEdgarOverlays(targets: RefreshTarget[]): Promise<Map<string, SecEdgarProfile | null>> {
+  const entries = await Promise.all(
+    targets.map(async (t) => [t.id, await runSecEdgarLookup({ data: { companyName: t.name } })] as const),
+  );
+  return new Map(entries);
+}
+
+/** Merges a real SEC EDGAR profile into an AI-webpage diff set — SEC wins
+ *  for the fields it's actually authoritative for (a marketing page is not
+ *  a reliable source for a SIC code), everything else stays exactly what
+ *  the webpage check found. Only touches fields the project actually
+ *  tracks (extractableFields), and only when SEC returned a real value. */
+function applySecEdgarOverlay(
+  diffs: FieldDiff[],
+  secProfile: SecEdgarProfile,
+  baseline: Record<string, string>,
+  extractableFields: string[],
+): (FieldDiff & { fromRegistry?: boolean })[] {
+  const byField = new Map(diffs.map((d) => [d.field, d as FieldDiff & { fromRegistry?: boolean }]));
+  for (const field of extractableFields) {
+    if (!SEC_EDGAR_FIELD_KEYS.has(field)) continue;
+    const secValue = (secProfile as unknown as Record<string, string>)[field];
+    if (!secValue || !secValue.trim()) continue;
+    const oldValue = (baseline[field] ?? byField.get(field)?.oldValue ?? "").trim();
+    const changeType: ChangeType = !oldValue ? "Added" : oldValue.trim() === secValue.trim() ? "Verified" : "Modified";
+    byField.set(field, { field, oldValue, newValue: secValue, changeType, fromRegistry: true });
+  }
+  return [...byField.values()];
+}
+
 /** Runs the real live refresh for a live-checkable project and turns the
  *  result into the ReviewRecord[] shape ReviewDialog already knows how to
  *  render (Old → New, tagged Added/Deleted/Modified/Verified). */
@@ -81,6 +113,7 @@ export async function fetchLiveReview(project: Project): Promise<LiveReviewData>
   if (!profile) throw new Error(`"${project.name}" isn't set up for live refresh.`);
 
   if (profile.kind === "registry") return fetchRegistryLiveReview(project, profile);
+  if (profile.kind === "directory") return fetchDirectoryLiveReview(project, profile);
 
   const targets = profile.currentValueRows.map((row, i) => ({
     id: row[profile.idField] || `row-${i}`,
@@ -89,15 +122,24 @@ export async function fetchLiveReview(project: Project): Promise<LiveReviewData>
     currentValues: row,
   }));
 
-  const outcome = await runMonitoringRefresh({
-    data: { config: profile.promptConfig, targets, fields: profile.extractableFields },
-  });
+  const [outcome, secProfiles] = await Promise.all([
+    runMonitoringRefresh({
+      data: { config: profile.promptConfig, targets, fields: profile.extractableFields },
+    }),
+    profile.usesSecEdgarOverlay ? fetchSecEdgarOverlays(targets) : Promise.resolve(null),
+  ]);
 
   const records: ReviewRecord[] = [];
   const fetchErrors: { entity: string; error: string }[] = [];
 
   for (const record of outcome.results) {
-    if (!record.reachable || record.diffs.length === 0) {
+    const target = targets.find((t) => t.id === record.id);
+    const secProfile = secProfiles?.get(record.id) ?? null;
+    const diffs: (FieldDiff & { fromRegistry?: boolean })[] = secProfile
+      ? applySecEdgarOverlay(record.diffs, secProfile, target?.currentValues ?? {}, profile.extractableFields)
+      : record.diffs;
+
+    if (diffs.length === 0) {
       if (record.error) fetchErrors.push({ entity: record.name, error: record.error });
       records.push({
         id: `${project.id}-live-${record.id}-status`,
@@ -114,7 +156,12 @@ export async function fetchLiveReview(project: Project): Promise<LiveReviewData>
       });
       continue;
     }
-    for (const d of record.diffs) {
+    if (!record.reachable && record.error) {
+      // The company's own site failed, but SEC EDGAR still answered some
+      // fields — surface both: the failure, and what SEC did find.
+      fetchErrors.push({ entity: record.name, error: record.error });
+    }
+    for (const d of diffs) {
       records.push({
         id: `${project.id}-live-${record.id}-${d.field}`,
         projectId: project.id,
@@ -123,9 +170,9 @@ export async function fetchLiveReview(project: Project): Promise<LiveReviewData>
         oldValue: d.oldValue || "—",
         newValue: d.newValue || "—",
         changeType: d.changeType,
-        confidence: 95,
-        source: record.name,
-        sourceUrl: record.url,
+        confidence: d.fromRegistry ? 99 : 95,
+        source: d.fromRegistry ? "SEC EDGAR (registry lookup)" : record.name,
+        sourceUrl: d.fromRegistry ? `https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=${secProfile?.registry_number ?? ""}` : record.url,
         detectedHrs: 0,
       });
     }
@@ -264,6 +311,68 @@ async function fetchRegistryLiveReview(project: Project, profile: RegistryLiveRe
   return live;
 }
 
+/** "directory" kind — re-scrapes every configured directory/listing page
+ *  (real HTTP fetch + AI extraction of every entity that page names, see
+ *  directory-extract.core.ts), merges the results, and diffs the combined
+ *  row set against the on-file baseline by the profile's key field —
+ *  reuses the exact same diffRegistrySnapshot() the registry kind uses,
+ *  since "diff a fresh row set against a baseline by key" is identical
+ *  either way; only how the fresh rows are obtained differs. */
+async function fetchDirectoryLiveReview(project: Project, profile: DirectoryLiveRefreshProfile): Promise<LiveReviewData> {
+  const fieldMeta: Record<string, { label: string }> = {};
+  for (const f of profile.extractableFields) fieldMeta[f] = { label: profile.fieldLabels[f] ?? f };
+
+  const outcome = await runDirectoryExtraction({
+    data: {
+      urls: profile.directoryUrls,
+      fields: profile.extractableFields,
+      fieldMeta,
+      entityLabel: profile.entityLabel,
+    },
+  });
+
+  const records: ReviewRecord[] = [];
+  const fetchErrors: { entity: string; error: string }[] = [];
+  let reachableCount = 0;
+  for (const page of outcome.perPage) {
+    if (page.reachable) reachableCount += 1;
+    if (page.error) fetchErrors.push({ entity: page.url, error: page.error });
+  }
+
+  const diffed = diffRegistrySnapshot(profile.currentValueRows, outcome.rows, profile.keyField, profile.nameField, profile.extractableFields);
+  for (const rec of diffed) {
+    const sourceUrl = outcome.perPage.find((p) => p.rows.includes(rec.row))?.url ?? profile.directoryUrls[0] ?? "";
+    for (const d of rec.diffs) {
+      records.push({
+        id: `${project.id}-live-${rec.key}-${rec.index}-${d.field}`,
+        projectId: project.id,
+        entity: rec.name,
+        datapoint: d.field,
+        oldValue: d.oldValue || "—",
+        newValue: d.newValue || "—",
+        changeType: d.changeType,
+        confidence: 90,
+        source: rec.name,
+        sourceUrl,
+        detectedHrs: 0,
+      });
+    }
+  }
+
+  const live: LiveReviewData = {
+    records,
+    checkedAt: outcome.checkedAt,
+    aiConfigured: true,
+    reachableCount,
+    totalCount: profile.directoryUrls.length,
+    fetchErrors,
+    profileKind: profile.kind,
+  };
+  saveLiveReview(project.id, live);
+  clearReviewProgress(project.id);
+  return live;
+}
+
 export type RefreshedMonitoringTable = { columns: string[]; rows: Record<string, string>[]; sheetName: string };
 
 const DISP_CODE: Record<ChangeType, string> = { Added: "A", Deleted: "D", Modified: "M", Verified: "V" };
@@ -363,12 +472,46 @@ const POOL = 6000;
 export function recordsForDownload(project: Project): ReviewRecord[] {
   const live = loadLiveReview(project.id);
   if (live) return live.records;
-  // Live-refresh-enabled projects must never fall back to the fabricated
-  // sample-file records below (same reasoning as ReviewDialog) — an empty
-  // download is the honest answer until a real "Run" has happened.
-  if (isLiveCheckable(project)) return [];
+  if (isLiveCheckable(project)) return baselineReviewRecords(project);
   if (project.sampleRows && project.sampleRows.length > 0) {
     return xlsxRowsToReviewRecords(project);
   }
   return reviewRecordsFor(project, Math.min(POOL, Math.max(1200, project.pendingReview)));
+}
+
+/** A live-checkable project's real on-file snapshot (sampleRows), shown as
+ *  the Review content before any "Run" has been made/cached — one record
+ *  per tracked field per row, marked Verified with its real value. Never
+ *  fabricated: a self-service project whose sampleRows are still empty
+ *  placeholders (nothing fetched yet) correctly produces no records here,
+ *  same as before — this only surfaces real values that are actually on
+ *  file, so a directory project's launch-time extraction (or any other
+ *  live-checkable project's real baseline) is never hidden behind a
+ *  missing/stale live-review cache entry. */
+export function baselineReviewRecords(project: Project): ReviewRecord[] {
+  const profile = getLiveRefreshProfile(project.id);
+  if (!profile || project.sampleRows.length === 0 || project.columns.length === 0) return [];
+  const src = project.sources[0] ?? { label: project.source, url: project.websiteUrl };
+  const records: ReviewRecord[] = [];
+  project.sampleRows.forEach((row, i) => {
+    const entity = row[profile.nameField] || `Record ${i + 1}`;
+    for (const f of profile.extractableFields) {
+      const v = (row[f] ?? "").trim();
+      if (!v) continue;
+      records.push({
+        id: `${project.id}-base-${i}-${f}`,
+        projectId: project.id,
+        entity,
+        datapoint: f,
+        oldValue: v,
+        newValue: v,
+        changeType: "Verified",
+        confidence: 90,
+        source: src.label,
+        sourceUrl: src.url,
+        detectedHrs: 0,
+      });
+    }
+  });
+  return records;
 }
