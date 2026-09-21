@@ -77,6 +77,22 @@ function makeSession(account: StoredAccount): SessionInfo {
   };
 }
 
+// Read the non-httpOnly gateway cookie set by freda-auth server.mjs.
+// Returns null if absent, malformed, or past midnight expiry.
+function getGatewayAuthCookie(): { username: string; userType: string; exp: number } | null {
+  if (typeof document === "undefined") return null;
+  try {
+    const match = document.cookie.split(";").find((c) => c.trim().startsWith("freda_auth="));
+    if (!match) return null;
+    const raw  = decodeURIComponent(match.trim().split("=").slice(1).join("="));
+    const data = JSON.parse(atob(raw)) as { username: string; userType: string; exp: number };
+    if (!data.username || !data.userType || Date.now() > data.exp) return null;
+    return data;
+  } catch {
+    return null;
+  }
+}
+
 export function getStoredSession(): SessionInfo | null {
   if (typeof window === "undefined" || !window.localStorage) return null;
   try {
@@ -106,6 +122,24 @@ export function clearStoredSession() {
 }
 
 export async function fetchSession(): Promise<SessionInfo | null> {
+  // If the freda-auth gateway cookie is present, auto-create a local session from it
+  // so the app skips its own login page.
+  const gateway = getGatewayAuthCookie();
+  if (gateway) {
+    const existing = getStoredSession();
+    if (!existing) {
+      const session = makeSession({
+        username:     gateway.username,
+        password:     "",
+        role:         "user",
+        display_name: gateway.username,
+      });
+      setStoredSession(session);
+      return session;
+    }
+    return existing;
+  }
+
   const session = getStoredSession();
   if (!session) return null;
   if (session.expires_at && new Date(session.expires_at).getTime() < Date.now()) {
@@ -157,6 +191,15 @@ export async function signupRequest(username: string, password: string, displayN
 
 export async function logoutRequest() {
   clearStoredSession();
+  // Clear the client-readable gateway cookie then hard-navigate to the
+  // gateway logout endpoint, which clears the httpOnly session cookie too.
+  if (typeof document !== "undefined") {
+    document.cookie = "freda_auth=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+    document.cookie = "freda_gateway_session=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+  }
+  if (typeof window !== "undefined") {
+    window.location.href = "/auth/logout";
+  }
 }
 
 export type AccountSummary = { username: string; display_name: string; role: "user" | "admin" };
