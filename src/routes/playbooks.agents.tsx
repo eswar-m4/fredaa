@@ -86,13 +86,14 @@ function AgentsPage() {
   function addSource() {
     const url = newSource.trim();
     if (!url || sourceAttrs.length === 0) return;
+    const cleanUrl = url.replace(/^https?:\/\//, “”);
     const id = `${project.id}-new-${Date.now()}`;
     setExtra((e) => ({
       ...e,
-      [project.id]: [...(e[project.id] ?? []), { id, label: url.replace(/^https?:\/\//, “”), url, status: “Pending approval”, records: 0, addedOn: “Just now” }],
+      [project.id]: [...(e[project.id] ?? []), { id, label: cleanUrl, url, status: “Pending approval”, records: 0, addedOn: “Just now” }],
     }));
-    logActivity(“source_added”, `Added source: ${url.replace(/^https?:\/\//, “”)} to project “${project.name}”`, “/playbooks/agents”);
-    raise(“Add source”, `Add source ${url.replace(/^https?:\/\//, “”)} · ${sourceAttrs.length} attributes`, est.setupDays, [url], sourceAttrs);
+    logActivity(“source_added”, `Added source: ${cleanUrl} to project: ${project.name}`, “/playbooks/agents”);
+    raise(“Add source”, `Add source ${cleanUrl} · ${sourceAttrs.length} attributes`, est.setupDays, [url], sourceAttrs);
     setNewSource(“”);
     setSourceAttrs([]);
   }
@@ -100,13 +101,13 @@ function AgentsPage() {
   function removeSource(id: string) {
     const label = sources.find((s) => s.id === id)?.label ?? id;
     setRemoved((r) => ({ ...r, [project.id]: [...(r[project.id] ?? []), id] }));
-    logActivity(“source_removed”, `Retired source: ${label} from project “${project.name}”`, “/playbooks/agents”);
+    logActivity(“source_removed”, `Retired source: ${label} from project: ${project.name}`, “/playbooks/agents”);
     raise(“Remove source”, `Retire source ${label}`, 2, [label], []);
   }
 
   function saveSchedule() {
     const label = currentCadence === “Custom” ? `Custom — ${currentRule}` : currentCadence;
-    logActivity(“schedule_changed”, `Schedule for project “${project.name}” set to ${label}`, “/playbooks/agents”);
+    logActivity(“schedule_changed”, `Schedule for project: ${project.name} set to ${label}`, “/playbooks/agents”);
     raise(“Schedule change”, `Run schedule for “${project.name}” set to ${label}`, 1, [], []);
   }
 
