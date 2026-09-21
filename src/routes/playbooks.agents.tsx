@@ -39,14 +39,14 @@ type Cadence = "Daily" | "Weekly" | "Monthly" | "Custom";
 function AgentsPage() {
   const mounted = useMounted();
   const customer = useActiveCustomer();
-  const [q, setQ] = useState("");
+  const [q, setQ] = useState('');
   const [projectId, setProjectId] = useState<string>(customer.projects[0]!.id);
 
   const project = customer.projects.find((p) => p.id === projectId) ?? customer.projects[0]!;
 
   const [extra, setExtra] = useState<Record<string, SourceRef[]>>({});
   const [removed, setRemoved] = useState<Record<string, string[]>>({});
-  const [newSource, setNewSource] = useState("");
+  const [newSource, setNewSource] = useState('');
   const [sourceAttrs, setSourceAttrs] = useState<string[]>([]);
   const [cadence, setCadence] = useState<Record<string, Cadence>>({});
   const [customRule, setCustomRule] = useState<Record<string, string>>({});
@@ -86,15 +86,15 @@ function AgentsPage() {
   function addSource() {
     const url = newSource.trim();
     if (!url || sourceAttrs.length === 0) return;
-    const cleanUrl = url.replace(/^https?:\/\//, “”);
+    const cleanUrl = url.replace(/^https?:\/\//, '');
     const id = `${project.id}-new-${Date.now()}`;
     setExtra((e) => ({
       ...e,
-      [project.id]: [...(e[project.id] ?? []), { id, label: cleanUrl, url, status: “Pending approval”, records: 0, addedOn: “Just now” }],
+      [project.id]: [...(e[project.id] ?? []), { id, label: cleanUrl, url, status: 'Pending approval', records: 0, addedOn: 'Just now' }],
     }));
-    logActivity(“source_added”, `Added source: ${cleanUrl} to project: ${project.name}`, “/playbooks/agents”);
-    raise(“Add source”, `Add source ${cleanUrl} · ${sourceAttrs.length} attributes`, est.setupDays, [url], sourceAttrs);
-    setNewSource(“”);
+    logActivity('source_added', `Added source: ${cleanUrl} to project: ${project.name}`, '/playbooks/agents');
+    raise('Add source', `Add source ${cleanUrl} · ${sourceAttrs.length} attributes`, est.setupDays, [url], sourceAttrs);
+    setNewSource('');
     setSourceAttrs([]);
   }
 
