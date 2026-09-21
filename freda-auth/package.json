@@ -1,0 +1,10 @@
+{
+  "name": "freda-auth",
+  "version": "1.0.0",
+  "description": "Unified auth gateway for freda.mobiusservices.io",
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "add-user": "node add-user.mjs"
+  }
+}

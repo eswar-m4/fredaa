@@ -14,6 +14,22 @@ export type SessionInfo = {
 
 const CURRENT_SESSION_STORAGE_KEY = "freda.auth.session.v1";
 
+// Read the non-httpOnly gateway cookie set by freda-auth server.mjs.
+// Returns null if absent, malformed, or expired.
+function getGatewayAuthCookie(): { username: string; userType: string; exp: number } | null {
+  if (typeof document === "undefined") return null;
+  try {
+    const match = document.cookie.split(";").find((c) => c.trim().startsWith("freda_auth="));
+    if (!match) return null;
+    const raw  = decodeURIComponent(match.trim().split("=").slice(1).join("="));
+    const data = JSON.parse(atob(raw)) as { username: string; userType: string; exp: number };
+    if (!data.username || !data.userType || Date.now() > data.exp) return null;
+    return data;
+  } catch {
+    return null;
+  }
+}
+
 export function getStoredSession(): SessionInfo | null {
   if (typeof window === "undefined" || !window.localStorage) return null;
   try {
@@ -44,11 +60,28 @@ export function clearStoredSession() {
 }
 
 export async function fetchSession(): Promise<SessionInfo | null | undefined> {
+  // Gateway auth cookie must be present — set by freda-auth gateway on login.
+  // If absent the user has not authenticated through the gateway and must log in.
+  const gateway = getGatewayAuthCookie();
+  if (!gateway) {
+    clearStoredSession();
+    return null;
+  }
+
   try {
     const response = await apiFetch("/api/v1/auth/me", { timeoutMs: 5000 });
     if (response.status === 401) {
+      // Gateway authenticated but backend session not yet established — sync now.
       clearStoredSession();
-      return null;
+      const syncRes = await apiFetch("/api/v1/auth/gateway-sync", {
+        method: "POST",
+        timeoutMs: 5000,
+      });
+      if (!syncRes.ok) return null;
+      const syncData = await syncRes.json();
+      const session = (syncData?.session ?? null) as SessionInfo | null;
+      setStoredSession(session);
+      return session;
     }
     if (!response.ok) return undefined;
     const data = await response.json();
@@ -89,12 +122,16 @@ export async function signupRequest(username: string, password: string, displayN
 }
 
 export async function logoutRequest() {
-  // Always clear the local session, even if the backend call fails (e.g.
-  // the API is unreachable) — otherwise a network hiccup leaves the user
-  // stuck "logged in" with no way to sign out from the UI.
   try {
     await apiFetch("/api/v1/auth/logout", { method: "POST" });
   } finally {
     clearStoredSession();
+    if (typeof document !== "undefined") {
+      document.cookie = "freda_auth=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+      document.cookie = "freda_gateway_session=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+    }
+    if (typeof window !== "undefined") {
+      window.location.href = "/auth/logout";
+    }
   }
 }
