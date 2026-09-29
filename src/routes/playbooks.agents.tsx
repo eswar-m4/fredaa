@@ -101,14 +101,14 @@ function AgentsPage() {
   function removeSource(id: string) {
     const label = sources.find((s) => s.id === id)?.label ?? id;
     setRemoved((r) => ({ ...r, [project.id]: [...(r[project.id] ?? []), id] }));
-    logActivity(“source_removed”, `Retired source: ${label} from project: ${project.name}`, “/playbooks/agents”);
-    raise(“Remove source”, `Retire source ${label}`, 2, [label], []);
+    logActivity('source_removed', `Retired source: ${label} from project: ${project.name}`, '/playbooks/agents');
+    raise('Remove source', `Retire source ${label}`, 2, [label], []);
   }
 
   function saveSchedule() {
-    const label = currentCadence === “Custom” ? `Custom — ${currentRule}` : currentCadence;
-    logActivity(“schedule_changed”, `Schedule for project: ${project.name} set to ${label}`, “/playbooks/agents”);
-    raise(“Schedule change”, `Run schedule for “${project.name}” set to ${label}`, 1, [], []);
+    const label = currentCadence === 'Custom' ? `Custom — ${currentRule}` : currentCadence;
+    logActivity('schedule_changed', `Schedule for project: ${project.name} set to ${label}`, '/playbooks/agents');
+    raise('Schedule change', `Run schedule for '${project.name}' set to ${label}`, 1, [], []);
   }
 
   if (!mounted) return <WorkspaceLoadingFallback />;
