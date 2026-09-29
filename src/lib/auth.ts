@@ -126,18 +126,19 @@ export async function fetchSession(): Promise<SessionInfo | null> {
   // so the app skips its own login page.
   const gateway = getGatewayAuthCookie();
   if (gateway) {
+    const expectedRole: "user" | "admin" = gateway.userType === "admin" ? "admin" : "user";
     const existing = getStoredSession();
-    if (!existing) {
-      const session = makeSession({
-        username:     gateway.username,
-        password:     "",
-        role:         "user",
-        display_name: gateway.username,
-      });
-      setStoredSession(session);
-      return session;
+    if (existing && existing.username === gateway.username && existing.role === expectedRole) {
+      return existing;
     }
-    return existing;
+    const session = makeSession({
+      username:     gateway.username,
+      password:     "",
+      role:         expectedRole,
+      display_name: gateway.username,
+    });
+    setStoredSession(session);
+    return session;
   }
 
   const session = getStoredSession();
