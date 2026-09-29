@@ -498,18 +498,24 @@ async function init() {
 }
 
 function showPage(name, btn) {
+  // Always clear embed mode and reset iframes first to stop background requests
+  document.cookie = 'freda_embed_mode=; path=/; max-age=0';
+  document.getElementById('market-frame').src = 'about:blank';
+  document.getElementById('customer-frame').src = 'about:blank';
+
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-link').forEach(b => b.classList.remove('active'));
   document.getElementById('page-' + name).classList.add('active');
   btn.classList.add('active');
-  // Lazy-load iframes on first visit
+
+  // Set embed cookie THEN load iframe — cookie must arrive with the first request
   if (name === 'madmin') {
-    const f = document.getElementById('market-frame');
-    if (f.src === 'about:blank' || f.src === window.location.origin + '/about:blank') f.src = '/freda-embed/market/admin';
+    document.cookie = 'freda_embed_mode=market; path=/';
+    document.getElementById('market-frame').src = '/admin';
   }
   if (name === 'cadmin') {
-    const f = document.getElementById('customer-frame');
-    if (f.src === 'about:blank' || f.src === window.location.origin + '/about:blank') f.src = '/freda-embed/customer/admin';
+    document.cookie = 'freda_embed_mode=customer; path=/';
+    document.getElementById('customer-frame').src = '/admin';
   }
 }
 
@@ -879,27 +885,10 @@ const server = createServer(async (req, res) => {
         return;
       }
 
-      // Embed proxy: /freda-embed/market/* → market frontend/backend
-      if (url.startsWith('/freda-embed/market')) {
-        const targetPath = url.slice('/freda-embed/market'.length) || '/';
-        if (targetPath.startsWith('/api/') || targetPath.startsWith('/docs') || targetPath.startsWith('/redoc')) {
-          proxy(req, res, BACKEND_PORT, session.username, session.userType, targetPath);
-        } else {
-          proxy(req, res, MARKET_PORT, session.username, session.userType, targetPath);
-        }
-        return;
-      }
-
-      // Embed proxy: /freda-embed/customer/* → customer frontend
-      if (url.startsWith('/freda-embed/customer')) {
-        const targetPath = url.slice('/freda-embed/customer'.length) || '/';
-        proxy(req, res, CUSTOMER_PORT, session.username, session.userType, targetPath);
-        return;
-      }
-
-      // Referer-based passthrough: static assets & API calls from embedded iframes
-      const referer = req.headers['referer'] || '';
-      if (referer.includes('/freda-embed/market')) {
+      // Embed proxy: freda_embed_mode cookie (set by admin SPA JS) routes to
+      // the correct React app at the SAME URL path — avoids SSR hydration mismatch.
+      const embedMode = cookies['freda_embed_mode'];
+      if (embedMode === 'market') {
         if (url.startsWith('/api/') || url.startsWith('/docs') || url.startsWith('/redoc')) {
           proxy(req, res, BACKEND_PORT, session.username, session.userType);
         } else {
@@ -907,7 +896,7 @@ const server = createServer(async (req, res) => {
         }
         return;
       }
-      if (referer.includes('/freda-embed/customer')) {
+      if (embedMode === 'customer') {
         proxy(req, res, CUSTOMER_PORT, session.username, session.userType);
         return;
       }
