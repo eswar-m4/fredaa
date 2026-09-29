@@ -68,6 +68,26 @@ export async function fetchSession(): Promise<SessionInfo | null | undefined> {
     return null;
   }
 
+  // Admin gateway users get a synthetic local session — no backend round-trip needed.
+  if (gateway.userType === "admin") {
+    const existing = getStoredSession();
+    if (existing?.role === "admin" && existing.username === gateway.username) return existing;
+    const now = new Date().toISOString();
+    const session: SessionInfo = {
+      session_token: `gw-admin-${gateway.username}`,
+      username: gateway.username,
+      user_id: `admin-${gateway.username}`,
+      display_name: gateway.username,
+      role: "admin",
+      created_at: now,
+      updated_at: now,
+      expires_at: new Date(gateway.exp).toISOString(),
+      last_seen_at: now,
+    };
+    setStoredSession(session);
+    return session;
+  }
+
   try {
     const response = await apiFetch("/api/v1/auth/me", { timeoutMs: 5000 });
     if (response.status === 401) {

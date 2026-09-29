@@ -332,6 +332,8 @@ function adminPage() {
     .form-msg.ok{background:#f0fdf4;border:1px solid #bbf7d0;color:#166534}
     .toast{position:fixed;bottom:1.25rem;right:1.25rem;background:#1e293b;color:#f1f5f9;font-size:.8125rem;padding:.5625rem .9375rem;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.2);opacity:0;pointer-events:none;z-index:999;transition:opacity .2s;max-width:280px}
     .toast.show{opacity:1}
+    .page.embed{padding:0;max-width:none;height:calc(100vh - 52px);overflow:hidden}
+    .embed-frame{width:100%;height:100%;border:none;display:block;background:#f8fafc}
   </style>
 </head>
 <body>
@@ -340,6 +342,8 @@ function adminPage() {
   <button class="nav-link active" onclick="showPage('console',this)">Console</button>
   <button class="nav-link" onclick="showPage('clogs',this)">Customer Logs</button>
   <button class="nav-link" onclick="showPage('mlogs',this)">Market Logs</button>
+  <button class="nav-link" onclick="showPage('madmin',this)">Market Admin</button>
+  <button class="nav-link" onclick="showPage('cadmin',this)">Customer Admin</button>
   <div class="nav-right">
     <span class="nav-user" id="nav-user"></span>
     <button class="logout-btn" onclick="doLogout()">Sign out</button>
@@ -432,6 +436,16 @@ function adminPage() {
   </div>
 </div>
 
+<!-- Market Admin embed -->
+<div class="page embed" id="page-madmin">
+  <iframe class="embed-frame" id="market-frame" src="about:blank" title="Market Admin Console"></iframe>
+</div>
+
+<!-- Customer Admin embed -->
+<div class="page embed" id="page-cadmin">
+  <iframe class="embed-frame" id="customer-frame" src="about:blank" title="Customer Admin Console"></iframe>
+</div>
+
 <!-- Edit modal -->
 <div class="overlay" id="edit-overlay">
   <div class="modal">
@@ -488,6 +502,15 @@ function showPage(name, btn) {
   document.querySelectorAll('.nav-link').forEach(b => b.classList.remove('active'));
   document.getElementById('page-' + name).classList.add('active');
   btn.classList.add('active');
+  // Lazy-load iframes on first visit
+  if (name === 'madmin') {
+    const f = document.getElementById('market-frame');
+    if (f.src === 'about:blank' || f.src === window.location.origin + '/about:blank') f.src = '/freda-embed/market/admin';
+  }
+  if (name === 'cadmin') {
+    const f = document.getElementById('customer-frame');
+    if (f.src === 'about:blank' || f.src === window.location.origin + '/about:blank') f.src = '/freda-embed/customer/admin';
+  }
 }
 
 // chips
@@ -670,7 +693,7 @@ init();
 
 // ── HTTP proxy ────────────────────────────────────────────────────────────────
 
-function proxy(req, res, targetPort, username, userType) {
+function proxy(req, res, targetPort, username, userType, overridePath) {
   const headers = { ...req.headers };
   headers['host']         = `127.0.0.1:${targetPort}`;
   headers['x-freda-user'] = username;
@@ -685,7 +708,8 @@ function proxy(req, res, targetPort, username, userType) {
     else delete headers['cookie'];
   }
 
-  const proxyReq = httpRequest({ hostname: '127.0.0.1', port: targetPort, path: req.url, method: req.method, headers }, (proxyRes) => {
+  const path = overridePath !== undefined ? overridePath : req.url;
+  const proxyReq = httpRequest({ hostname: '127.0.0.1', port: targetPort, path, method: req.method, headers }, (proxyRes) => {
     res.writeHead(proxyRes.statusCode, proxyRes.headers);
     proxyRes.pipe(res);
   });
@@ -854,6 +878,40 @@ const server = createServer(async (req, res) => {
         await handleAdminApi(req, res, url);
         return;
       }
+
+      // Embed proxy: /freda-embed/market/* → market frontend/backend
+      if (url.startsWith('/freda-embed/market')) {
+        const targetPath = url.slice('/freda-embed/market'.length) || '/';
+        if (targetPath.startsWith('/api/') || targetPath.startsWith('/docs') || targetPath.startsWith('/redoc')) {
+          proxy(req, res, BACKEND_PORT, session.username, session.userType, targetPath);
+        } else {
+          proxy(req, res, MARKET_PORT, session.username, session.userType, targetPath);
+        }
+        return;
+      }
+
+      // Embed proxy: /freda-embed/customer/* → customer frontend
+      if (url.startsWith('/freda-embed/customer')) {
+        const targetPath = url.slice('/freda-embed/customer'.length) || '/';
+        proxy(req, res, CUSTOMER_PORT, session.username, session.userType, targetPath);
+        return;
+      }
+
+      // Referer-based passthrough: static assets & API calls from embedded iframes
+      const referer = req.headers['referer'] || '';
+      if (referer.includes('/freda-embed/market')) {
+        if (url.startsWith('/api/') || url.startsWith('/docs') || url.startsWith('/redoc')) {
+          proxy(req, res, BACKEND_PORT, session.username, session.userType);
+        } else {
+          proxy(req, res, MARKET_PORT, session.username, session.userType);
+        }
+        return;
+      }
+      if (referer.includes('/freda-embed/customer')) {
+        proxy(req, res, CUSTOMER_PORT, session.username, session.userType);
+        return;
+      }
+
       res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
       res.end(adminPage());
       return;
