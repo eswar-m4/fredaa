@@ -88,6 +88,25 @@ export async function fetchSession(): Promise<SessionInfo | null | undefined> {
     return session;
   }
 
+  // Helper: synthesize a local session from the gateway cookie so the user
+  // can access the app even when the backend is temporarily unreachable.
+  function gatewayFallbackSession(): SessionInfo {
+    const now = new Date().toISOString();
+    const s: SessionInfo = {
+      session_token: `gw-${gateway.username}`,
+      username: gateway.username,
+      user_id: `market-${gateway.username}`,
+      display_name: gateway.username,
+      role: "user",
+      created_at: now,
+      updated_at: now,
+      expires_at: new Date(gateway.exp).toISOString(),
+      last_seen_at: now,
+    };
+    setStoredSession(s);
+    return s;
+  }
+
   try {
     const response = await apiFetch("/api/v1/auth/me", { timeoutMs: 5000 });
     if (response.status === 401) {
@@ -97,19 +116,21 @@ export async function fetchSession(): Promise<SessionInfo | null | undefined> {
         method: "POST",
         timeoutMs: 5000,
       });
-      if (!syncRes.ok) return null;
+      if (!syncRes.ok) return gatewayFallbackSession();
       const syncData = await syncRes.json();
       const session = (syncData?.session ?? null) as SessionInfo | null;
+      if (!session) return gatewayFallbackSession();
       setStoredSession(session);
       return session;
     }
-    if (!response.ok) return undefined;
+    if (!response.ok) return gatewayFallbackSession();
     const data = await response.json();
     const session = (data?.session ?? null) as SessionInfo | null;
+    if (!session) return gatewayFallbackSession();
     setStoredSession(session);
     return session;
   } catch {
-    return undefined;
+    return gatewayFallbackSession();
   }
 }
 

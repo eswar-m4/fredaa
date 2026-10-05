@@ -850,7 +850,7 @@ const server = createServer(async (req, res) => {
         return;
       }
       writeLog({ timestamp: new Date().toISOString(), username: user.username, userType: user.user_type, action: 'login', details: 'Successful login', page: '/auth/login' });
-      res.writeHead(302, { 'Set-Cookie': makeSessionCookies(user.username, user.user_type), 'Location': '/' });
+      res.writeHead(302, { 'Set-Cookie': [...makeSessionCookies(user.username, user.user_type), 'freda_embed_mode=; Path=/; Max-Age=0; SameSite=Lax'], 'Location': '/' });
       res.end();
       return;
     }
@@ -885,23 +885,27 @@ const server = createServer(async (req, res) => {
         return;
       }
 
-      // Embed proxy: freda_embed_mode cookie (set by admin SPA JS) routes to
-      // the correct React app at the SAME URL path — avoids SSR hydration mismatch.
+      // Embed proxy: freda_embed_mode cookie routes to the correct React app at the
+      // SAME URL path (avoids SSR hydration mismatch). Skip on root '/' so a fresh
+      // admin page-load always lands on the gateway admin SPA, never a stale embed.
       const embedMode = cookies['freda_embed_mode'];
-      if (embedMode === 'market') {
-        if (url.startsWith('/api/') || url.startsWith('/docs') || url.startsWith('/redoc')) {
-          proxy(req, res, BACKEND_PORT, session.username, session.userType);
-        } else {
-          proxy(req, res, MARKET_PORT, session.username, session.userType);
+      if (embedMode && url !== '/') {
+        if (embedMode === 'market') {
+          if (url.startsWith('/api/') || url.startsWith('/docs') || url.startsWith('/redoc')) {
+            proxy(req, res, BACKEND_PORT, session.username, session.userType);
+          } else {
+            proxy(req, res, MARKET_PORT, session.username, session.userType);
+          }
+          return;
         }
-        return;
-      }
-      if (embedMode === 'customer') {
-        proxy(req, res, CUSTOMER_PORT, session.username, session.userType);
-        return;
+        if (embedMode === 'customer') {
+          proxy(req, res, CUSTOMER_PORT, session.username, session.userType);
+          return;
+        }
       }
 
-      res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
+      // Serve admin SPA and clear any stale embed cookie
+      res.writeHead(200, { 'content-type': 'text/html; charset=utf-8', 'set-cookie': 'freda_embed_mode=; Path=/; Max-Age=0; SameSite=Lax' });
       res.end(adminPage());
       return;
     }
