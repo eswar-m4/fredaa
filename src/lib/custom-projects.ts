@@ -18,7 +18,7 @@ import type { WebpageLiveRefreshProfile, DirectoryLiveRefreshProfile } from "@/l
 import type { Dataset } from "@/data/datasets";
 import { runDirectoryExtraction } from "@/lib/api/directory-extract.functions";
 import { diffRegistrySnapshot } from "@/lib/api/registry-refresh.core";
-import { saveLiveReview } from "@/lib/live-review-store";
+import { saveLiveReview, saveLiveSnapshot } from "@/lib/live-review-store";
 import type { LiveReviewData } from "@/components/ReviewDialog";
 
 export type CustomProjectEntry = { project: Project; profile: WebpageLiveRefreshProfile | DirectoryLiveRefreshProfile };
@@ -255,7 +255,8 @@ export function launchSelfServiceProject(params: {
  *  the workspace with real rows already in Review/Output, not an empty
  *  shell waiting for a first "Run" — matches how ERIS/ABM's other
  *  first-time-onboarded real datasets already work (a real snapshot,
- *  all-Verified, no fabricated Added). A later "Run" in Monitor re-scrapes
+ *  every value tagged Added with no old value, since it's a new data run).
+ *  A later "Run" in Monitor re-scrapes
  *  the same directory URLs and diffs against this baseline. */
 export async function launchDirectoryProject(params: {
   customerId: string;
@@ -337,7 +338,7 @@ export async function launchDirectoryProject(params: {
     datapoints: fields.map((f) => fieldLabels[f] ?? f),
     sources,
     records: sampleRows.length,
-    admv: { added: 0, deleted: 0, modified: 0, verified: sampleRows.length },
+    admv: { added: sampleRows.length, deleted: 0, modified: 0, verified: 0 },
     freshness: sampleRows.length > 0 ? 96 : 0,
     accuracy: sampleRows.length > 0 ? 94 : 0,
     coverage: sampleRows.length > 0 ? 95 : 0,
@@ -356,10 +357,11 @@ export async function launchDirectoryProject(params: {
   // baseline directly — so without this, Review would sit empty until the
   // customer separately clicked "Run" in Monitor, even though the real
   // first-pass data (every field, every org, straight from the real page)
-  // is already sitting right here. Diffing sampleRows against itself is
-  // exactly the "first real snapshot" case: every field naturally comes
-  // back Verified with its real value, nothing fabricated.
-  const diffed = diffRegistrySnapshot(sampleRows, sampleRows, nameField, nameField, fields);
+  // is already sitting right here. This is a new data run, not a refresh —
+  // there is no previous delivery, so diff against an empty baseline: every
+  // real value comes back Added with no old value. Later "Run"s diff against
+  // this snapshot (profile.currentValueRows) as a regular refresh.
+  const diffed = diffRegistrySnapshot([], sampleRows, nameField, nameField, fields);
   const records: ReviewRecord[] = [];
   for (const rec of diffed) {
     const sourceUrl = outcome.perPage.find((p) => p.rows.includes(rec.row))?.url ?? urls[0] ?? "";
@@ -389,6 +391,8 @@ export async function launchDirectoryProject(params: {
     profileKind: "directory",
   };
   saveLiveReview(id, live);
+  // The launch extraction is run 1 — the next "Run" diffs against it.
+  if (sampleRows.length > 0) saveLiveSnapshot(id, "directory", sampleRows);
 
   const all = readAll();
   const existing = all[customerId] ?? [];

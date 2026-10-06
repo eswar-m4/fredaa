@@ -82,6 +82,11 @@ export function ReviewDialog({
   const [decisions, setDecisions] = useState<Record<string, Decision>>({});
   const [batchIdx, setBatchIdx] = useState(0);
   const [submitted, setSubmitted] = useState(0);
+  // Records whose decision has been submitted. Review flow per record:
+  //   undecided -> decided (approve/reject, still editable) -> submitted (locked).
+  // Every action button is enabled only while there is something left for it
+  // to act on, so after Bulk approve + Submit nothing stays clickable.
+  const [submittedIds, setSubmittedIds] = useState<Set<string>>(() => new Set());
   const [completedFile, setCompletedFile] = useState<Array<Record<string, string | number>>>([]);
 
   // Live-check records carry the raw field key as `datapoint` (needed so
@@ -123,6 +128,15 @@ export function ReviewDialog({
 
   useEffect(() => setBatchIdx(0), [admvFilter, minConf, datapoint, query, sampling]);
 
+  // A new run (or another project) is a new record set — start its review fresh.
+  useEffect(() => {
+    setDecisions({});
+    setSubmittedIds(new Set());
+    setSubmitted(0);
+    setCompletedFile([]);
+    setBatchIdx(0);
+  }, [all]);
+
   const decided = records.filter((r) => decisions[r.id]).length;
   const approved = records.filter((r) => decisions[r.id] === "approved").length;
   const rejected = decided - approved;
@@ -147,28 +161,48 @@ export function ReviewDialog({
 
   const batchDecided = batch.filter((r) => decisions[r.id]).length;
 
+  const isLocked = (id: string) => submittedIds.has(id);
+  /** Still waiting for a decision (not decided, not submitted). */
+  const isOpen = (r: ReviewRecord) => !decisions[r.id] && !isLocked(r.id);
+  const openRecords = records.filter(isOpen);
+  const batchOpen = batch.filter(isOpen);
+  /** Decided in this session but not yet submitted — what Submit will send. */
+  const pendingSubmit = records.filter((r) => decisions[r.id] && !isLocked(r.id));
+  const reviewComplete = records.length > 0 && records.every((r) => isLocked(r.id));
+
   function decide(ids: string[], d: Decision) {
     setDecisions((prev) => {
       const next = { ...prev };
-      ids.forEach((id) => (next[id] = d));
+      ids.forEach((id) => {
+        if (!submittedIds.has(id)) next[id] = d;
+      });
       return next;
     });
   }
 
   function approveBatchAndNext() {
-    decide(batch.map((r) => r.id), "approved");
+    decide(batchOpen.map((r) => r.id), "approved");
     setBatchIdx((b) => Math.min(batchCount - 1, b + 1));
   }
 
   function reset() {
-    setDecisions({});
+    // Only unsubmitted decisions can be undone; submitted ones stay locked.
+    setDecisions((prev) => {
+      const next: Record<string, Decision> = {};
+      for (const id of Object.keys(prev)) if (submittedIds.has(id)) next[id] = prev[id]!;
+      return next;
+    });
     setBatchIdx(0);
   }
 
   function submit() {
+    if (pendingSubmit.length === 0) return;
+    const nowSubmitted = new Set(submittedIds);
+    pendingSubmit.forEach((r) => nowSubmitted.add(r.id));
+    setSubmittedIds(nowSubmitted);
     setCompletedFile(
-      records
-        .filter((r) => decisions[r.id])
+      all
+        .filter((r) => nowSubmitted.has(r.id) && decisions[r.id])
         .map((r) => ({
           entity: r.entity,
           datapoint: labelFor(r.datapoint),
@@ -180,7 +214,7 @@ export function ReviewDialog({
           decision: decisions[r.id] === "approved" ? "Approved" : "Rejected",
         })),
     );
-    setSubmitted(decided);
+    setSubmitted(nowSubmitted.size);
     // Persist against the sampled set (what "review contour %" below is
     // already measured against), not the full unsampled `all` — sampling is
     // a deliberate review-scope choice, so fully deciding everything in a
@@ -189,9 +223,11 @@ export function ReviewDialog({
     // also decided. A secondary admv/confidence/search filter still counts
     // honestly: records it hides from `sampled`'s decided count stay
     // undecided, so submitting under a narrow filter won't misreport 100%.
-    if (project) recordReviewSubmission(project.id, sampled.filter((r) => decisions[r.id]).length, sampled.length);
-    setDecisions({});
-    setBatchIdx(0);
+    if (project) recordReviewSubmission(project.id, sampled.filter((r) => nowSubmitted.has(r.id)).length, sampled.length);
+    // Decisions are kept (now locked) so the queue shows what was submitted
+    // instead of snapping back to an undecided state that looks re-approvable.
+    const firstOpenIdx = records.findIndex((r) => !nowSubmitted.has(r.id) && !decisions[r.id]);
+    setBatchIdx(firstOpenIdx >= 0 ? Math.floor(firstOpenIdx / batchSize) : 0);
   }
 
   if (!project) return null;
@@ -205,7 +241,9 @@ export function ReviewDialog({
         if (!v) {
           setSubmitted(0);
           setCompletedFile([]);
-          reset();
+          setSubmittedIds(new Set());
+          setDecisions({});
+          setBatchIdx(0);
         }
       }}
     >
@@ -338,7 +376,7 @@ export function ReviewDialog({
                 <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Group approval</span>
                 <div className="ml-auto flex flex-wrap items-center gap-1.5">
                   {CHANGE_TYPES.map((t) => {
-                    const ids = records.filter((r) => r.changeType === t).map((r) => r.id);
+                    const ids = openRecords.filter((r) => r.changeType === t).map((r) => r.id);
                     return (
                       <button
                         key={t}
@@ -404,8 +442,8 @@ export function ReviewDialog({
                   >
                     Next batch <ChevronRight className="h-3.5 w-3.5" />
                   </Button>
-                  <Button size="sm" disabled={batch.length === 0} onClick={approveBatchAndNext}>
-                    <Layers className="h-3.5 w-3.5" /> Approve batch &amp; next ({batch.length})
+                  <Button size="sm" disabled={batchOpen.length === 0} onClick={approveBatchAndNext}>
+                    <Layers className="h-3.5 w-3.5" /> Approve batch &amp; next ({batchOpen.length})
                   </Button>
                 </div>
               </div>
@@ -443,6 +481,7 @@ export function ReviewDialog({
                   <tbody>
                     {batch.map((r: ReviewRecord) => {
                       const d = decisions[r.id];
+                      const locked = isLocked(r.id);
                       return (
                         <tr key={r.id} className="border-b border-border/60 hover:bg-secondary/40">
                           <td className="px-6 py-2 w-[110px] max-w-[110px]">
@@ -486,25 +525,30 @@ export function ReviewDialog({
                           <td className="px-3 py-2 text-[11.5px] text-muted-foreground whitespace-nowrap">{hrsAgo(r.detectedHrs)}</td>
                           <td className="px-6 py-2">
                             <div className="flex items-center justify-end gap-1.5">
+                              {locked && <span className="text-[10.5px] text-muted-foreground mr-1">Submitted</span>}
                               <button
+                                disabled={locked}
                                 onClick={() => decide([r.id], "approved")}
                                 className={cn(
-                                  "h-7 w-7 rounded-md inline-flex items-center justify-center border transition",
+                                  "h-7 w-7 rounded-md inline-flex items-center justify-center border transition disabled:cursor-not-allowed",
                                   d === "approved" ? "bg-success text-success-bg border-success" : "border-border hover:bg-secondary",
+                                  locked && d !== "approved" && "opacity-40",
                                 )}
-                                title="Approve"
+                                title={locked ? "Decision submitted" : "Approve"}
                               >
                                 <Check className="h-3.5 w-3.5" />
                               </button>
                               <button
+                                disabled={locked}
                                 onClick={() => decide([r.id], "rejected")}
                                 className={cn(
-                                  "h-7 w-7 rounded-md inline-flex items-center justify-center border transition",
+                                  "h-7 w-7 rounded-md inline-flex items-center justify-center border transition disabled:cursor-not-allowed",
                                   d === "rejected"
                                     ? "bg-destructive text-destructive-foreground border-destructive"
                                     : "border-border hover:bg-secondary",
+                                  locked && d !== "rejected" && "opacity-40",
                                 )}
-                                title="Reject"
+                                title={locked ? "Decision submitted" : "Reject"}
                               >
                                 <X className="h-3.5 w-3.5" />
                               </button>
@@ -527,6 +571,7 @@ export function ReviewDialog({
             <span className="text-success">{approved} approved</span> · <span className="text-destructive">{rejected} rejected</span> ·{" "}
             review contour <strong className="text-foreground">{coverage.toFixed(0)}%</strong>
             {submitted > 0 && <span className="ml-2 text-success">✓ {submitted} decisions submitted</span>}
+            {reviewComplete && <span className="ml-2 text-success font-medium">· Review complete</span>}
           </div>
           <div className="ml-auto flex flex-wrap items-center gap-2">
             {submitted > 0 && (
@@ -540,14 +585,19 @@ export function ReviewDialog({
                 <Download className="h-3.5 w-3.5" /> Download reviewed file
               </Button>
             )}
-            <Button variant="ghost" size="sm" onClick={reset}>
+            <Button variant="ghost" size="sm" disabled={pendingSubmit.length === 0} onClick={reset}>
               <RotateCcw className="h-3.5 w-3.5" /> Reset
             </Button>
-            <Button variant="outline" size="sm" onClick={() => decide(records.map((r) => r.id), "approved")}>
-              Bulk approve all ({records.length})
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={openRecords.length === 0}
+              onClick={() => decide(openRecords.map((r) => r.id), "approved")}
+            >
+              Bulk approve all ({openRecords.length})
             </Button>
-            <Button size="sm" disabled={decided === 0} onClick={submit}>
-              <Send className="h-3.5 w-3.5" /> Submit {decided > 0 ? `${decided} ` : ""}decisions
+            <Button size="sm" disabled={pendingSubmit.length === 0} onClick={submit}>
+              <Send className="h-3.5 w-3.5" /> Submit {pendingSubmit.length > 0 ? `${pendingSubmit.length} ` : ""}decisions
             </Button>
           </div>
         </div>

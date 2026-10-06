@@ -34,7 +34,9 @@ import { statusTone } from "@/routes/index";
 import { cn } from "@/lib/utils";
 import { ReviewDialog, type LiveReviewData } from "@/components/ReviewDialog";
 import { DownloadMenu } from "@/components/DownloadMenu";
-import { isLiveCheckable, fetchLiveReview, monitorStatusFor } from "@/lib/monitoring-live-review";
+import { isLiveCheckable, fetchLiveReview, loadLiveReview, monitorStatusFor } from "@/lib/monitoring-live-review";
+import { clearProjectRun, recordProjectRun, runTimesFor, useLastRunVersion } from "@/lib/last-run";
+import { clearLiveSnapshot } from "@/lib/live-review-store";
 import { useReviewStatusVersion, clearReviewProgress } from "@/lib/review-status";
 import { useDeletedJobIds, deleteJob, deleteJobs, restoreAllJobs } from "@/lib/deleted-jobs";
 import { removeCustomProject, isCustomProjectId } from "@/lib/custom-projects";
@@ -71,6 +73,7 @@ function MonitoringPage() {
   const mounted = useMounted();
   const customer = useActiveCustomer();
   useReviewStatusVersion(); // re-render when a Submit in ReviewDialog (here or on the Dashboard) changes a project's status
+  useLastRunVersion(); // re-render Last run / Next run when a Run now completes
   const deletedJobIds = useDeletedJobIds();
   const [range, setRange] = useState<RangeValue>(DEFAULT_RANGE);
   const [scope, setScope] = useState("all");
@@ -104,6 +107,7 @@ function MonitoringPage() {
       setRunning((r) => ({ ...r, [id]: pct }));
       if (pct >= 100) {
         clearInterval(t);
+        recordProjectRun(id);
         setTimeout(
           () =>
             setRunning((r) => {
@@ -125,6 +129,7 @@ function MonitoringPage() {
     }, 700);
     try {
       const live = await fetchLiveReview(project);
+      recordProjectRun(project.id, new Date(live.checkedAt || Date.now()));
       setLiveReview(live);
       setLiveReviewProject(project);
     } finally {
@@ -140,6 +145,8 @@ function MonitoringPage() {
     if (!deleteTarget) return;
     removeCustomProject(customer.id, deleteTarget.id);
     clearReviewProgress(deleteTarget.id);
+    clearProjectRun(deleteTarget.id);
+    clearLiveSnapshot(deleteTarget.id);
     if (scope === deleteTarget.id) setScope("all");
     setDeleteTarget(null);
   }
@@ -329,6 +336,7 @@ function MonitoringPage() {
             <tbody>
               {projects.map((p) => {
                 const pct = running[p.id];
+                const runTimes = runTimesFor(p, loadLiveReview(p.id)?.checkedAt);
                 return (
                   <tr key={p.id} className="border-b border-border/60 hover:bg-secondary/40">
                     <td className="px-5 py-3">
@@ -347,10 +355,10 @@ function MonitoringPage() {
                     <td className="px-3 py-3">
                       <Badge tone="neutral">{p.frequency}</Badge>
                     </td>
-                    <td className="px-3 py-3 text-muted-foreground">{hrsAgo(p.lastRefreshHrs)}</td>
+                    <td className="px-3 py-3 text-muted-foreground">{hrsAgo(runTimes.lastHrs)}</td>
                     <td className="px-3 py-3 text-muted-foreground">
                       <span className="inline-flex items-center gap-1">
-                        <Timer className="h-3.5 w-3.5" /> {inHrs(p.nextRefreshHrs)}
+                        <Timer className="h-3.5 w-3.5" /> {inHrs(runTimes.nextHrs)}
                       </span>
                     </td>
                     <td className="px-3 py-3 tabular-nums">{fmt(p.records)}</td>

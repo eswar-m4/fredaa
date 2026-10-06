@@ -142,7 +142,7 @@ function SolutionsPage() {
   return (
     <AppLayout>
       <PageHeader
-        title="Solutions — Dataset Setup"
+        title={cat !== "All" ? `${cat} Data Set Up` : "Solutions — Dataset Setup"}
         subtitle="Pick a dataset, choose your sources or upload your own data, then select your datapoints. A workflow runs behind the scenes."
         actions={
           <div className="flex items-center gap-2">
@@ -358,8 +358,8 @@ function DatasetSetup({ item, onBack }: { item: SetupItem; onBack: () => void })
   return (
     <AppLayout>
       <PageHeader
-        title={item.name}
-        subtitle={`${item.origin} · ${item.category} · ${item.rows}`}
+        title={`${item.category} Data Set Up`}
+        subtitle={`${item.name} · ${item.origin} · ${item.rows}`}
         actions={
           <Button size="sm" variant="outline" onClick={onBack}>
             <ArrowLeft className="h-3.5 w-3.5" /> All datasets

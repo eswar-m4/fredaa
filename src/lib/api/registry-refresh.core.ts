@@ -338,11 +338,28 @@ export function diffRegistrySnapshot(
   keyField: string,
   nameField: string,
   fields: string[],
+  /** Also report entities present in the baseline but gone from the live rows
+   *  as Deleted. Only meaningful when the baseline was produced the same way
+   *  as liveRows (the previous live run) — an on-file snapshot can hold far
+   *  more rows than one live fetch returns, which would read as mass deletes. */
+  includeRemoved = false,
 ): RegistryDiffRecord[] {
   const baselineByKey = new Map(baselineRows.map((r) => [r[keyField], r]));
-  return liveRows.map((live, index) => {
+  const diffed = liveRows.map((live, index) => {
     const key = live[keyField] ?? "";
     const baseline = baselineByKey.get(key) ?? {};
     return { key, name: live[nameField] || key, diffs: diffFields(fields, baseline, live), index, row: live };
   });
+  if (!includeRemoved) return diffed;
+  const liveKeys = new Set(liveRows.map((r) => r[keyField] ?? ""));
+  baselineRows.forEach((old, i) => {
+    const key = old[keyField] ?? "";
+    if (!key || liveKeys.has(key)) return;
+    // diffFields() treats a missing field as "unchanged", so build the deletes directly.
+    const diffs = fields
+      .map((field) => ({ field, oldValue: (old[field] ?? "").trim(), newValue: "", changeType: "Deleted" as const }))
+      .filter((d) => d.oldValue && !/^(-|—|n\/?a|na|none|null|unknown)$/i.test(d.oldValue));
+    if (diffs.length) diffed.push({ key, name: old[nameField] || key, diffs, index: liveRows.length + i, row: old });
+  });
+  return diffed;
 }

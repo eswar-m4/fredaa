@@ -16,6 +16,48 @@ export const LIVE_REVIEW_STORAGE_PREFIX = "freda_live_review_";
 // LiveReviewData.
 export const LIVE_REVIEW_CACHE_VERSION = 6;
 
+const LIVE_SNAPSHOT_PREFIX = "freda_live_snapshot_";
+
+type LiveSnapshot = { profileKind: string; rows: Record<string, string>[]; savedAt: string };
+
+/** The full row set a live run produced, kept so the NEXT run is diffed
+ *  against the previous run (a regular refresh), not against the original
+ *  on-file/launch snapshot every time. */
+export function saveLiveSnapshot(projectId: string, profileKind: string, rows: Record<string, string>[]) {
+  if (typeof window === "undefined") return;
+  try {
+    const snap: LiveSnapshot = { profileKind, rows, savedAt: new Date().toISOString() };
+    window.localStorage.setItem(`${LIVE_SNAPSHOT_PREFIX}${projectId}`, JSON.stringify(snap));
+  } catch {
+    // Too large for storage — the next run falls back to the on-file baseline.
+    try { window.localStorage.removeItem(`${LIVE_SNAPSHOT_PREFIX}${projectId}`); } catch { /* ignore */ }
+  }
+}
+
+/** Rows from the previous live run, or null when there hasn't been one (or it
+ *  was produced by a different profile kind than the project now uses). */
+export function loadLiveSnapshot(projectId: string, profileKind: string): Record<string, string>[] | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(`${LIVE_SNAPSHOT_PREFIX}${projectId}`);
+    if (!raw) return null;
+    const snap = JSON.parse(raw) as LiveSnapshot;
+    if (snap.profileKind !== profileKind || !Array.isArray(snap.rows) || snap.rows.length === 0) return null;
+    return snap.rows;
+  } catch {
+    return null;
+  }
+}
+
+export function clearLiveSnapshot(projectId: string) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.removeItem(`${LIVE_SNAPSHOT_PREFIX}${projectId}`);
+  } catch {
+    // ignore
+  }
+}
+
 /** Persists the result of a live "Run" (or a project's real launch-time
  *  extraction) so other screens (Review, Dashboard, Monitor's status badge)
  *  can show the same data without re-running it. */

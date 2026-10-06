@@ -1,15 +1,29 @@
 import { useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Send, Sparkles, ArrowRight, Loader2 } from "lucide-react";
-import { Button, Card, SectionTitle } from "@/components/ui-bits";
+import { Send, Sparkles, ArrowRight, Loader2, Bot, Boxes, CheckCircle2, Clock, Database, Download, FileInput, Filter, Globe, Layers } from "lucide-react";
+import { Badge, Button, Card, SectionTitle } from "@/components/ui-bits";
 import { addTicket } from "@/lib/ticket-store";
 import { useActiveCustomer } from "@/lib/workspace";
 import { fmt, rollup, hrsAgo } from "@/data/customers";
 import { cn } from "@/lib/utils";
 import { getAskFredaFollowUp, getAskFredaIntakeSummary } from "@/lib/api/ask-freda-intake.functions";
 import type { QaTurn } from "@/lib/api/ask-freda-intake.core";
+import { readIntent } from "@/lib/freda-intent";
+import { runTimesFor } from "@/lib/last-run";
+import { buildProposal, type Proposal, type WorkflowNode } from "@/lib/freda-firmographic";
 
 type NavHint = { to: string; label: string };
+
+/** What was raised through the intake — shown beside the chat once submitted. */
+type SubmittedRequest = {
+  ticketId: string;
+  requestType: "Agent" | "Solution";
+  name: string;
+  proposal: Proposal;
+  sources: string[];
+  datapoints: string[];
+  metadata: { label: string; value: string }[];
+};
 type Msg = { role: "user" | "freda"; text: string; nav?: NavHint; choices?: string[] };
 
 type FlowStage = "type" | "name" | "industry" | "geography" | "ai-followup" | "summarizing";
@@ -63,6 +77,7 @@ export function AskFredaPanel() {
   const [input, setInput] = useState("");
   const [flow, setFlow] = useState<FlowState | null>(null);
   const [busy, setBusy] = useState(false);
+  const [submitted, setSubmitted] = useState<SubmittedRequest | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
 
   function answer(q: string): { text: string; nav?: NavHint } {
@@ -117,14 +132,14 @@ export function AskFredaPanel() {
 
     if (has("stale", "fresh", "old data", "last run"))
       return {
-        text: `Least fresh dataset is "${stale.name}" at ${stale.freshness}% freshness — last run ${hrsAgo(stale.lastRefreshHrs)}. Re-run it from Monitor, or tighten its cadence in Agents so it refreshes more often.`,
+        text: `Least fresh dataset is "${stale.name}" at ${stale.freshness}% freshness — last run ${hrsAgo(runTimesFor(stale).lastHrs)}. Re-run it from Monitor, or tighten its cadence in Agents so it refreshes more often.`,
         nav: { to: "/monitoring", label: "Open Monitor" },
       };
 
     if (has("source", "website", "url", "agent"))
       return {
         text:
-          `${customer.projects.map((p) => `• ${p.name} — ${p.sources.length} sources · ${p.frequency.toLowerCase()} agent · last run ${hrsAgo(p.lastRefreshHrs)}`).join("\n")}\n\nTo add or retire a source: Playbooks → Agents, pick the project, paste the URL and choose the attributes to extract. That raises a request; the FreDA team builds the bot and onboards it to your workspace.`,
+          `${customer.projects.map((p) => `• ${p.name} — ${p.sources.length} sources · ${p.frequency.toLowerCase()} agent · last run ${hrsAgo(runTimesFor(p).lastHrs)}`).join("\n")}\n\nTo add or retire a source: Playbooks → Agents, pick the project, paste the URL and choose the attributes to extract. That raises a request; the FreDA team builds the bot and onboards it to your workspace.`,
         nav: { to: "/playbooks/agents", label: "Manage sources" },
       };
 
@@ -217,6 +232,13 @@ export function AskFredaPanel() {
     try {
       const result = await getAskFredaIntakeSummary({ data: intakeContext(state) });
       const days = Math.max(3, Math.round(result.sources.length * 1.5 + result.datapoints.length * 0.3 + 2));
+      // Estimated volume and solution flow come from the same proposal model
+      // used by the original Ask Freda, read from everything the user said.
+      const intent = readIntent(
+        [state.name, state.industry, state.geography, ...state.qaHistory.map((t) => t.answer)].join(". "),
+      );
+      const proposal = buildProposal(intent.answers, state.name, intent.focus);
+      const volumeCount = Number(proposal.volume.replace(/[^\d]/g, "")) || undefined;
       const t = addTicket({
         workspaceId: customer.id,
         workspaceName: customer.name,
@@ -225,14 +247,32 @@ export function AskFredaPanel() {
         detail: result.summary,
         raisedBy: `${customer.shortName.toLowerCase()} workspace user`,
         estimateDays: days,
+        ...(volumeCount ? { monthlyRecords: volumeCount } : {}),
         sources: result.sources,
         datapoints: result.datapoints,
         frequency: result.schedule,
         industry: state.industry,
         geography: state.geography,
       });
+      setSubmitted({
+        ticketId: t.id,
+        requestType: state.requestType!,
+        name: state.name,
+        proposal,
+        sources: result.sources.length ? result.sources : proposal.sources.map((s) => s.name),
+        datapoints: result.datapoints.length ? result.datapoints : proposal.attributes,
+        metadata: [
+          { label: "Request", value: t.id },
+          { label: "Type", value: state.requestType! },
+          { label: "Industry", value: state.industry },
+          { label: "Geography", value: state.geography },
+          { label: "Refresh", value: result.schedule },
+          { label: "Build estimate", value: `${days} days` },
+          ...proposal.metadata.filter((m) => !["Industry", "Geography", "Refresh", "Attributes", "Sources"].includes(m.label)),
+        ],
+      });
       pushBot(
-        `Done — ${t.id} raised with your FreDA admin.\n\n• ${state.requestType}: ${state.name}\n• Industry: ${state.industry}\n• Geography: ${state.geography}\n• Sources: ${result.sources.length || "to be scoped"}\n• Datapoints: ${result.datapoints.length || "to be scoped"}\n• Refresh: ${result.schedule}\n• Estimate: ${days} days to build and onboard\n\nAdmin will review it, build the bots in the backend and onboard it to your workspace. Track it in the Request tracker.`,
+        `Done — ${t.id} raised with your FreDA admin.\n\n• ${state.requestType}: ${state.name}\n• Industry: ${state.industry}\n• Geography: ${state.geography}\n• Estimated volume: ${proposal.volume}\n• Sources: ${result.sources.length || "to be scoped"}\n• Datapoints: ${result.datapoints.length || "to be scoped"}\n• Refresh: ${result.schedule}\n• Estimate: ${days} days to build and onboard\n\nThe proposed solution flow and metadata are alongside. Admin will review it, build the bots in the backend and onboard it to your workspace. Track it in the Request tracker.`,
         { nav: { to: "/requests", label: "Track this request" } },
       );
     } finally {
@@ -241,6 +281,7 @@ export function AskFredaPanel() {
   }
 
   async function startIntake() {
+    setSubmitted(null);
     setFlow(INITIAL_FLOW);
     pushBot("Great — let's scope it. Is this a new Agent (a single data source) or a Solution (a packaged multi-source dataset)?", {
       choices: ["Agent", "Solution"],
@@ -402,6 +443,58 @@ export function AskFredaPanel() {
       </Card>
 
       <div className="space-y-5">
+        {submitted && (
+          <>
+            <Card className="p-5">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">
+                    Proposed {submitted.requestType.toLowerCase()}
+                  </div>
+                  <div className="text-[15px] font-semibold mt-0.5">{submitted.name || submitted.proposal.title}</div>
+                </div>
+                <Badge tone="success">
+                  <CheckCircle2 className="h-3 w-3" /> Submitted
+                </Badge>
+              </div>
+              <div className="grid grid-cols-2 gap-3 mt-4">
+                <Stat icon={Database} label="Estimated volume" value={submitted.proposal.volume} sub={submitted.proposal.volumeNote} />
+                <Stat icon={Clock} label="Estimated timeline" value={submitted.proposal.timeline} sub={submitted.proposal.validation} />
+              </div>
+            </Card>
+
+            <Card className="p-5">
+              <SectionTitle hint={`${submitted.proposal.workflow.length} steps`}>Solution flow</SectionTitle>
+              <WorkflowDiagram nodes={submitted.proposal.workflow} />
+            </Card>
+
+            <Card className="p-5">
+              <SectionTitle hint={`${submitted.datapoints.length} fields · ${submitted.sources.length} sources`}>Datapoints & sources</SectionTitle>
+              <div className="flex flex-wrap gap-1.5 mt-2">
+                {submitted.datapoints.map((a) => (
+                  <Badge key={a} tone="neutral">{a}</Badge>
+                ))}
+              </div>
+              <ul className="mt-3 space-y-1 text-[12px] text-muted-foreground">
+                {submitted.sources.map((s) => (
+                  <li key={s}>• {s}</li>
+                ))}
+              </ul>
+            </Card>
+
+            <Card className="p-5">
+              <SectionTitle>Metadata</SectionTitle>
+              <div className="grid grid-cols-2 gap-2 mt-2">
+                {submitted.metadata.map((m) => (
+                  <div key={m.label} className="rounded-md border border-border px-3 py-2">
+                    <div className="text-[10.5px] uppercase tracking-wider text-muted-foreground font-semibold">{m.label}</div>
+                    <div className="text-[12.5px] font-medium mt-0.5">{m.value}</div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          </>
+        )}
         <Card className="p-5">
           <SectionTitle hint={flow ? "finish the request first" : customer.industry}>Suggested questions</SectionTitle>
           <div className="space-y-2 mt-2">
@@ -428,6 +521,50 @@ export function AskFredaPanel() {
           </ul>
         </Card>
       </div>
+    </div>
+  );
+}
+
+/* ---------------------------- solution flow diagram ---------------------------- */
+
+const NODE_STYLE: Record<WorkflowNode["kind"], { cls: string; icon: typeof Bot }> = {
+  io: { cls: "bg-emerald-500/15 text-emerald-500 border-emerald-500/40", icon: FileInput },
+  fetch: { cls: "bg-sky-500/15 text-sky-500 border-sky-500/40", icon: Globe },
+  llm: { cls: "bg-violet-500/15 text-violet-500 border-violet-500/40", icon: Bot },
+  filter: { cls: "bg-amber-500/15 text-amber-500 border-amber-500/40", icon: Filter },
+  merge: { cls: "bg-cyan-500/15 text-cyan-500 border-cyan-500/40", icon: Layers },
+};
+
+function WorkflowDiagram({ nodes }: { nodes: WorkflowNode[] }) {
+  return (
+    <div className="flex flex-wrap items-stretch gap-x-1 gap-y-3 mt-2">
+      {nodes.map((n, i) => {
+        const s = NODE_STYLE[n.kind];
+        const Icon = n.id === "output" ? Download : n.id === "thirdparty" ? Boxes : s.icon;
+        return (
+          <div key={n.id} className="flex items-center">
+            <div className="w-[76px] flex flex-col items-center text-center">
+              <div className={`h-9 w-9 rounded-lg border inline-flex items-center justify-center ${s.cls}`}>
+                <Icon className="h-4 w-4" strokeWidth={1.75} />
+              </div>
+              <div className="mt-1.5 text-[10.5px] leading-tight text-muted-foreground">{n.label}</div>
+            </div>
+            {i < nodes.length - 1 && <span className="text-border text-[10px] -mt-5">▶</span>}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function Stat({ icon: Icon, label, value, sub }: { icon: typeof Database; label: string; value: string; sub?: string }) {
+  return (
+    <div className="rounded-md border border-border px-3 py-2.5">
+      <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+        <Icon className="h-3.5 w-3.5" /> {label}
+      </div>
+      <div className="text-[14px] font-semibold mt-1 leading-snug">{value}</div>
+      {sub && <div className="text-[11px] text-muted-foreground mt-0.5 leading-snug">{sub}</div>}
     </div>
   );
 }

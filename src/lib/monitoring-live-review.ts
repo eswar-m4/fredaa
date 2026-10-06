@@ -16,7 +16,22 @@ import {
 import { xlsxRowsToReviewRecords, reviewRecordsFor, reviewStatusFor, type Project, type ProjectStatus, type ReviewRecord, type ChangeType } from "@/data/customers";
 import type { LiveReviewData } from "@/components/ReviewDialog";
 import { clearReviewProgress } from "@/lib/review-status";
-import { saveLiveReview, LIVE_REVIEW_STORAGE_PREFIX as STORAGE_PREFIX, LIVE_REVIEW_CACHE_VERSION as CACHE_VERSION } from "@/lib/live-review-store";
+import { isCustomProjectId } from "@/lib/custom-projects";
+import {
+  saveLiveReview,
+  saveLiveSnapshot,
+  loadLiveSnapshot,
+  LIVE_REVIEW_STORAGE_PREFIX as STORAGE_PREFIX,
+  LIVE_REVIEW_CACHE_VERSION as CACHE_VERSION,
+} from "@/lib/live-review-store";
+
+/** What a live run is diffed against: the previous live run when there has
+ *  been one (a regular refresh — Added/Deleted/Modified/Verified against the
+ *  last delivery), otherwise the project's on-file/launch snapshot. */
+function baselineFor(projectId: string, kind: string, onFile: Record<string, string>[]) {
+  const previous = loadLiveSnapshot(projectId, kind);
+  return previous ? { rows: previous, fromPreviousRun: true } : { rows: onFile, fromPreviousRun: false };
+}
 
 export { saveLiveReview } from "@/lib/live-review-store";
 
@@ -115,12 +130,19 @@ export async function fetchLiveReview(project: Project): Promise<LiveReviewData>
   if (profile.kind === "registry") return fetchRegistryLiveReview(project, profile);
   if (profile.kind === "directory") return fetchDirectoryLiveReview(project, profile);
 
-  const targets = profile.currentValueRows.map((row, i) => ({
-    id: row[profile.idField] || `row-${i}`,
-    name: row[profile.nameField] || `Record ${i + 1}`,
-    url: row[profile.urlField] || "",
-    currentValues: row,
-  }));
+  // The entity list (ids, names, URLs) always comes from the on-file rows; the
+  // values each field is compared against come from the previous run if any.
+  const baseline = baselineFor(project.id, profile.kind, profile.currentValueRows);
+  const previousById = new Map(baseline.rows.map((r, i) => [r[profile.idField] || `row-${i}`, r]));
+  const targets = profile.currentValueRows.map((row, i) => {
+    const id = row[profile.idField] || `row-${i}`;
+    return {
+      id,
+      name: row[profile.nameField] || `Record ${i + 1}`,
+      url: row[profile.urlField] || "",
+      currentValues: { ...row, ...(previousById.get(id) ?? {}) },
+    };
+  });
 
   const [outcome, secProfiles] = await Promise.all([
     runMonitoringRefresh({
@@ -188,6 +210,22 @@ export async function fetchLiveReview(project: Project): Promise<LiveReviewData>
     profileKind: profile.kind,
   };
   saveLiveReview(project.id, live);
+  // This run's values become the baseline for the next run. Only fields the
+  // run actually re-extracted move forward; everything else keeps its value.
+  if (outcome.aiConfigured) {
+    saveLiveSnapshot(
+      project.id,
+      profile.kind,
+      targets.map((t) => {
+        const next: Record<string, string> = { ...t.currentValues };
+        for (const r of records) {
+          if (r.datapoint === "Website check" || r.id !== `${project.id}-live-${t.id}-${r.datapoint}`) continue;
+          next[r.datapoint] = r.newValue === "—" ? "" : r.newValue;
+        }
+        return next;
+      }),
+    );
+  }
   // A fresh live run can change the record set entirely — don't let a prior
   // submission's progress against the old set keep reading as complete.
   clearReviewProgress(project.id);
@@ -239,7 +277,8 @@ async function fetchRegistryLiveReview(project: Project, profile: RegistryLiveRe
     // directory listings) — reachable=true just means at least one
     // succeeded, so a partial failure still needs surfacing honestly.
     if (outcome.error) fetchErrors.push({ entity: `${profile.registryId} registry query`, error: outcome.error });
-    const diffed = diffRegistrySnapshot(profile.currentValueRows, outcome.rows, profile.keyField, profile.nameField, profile.extractableFields);
+    const baseline = baselineFor(project.id, profile.kind, profile.currentValueRows);
+    const diffed = diffRegistrySnapshot(baseline.rows, outcome.rows, profile.keyField, profile.nameField, profile.extractableFields, baseline.fromPreviousRun);
     for (const rec of diffed) {
       for (const d of rec.diffs) {
         records.push({
@@ -307,6 +346,7 @@ async function fetchRegistryLiveReview(project: Project, profile: RegistryLiveRe
     profileKind: profile.kind,
   };
   saveLiveReview(project.id, live);
+  if (outcome.reachable && outcome.rows.length > 0) saveLiveSnapshot(project.id, profile.kind, outcome.rows);
   clearReviewProgress(project.id);
   return live;
 }
@@ -339,7 +379,8 @@ async function fetchDirectoryLiveReview(project: Project, profile: DirectoryLive
     if (page.error) fetchErrors.push({ entity: page.url, error: page.error });
   }
 
-  const diffed = diffRegistrySnapshot(profile.currentValueRows, outcome.rows, profile.keyField, profile.nameField, profile.extractableFields);
+  const baseline = baselineFor(project.id, profile.kind, profile.currentValueRows);
+  const diffed = diffRegistrySnapshot(baseline.rows, outcome.rows, profile.keyField, profile.nameField, profile.extractableFields, baseline.fromPreviousRun);
   for (const rec of diffed) {
     const sourceUrl = outcome.perPage.find((p) => p.rows.includes(rec.row))?.url ?? profile.directoryUrls[0] ?? "";
     for (const d of rec.diffs) {
@@ -369,6 +410,7 @@ async function fetchDirectoryLiveReview(project: Project, profile: DirectoryLive
     profileKind: profile.kind,
   };
   saveLiveReview(project.id, live);
+  if (outcome.rows.length > 0) saveLiveSnapshot(project.id, profile.kind, outcome.rows);
   clearReviewProgress(project.id);
   return live;
 }
@@ -492,6 +534,10 @@ export function baselineReviewRecords(project: Project): ReviewRecord[] {
   const profile = getLiveRefreshProfile(project.id);
   if (!profile || project.sampleRows.length === 0 || project.columns.length === 0) return [];
   const src = project.sources[0] ?? { label: project.source, url: project.websiteUrl };
+  // A self-provisioned project's on-file rows are its own first extraction —
+  // a new data run with no previous delivery — so show only the new value,
+  // tagged Added. Onboarded projects' on-file rows are the existing delivery.
+  const isNewRun = isCustomProjectId(project.id);
   const records: ReviewRecord[] = [];
   project.sampleRows.forEach((row, i) => {
     const entity = row[profile.nameField] || `Record ${i + 1}`;
@@ -503,9 +549,9 @@ export function baselineReviewRecords(project: Project): ReviewRecord[] {
         projectId: project.id,
         entity,
         datapoint: f,
-        oldValue: v,
+        oldValue: isNewRun ? "—" : v,
         newValue: v,
-        changeType: "Verified",
+        changeType: isNewRun ? "Added" : "Verified",
         confidence: 90,
         source: src.label,
         sourceUrl: src.url,
