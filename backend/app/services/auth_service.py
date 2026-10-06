@@ -150,8 +150,36 @@ class AuthService:
             "last_seen_at": now,
         }
 
+    @staticmethod
+    def _gateway_admin_session(request: Request) -> Optional[Dict[str, Any]]:
+        """Admin identity asserted by the freda-auth gateway.
+
+        Gateway admins never get a backend session cookie (gateway-sync only
+        provisions market users), so admin endpoints called from the embedded
+        Market Admin console would always 401. The gateway overwrites the
+        X-Freda-* headers on every proxied request, so they are trusted here
+        exactly as gateway-sync already trusts them.
+        """
+        username = request.headers.get("x-freda-user", "").strip()
+        if not username or request.headers.get("x-freda-type", "").strip() != "admin":
+            return None
+        now = datetime.utcnow()
+        return {
+            "session_token": f"gw-admin-{username}",
+            "username": username,
+            "role": "admin",
+            "user_id": f"admin-{username}",
+            "display_name": username,
+            "created_at": now,
+            "updated_at": now,
+            "expires_at": now + timedelta(hours=1),
+            "last_seen_at": now,
+        }
+
     def require_session(self, request: Request, *, role: Optional[str] = None) -> Dict[str, Any]:
         session = self.get_session(request)
+        if role == "admin" and (not session or session.get("role") != "admin"):
+            session = self._gateway_admin_session(request) or session
         if not session:
             raise HTTPException(status_code=401, detail="Login required")
         if role and session.get("role") != role:

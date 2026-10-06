@@ -117,7 +117,7 @@ function AnySite() {
     if (
       typeof window !== "undefined" &&
       (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") &&
-      window.location.port !== "8000"
+      window.location.port === "5433" // standalone Vite dev only; behind the gateway use relative /api
     ) {
       return `http://${window.location.hostname}:8000`;
     }
@@ -225,6 +225,8 @@ function AnySite() {
     } catch (err) {
       console.error("Failed to parse uploaded file via backend:", err);
       toast.error("File parsing failed. Please try again.");
+      setSeedFile(null);
+      e.target.value = "";
       setSeedHeaders([]);
       setSeedRecords([]);
       setSeedRows(0);
@@ -256,6 +258,10 @@ function AnySite() {
 
   async function handleLaunch(): Promise<boolean> {
     if (!ds) return false;
+    if (seedFile && seedRecords.length === 0) {
+      toast.error("The input file has no parsed rows. Re-upload it before launching.");
+      return false;
+    }
 
     const filters = JSON.stringify({
       datasetId: ds.id,
@@ -291,6 +297,9 @@ function AnySite() {
     };
 
     writeJobsCache([...readJobsCache(), job]);
+    // The backend never recorded a failed launch — drop the optimistic cache
+    // entry so it doesn't sit in Monitoring/Review as "Running" forever.
+    const dropCachedJob = () => writeJobsCache(readJobsCache().filter((j: any) => j.id !== job.id));
 
     try {
       const launchRequest = fetch(`${baseApiUrl}/api/v1/demo/jobs/launch`, {
@@ -304,12 +313,14 @@ function AnySite() {
       const response = await launchRequest;
 
       if (!response.ok) {
+        dropCachedJob();
         toast.error("Launch failed. Backend rejected the request.");
         return false;
       }
       return true;
     } catch (err) {
       console.error("Failed to launch dataset job:", err);
+      dropCachedJob();
       toast.error("Launch failed. Could not reach backend.");
       return false;
     }
@@ -318,7 +329,13 @@ function AnySite() {
   return (
     <AppLayout>
       <PageHeader
-        title="Solutions Data Set Up"
+        title={
+          ds
+            ? `${catLabel(ds.category)} Data Set Up`
+            : cat !== "All"
+              ? `${catLabel(cat)} Data Set Up`
+              : "Solutions Data Set Up"
+        }
         subtitle="Pick a dataset, choose your sources or upload your own data, then select your datapoints. A workflow runs behind the scenes."
         actions={
           <Link to="/site-specific">

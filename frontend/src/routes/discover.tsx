@@ -3,7 +3,16 @@ import { useEffect, useRef, useState } from "react";
 import {
   ArrowRight,
   Bot,
+  Boxes,
+  CheckCircle2,
+  Clock,
+  Database,
+  Download,
   ExternalLink,
+  FileInput,
+  Filter,
+  Globe,
+  Layers,
   Send,
   ShieldCheck,
   Sparkles,
@@ -11,8 +20,9 @@ import {
 } from "lucide-react";
 
 import { AppLayout } from "@/components/AppLayout";
-import { Badge, Button, Card, PageHeader } from "@/components/ui-bits";
+import { Badge, Button, Card, PageHeader, SectionTitle } from "@/components/ui-bits";
 import { readIntent } from "@/lib/freda-intent";
+import { buildProposal, type Proposal, type WorkflowNode } from "@/lib/freda-firmographic";
 
 export const Route = createFileRoute("/discover")({
   head: () => ({
@@ -123,7 +133,7 @@ function getBaseApiUrl(): string {
   if (
     typeof window !== "undefined" &&
     (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") &&
-    window.location.port !== "8000"
+    window.location.port === "5433" // standalone Vite dev only; behind the gateway use relative /api
   ) {
     return `http://${window.location.hostname}:8000`;
   }
@@ -176,6 +186,9 @@ function FredaAi() {
   const [phase, setPhase] = useState<string>("intake");
   const [submitted, setSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState(false);
+  // Built from the conversation when the requirement is submitted — the
+  // estimated volume, solution flow and metadata shown alongside the chat.
+  const [proposal, setProposal] = useState<Proposal | null>(null);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
@@ -259,28 +272,39 @@ function FredaAi() {
       .map((t) => `${t.kind === "user" ? "User" : "Freda"}: ${t.text}`)
       .join("\n\n");
 
+    // Everything the user said across the chat drives the proposal, so details
+    // given in follow-up answers (geography, refresh, fields) are included.
+    const userText = turns
+      .filter((t): t is { kind: "user"; text: string } => t.kind === "user")
+      .map((t) => t.text)
+      .join(". ");
+    const intent = readIntent(userText);
+    const p = buildProposal(intent.answers, title, intent.focus);
+
     try {
-      await fetch(`${getBaseApiUrl()}/api/v1/demo/solution-request`, {
+      const res = await fetch(`${getBaseApiUrl()}/api/v1/demo/solution-request`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
-          title,
+          title: p.title,
           request: transcript,
-          attributes: [],
-          sources: [],
-          metadata: [],
-          workflow: [],
-          volume: null,
-          timeline: null,
-          cadence: null,
+          attributes: p.attributes,
+          sources: p.sources,
+          metadata: p.metadata,
+          workflow: p.workflow,
+          volume: p.volume,
+          timeline: p.timeline,
+          cadence: p.cadence,
         }),
       });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      setProposal(p);
       setTurns((prev) => [
         ...prev,
         {
           kind: "freda",
-          text: "Your requirement has been submitted. The admin team will review it — you can track progress in Monitoring once it's approved and assigned a job.",
+          text: `Your requirement has been submitted. Estimated volume ${p.volume}, ${p.timeline.toLowerCase()} — the proposed solution flow and metadata are alongside. The admin team will review it — you can track progress in Monitoring once it's approved and assigned a job.`,
           actions: [{ label: "View in Monitoring", route: "/monitoring" }],
         },
       ]);
@@ -298,6 +322,7 @@ function FredaAi() {
     setPhase("intake");
     setSubmitted(false);
     setSubmitError(false);
+    setProposal(null);
   }
 
   const hasExchanged = turns.some((t) => t.kind === "user");
@@ -326,8 +351,13 @@ function FredaAi() {
         }
       />
 
-      <div className="px-7 pb-8">
-        <Card className="overflow-hidden max-w-3xl mx-auto">
+      <div
+        className={[
+          "px-7 pb-8",
+          proposal ? "grid gap-4 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] items-start" : "",
+        ].join(" ")}
+      >
+        <Card className={["overflow-hidden", proposal ? "" : "max-w-3xl mx-auto"].join(" ")}>
           {/* Header */}
           <div className="flex items-center gap-2 border-b border-border px-5 py-3">
             <span className="h-7 w-7 rounded-md bg-purple-bg text-purple-token inline-flex items-center justify-center">
@@ -553,7 +583,144 @@ function FredaAi() {
             </div>
           </div>
         </Card>
+
+        {/* ---------------- proposal (shown once submitted) ---------------- */}
+        {proposal && (
+          <div className="space-y-4 xl:sticky xl:top-4 xl:max-h-[calc(100vh-6rem)] xl:overflow-y-auto xl:pr-1">
+            <Card className="p-5">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">
+                    Proposed solution
+                  </div>
+                  <div className="text-[16px] font-semibold mt-0.5">{proposal.title}</div>
+                  <div className="text-[12px] text-muted-foreground mt-1">
+                    Lands in {proposal.routeLabel} · refresh {proposal.cadence.toLowerCase()}
+                  </div>
+                </div>
+                <Badge tone="success">
+                  <CheckCircle2 className="h-3 w-3" /> Submitted
+                </Badge>
+              </div>
+              <div className="grid grid-cols-2 gap-3 mt-4">
+                <Stat icon={Database} label="Estimated volume" value={proposal.volume} sub={proposal.volumeNote} />
+                <Stat icon={Clock} label="Estimated timeline" value={proposal.timeline} sub={proposal.validation} />
+              </div>
+            </Card>
+
+            <Card className="p-5">
+              <SectionTitle hint={`${proposal.workflow.length} steps`}>Proposed solution flow</SectionTitle>
+              <WorkflowDiagram nodes={proposal.workflow} />
+            </Card>
+
+            <Card className="p-5">
+              <SectionTitle hint={`${proposal.attributes.length} fields`}>Data attributes</SectionTitle>
+              <div className="flex flex-wrap gap-1.5">
+                {proposal.attributes.map((a) => (
+                  <Badge key={a} tone="neutral">
+                    {a}
+                  </Badge>
+                ))}
+              </div>
+              <p className="text-[11.5px] text-muted-foreground mt-2">
+                Fields can be added or dropped by the admin when the solution is built.
+              </p>
+            </Card>
+
+            <Card className="p-5">
+              <SectionTitle hint={`${proposal.sources.length} sources`}>Recommended sources</SectionTitle>
+              <ul className="space-y-2">
+                {proposal.sources.map((s) => (
+                  <li key={s.name} className="rounded-md border border-border px-3 py-2">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="text-[13px] font-medium truncate">{s.name}</div>
+                      <Badge tone={s.kind === "Company website" ? "success" : "info"}>{s.kind}</Badge>
+                    </div>
+                    <div className="text-[11.5px] text-muted-foreground mt-0.5">{s.note}</div>
+                  </li>
+                ))}
+              </ul>
+            </Card>
+
+            <Card className="p-5">
+              <SectionTitle>Solution metadata</SectionTitle>
+              <div className="grid grid-cols-2 gap-2">
+                {proposal.metadata.map((m) => (
+                  <div key={m.label} className="rounded-md border border-border px-3 py-2">
+                    <div className="text-[10.5px] uppercase tracking-wider text-muted-foreground font-semibold">{m.label}</div>
+                    <div className="text-[12.5px] font-medium mt-0.5">{m.value}</div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          </div>
+        )}
       </div>
     </AppLayout>
+  );
+}
+
+/* ---------------------------- workflow diagram ---------------------------- */
+
+const NODE_STYLE: Record<WorkflowNode["kind"], { cls: string; icon: typeof Bot }> = {
+  io: { cls: "bg-emerald-500/15 text-emerald-400 border-emerald-500/40", icon: FileInput },
+  fetch: { cls: "bg-sky-500/15 text-sky-400 border-sky-500/40", icon: Globe },
+  llm: { cls: "bg-violet-500/15 text-violet-400 border-violet-500/40", icon: Bot },
+  filter: { cls: "bg-amber-500/15 text-amber-500 border-amber-500/40", icon: Filter },
+  merge: { cls: "bg-cyan-500/15 text-cyan-400 border-cyan-500/40", icon: Layers },
+};
+
+function WorkflowDiagram({ nodes }: { nodes: WorkflowNode[] }) {
+  return (
+    <div>
+      <div className="flex flex-wrap items-stretch gap-x-1 gap-y-3">
+        {nodes.map((n, i) => {
+          const s = NODE_STYLE[n.kind];
+          const Icon = n.id === "output" ? Download : n.id === "thirdparty" ? Boxes : s.icon;
+          return (
+            <div key={n.id} className="flex items-center">
+              <div className="w-[104px] flex flex-col items-center text-center">
+                <div className={`h-10 w-10 rounded-lg border inline-flex items-center justify-center ${s.cls}`}>
+                  <Icon className="h-4.5 w-4.5" strokeWidth={1.75} />
+                </div>
+                <div className="mt-1.5 text-[10.5px] leading-tight text-muted-foreground">{n.label}</div>
+              </div>
+              {i < nodes.length - 1 && (
+                <div className="flex items-center gap-0.5 -mt-5">
+                  <span className="h-1 w-1 rounded-full bg-border" />
+                  <span className="h-px w-4 bg-border" />
+                  <span className="text-border text-[10px]">▶</span>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+      <div className="mt-3 flex flex-wrap gap-2 text-[10.5px] text-muted-foreground">
+        {[
+          ["io", "Input / output"],
+          ["fetch", "Fetch & discovery"],
+          ["llm", "LLM step"],
+          ["filter", "Filter / compare"],
+          ["merge", "Merge"],
+        ].map(([k, label]) => (
+          <span key={k} className="inline-flex items-center gap-1.5">
+            <span className={`h-2.5 w-2.5 rounded-sm border ${NODE_STYLE[k as WorkflowNode["kind"]].cls}`} /> {label}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function Stat({ icon: Icon, label, value, sub }: { icon: typeof Database; label: string; value: string; sub?: string }) {
+  return (
+    <div className="rounded-md border border-border px-3 py-2.5">
+      <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+        <Icon className="h-3.5 w-3.5" /> {label}
+      </div>
+      <div className="text-[14px] font-semibold mt-1 leading-snug">{value}</div>
+      {sub && <div className="text-[11px] text-muted-foreground mt-0.5 leading-snug">{sub}</div>}
+    </div>
   );
 }

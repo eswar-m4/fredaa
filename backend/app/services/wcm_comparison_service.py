@@ -1298,7 +1298,7 @@ def get_review_rows(job_id: str, sample_rate: float, sample_offset: int = 0, inc
             pass
 
     cache_signature_parts: List[str] = [
-        "review_logic_v6",
+        "review_logic_v7",
         f"refresh_count={refresh_count}",
         f"source={source or ''}",
         f"scope={scope or ''}",
@@ -1439,6 +1439,13 @@ def get_review_rows(job_id: str, sample_rate: float, sample_offset: int = 0, inc
     sampled_new = new_records[sample_offset:sample_offset + sample_limit]
     sampled_baseline = baseline_records[sample_offset:sample_offset + sample_limit]
 
+    # A new data run (first run of the job, or a one-time job) has no previous
+    # delivery to compare against: show only the new value and tag it Added.
+    # Only later refresh runs are compared against the previous run / baseline.
+    is_new_run = is_one_time or current_run_num <= 1
+    if is_new_run:
+        sampled_baseline = []
+
     # Perform comparison
     rows, _ = compare_records(
         source,
@@ -1450,12 +1457,6 @@ def get_review_rows(job_id: str, sample_rate: float, sample_offset: int = 0, inc
         record_offset=sample_offset,
         scope=scope,
     )
-
-    if is_one_time and not is_dataset and rows:
-        for r in rows:
-            r["previous"] = "-"
-            r["changeType"] = "V"
-            r["changed"] = False
 
     result = {
         "rows": rows,

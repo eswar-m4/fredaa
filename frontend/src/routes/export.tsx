@@ -76,7 +76,7 @@ function ExportPage() {
     if (
       typeof window !== "undefined" &&
       (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") &&
-      window.location.port !== "8000"
+      window.location.port === "5433" // standalone Vite dev only; behind the gateway use relative /api
     ) {
       return `http://${window.location.hostname}:8000`;
     }

@@ -1321,7 +1321,7 @@ function ReviewStep({ sel, onBack }: { sel: Selection; onBack: () => void }) {
         if (
           typeof window !== "undefined" &&
           (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") &&
-          window.location.port !== "8000"
+          window.location.port === "5433" // standalone Vite dev only; behind the gateway use relative /api
         ) {
           return `http://${window.location.hostname}:8000`;
         }
@@ -1390,17 +1390,27 @@ function ReviewStep({ sel, onBack }: { sel: Selection; onBack: () => void }) {
       }
 
       writeJobsCache([...readJobsCache(), ...newJobs]);
+      // Drop the optimistic cache entries if the backend never recorded the launch.
+      const newJobIds = new Set(newJobs.map((j: any) => j.id));
+      const dropCachedJobs = () => writeJobsCache(readJobsCache().filter((j: any) => !newJobIds.has(j.id)));
 
-      const response = await fetch(`${baseApiUrl}/api/v1/demo/jobs/launch`, {
-        credentials: "include",
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ jobs: newJobs }),
-        keepalive: true
-      });
+      let response: Response;
+      try {
+        response = await fetch(`${baseApiUrl}/api/v1/demo/jobs/launch`, {
+          credentials: "include",
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ jobs: newJobs }),
+          keepalive: true
+        });
+      } catch (err) {
+        dropCachedJobs();
+        throw err;
+      }
 
       if (!response.ok) {
         console.error("Failed to launch jobs: backend returned", response.status);
+        dropCachedJobs();
         return false;
       }
 
@@ -1532,7 +1542,7 @@ function SampleModal({ bot, onClose }: { bot: Bot; onClose: () => void }) {
         if (
           typeof window !== "undefined" &&
           (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") &&
-          window.location.port !== "8000"
+          window.location.port === "5433" // standalone Vite dev only; behind the gateway use relative /api
         ) {
           baseApiUrl = `http://${window.location.hostname}:8000`;
         }
@@ -1820,7 +1830,7 @@ function AddSourceModal({
       if (
         typeof window !== "undefined" &&
         (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") &&
-        window.location.port !== "8000"
+        window.location.port === "5433" // standalone Vite dev only; behind the gateway use relative /api
       ) {
         baseApiUrl = `http://${window.location.hostname}:8000`;
       }
@@ -1930,7 +1940,7 @@ function AddSourceModal({
       if (
         typeof window !== "undefined" &&
         (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") &&
-        window.location.port !== "8000"
+        window.location.port === "5433" // standalone Vite dev only; behind the gateway use relative /api
       ) {
         return `http://${window.location.hostname}:8000`;
       }

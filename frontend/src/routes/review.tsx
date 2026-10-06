@@ -91,6 +91,15 @@ type ReviewQueueMetrics = {
   avg_confidence: number;
 };
 
+/** Cache scope for a job's review rows. Includes the run (refresh count and
+ *  last-run time) so a rerun never reuses the previous run's rows — e.g. the
+ *  first run's all-Added rows showing again instead of the second run's
+ *  Added/Deleted/Modified/Verified comparison. Starts with `${id}:` so the
+ *  per-job prefix invalidation in handleRetry still matches. */
+function reviewCacheScope(job: { id: string; refreshCount?: number; lastRunAt?: string | null }): string {
+  return `${job.id}:run${job.refreshCount ?? 0}@${job.lastRunAt ?? ""}`;
+}
+
 const REVIEW_SAMPLE_CACHE = new Map<string, { rows: any[]; totalSampled: number; sampledCount: number; coverage?: ReviewCoverage | null }>();
 
 type JobRow = {
@@ -115,6 +124,8 @@ type JobRow = {
   isUrgent?: boolean;
   /** Freshness score (0-100) already tracked per job by the backend. */
   fresh?: number | null;
+  /** When the job last ran (last_refresh, falling back to created_at) — ISO string. */
+  lastRunAt?: string | null;
 };
 
 const ATTRIBUTE_LABELS: Record<string, string> = {
@@ -599,7 +610,7 @@ function cleanValue(val: any): string {
 function cleanReviewValue(val: any): string {
   if (val === null || val === undefined) return "";
   const s = String(val).trim();
-  if (["", "-", "null", "n/a", "na", "none", "nan", "unknown"].includes(s.toLowerCase())) return "";
+  if (["", "-", "—", "–", "null", "n/a", "na", "none", "nan", "unknown"].includes(s.toLowerCase())) return "";
   return s;
 }
 
@@ -876,7 +887,7 @@ function formatNextRefreshDate(isoStr: string | null | undefined): string {
 
 function Review() {
   const [modeFilter, setModeFilter] = useState<"All" | JobMode>("All");
-  const [jobSort, setJobSort] = useState<"latest" | "oldest" | "id-asc" | "id-desc" | "status">("latest");
+  const [jobSort, setJobSort] = useState<"id-asc" | "id-desc" | "status" | "ran-desc" | "ran-asc">("ran-desc");
   const [jobRates, setJobRates] = useState<Record<string, number>>({});
   const [openJob, setOpenJob] = useState<JobRow | null>(null);
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
@@ -922,7 +933,7 @@ function Review() {
     if (
       typeof window !== "undefined" &&
       (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") &&
-      window.location.port !== "8000"
+      window.location.port === "5433" // standalone Vite dev only; behind the gateway use relative /api
     ) {
       return `http://${window.location.hostname}:8000`;
     }
@@ -985,7 +996,7 @@ function Review() {
             coverage: updatedCoverage ?? bulkSample.coverage ?? null,
           };
           setBulkSample(nextBulk);
-          const bulkKey = `${openJob!.id}:100:review_logic_v6:bulk`;
+          const bulkKey = `${reviewCacheScope(openJob!)}:100:review_logic_v7:bulk`;
           sampleCacheRef.current[bulkKey] = nextBulk;
           REVIEW_SAMPLE_CACHE.set(bulkKey, nextBulk);
         }
@@ -1156,7 +1167,7 @@ function Review() {
     if (bulkSample?.rows?.length) return bulkSample.rows;
 
     const bulkRate = 100;
-    const bulkKey = `${openJob.id}:${bulkRate}:review_logic_v6:bulk`;
+    const bulkKey = `${reviewCacheScope(openJob)}:${bulkRate}:review_logic_v7:bulk`;
     const cachedBulk = sampleCacheRef.current[bulkKey];
     if (cachedBulk) {
       setBulkSample(cachedBulk);
@@ -1317,6 +1328,7 @@ function Review() {
           coverage: j.coverage || null,
           isUrgent: Boolean(j.is_urgent ?? j.isUrgent),
           fresh: j.fresh !== undefined && j.fresh !== null ? Number(j.fresh) : null,
+          lastRunAt: j.last_refresh || j.created_at || null,
         };
       });
     return dbDataset as JobRow[];
@@ -1364,9 +1376,10 @@ function Review() {
           coverage: j.coverage || null,
           isUrgent: Boolean(j.is_urgent ?? j.isUrgent),
           fresh: j.fresh !== undefined && j.fresh !== null ? Number(j.fresh) : null,
+          lastRunAt: j.last_refresh || j.created_at || null,
         };
       });
-      
+
     return dbSource as JobRow[];
   }, [dbJobs]);
 
@@ -1380,9 +1393,19 @@ function Review() {
   );
 
   const sortedJobs = useMemo(() => {
+    // Jobs that have never run sort last in either direction.
+    const ranAt = (j: JobRow) => {
+      const t = j.lastRunAt ? Date.parse(j.lastRunAt) : NaN;
+      return Number.isNaN(t) ? null : t;
+    };
     return [...filteredJobs].sort((a, b) => {
-      if (jobSort === "oldest") {
-        return String(a.id).localeCompare(String(b.id));
+      if (jobSort === "ran-desc" || jobSort === "ran-asc") {
+        const ta = ranAt(a);
+        const tb = ranAt(b);
+        if (ta === null && tb === null) return String(b.id).localeCompare(String(a.id));
+        if (ta === null) return 1;
+        if (tb === null) return -1;
+        return jobSort === "ran-desc" ? tb - ta : ta - tb;
       }
       if (jobSort === "id-asc") return String(a.id).localeCompare(String(b.id));
       if (jobSort === "id-desc") return String(b.id).localeCompare(String(a.id));
@@ -1441,7 +1464,7 @@ function Review() {
 
     const jobId = openJob.id;
     const sampleRate = jobRates[jobId] ?? 2;
-    const sampleKey = `${jobId}:${sampleRate}:review_logic_v6:${viewInBulk ? "bulk" : pageOffset}`;
+    const sampleKey = `${reviewCacheScope(openJob)}:${sampleRate}:review_logic_v7:${viewInBulk ? "bulk" : pageOffset}`;
 
     const bypass = forceRefreshRef.current;
     if (bypass) {
@@ -1539,7 +1562,7 @@ function Review() {
     }
 
     const bulkRate = 100;
-    const bulkKey = `${openJob.id}:${bulkRate}:review_logic_v6:bulk`;
+    const bulkKey = `${reviewCacheScope(openJob)}:${bulkRate}:review_logic_v7:bulk`;
     const cachedBulk = sampleCacheRef.current[bulkKey];
     if (cachedBulk) {
       setBulkSample(cachedBulk);
@@ -1820,8 +1843,8 @@ function Review() {
             <div className="flex items-center gap-2 ml-auto flex-wrap">
               <span className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">Sort</span>
               {[
-                { value: "latest", label: "Latest" },
-                { value: "oldest", label: "Oldest" },
+                { value: "ran-desc", label: "Last ran ↓" },
+                { value: "ran-asc", label: "Last ran ↑" },
                 { value: "id-asc", label: "ID ↑" },
                 { value: "id-desc", label: "ID ↓" },
                 { value: "status", label: "Status" },
@@ -1921,7 +1944,7 @@ function Review() {
                             <Button size="sm" variant="outline" onClick={() => { setOpenJob(j); setChangeFilter("all"); setConfFilter("all"); }}>
                               <Eye className="h-3.5 w-3.5" /> Review
                             </Button>
-                            <Button size="sm" variant="outline" title="Download" onClick={() => window.open(`/api/v1/export?run_id=${j.id}&format=xlsx`, "_blank")}>
+                            <Button size="sm" variant="outline" title="Download" onClick={() => window.open(`${baseApiUrl}/api/v1/export?run_id=${j.id}&format=xlsx`, "_blank")}>
                               <Download className="h-3.5 w-3.5" />
                             </Button>
                           </div>
@@ -2035,7 +2058,7 @@ function Review() {
                             <Button size="sm" variant="outline" onClick={() => { setOpenJob(j); setChangeFilter("all"); setConfFilter("all"); }} disabled={j.statusText === "Running" || j.statusText === "Refreshing"}>
                               <Eye className="h-3.5 w-3.5" /> Review
                             </Button>
-                            <Button size="sm" variant="outline" title="Download" onClick={() => window.open(`/api/v1/export?run_id=${j.id}&format=xlsx`, "_blank")}>
+                            <Button size="sm" variant="outline" title="Download" onClick={() => window.open(`${baseApiUrl}/api/v1/export?run_id=${j.id}&format=xlsx`, "_blank")}>
                               <Download className="h-3.5 w-3.5" />
                             </Button>
                           </div>

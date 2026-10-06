@@ -18,7 +18,7 @@ trafilatura==2.2.0
 
 # Data Processing (Allowed Libraries for Future Phases)
 pandas==3.0.5
-openpyxl==3.1.2
+openpyxl==3.1.5
 xlrd==2.0.1
 pdfplumber==0.10.3
 pymupdf==1.28.2

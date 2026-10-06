@@ -9,9 +9,10 @@ const HOST    = process.env.FREDA_AUTH_HOST           || '127.0.0.1';
 const SECRET  = process.env.FREDA_SESSION_SECRET      || 'freda-dev-secret-change-in-prod';
 const USERS_FILE  = process.env.FREDA_USERS_FILE      || 'C:\\freda-auth\\users.json';
 const LOGS_FILE   = process.env.FREDA_LOGS_FILE       || 'C:\\freda-auth\\activity.log';
-const MARKET_PORT   = 8130;
-const BACKEND_PORT  = 8131;
-const CUSTOMER_PORT = 8132;
+// Upstream ports — production defaults; overridable for local runs (see run-freda-app.bat).
+const MARKET_PORT   = parseInt(process.env.FREDA_MARKET_PORT   || '8130', 10);
+const BACKEND_PORT  = parseInt(process.env.FREDA_BACKEND_PORT  || '8131', 10);
+const CUSTOMER_PORT = parseInt(process.env.FREDA_CUSTOMER_PORT || '8132', 10);
 const SESSION_COOKIE  = 'freda_gateway_session';
 const AUTH_COOKIE     = 'freda_auth';
 const CUSTOMER_SPACES = ['NTM', 'ERIS'];

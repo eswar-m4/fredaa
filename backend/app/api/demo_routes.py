@@ -1491,6 +1491,17 @@ async def run_scraper_background(job_id: str):
         )
         conn.commit()
 
+    # A rerun produces a new run that must be reviewed from scratch — archive the
+    # previous run's reviewer decisions so they aren't counted against the new run.
+    if (refresh_count_curr or 0) > 0:
+        decisions_path = os.path.join(BASE_DIR, "datasets", f"{job_id}_review_decisions.json")
+        if os.path.exists(decisions_path):
+            archived_path = os.path.join(BASE_DIR, "datasets", f"{job_id}_review_decisions_run_{refresh_count_curr}.json")
+            try:
+                os.replace(decisions_path, archived_path)
+            except Exception as exc:
+                logger.error("Job %s: failed to archive previous review decisions: %s", job_id, exc)
+
     # Simulate scraper run time (onboarding duration for first run of custom source, or 5s standard)
     if bool(is_custom) and refresh_count_curr == 0:
         duration = 30
@@ -1567,6 +1578,14 @@ async def run_scraper_background(job_id: str):
                 )
                 raise RuntimeError(
                     f"Job {job_id}: the uploaded input file has no usable rows."
+                )
+
+            if not input_rows and (config_data.get("seedFile") or int(config_data.get("seedRows") or 0) > 0):
+                # The user attached a seed file but its rows never reached the
+                # backend (e.g. parsing failed) — fail instead of running demo data.
+                logger.error("Job %s: seed file %r was attached but no input rows were received.", job_id, config_data.get("seedFile"))
+                raise RuntimeError(
+                    f"Job {job_id}: the attached input file '{config_data.get('seedFile')}' was not parsed. Re-upload it and launch again."
                 )
 
             if not input_rows:
@@ -2626,10 +2645,14 @@ async def launch_jobs(request: Request, payload: LaunchJobsRequest, background_t
         status_val = "Pending Onboarding" if bool(item.isCustomSource) or _is_partial_scope(item.scope) else "Running"
 
         try:
-            if not (_is_nationalgrid_tso29_source(item.source) or _is_gasunie_demand_prod_source(item.source)):
+            # A new site scrape supersedes an older running scrape of the same site.
+            # By Dataset / Any-Site jobs share the dataset name as "source" but each
+            # has its own input, so they are independent and must never abort each other.
+            is_dataset_launch = (item.mode or "").strip() in {"By Dataset", "Any-Site"}
+            if not is_dataset_launch and not (_is_nationalgrid_tso29_source(item.source) or _is_gasunie_demand_prod_source(item.source)):
                 with get_connection() as conn:
                     conn.execute(
-                        "UPDATE scraper_jobs SET status = 'Failed' WHERE source = ? AND status = 'Running' AND id != ?",
+                        "UPDATE scraper_jobs SET status = 'Failed' WHERE source = ? AND status = 'Running' AND id != ? AND COALESCE(mode, '') NOT IN ('By Dataset', 'Any-Site')",
                         (item.source, item.id)
                     )
                     conn.commit()
@@ -3009,6 +3032,7 @@ class SubmitReviewRequest(BaseModel):
 
 class WeeklyRerunRequest(BaseModel):
     scheduled_for: Optional[datetime] = None
+    frequency: Optional[str] = None
 
 @router.post("/jobs/submit_review")
 async def submit_review(req: SubmitReviewRequest):
@@ -3318,11 +3342,15 @@ async def get_job_review_summary_endpoint(job_id: str):
 @router.post("/jobs/{job_id}/weekly-rerun")
 async def weekly_rerun_job(job_id: str, payload: WeeklyRerunRequest, background_tasks: BackgroundTasks):
     with get_connection() as conn:
-        row = conn.execute("SELECT frequency FROM scraper_jobs WHERE id = ?", (job_id,)).fetchone()
+        row = conn.execute("SELECT frequency, status FROM scraper_jobs WHERE id = ?", (job_id,)).fetchone()
         if not row:
             raise HTTPException(status_code=404, detail="Job not found")
-        if str(row[0] or "").strip().lower() != "weekly":
-            raise HTTPException(status_code=400, detail="Only weekly jobs can be rerun from this action")
+        # Any job (one-time or recurring, whatever its cadence) can be rerun or rescheduled.
+        if str(row[1] or "") in ("Running", "Pending Onboarding"):
+            raise HTTPException(status_code=409, detail=f"Job is {row[1]} — wait for it to finish before rerunning")
+        if payload.frequency and payload.frequency.strip():
+            conn.execute("UPDATE scraper_jobs SET frequency = ? WHERE id = ?", (payload.frequency.strip(), job_id))
+            conn.commit()
 
         if payload.scheduled_for:
             scheduled_at = payload.scheduled_for

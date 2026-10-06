@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { AppLayout } from "@/components/AppLayout";
 import { Badge, Card, PageHeader, Button } from "@/components/ui-bits";
 import { Download, Trash2, Star, RefreshCw, Timer, Filter } from "lucide-react";
+import { toast } from "sonner";
 import { apiFetch } from "@/lib/api";
 import { logActivity } from "@/lib/logger";
 import { clearDeletedJob, jobsCacheUpdatedEventName, markJobDeleted, readJobsCache, writeJobsCache } from "@/lib/jobs-cache";
@@ -201,7 +202,7 @@ function Monitoring() {
     if (
       typeof window !== "undefined" &&
       (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") &&
-      window.location.port !== "8000"
+      window.location.port === "5433" // standalone Vite dev only; behind the gateway use relative /api
     ) {
       return `http://${window.location.hostname}:8000`;
     }
@@ -324,13 +325,21 @@ function Monitoring() {
       const response = await apiFetch(`/api/v1/demo/jobs/${job.id}/weekly-rerun`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(scheduledFor ? { scheduled_for: new Date(scheduledFor).toISOString() } : {}),
+        body: JSON.stringify({
+          ...(scheduledFor ? { scheduled_for: new Date(scheduledFor).toISOString() } : {}),
+          ...(job.frequency ? { frequency: job.frequency } : {}),
+        }),
       });
-      if (!response.ok) throw new Error("Failed to update weekly rerun");
+      if (!response.ok) {
+        const detail = await response.json().then((b) => b?.detail).catch(() => null);
+        toast.error(typeof detail === "string" ? detail : "Rerun failed. Please try again.");
+        return;
+      }
       const result = await response.json();
       setCustomJobs((current) => {
         const next = current.map((item) => item.id === job.id ? {
           ...item,
+          frequency: job.frequency ?? item.frequency,
           status: scheduledFor ? item.status : "Running",
           next_refresh: scheduledFor ? result.next_refresh : null,
         } : item);
@@ -338,6 +347,9 @@ function Monitoring() {
         return next;
       });
       setRerunJobId(null);
+    } catch (err) {
+      console.error("Rerun failed:", err);
+      toast.error("Rerun failed. Could not reach backend.");
     } finally {
       setRerunBusyId(null);
     }

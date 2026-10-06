@@ -54,6 +54,9 @@ app.add_middleware(
         # Actual Vite frontend dev port (see frontend/vite.config.ts / _frontend.bat).
         "http://localhost:5433",
         "http://127.0.0.1:5433",
+        # freda-auth gateway when run locally (run-freda-app.bat).
+        "http://localhost:8133",
+        "http://127.0.0.1:8133",
     ],
     allow_credentials=True,
     allow_methods=["*"],
