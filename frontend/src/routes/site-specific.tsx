@@ -4,7 +4,9 @@ import { AppLayout } from "@/components/AppLayout";
 import { Badge, Button, Card, Input, PageHeader, Select, SectionTitle, Steps } from "@/components/ui-bits";
 import { readJobsCache, writeJobsCache } from "@/lib/jobs-cache";
 import bots from "@/data/bots.json";
+import { hasAskFredaConversation } from "@/lib/ask-freda-session";
 import {
+  ArrowLeft,
   Search,
   Sparkles,
   CheckCircle2,
@@ -273,6 +275,7 @@ function FrequencyWidget({ value, onChange }: { value: string; onChange: (v: str
 }
 
 function SiteSpecific() {
+  const navigate = useNavigate();
   const all = (bots as any).bots as Bot[];
   const cats = Object.keys((bots as any).categoryCounts).sort();
 
@@ -361,6 +364,11 @@ function SiteSpecific() {
         subtitle={`Browse ${all.length} onboarded scraping agents. Pick one or many to schedule a refresh, or add a brand-new site.`}
         actions={step === 0 ? (
           <div className="relative flex items-center gap-3">
+            {hasAskFredaConversation() && (
+              <Button variant="outline" size="sm" className="h-10 shrink-0" onClick={() => navigate({ to: "/discover" })}>
+                <ArrowLeft className="h-4 w-4" /> Back to Ask Freda
+              </Button>
+            )}
             <div className="relative flex items-center w-80">
               <Search className="h-4 w-4 absolute left-3 text-muted-foreground" />
               <input

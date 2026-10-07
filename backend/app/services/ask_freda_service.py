@@ -25,11 +25,21 @@ import os
 import logging
 import re
 from typing import List, Dict, Any, Optional
+from urllib.parse import urlparse
 
 import httpx
 
 from app.config import settings
 from app.services.freda_catalog_service import freda_catalog_service, detect_browse_intent
+
+_EXPAND_LABEL = re.compile(r"^\s*(customize\s*/\s*extend|customize|extend|customise)\s*$", re.I)
+_BUILD_NEW_LABEL = re.compile(
+    r"^\s*(create new scope|build a new requirement|build new|new requirement|new dataset|new scope)\s*$",
+    re.I,
+)
+_SUBMIT_LABEL = re.compile(r"^\s*(submit( request)?|create ticket|create job|send to onboarding)\s*$", re.I)
+_REVISE_LABEL = re.compile(r"^\s*(edit( scope)?|revise|change|make changes)\s*$", re.I)
+_CONFIRM_LABEL = re.compile(r"^\s*(looks correct|confirm|yes,? that'?s (right|correct))\s*$", re.I)
 
 logger = logging.getLogger(__name__)
 
@@ -333,7 +343,7 @@ def _agent_match(item: Dict[str, Any]) -> Dict[str, Any]:
         "category": item.get("category"),
         "description": item.get("info") or item.get("dataType"),
         "url": item.get("url"),
-        "route": f"/library?q={name}",
+        "route": f"/site-specific?agent={item.get('id')}",
         "score": item.get("_score"),
     }
 
@@ -381,6 +391,32 @@ def _build_candidates_message(query: str) -> tuple[str, List[Dict[str, Any]]]:
     return context, matches
 
 
+_PATH_ACTION_LABELS = {
+    "customize / extend",
+    "customize",
+    "extend",
+    "customise",
+    "create new scope",
+    "build a new requirement",
+    "build new",
+    "new requirement",
+    "new dataset",
+    "new scope",
+    "create a new multi-source requirement",
+    "extend existing capability",
+    "use existing capability without the missing sources",
+    "submit request",
+    "edit scope",
+    "looks correct",
+}
+
+_PATH_ACTIONS = {"expand", "build_new", "submit_job", "revise", "confirm", "use_existing", "answer_question"}
+
+
+def _is_path_label(text: str) -> bool:
+    return (text or "").strip().lower() in _PATH_ACTION_LABELS
+
+
 def _latest_user_text(messages: List[Dict[str, Any]]) -> str:
     for m in reversed(messages):
         if m.get("role") == "user":
@@ -388,8 +424,201 @@ def _latest_user_text(messages: List[Dict[str, Any]]) -> str:
     return ""
 
 
+def _requirement_text(messages: List[Dict[str, Any]], state: Optional[Dict[str, Any]] = None) -> str:
+    last = str((state or {}).get("lastUserMessage") or "").strip()
+    if last and not _is_path_label(last):
+        return last
+    for m in messages:
+        if m.get("role") != "user":
+            continue
+        content = str(m.get("content") or "").strip()
+        if content and not _is_path_label(content):
+            return content
+    return _latest_user_text(messages)
+
+
 def _all_user_text(messages: List[Dict[str, Any]]) -> str:
     return " ".join(str(m.get("content") or "") for m in messages if m.get("role") == "user")
+
+
+def _as_number(value: Any) -> Optional[float]:
+    try:
+        return float(str(value).replace("%", "").strip())
+    except (TypeError, ValueError):
+        return None
+
+
+def _genesis_phase(phase: Optional[str]) -> str:
+    return {
+        "idle": "intake",
+        "gathering": "requirements_gathering",
+        "awaiting_path": "capability_found",
+        "confirming": "confirming",
+        "estimated": "confirming",
+        "submitted": "confirmed",
+        "revising": "requirements_gathering",
+    }.get(phase or "", phase or "intake")
+
+
+def _choice_labels(raw: Any) -> List[str]:
+    labels: List[str] = []
+    for item in raw or []:
+        if isinstance(item, str) and item.strip():
+            labels.append(item.strip())
+        elif isinstance(item, dict):
+            label = item.get("label") or item.get("id") or item.get("value")
+            if label:
+                labels.append(str(label))
+    return labels
+
+
+_IN_APP_PATHS = {"/any-site", "/site-specific", "/library", "/monitoring", "/discover"}
+
+
+def _in_app_route(href: Any) -> Optional[str]:
+    """Keep capability links on this origin even if the engine sent a full URL."""
+    if not href:
+        return None
+    raw = str(href).strip()
+    if not raw:
+        return None
+    if "://" in raw:
+        parsed = urlparse(raw)
+        raw = parsed.path + (f"?{parsed.query}" if parsed.query else "")
+    if not raw.startswith("/"):
+        raw = f"/{raw}"
+    path = raw.split("?", 1)[0]
+    if path not in _IN_APP_PATHS:
+        return None
+    return raw
+
+
+def _option_action(option: Dict[str, Any]) -> Dict[str, Any]:
+    route = _in_app_route(option.get("href"))
+    return {
+        "label": option.get("label") or "Continue",
+        "route": route,
+        "action": None if route else option.get("id"),
+    }
+
+
+def _adapt_genesis(payload: Dict[str, Any]) -> Dict[str, Any]:
+    """Map Genesis /chat onto the Discover UI contract, with in-app routes."""
+    cards = payload.get("cards") or []
+    matches: List[Dict[str, Any]] = []
+    actions: List[Dict[str, Any]] = []
+    next_question: Any = None
+    extra_notes: List[str] = []
+
+    for card in cards:
+        kind = card.get("type")
+        if kind == "capabilities":
+            for solution in card.get("solutions") or []:
+                sid = str(solution.get("id") or "")
+                if not sid:
+                    continue
+                matches.append(
+                    {
+                        "type": "solution",
+                        "id": sid,
+                        "name": solution.get("name"),
+                        "category": solution.get("category"),
+                        "description": solution.get("tagline") or solution.get("description"),
+                        "coverage": _as_number(solution.get("coverage")),
+                        "refresh": solution.get("refreshCadence"),
+                        "sources": solution.get("sourceNames") or [],
+                        "route": f"/any-site?dataset={sid}",
+                    }
+                )
+            for agent in card.get("agents") or []:
+                aid = str(agent.get("id") or "")
+                if not aid:
+                    continue
+                matches.append(
+                    {
+                        "type": "agent",
+                        "id": aid,
+                        "name": agent.get("name"),
+                        "category": agent.get("category"),
+                        "description": agent.get("dataType") or agent.get("description"),
+                        "url": agent.get("sourceUrl"),
+                        "route": f"/site-specific?agent={aid}",
+                    }
+                )
+        elif kind == "path_options":
+            for option in card.get("options") or []:
+                if isinstance(option, dict):
+                    actions.append(_option_action(option))
+        elif kind in {"choice_question", "questions"}:
+            prompt = card.get("title") or (card.get("questions") or [None])[0] or card.get("prompt")
+            options = _choice_labels(card.get("choices"))
+            if prompt:
+                next_question = {
+                    "text": prompt,
+                    "options": options,
+                    "multi": bool(card.get("multi")),
+                    "allowOther": card.get("allowOther", True),
+                    "selected": [str(item) for item in (card.get("selected") or []) if item],
+                    "field": card.get("field"),
+                }
+        elif kind == "summary":
+            summary = card.get("summary") or {}
+            if isinstance(summary, dict) and summary:
+                extra_notes.append("\n".join(f"{key}: {value}" for key, value in summary.items() if value))
+            for option in card.get("options") or []:
+                if isinstance(option, dict):
+                    actions.append(_option_action(option))
+        elif kind == "job":
+            actions.append({"label": "View in Monitoring", "route": "/monitoring", "action": None})
+        elif kind == "estimate":
+            estimate = card.get("estimate") or {}
+            if isinstance(estimate, dict):
+                bits = [str(estimate.get("timeline") or ""), str(estimate.get("volume") or "")]
+                extra_notes.extend([bit for bit in bits if bit])
+            for option in card.get("options") or []:
+                if isinstance(option, dict):
+                    actions.append(_option_action(option))
+
+    message = str(payload.get("text") or "").strip()
+    if extra_notes:
+        message = (message + "\n\n" + "\n".join(extra_notes)).strip()
+
+    state = payload.get("state") if isinstance(payload.get("state"), dict) else {}
+    match_routes = {item.get("route") for item in matches if item.get("route")}
+    actions = [item for item in actions if not item.get("route") or item.get("route") not in match_routes]
+    return {
+        "message": message or "I checked the catalog.",
+        "actions": actions,
+        "next_question": next_question,
+        "phase": _genesis_phase(state.get("phase")),
+        "matches": matches,
+        "state": state,
+    }
+
+
+def _infer_engine_action(latest: str, action: Optional[str], state: Optional[Dict[str, Any]]) -> Optional[str]:
+    if action:
+        return action
+    text = (latest or "").strip()
+    phase = str((state or {}).get("phase") or "")
+    if _EXPAND_LABEL.search(text) or (
+        phase == "awaiting_path" and re.search(r"\b(customize|extend|customise)\b", text, re.I)
+    ):
+        return "expand"
+    if _BUILD_NEW_LABEL.search(text) or (
+        phase == "awaiting_path"
+        and re.search(r"\b(build new|new requirement|new dataset|new scope|create new)\b", text, re.I)
+    ):
+        return "build_new"
+    if _SUBMIT_LABEL.search(text):
+        return "submit_job"
+    if _REVISE_LABEL.search(text):
+        return "revise"
+    if _CONFIRM_LABEL.search(text):
+        return "confirm"
+    if phase in {"gathering", "revising"} and text and not _is_path_label(text):
+        return "answer_question"
+    return None
 
 
 class AskFredaService:
@@ -401,20 +630,72 @@ class AskFredaService:
         self,
         messages: List[Dict[str, Any]],
         api_key: Optional[str] = None,
+        state: Optional[Dict[str, Any]] = None,
+        action: Optional[str] = None,
     ) -> Dict[str, Any]:
         """
-        Send conversation history to gpt-4o-mini, grounded in a real catalog
-        search for this turn. Returns a structured dict: {message, actions,
-        next_question, phase, matches}.
+        Prefer the Genesis Ask Freda engine (offline catalog match + semantic
+        fallback) so Discover and dataset/agent playbooks stay on one origin.
+        Fall back to the local catalog LLM if that engine is unreachable.
         """
         latest = _latest_user_text(messages)
-
-        # Deterministic path: browsing/listing the catalog needs no model
-        # call at all — it's just the real data, grouped, and it can never
-        # be wrong this way.
-        if latest and detect_browse_intent(latest):
+        state = state if isinstance(state, dict) else {}
+        action = _infer_engine_action(latest, action, state)
+        if latest and detect_browse_intent(latest) and not state and not action:
             return self._browse_response()
 
+        genesis = await self._chat_via_genesis(messages, state, action)
+        if genesis is not None:
+            return genesis
+
+        return await self._chat_legacy(messages, api_key, latest)
+
+    async def _chat_via_genesis(
+        self,
+        messages: List[Dict[str, Any]],
+        state: Optional[Dict[str, Any]],
+        action: Optional[str],
+    ) -> Optional[Dict[str, Any]]:
+        engine_url = str(getattr(settings, "ASK_FREDA_ENGINE_URL", "") or os.environ.get("ASK_FREDA_ENGINE_URL") or "http://127.0.0.1:43148").rstrip("/")
+        if not engine_url:
+            return None
+        latest = _latest_user_text(messages)
+        history = [
+            {"role": m.get("role"), "text": m.get("content") or ""}
+            for m in messages
+            if not _is_path_label(str(m.get("content") or ""))
+        ]
+        if action in {"expand", "build_new", "use_existing", "revise", "confirm", "submit_job"}:
+            engine_message = _requirement_text(messages, state)
+        elif action == "answer_question":
+            engine_message = latest
+        else:
+            engine_message = latest or ""
+        try:
+            async with httpx.AsyncClient(timeout=max(90, self.timeout)) as client:
+                response = await client.post(
+                    f"{engine_url}/chat",
+                    json={
+                        "message": engine_message,
+                        "state": state or {},
+                        "action": action,
+                        "history": history,
+                    },
+                )
+            if not response.is_success:
+                logger.warning("Genesis Ask Freda engine returned %s", response.status_code)
+                return None
+            return _adapt_genesis(response.json())
+        except Exception:
+            logger.exception("Genesis Ask Freda engine unreachable; using local Ask Freda")
+            return None
+
+    async def _chat_legacy(
+        self,
+        messages: List[Dict[str, Any]],
+        api_key: Optional[str],
+        latest: str,
+    ) -> Dict[str, Any]:
         resolved_key = str(
             api_key or settings.OPENAI_API_KEY or os.environ.get("OPENAI_API_KEY") or ""
         ).strip()

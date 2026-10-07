@@ -58,6 +58,9 @@ const OPERATE: NavGroup = {
   ],
 };
 
+/** Ask Freda deep-links here; do not bounce these to login. */
+const PUBLIC_APP_PATHS = new Set(["/", "/any-site", "/library", "/site-specific", "/discover"]);
+
 export function AppLayout({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -107,13 +110,20 @@ export function AppLayout({ children }: { children: ReactNode }) {
     async function checkSession() {
       const session = await fetchSession();
       if (!active) return;
+      const search = typeof window !== "undefined" ? window.location.search : "";
+      const isPublic = PUBLIC_APP_PATHS.has(pathname);
       if (session === null) {
-        navigate({ to: "/login", search: { next: pathname }, replace: true });
+        if (isPublic) {
+          setSession(null);
+          setAuthLoading(false);
+          return;
+        }
+        navigate({ to: "/login", search: { next: `${pathname}${search}` }, replace: true });
         return;
       }
       if (session) {
         setSession(session);
-        if (session.role === "admin") {
+        if (session.role === "admin" && !isPublic) {
           navigate({ to: "/admin", replace: true });
           return;
         }
@@ -433,7 +443,15 @@ export function AppLayout({ children }: { children: ReactNode }) {
             </Popover>
           </div>
         </header>
-        <main className="flex-1 overflow-y-auto">{children}</main>
+        <main
+          className={
+            pathname === "/discover"
+              ? "flex min-h-0 flex-1 flex-col overflow-hidden"
+              : "flex-1 overflow-y-auto"
+          }
+        >
+          {children}
+        </main>
       </div>
     </div>
   );

@@ -16,6 +16,7 @@ const CATEGORY_LABEL: Record<string, string> = {
 const catLabel = (c: string) => CATEGORY_LABEL[c] ?? c;
 import { WORKFLOWS } from "@/data/any-site-reference/workflows";
 import {
+  ArrowLeft,
   ArrowRight,
   Upload,
   Sparkles,
@@ -28,6 +29,7 @@ import {
 } from "lucide-react";
 import * as Icons from "lucide-react";
 import { toast } from "sonner";
+import { hasAskFredaConversation } from "@/lib/ask-freda-session";
 
 export const Route = createFileRoute("/any-site")({
   validateSearch: (search: Record<string, unknown>): { dataset?: string } =>
@@ -338,9 +340,16 @@ function AnySite() {
         }
         subtitle="Pick a dataset, choose your sources or upload your own data, then select your datapoints. A workflow runs behind the scenes."
         actions={
-          <Link to="/site-specific">
-            <Button variant="ghost" size="sm">â† Switch to Agents</Button>
-          </Link>
+          <div className="flex items-center gap-2">
+            {(datasetParam || hasAskFredaConversation()) && (
+              <Button variant="outline" size="sm" onClick={() => navigate({ to: "/discover" })}>
+                <ArrowLeft className="h-4 w-4" /> Back to Ask Freda
+              </Button>
+            )}
+            <Link to="/site-specific">
+              <Button variant="ghost" size="sm">Switch to Agents</Button>
+            </Link>
+          </div>
         }
       />
 

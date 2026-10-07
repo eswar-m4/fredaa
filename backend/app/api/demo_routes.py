@@ -3488,6 +3488,8 @@ class AskFredaMessage(BaseModel):
 
 class AskFredaChatRequest(BaseModel):
     messages: List[AskFredaMessage]
+    state: Optional[Dict[str, Any]] = None
+    action: Optional[str] = None
 
 
 @router.post("/ask-freda/chat")
@@ -3496,6 +3498,10 @@ async def ask_freda_chat(payload: AskFredaChatRequest):
     from app.services.ask_freda_service import ask_freda_service
 
     messages = [{"role": m.role, "content": m.content} for m in payload.messages]
-    result = await ask_freda_service.chat(messages)
-    # result is a dict: {message, actions, next_question, phase}
+    result = await ask_freda_service.chat(
+        messages,
+        state=payload.state,
+        action=payload.action,
+    )
+    # result is a dict: {message, actions, next_question, phase, matches, state}
     return result
