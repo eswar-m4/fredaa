@@ -2814,7 +2814,7 @@ async def get_jobs(request: Request):
         username = session.get("username")
         rows = [
             r for r in rows
-            if str(r["owner_username"] or "") == username or (r["owner_username"] is None and username == "user")
+            if str(r["owner_username"] or "") == username or r["owner_username"] is None
         ]
     
     jobs = []

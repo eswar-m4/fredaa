@@ -111,7 +111,8 @@ export async function fetchSession(): Promise<SessionInfo | null | undefined> {
     const response = await apiFetch("/api/v1/auth/me", { timeoutMs: 5000 });
     if (response.status === 401) {
       // Gateway authenticated but backend session not yet established — sync now.
-      clearStoredSession();
+      // Do NOT clear the stored session before sync completes; doing so briefly sets
+      // the jobs-cache owner key to "__anonymous__" and orphans cached job data.
       const syncRes = await apiFetch("/api/v1/auth/gateway-sync", {
         method: "POST",
         timeoutMs: 5000,
