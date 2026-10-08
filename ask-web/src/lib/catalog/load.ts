@@ -73,11 +73,13 @@ function facetSheet(workbook: XLSX.WorkBook, name: string): FacetCount[] {
 }
 
 function parseCatalog(): Catalog {
-  const filePath = path.join(
-    process.cwd(),
-    "data",
-    "Freda_Agents_and_Solutions_Catalog.xlsx",
-  );
+  // When deployed, the data directory lives one level above ask-web/ (at C:\fredaa\data\).
+  // Fall back to the sibling path so both dev and server deployments work.
+  const candidates = [
+    path.join(process.cwd(), "data", "Freda_Agents_and_Solutions_Catalog.xlsx"),
+    path.join(process.cwd(), "..", "data", "Freda_Agents_and_Solutions_Catalog.xlsx"),
+  ];
+  const filePath = candidates.find((p) => fs.existsSync(p)) ?? candidates[0];
   const buffer = fs.readFileSync(filePath);
   const workbook = XLSX.read(buffer, { type: "buffer", cellDates: true });
 
