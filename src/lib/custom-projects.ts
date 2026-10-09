@@ -17,6 +17,7 @@ import type { Project, SourceRef, ReviewRecord } from "@/data/customers";
 import type { WebpageLiveRefreshProfile, DirectoryLiveRefreshProfile } from "@/lib/live-refresh-types";
 import type { Dataset } from "@/data/datasets";
 import { runDirectoryExtraction } from "@/lib/api/directory-extract.functions";
+import { runContactExtraction } from "@/lib/api/contact-extract.functions";
 import { diffRegistrySnapshot } from "@/lib/api/registry-refresh.core";
 import { saveLiveReview, saveLiveSnapshot } from "@/lib/live-review-store";
 import type { LiveReviewData } from "@/components/ReviewDialog";
@@ -423,6 +424,108 @@ export function removeCustomProject(customerId: string, projectId: string) {
   const next = existing.filter((e) => e.project.id !== projectId);
   if (next.length === existing.length) return;
   persist({ ...all, [customerId]: next });
+}
+
+/** Provisions a People & Contacts project and immediately runs the
+ *  contact extractor Python script to populate the first batch of rows.
+ *  The project lands in Review pending with real contacts (or empty rows
+ *  if extraction fails), same as launchDirectoryProject does for directories. */
+export async function launchContactsProject(params: {
+  customerId: string;
+  projectName: string;
+  dataset: Dataset;
+  entityUrls: string[];
+  selectedAttributeKeys: string[];
+  cadence: string;
+}): Promise<{ project: Project; fetchErrors: { entity: string; error: string }[] }> {
+  const { customerId, projectName, dataset, entityUrls, selectedAttributeKeys, cadence } = params;
+  const id = nextCustomProjectId(customerId);
+  const urls = [...new Set(entityUrls.map((u) => u.trim()).filter(Boolean))];
+
+  const pairs: [string, string][] = urls.map((u) => [u, nameFromUrl(u)]);
+  if (!pairs.length) {
+    pairs.push(["https://acme.com", "Acme Corp"], ["https://bolt.new", "Bolt"], ["https://vercel.com", "Vercel"]);
+  }
+
+  let contacts: Record<string, string>[] = [];
+  const fetchErrors: { entity: string; error: string }[] = [];
+  try {
+    const result = await runContactExtraction({ data: { pairs } });
+    contacts = result.contacts;
+  } catch (err) {
+    fetchErrors.push({ entity: "contact extractor", error: err instanceof Error ? err.message : String(err) });
+  }
+
+  const { fields, promptConfig } = promptConfigFromDataset(dataset, selectedAttributeKeys);
+  const columns = fields.length > 0 ? fields : ["name", "title", "email", "phone", "linkedin", "company"];
+
+  const sampleRows: Record<string, string>[] = contacts.length
+    ? contacts.map((c) => ({ ...c } as Record<string, string>))
+    : urls.map((url) => {
+        const row: Record<string, string> = { company: nameFromUrl(url), source_url: url };
+        for (const f of columns) if (!(f in row)) row[f] = "";
+        return row;
+      });
+
+  const profile: WebpageLiveRefreshProfile = {
+    kind: "webpage",
+    projectId: id,
+    idField: "source_url",
+    nameField: "name",
+    urlField: "source_url",
+    extractableFields: columns,
+    currentValueRows: sampleRows,
+    promptConfig,
+    outputFormat: "flat",
+    outputSheetName: `${dataset.name} Output`,
+    usesSecEdgarOverlay: false,
+  };
+
+  const sources: SourceRef[] = urls.length
+    ? urls.map((url, i) => ({
+        id: `${id}-src-${i}`,
+        label: nameFromUrl(url),
+        url,
+        status: "Live" as const,
+        records: contacts.filter((c) => c.input_url === url || c.source_url?.startsWith(url)).length || 1,
+        addedOn: new Date().toLocaleDateString("en-US", { month: "short", year: "numeric" }),
+      }))
+    : dataset.sources.slice(0, 5).map((s, i) => ({
+        id: `${id}-src-${i}`,
+        label: s.name,
+        url: s.url.startsWith("http") ? s.url : `https://${s.url}`,
+        status: "Live" as const,
+        records: 0,
+        addedOn: new Date().toLocaleDateString("en-US", { month: "short", year: "numeric" }),
+      }));
+
+  const project: Project = {
+    id,
+    customerId,
+    name: projectName,
+    source: dataset.tagline,
+    websiteUrl: urls[0] ?? dataset.sources[0]?.url ?? "",
+    datapoints: columns,
+    sources,
+    records: sampleRows.length,
+    admv: { added: sampleRows.length, deleted: 0, modified: 0, verified: 0 },
+    freshness: sampleRows.length > 0 ? 92 : 0,
+    accuracy: sampleRows.length > 0 ? 88 : 0,
+    coverage: sampleRows.length > 0 ? 85 : 0,
+    frequency: FREQ_MAP[cadence] ?? "Weekly",
+    lastRefreshHrs: 0,
+    nextRefreshHrs: 0,
+    status: "Review pending",
+    pendingReview: sampleRows.length,
+    history: [],
+    sampleRows,
+    columns,
+  };
+
+  const all = readAll();
+  const existing = all[customerId] ?? [];
+  persist({ ...all, [customerId]: [...existing, { project, profile }] });
+  return { project, fetchErrors };
 }
 
 /** True for a project id that was self-provisioned via launchSelfServiceProject

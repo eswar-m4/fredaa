@@ -43,7 +43,7 @@ import { Badge, Button, Card, Input, PageHeader, SectionTitle, Select, Steps } f
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useActiveCustomer, useMounted } from "@/lib/workspace";
 import { readIntakeFile, type IntakeResult } from "@/lib/ai-intake";
-import { launchSelfServiceProject, launchDirectoryProject } from "@/lib/custom-projects";
+import { launchSelfServiceProject, launchDirectoryProject, launchContactsProject } from "@/lib/custom-projects";
 import { logActivity } from "@/lib/logger";
 import { estimate, fmt, type Project } from "@/data/customers";
 import { DATASETS, DATASET_CATEGORIES, type Dataset } from "@/data/datasets";
@@ -315,6 +315,31 @@ function DatasetSetup({ item, onBack }: { item: SetupItem; onBack: () => void })
     if (!dataset) return;
     logActivity("workflow_launched", `Launched dataset: ${item.name} · ${attrs.length} attributes · ${cadence} schedule`, "/playbooks/solutions");
     const urls = extraUrls.filter((u) => u.trim());
+
+    // People & Contacts — run the contact extractor now so real contacts land
+    // in the workspace immediately (same pattern as directory mode).
+    if (dataset.id === "ds-contacts") {
+      setLaunching(true);
+      setLaunchError(null);
+      try {
+        const { project, fetchErrors } = await launchContactsProject({
+          customerId: customer.id,
+          projectName: name,
+          dataset,
+          entityUrls: urls,
+          selectedAttributeKeys: attrs,
+          cadence,
+        });
+        setLaunchedProject(project);
+        setLaunchFetchErrors(fetchErrors);
+        setStep(WIZARD_STEPS.length - 1);
+      } catch (err) {
+        setLaunchError(err instanceof Error ? err.message : String(err));
+      } finally {
+        setLaunching(false);
+      }
+      return;
+    }
 
     if (!directoryMode) {
       const project = launchSelfServiceProject({
