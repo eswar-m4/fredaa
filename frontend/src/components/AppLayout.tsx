@@ -2,72 +2,49 @@ import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { ReactNode, useState, useEffect } from "react";
 import {
   LayoutDashboard,
-  Target,
-  Globe2,
-  Compass,
-  Library,
   BarChart3,
-  Workflow as WorkflowIcon,
   Activity,
   CheckSquare,
   Upload,
   Bell,
   HelpCircle,
-  GitBranch,
-  RefreshCw,
   PanelLeft,
   Sun,
   Moon,
+  BookOpen,
 } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { setUseCase, useUseCase, USE_CASES } from "@/lib/useCase";
 import { fetchSession, logoutRequest, type SessionInfo } from "@/lib/auth";
 import fredaLogo from "@/assets/freda-mobius-bold.png";
 
-type NavItem = { to: string; label: string; icon: typeof Target; hash?: string };
+type NavItem = { to: string; label: string; icon: typeof LayoutDashboard; hash?: string };
 type NavGroup = { group: string; items: NavItem[] };
 
-const BASE: NavGroup = {
-  group: "OVERVIEW",
-  items: [{ to: "/", label: "Playbooks", icon: LayoutDashboard }],
-};
-
-const TARGETED: NavGroup = {
-  group: "AGENTS",
+const WORKSPACE: NavGroup = {
+  group: "WORKSPACE",
   items: [
-    { to: "/site-specific", label: "Sources & Agents", icon: Library },
-  ],
-};
-
-
-
-const OPENWEB: NavGroup = {
-  group: "SOLUTIONS",
-  items: [
-    { to: "/any-site", label: "Dataset Setup", icon: GitBranch },
+    { to: "/", label: "Dashboard", icon: LayoutDashboard },
+    { to: "/monitoring", label: "Monitoring", icon: Activity },
+    { to: "/playbooks", label: "Playbooks", icon: BookOpen },
   ],
 };
 
 const OPERATE: NavGroup = {
   group: "OPERATE",
   items: [
-    { to: "/monitoring", label: "Monitoring", icon: Activity },
     { to: "/review", label: "Review", icon: CheckSquare },
-    { to: "/dashboard", label: "Dashboard", icon: BarChart3 },
+    { to: "/dashboard", label: "Analytics", icon: BarChart3 },
     { to: "/export", label: "Export & Sync", icon: Upload },
   ],
 };
 
 /** Ask Freda deep-links here; do not bounce these to login. */
-const PUBLIC_APP_PATHS = new Set(["/", "/any-site", "/library", "/site-specific", "/discover"]);
+const PUBLIC_APP_PATHS = new Set(["/any-site", "/library", "/site-specific", "/discover", "/playbooks", "/playbooks/", "/playbooks/solutions", "/playbooks/agents", "/playbooks/ask"]);
 
 export function AppLayout({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const hash = useRouterState({ select: (s) => s.location.hash });
-  const uc = useUseCase();
-  const activeSectionLabel = pathname === "/any-site" ? "Active Playbooks" : "Active use case";
-
   const [authLoading, setAuthLoading] = useState(true);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
@@ -208,10 +185,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
     }
   }
 
-  const groups: NavGroup[] = [BASE];
-  if (uc === "targeted") groups.push(TARGETED);
-  if (uc === "openweb") groups.push(OPENWEB);
-  if (uc) groups.push(OPERATE);
+  const groups: NavGroup[] = [WORKSPACE, OPERATE];
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-background text-foreground">
@@ -232,31 +206,6 @@ export function AppLayout({ children }: { children: ReactNode }) {
             </div>
           </div>
         </div>
-
-        {uc && (
-          <div className="px-3 py-3 border-b border-white/10 whitespace-nowrap">
-            <div className="text-[10px] uppercase tracking-wider text-white/40 font-semibold mb-1">{activeSectionLabel}</div>
-            <div className="flex items-center justify-between gap-2">
-              <div className="flex items-center gap-1.5 font-semibold text-[12px]">
-                {uc === "targeted" ? (
-                  <Target className="h-3.5 w-3.5" />
-                ) : uc === "openweb" ? (
-                  <Globe2 className="h-3.5 w-3.5" />
-                ) : (
-                  <Compass className="h-3.5 w-3.5" />
-                )}
-                <span>{USE_CASES[uc].short}</span>
-              </div>
-              <button
-                onClick={() => setUseCase(null)}
-                title="Switch use case"
-                className="inline-flex items-center gap-1 text-[10px] text-white/60 hover:text-white"
-              >
-                <RefreshCw className="h-3 w-3" /> switch
-              </button>
-            </div>
-          </div>
-        )}
 
         <nav className="flex-1 overflow-y-auto py-3 px-2 space-y-4">
           {groups.map((g) => (

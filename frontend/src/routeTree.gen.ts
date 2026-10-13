@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as WorkflowsRouteImport } from './routes/workflows'
 import { Route as SiteSpecificRouteImport } from './routes/site-specific'
 import { Route as ReviewRouteImport } from './routes/review'
+import { Route as PlaybooksRouteImport } from './routes/playbooks'
 import { Route as MonitoringRouteImport } from './routes/monitoring'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LibraryRouteImport } from './routes/library'
@@ -21,6 +22,10 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AnySiteRouteImport } from './routes/any-site'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PlaybooksIndexRouteImport } from './routes/playbooks.index'
+import { Route as PlaybooksAgentsRouteImport } from './routes/playbooks.agents'
+import { Route as PlaybooksSolutionsRouteImport } from './routes/playbooks.solutions'
+import { Route as PlaybooksAskRouteImport } from './routes/playbooks.ask'
 
 const WorkflowsRoute = WorkflowsRouteImport.update({
   id: '/workflows',
@@ -35,6 +40,11 @@ const SiteSpecificRoute = SiteSpecificRouteImport.update({
 const ReviewRoute = ReviewRouteImport.update({
   id: '/review',
   path: '/review',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlaybooksRoute = PlaybooksRouteImport.update({
+  id: '/playbooks',
+  path: '/playbooks',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MonitoringRoute = MonitoringRouteImport.update({
@@ -82,6 +92,26 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PlaybooksIndexRoute = PlaybooksIndexRouteImport.update({
+  id: '/playbooks/',
+  path: '/',
+  getParentRoute: () => PlaybooksRoute,
+} as any)
+const PlaybooksAgentsRoute = PlaybooksAgentsRouteImport.update({
+  id: '/playbooks/agents',
+  path: '/agents',
+  getParentRoute: () => PlaybooksRoute,
+} as any)
+const PlaybooksSolutionsRoute = PlaybooksSolutionsRouteImport.update({
+  id: '/playbooks/solutions',
+  path: '/solutions',
+  getParentRoute: () => PlaybooksRoute,
+} as any)
+const PlaybooksAskRoute = PlaybooksAskRouteImport.update({
+  id: '/playbooks/ask',
+  path: '/ask',
+  getParentRoute: () => PlaybooksRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -93,6 +123,11 @@ export interface FileRoutesByFullPath {
   '/library': typeof LibraryRoute
   '/login': typeof LoginRoute
   '/monitoring': typeof MonitoringRoute
+  '/playbooks': typeof PlaybooksRoute
+  '/playbooks/': typeof PlaybooksIndexRoute
+  '/playbooks/agents': typeof PlaybooksAgentsRoute
+  '/playbooks/solutions': typeof PlaybooksSolutionsRoute
+  '/playbooks/ask': typeof PlaybooksAskRoute
   '/review': typeof ReviewRoute
   '/site-specific': typeof SiteSpecificRoute
   '/workflows': typeof WorkflowsRoute
@@ -107,6 +142,11 @@ export interface FileRoutesByTo {
   '/library': typeof LibraryRoute
   '/login': typeof LoginRoute
   '/monitoring': typeof MonitoringRoute
+  '/playbooks': typeof PlaybooksRoute
+  '/playbooks/': typeof PlaybooksIndexRoute
+  '/playbooks/agents': typeof PlaybooksAgentsRoute
+  '/playbooks/solutions': typeof PlaybooksSolutionsRoute
+  '/playbooks/ask': typeof PlaybooksAskRoute
   '/review': typeof ReviewRoute
   '/site-specific': typeof SiteSpecificRoute
   '/workflows': typeof WorkflowsRoute
@@ -122,6 +162,11 @@ export interface FileRoutesById {
   '/library': typeof LibraryRoute
   '/login': typeof LoginRoute
   '/monitoring': typeof MonitoringRoute
+  '/playbooks': typeof PlaybooksRoute
+  '/playbooks/': typeof PlaybooksIndexRoute
+  '/playbooks/agents': typeof PlaybooksAgentsRoute
+  '/playbooks/solutions': typeof PlaybooksSolutionsRoute
+  '/playbooks/ask': typeof PlaybooksAskRoute
   '/review': typeof ReviewRoute
   '/site-specific': typeof SiteSpecificRoute
   '/workflows': typeof WorkflowsRoute
@@ -138,6 +183,11 @@ export interface FileRouteTypes {
     | '/library'
     | '/login'
     | '/monitoring'
+    | '/playbooks'
+    | '/playbooks/'
+    | '/playbooks/agents'
+    | '/playbooks/solutions'
+    | '/playbooks/ask'
     | '/review'
     | '/site-specific'
     | '/workflows'
@@ -152,6 +202,11 @@ export interface FileRouteTypes {
     | '/library'
     | '/login'
     | '/monitoring'
+    | '/playbooks'
+    | '/playbooks/'
+    | '/playbooks/agents'
+    | '/playbooks/solutions'
+    | '/playbooks/ask'
     | '/review'
     | '/site-specific'
     | '/workflows'
@@ -166,11 +221,24 @@ export interface FileRouteTypes {
     | '/library'
     | '/login'
     | '/monitoring'
+    | '/playbooks'
+    | '/playbooks/'
+    | '/playbooks/agents'
+    | '/playbooks/solutions'
+    | '/playbooks/ask'
     | '/review'
     | '/site-specific'
     | '/workflows'
   fileRoutesById: FileRoutesById
 }
+
+const playbooksRouteChildren = {
+  PlaybooksIndexRoute: PlaybooksIndexRoute,
+  PlaybooksAgentsRoute: PlaybooksAgentsRoute,
+  PlaybooksSolutionsRoute: PlaybooksSolutionsRoute,
+  PlaybooksAskRoute: PlaybooksAskRoute,
+}
+
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
@@ -181,6 +249,7 @@ export interface RootRouteChildren {
   LibraryRoute: typeof LibraryRoute
   LoginRoute: typeof LoginRoute
   MonitoringRoute: typeof MonitoringRoute
+  PlaybooksRoute: typeof PlaybooksRoute
   ReviewRoute: typeof ReviewRoute
   SiteSpecificRoute: typeof SiteSpecificRoute
   WorkflowsRoute: typeof WorkflowsRoute
@@ -208,6 +277,41 @@ declare module '@tanstack/react-router' {
       fullPath: '/review'
       preLoaderRoute: typeof ReviewRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/playbooks': {
+      id: '/playbooks'
+      path: '/playbooks'
+      fullPath: '/playbooks'
+      preLoaderRoute: typeof PlaybooksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/playbooks/': {
+      id: '/playbooks/'
+      path: '/'
+      fullPath: '/playbooks/'
+      preLoaderRoute: typeof PlaybooksIndexRouteImport
+      parentRoute: typeof PlaybooksRoute
+    }
+    '/playbooks/agents': {
+      id: '/playbooks/agents'
+      path: '/agents'
+      fullPath: '/playbooks/agents'
+      preLoaderRoute: typeof PlaybooksAgentsRouteImport
+      parentRoute: typeof PlaybooksRoute
+    }
+    '/playbooks/solutions': {
+      id: '/playbooks/solutions'
+      path: '/solutions'
+      fullPath: '/playbooks/solutions'
+      preLoaderRoute: typeof PlaybooksSolutionsRouteImport
+      parentRoute: typeof PlaybooksRoute
+    }
+    '/playbooks/ask': {
+      id: '/playbooks/ask'
+      path: '/ask'
+      fullPath: '/playbooks/ask'
+      preLoaderRoute: typeof PlaybooksAskRouteImport
+      parentRoute: typeof PlaybooksRoute
     }
     '/monitoring': {
       id: '/monitoring'
@@ -275,6 +379,8 @@ declare module '@tanstack/react-router' {
   }
 }
 
+const PlaybooksRouteWithChildren = PlaybooksRoute._addFileChildren(playbooksRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
@@ -285,6 +391,7 @@ const rootRouteChildren: RootRouteChildren = {
   LibraryRoute: LibraryRoute,
   LoginRoute: LoginRoute,
   MonitoringRoute: MonitoringRoute,
+  PlaybooksRoute: PlaybooksRouteWithChildren,
   ReviewRoute: ReviewRoute,
   SiteSpecificRoute: SiteSpecificRoute,
   WorkflowsRoute: WorkflowsRoute,
