@@ -509,11 +509,11 @@ function describeInputRequirement(ds: Dataset): string {
   return `Any spreadsheet works — include a ${need} column${extra}. Header names don't need to match exactly; columns are auto-detected.`;
 }
 
-// Input template: the dataset's real input columns as headers only (no example
+// Input template: the dataset's input attributes as headers only (no example
 // rows — placeholder data must never end up in a real upload), plus an
 // Instructions sheet saying which columns are required and their format.
 async function downloadInputTemplate(ds: Dataset) {
-  const columns = ds.inputTemplateColumns?.length ? ds.inputTemplateColumns : ds.inputAttributes;
+  const columns = ds.inputAttributes;
   if (!columns.length) {
     toast.error("This dataset has no input columns defined.");
     return;
