@@ -14,7 +14,7 @@ const CATEGORY_LABEL: Record<string, string> = {
   Education: "Workforce",
 };
 const catLabel = (c: string) => CATEGORY_LABEL[c] ?? c;
-import { WORKFLOWS } from "@/data/any-site-reference/workflows";
+import { WORKFLOWS, type Workflow } from "@/data/any-site-reference/workflows";
 import {
   ArrowLeft,
   ArrowRight,
@@ -497,25 +497,45 @@ function SectionLabel({ children, className }: { children: React.ReactNode; clas
   );
 }
 
+type InputColumn = { label: string; required: boolean; type: string; example?: string };
+
+const normLabel = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "");
+
+// The input attributes of the selected solution — the same list its overview
+// shows: the workflow's Input Attributes when the solution has a workflow,
+// otherwise the solution's own input fields. "(optional)" marks optional ones.
+function solutionInputColumns(ds: Dataset, workflow: Workflow | null): InputColumn[] {
+  const wfInputs = workflow?.inputAttributes?.length ? workflow.inputAttributes : workflow?.inputs;
+  if (wfInputs?.length) {
+    return wfInputs.map((raw) => {
+      const optional = /\(\s*optional\s*\)/i.test(raw) || /^optional\b/i.test(raw.trim());
+      const label = raw.replace(/\(\s*optional\s*\)/gi, "").replace(/^optional\s+/i, "").trim();
+      const match = ds.inputAttributes.find((a) => normLabel(a.label) === normLabel(label) || normLabel(a.key) === normLabel(label));
+      return { label, required: !optional, type: match?.type ?? "string", example: match?.example };
+    });
+  }
+  return ds.inputAttributes.map((a) => ({ label: a.label, required: !!a.required, type: a.type, example: a.example }));
+}
+
 // Any CSV/Excel works — columns are auto-detected server-side by header
 // synonym + value pattern, not by matching a fixed template. This line just
 // tells the user which real-world column(s) to include, derived from the
-// dataset's own input fields (not a fabricated example list).
-function describeInputRequirement(ds: Dataset): string {
-  const required = ds.inputAttributes.filter((a) => a.required).map((a) => a.label);
-  const optional = ds.inputAttributes.filter((a) => !a.required).map((a) => a.label);
-  const need = required.length ? required.join(" or ") : ds.inputAttributes[0]?.label ?? "a name column";
+// solution's input attributes (not a fabricated example list).
+function describeInputRequirement(columns: InputColumn[]): string {
+  const required = columns.filter((a) => a.required).map((a) => a.label);
+  const optional = columns.filter((a) => !a.required).map((a) => a.label);
+  const need = required.length ? required.join(" and ") : columns[0]?.label ?? "a name";
   const extra = optional.length ? ` (${optional.join(", ")} helps too)` : "";
-  return `Any spreadsheet works — include a ${need} column${extra}. Header names don't need to match exactly; columns are auto-detected.`;
+  return `Any spreadsheet works — include ${need} column${required.length > 1 ? "s" : ""}${extra}. Header names don't need to match exactly; columns are auto-detected.`;
 }
 
-// Input template: the dataset's input attributes as headers only (no example
-// rows — placeholder data must never end up in a real upload), plus an
-// Instructions sheet saying which columns are required and their format.
-async function downloadInputTemplate(ds: Dataset) {
-  const columns = ds.inputAttributes;
+// Input template built from the selected solution's input attributes: one
+// header per attribute (required ones highlighted), no example rows —
+// placeholder data must never end up in a real upload — plus an Instructions
+// sheet saying which columns are required and their format.
+async function downloadInputTemplate(ds: Dataset, columns: InputColumn[]) {
   if (!columns.length) {
-    toast.error("This dataset has no input columns defined.");
+    toast.error("This solution has no input attributes defined.");
     return;
   }
   try {
@@ -525,7 +545,7 @@ async function downloadInputTemplate(ds: Dataset) {
     workbook.created = new Date();
 
     const sheet = workbook.addWorksheet("Template", { views: [{ state: "frozen", ySplit: 1 }] });
-    sheet.columns = columns.map((c) => ({ header: c.key, key: c.key, width: Math.max(16, c.key.length + 4) }));
+    sheet.columns = columns.map((c, i) => ({ header: c.label, key: `col_${i}`, width: Math.max(18, c.label.length + 4) }));
     const header = sheet.getRow(1);
     header.font = { bold: true, color: { argb: "FFFFFFFF" } };
     columns.forEach((c, i) => {
@@ -539,8 +559,7 @@ async function downloadInputTemplate(ds: Dataset) {
 
     const info = workbook.addWorksheet("Instructions");
     info.columns = [
-      { header: "Column", key: "column", width: 22 },
-      { header: "Label", key: "label", width: 26 },
+      { header: "Column", key: "column", width: 30 },
       { header: "Required", key: "required", width: 10 },
       { header: "Type", key: "type", width: 10 },
       { header: "Format / accepted values", key: "format", width: 40 },
@@ -548,8 +567,7 @@ async function downloadInputTemplate(ds: Dataset) {
     info.getRow(1).font = { bold: true };
     columns.forEach((c) =>
       info.addRow({
-        column: c.key,
-        label: c.label,
+        column: c.label,
         required: c.required ? "Yes" : "No",
         type: c.type,
         format: c.example ?? "",
@@ -606,6 +624,7 @@ function MapStep(p: {
     () => WORKFLOWS.find((w) => w.id === ds.workflowId) || null,
     [ds],
   );
+  const inputColumns = useMemo(() => solutionInputColumns(ds, workflow), [ds, workflow]);
   const grouped = useMemo(() => {
     const g: Record<string, typeof ds.outputAttributes> = {};
     ds.outputAttributes.forEach((a) => {
@@ -855,7 +874,7 @@ function MapStep(p: {
                   </div>
                   <div className="flex items-center gap-2">
                     {p.seedFile && <Badge tone="success">{p.seedRows.toLocaleString()} rows</Badge>}
-                    <Button variant="outline" size="sm" onClick={() => void downloadInputTemplate(p.ds)}>
+                    <Button variant="outline" size="sm" onClick={() => void downloadInputTemplate(ds, inputColumns)}>
                       <Download className="h-3.5 w-3.5" /> Download input template
                     </Button>
                   </div>
@@ -874,7 +893,7 @@ function MapStep(p: {
                       ? `${p.seedFile} · ${p.seedRows.toLocaleString()} rows · ${p.seedColumnCount || p.seedHeaders.length} columns`
                       : "Upload your dataset to get started."}
                   </div>
-                  <div className="mt-3 text-[12px] text-muted-foreground">{describeInputRequirement(p.ds)}</div>
+                  <div className="mt-3 text-[12px] text-muted-foreground">{describeInputRequirement(inputColumns)}</div>
                 </div>
               </Card>
             )}
