@@ -1588,7 +1588,9 @@ async def run_scraper_background(job_id: str):
                     f"Job {job_id}: the attached input file '{config_data.get('seedFile')}' was not parsed. Re-upload it and launch again."
                 )
 
-            if not input_rows:
+            is_contacts_dataset = "people" in source_lower or "contact" in source_lower
+
+            if not input_rows and not is_contacts_dataset:
                 # No input file was ever uploaded for this job at all — this
                 # is a genuine demo/preview run (no real data was provided),
                 # not a failure of real user input.
@@ -1609,17 +1611,24 @@ async def run_scraper_background(job_id: str):
                     }
 
             # People & Contacts — bypass the standard company-enrichment pipeline
-            # and run the dedicated contact extractor instead.
-            if "people" in source_lower or "contact" in source_lower:
-                records = await _run_contact_extractor(job_id, source, input_rows, BASE_DIR)
+            # and run the dedicated contact extractor on the real uploaded rows
+            # only (never the demo rows above; it raises if there is no input).
+            if is_contacts_dataset:
+                started_at = datetime.utcnow()
+                records = await _run_contact_extractor(
+                    job_id, source, input_rows, BASE_DIR,
+                    selected_outputs=selected_outputs,
+                    region=config_data.get("detectedRegion"),
+                )
                 now_str = datetime.utcnow().isoformat() + "Z"
                 records_count = len(records)
-                freshness_val = random.randint(88, 96)
+                matched = [r for r in records if r.get("_match_status") != "not_found" and r.get("_match_status") != "no_domain"]
+                freshness_val = round(100 * len(matched) / records_count) if records_count else 0
                 next_refresh_str = _calculate_next_refresh_str(frequency)
                 history_entry = {
-                    "timestamp": now_str, "records_scraped": records_count,
+                    "timestamp": now_str, "records_scraped": len(matched),
                     "accuracy_rate": freshness_val, "status": "Success",
-                    "execution_time_seconds": random.randint(30, 120),
+                    "execution_time_seconds": int((datetime.utcnow() - started_at).total_seconds()),
                 }
                 with get_connection() as conn:
                     existing_h = conn.execute(
@@ -1627,25 +1636,27 @@ async def run_scraper_background(job_id: str):
                     ).fetchone()[0]
                 history = json.loads(existing_h or "[]")
                 history.append(history_entry)
+                # Write the run file before flipping the status so Review never
+                # opens a job whose data isn't on disk yet.
+                run_file_dir = os.path.join(BASE_DIR, "datasets")
+                os.makedirs(run_file_dir, exist_ok=True)
+                run_file_path = os.path.join(
+                    run_file_dir, f"{job_id}_run_{(refresh_count_curr or 0) + 1}.json"
+                )
+                with open(run_file_path, "w", encoding="utf-8") as f_run:
+                    json.dump(records, f_run, ensure_ascii=False, indent=2)
                 with get_connection() as conn:
                     conn.execute(
                         """UPDATE scraper_jobs
                            SET status = 'Review Pending', records = ?, fresh = ?,
                                last_refresh = ?, next_refresh = ?,
                                refresh_count = refresh_count + 1,
-                               refresh_history_json = ?, changes_detected = 0
+                               refresh_history_json = ?, changes_detected = ?
                            WHERE id = ?""",
-                        (records_count, freshness_val, now_str, next_refresh_str,
-                         json.dumps(history), job_id),
+                        (len(matched), freshness_val, now_str, next_refresh_str,
+                         json.dumps(history), len(matched), job_id),
                     )
                     conn.commit()
-                run_file_dir = os.path.join(BASE_DIR, "datasets")
-                os.makedirs(run_file_dir, exist_ok=True)
-                run_file_path = os.path.join(
-                    run_file_dir, f"{job_id}_run_{refresh_count_curr + 1}.json"
-                )
-                with open(run_file_path, "w", encoding="utf-8") as f_run:
-                    json.dump(records, f_run, ensure_ascii=False, indent=2)
                 from app.services.workflow_service import workflow_service
                 workflow_service.runs[job_id] = {
                     "run_id": job_id, "dataset_id": job_id,
@@ -2475,7 +2486,8 @@ async def run_scraper_background(job_id: str):
             return
 
         elif "people" in source_lower or "contact" in source_lower:
-            records = await _run_contact_extractor(job_id, source, [], BASE_DIR)
+            # By Source: the source itself is the site to extract from.
+            records = await _run_contact_extractor(job_id, source, [{"url": source}], BASE_DIR)
 
         else:
             # Custom source/New Source - run onboarding workflow (analyse_site) then scraper
@@ -2851,8 +2863,19 @@ async def create_pending_job(request: Request, item: PendingJobItem):
     return {"status": "success", "job_id": job_id}
 
 
-async def _run_contact_extractor(job_id: str, source: str, input_rows: list, base_dir: str) -> list:
+async def _run_contact_extractor(
+    job_id: str,
+    source: str,
+    input_rows: list,
+    base_dir: str,
+    selected_outputs: Optional[List[str]] = None,
+    region: Optional[str] = None,
+) -> list:
     """Load contact_extractor.py from the repo root and run it against the input URLs.
+
+    Only real input is used: missing input, a missing API key, or every site
+    failing raises instead of returning placeholder data. Records are keyed by
+    the dataset's output fields so the Review grid can show them.
 
     Uses browser_provider='http' (plain requests, no Playwright) so it works
     inside the backend venv without needing Chromium installed.  Upgrade to
@@ -2860,16 +2883,17 @@ async def _run_contact_extractor(job_id: str, source: str, input_rows: list, bas
     the backend venv.
     """
     import importlib.util
+    import shutil
     import sys
     import tempfile
     import os
+    from typing import Tuple
     from openpyxl import Workbook
     from app.config import settings
 
     ce_path = os.path.abspath(os.path.join(base_dir, "..", "contact_extractor.py"))
     if not os.path.exists(ce_path):
-        logger.error("contact_extractor.py not found at %s", ce_path)
-        return []
+        raise RuntimeError(f"contact_extractor.py not found at {ce_path}")
 
     ce = sys.modules.get("contact_extractor")
     if ce is None:
@@ -2884,50 +2908,145 @@ async def _run_contact_extractor(job_id: str, source: str, input_rows: list, bas
             sys.modules.pop("contact_extractor", None)
             raise
 
-    def _first_url(row: dict) -> str:
-        for key in ("company_domain", "corp_site", "website", "url", "domain"):
-            v = str(row.get(key) or "").strip()
-            if v and ("." in v or v.startswith("http")):
-                return v
+    def _norm_key(key: Any) -> str:
+        return re.sub(r"[^a-z0-9]+", "_", str(key or "").strip().lower()).strip("_")
+
+    def _field(row: dict, *names: str) -> str:
+        """Value of the first matching column, ignoring case/spaces/punctuation."""
+        normalized = {_norm_key(k): v for k, v in row.items()}
+        for name in names:
+            v = normalized.get(name)
+            if v is not None and str(v).strip() and str(v).strip().lower() not in ("nan", "none", "-", "—"):
+                return str(v).strip()
         return ""
 
-    pairs = [(_first_url(r), str(r.get("company_name") or r.get("name") or "").strip())
-             for r in input_rows]
-    pairs = [(u, c) for u, c in pairs if u]
-    if not pairs:
-        pairs = [
-            ("https://acme.com", "Acme Corp"),
-            ("https://bolt.new", "Bolt"),
-            ("https://vercel.com", "Vercel"),
-        ]
+    def _row_url(row: dict) -> str:
+        v = _field(row, "company_domain", "domain", "website", "company_website", "corp_site",
+                   "url", "website_url", "company_url", "site")
+        if not v and "@" in _field(row, "email"):
+            v = _field(row, "email").split("@", 1)[1]
+        return v if v and ("." in v or v.startswith("http")) else ""
 
-    with tempfile.NamedTemporaryFile(suffix=".xlsx", delete=False) as f:
-        tmp_in = f.name
+    def _clean_name(value: str) -> str:
+        return re.sub(r"[^a-z ]+", "", (value or "").lower()).strip()
+
+    if not settings.OPENAI_API_KEY:
+        raise RuntimeError("OPENAI_API_KEY is not configured; People & Contacts extraction cannot run.")
+
+    rows = [r for r in (input_rows or []) if isinstance(r, dict)]
+    if not rows:
+        raise RuntimeError("People & Contacts needs an uploaded input file with company domains.")
+
+    row_urls = [_row_url(r) for r in rows]
+    targets: Dict[str, Tuple[str, str]] = {}
+    for row, url in zip(rows, row_urls):
+        if not url:
+            continue
+        domain = ce.registrable_domain(ce.ensure_http_url(url))
+        if domain and domain not in targets:
+            targets[domain] = (url, _field(row, "company_name", "company", "organization"))
+    if not targets:
+        raise RuntimeError(
+            "No company domain/website column found in the uploaded file "
+            "(expected e.g. company_domain, domain, website or url)."
+        )
+
+    region_map = {"US": "US", "UK": "GB", "IN": "IN", "DE": "DE", "FR": "FR", "AU": "AU", "SG": "SG"}
+    phone_region = region_map.get(str(region or "").upper(), "US")
+
+    tmp_dir = tempfile.mkdtemp(prefix=f"contacts_{job_id}_")
+    tmp_in = os.path.join(tmp_dir, "input.xlsx")
     wb = Workbook()
     ws = wb.active
     ws.append(["url", "company"])
-    for url, company in pairs:
+    for url, company in targets.values():
         ws.append([url, company])
     wb.save(tmp_in)
 
     try:
         # settings only puts .env keys into os.environ temporarily, so pass the key
-        # explicitly — otherwise the extractor can't find it and returns nothing.
+        # explicitly — otherwise the extractor can't find it.
         cfg = ce.ExtractionConfig(
             input_path=tmp_in,
+            output_path=os.path.join(tmp_dir, "output.xlsx"),
             browser_provider="http",
-            api_key=settings.OPENAI_API_KEY or None,
+            api_key=settings.OPENAI_API_KEY,
+            phone_region=phone_region,
         )
         report = await ce.run_async(cfg)
-        return report.contacts
-    except Exception as exc:
-        logger.exception("Contact extraction failed for job %s: %s", job_id, exc)
-        return []
     finally:
-        try:
-            os.unlink(tmp_in)
-        except OSError:
-            pass
+        shutil.rmtree(tmp_dir, ignore_errors=True)
+
+    failed_sites = [s for s in report.per_site if s.get("status") == "failed"]
+    if failed_sites and len(failed_sites) == len(report.per_site):
+        errors = "; ".join(f"{s.get('input_url')}: {s.get('error')}" for s in failed_sites[:3])
+        raise RuntimeError(f"Contact extraction failed for every site — {errors}")
+    for s in failed_sites:
+        logger.warning("Job %s: contact extraction failed for %s: %s", job_id, s.get("input_url"), s.get("error"))
+
+    def _to_output(contact: dict) -> Dict[str, Any]:
+        name = (contact.get("name") or "").strip()
+        parts = name.split()
+        extracted = {
+            "full_name": name or None,
+            "first_name": parts[0] if len(parts) > 1 else None,
+            "last_name": " ".join(parts[1:]) if len(parts) > 1 else None,
+            "title": contact.get("title") or None,
+            "email": contact.get("email") or None,
+            "direct_phone": contact.get("phone") or None,
+            "phone": contact.get("phone") or None,
+            "linkedin_url": contact.get("linkedin") or None,
+            "company_name": contact.get("company") or None,
+            "company_domain": ce.registrable_domain(contact.get("input_url") or "") or None,
+            "source_url": contact.get("source_url") or None,
+        }
+        # Only fields the extractor actually found; everything else stays empty
+        # rather than being guessed.
+        keys = list(selected_outputs or extracted.keys())
+        record = {k: extracted.get(k) for k in keys}
+        record["_source_url"] = contact.get("source_url")
+        record["_confidence"] = contact.get("confidence")
+        return record
+
+    contacts = list(report.contacts or [])
+    by_domain: Dict[str, List[dict]] = {}
+    for c in contacts:
+        by_domain.setdefault(ce.registrable_domain(c.get("input_url") or ""), []).append(c)
+
+    # Review pairs run rows with input rows by index. If the upload lists specific
+    # people, return exactly one row per input person (matched by email or name);
+    # if it only lists companies, return every contact found.
+    person_rows = any(_field(r, "full_name", "name", "contact_name", "email", "first_name") for r in rows)
+    if not person_rows:
+        return [_to_output(c) for c in contacts]
+
+    results: List[Dict[str, Any]] = []
+    for row, url in zip(rows, row_urls):
+        domain = ce.registrable_domain(ce.ensure_http_url(url)) if url else ""
+        candidates = by_domain.get(domain, [])
+        email = _field(row, "email").lower()
+        full = _clean_name(_field(row, "full_name", "name", "contact_name")
+                           or " ".join(filter(None, [_field(row, "first_name"), _field(row, "last_name")])))
+        match = None
+        if email:
+            match = next((c for c in candidates if (c.get("email") or "").lower() == email), None)
+        if match is None and full:
+            match = next((c for c in candidates if _clean_name(c.get("name") or "") == full), None)
+            if match is None:
+                tokens = set(full.split())
+                match = next(
+                    (c for c in candidates
+                     if len(tokens) > 1 and tokens <= set(_clean_name(c.get("name") or "").split())),
+                    None,
+                )
+        if match is not None:
+            record = _to_output(match)
+            record["_match_status"] = "matched"
+        else:
+            record = {k: None for k in (selected_outputs or [])}
+            record["_match_status"] = "not_found" if url else "no_domain"
+        results.append(record)
+    return results
 
 
 @router.get("/jobs")

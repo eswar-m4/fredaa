@@ -996,7 +996,7 @@ function Review() {
             coverage: updatedCoverage ?? bulkSample.coverage ?? null,
           };
           setBulkSample(nextBulk);
-          const bulkKey = `${reviewCacheScope(openJob!)}:100:review_logic_v7:bulk`;
+          const bulkKey = `${reviewCacheScope(openJob!)}:100:review_logic_v8:bulk`;
           sampleCacheRef.current[bulkKey] = nextBulk;
           REVIEW_SAMPLE_CACHE.set(bulkKey, nextBulk);
         }
@@ -1167,7 +1167,7 @@ function Review() {
     if (bulkSample?.rows?.length) return bulkSample.rows;
 
     const bulkRate = 100;
-    const bulkKey = `${reviewCacheScope(openJob)}:${bulkRate}:review_logic_v7:bulk`;
+    const bulkKey = `${reviewCacheScope(openJob)}:${bulkRate}:review_logic_v8:bulk`;
     const cachedBulk = sampleCacheRef.current[bulkKey];
     if (cachedBulk) {
       setBulkSample(cachedBulk);
@@ -1197,41 +1197,62 @@ function Review() {
     }
   }
 
+  async function loadRowsForBulkAction(): Promise<any[] | null> {
+    try {
+      const rows = await ensureFullReviewRows();
+      if (!rows.length) {
+        toast.error("No review rows were found for this job.");
+        return null;
+      }
+      return rows;
+    } catch (err) {
+      console.error("Failed to load full review data:", err);
+      toast.error("Could not load all rows for this job. Please try again.");
+      return null;
+    }
+  }
+
+  // Counts are computed from the current rowStatus before updating it — a
+  // setState updater runs later, so counting inside it always reported 0.
   async function bulkApprove() {
-    if (!openJob) return;
-    const rows = await ensureFullReviewRows();
-    if (!rows.length) return;
-    let count = 0;
-    setRowStatus((s) => {
-      const next = { ...s };
-      rows.forEach((r: any) => {
-        const key = `${openJob.id}-${r.id}`;
-        if (next[key] === "rejected") {
-          return;
-        }
-        if (next[key] !== "approved" && next[key] !== "auto") count++;
-        next[key] = "approved";
+    if (!openJob || bulkLoading) return;
+    const jobId = openJob.id;
+    const rows = await loadRowsForBulkAction();
+    if (!rows) return;
+    // Approve every undecided row; rows the reviewer explicitly rejected stay rejected.
+    const toApprove = rows
+      .map((r: any) => `${jobId}-${r.id}`)
+      .filter((key) => rowStatus[key] !== "approved" && rowStatus[key] !== "auto" && rowStatus[key] !== "rejected");
+    const keptRejected = rows.filter((r: any) => rowStatus[`${jobId}-${r.id}`] === "rejected").length;
+    if (toApprove.length) {
+      setRowStatus((s) => {
+        const next = { ...s };
+        toApprove.forEach((key) => (next[key] = "approved"));
+        return next;
       });
-      return next;
-    });
-    toast.success(`Approved ${count} row${count === 1 ? "" : "s"} (entire job)`);
+    }
+    toast.success(
+      `Approved ${toApprove.length} row${toApprove.length === 1 ? "" : "s"} (entire job)` +
+        (keptRejected ? ` · ${keptRejected} rejected row${keptRejected === 1 ? "" : "s"} kept` : ""),
+    );
   }
 
   async function bulkReject() {
-    if (!openJob) return;
-    const rows = await ensureFullReviewRows();
-    if (!rows.length) return;
-    let count = 0;
-    setRowStatus((s) => {
-      const next = { ...s };
-      rows.forEach((r: any) => {
-        const key = `${openJob.id}-${r.id}`;
-        if (next[key] !== "rejected") count++;
-        next[key] = "rejected";
+    if (!openJob || bulkLoading) return;
+    const jobId = openJob.id;
+    const rows = await loadRowsForBulkAction();
+    if (!rows) return;
+    const toReject = rows
+      .map((r: any) => `${jobId}-${r.id}`)
+      .filter((key) => rowStatus[key] !== "rejected");
+    if (toReject.length) {
+      setRowStatus((s) => {
+        const next = { ...s };
+        toReject.forEach((key) => (next[key] = "rejected"));
+        return next;
       });
-      return next;
-    });
-    toast.success(`Rejected ${count} row${count === 1 ? "" : "s"} (entire job)`);
+    }
+    toast.success(`Rejected ${toReject.length} row${toReject.length === 1 ? "" : "s"} (entire job)`);
   }
 
   // 1. Fetch jobs from database
@@ -1464,7 +1485,7 @@ function Review() {
 
     const jobId = openJob.id;
     const sampleRate = jobRates[jobId] ?? 2;
-    const sampleKey = `${reviewCacheScope(openJob)}:${sampleRate}:review_logic_v7:${viewInBulk ? "bulk" : pageOffset}`;
+    const sampleKey = `${reviewCacheScope(openJob)}:${sampleRate}:review_logic_v8:${viewInBulk ? "bulk" : pageOffset}`;
 
     const bypass = forceRefreshRef.current;
     if (bypass) {
@@ -1562,7 +1583,7 @@ function Review() {
     }
 
     const bulkRate = 100;
-    const bulkKey = `${reviewCacheScope(openJob)}:${bulkRate}:review_logic_v7:bulk`;
+    const bulkKey = `${reviewCacheScope(openJob)}:${bulkRate}:review_logic_v8:bulk`;
     const cachedBulk = sampleCacheRef.current[bulkKey];
     if (cachedBulk) {
       setBulkSample(cachedBulk);
@@ -2479,11 +2500,13 @@ function Review() {
                       >
                         <Download className="h-3.5 w-3.5" /> Download reviewed file
                       </Button>
-                      <Button variant="outline" size="sm" onClick={bulkReject} disabled={!visibleRows.length}>
+                      <Button variant="outline" size="sm" onClick={bulkReject} disabled={!visibleRows.length || bulkLoading}>
                         <XCircle className="h-3.5 w-3.5" /> Reject all
                       </Button>
-                      <Button variant="outline" size="sm" onClick={bulkApprove} disabled={!visibleRows.length}>
-                        Bulk approve all ({visibleRows.length})
+                      <Button variant="outline" size="sm" onClick={bulkApprove} disabled={!visibleRows.length || bulkLoading}>
+                        {bulkLoading
+                          ? "Loading all rows…"
+                          : `Bulk approve all (${(activeSample?.totalSampled ?? visibleRecordGroups.length).toLocaleString()} records)`}
                       </Button>
                       <Button size="sm" onClick={handleSaveReview}>
                         <Send className="h-3.5 w-3.5" /> Save review

@@ -26,6 +26,7 @@ import {
   Database,
   ChevronRight,
   Globe,
+  Download,
 } from "lucide-react";
 import * as Icons from "lucide-react";
 import { toast } from "sonner";
@@ -508,6 +509,70 @@ function describeInputRequirement(ds: Dataset): string {
   return `Any spreadsheet works — include a ${need} column${extra}. Header names don't need to match exactly; columns are auto-detected.`;
 }
 
+// Input template: the dataset's real input columns as headers only (no example
+// rows — placeholder data must never end up in a real upload), plus an
+// Instructions sheet saying which columns are required and their format.
+async function downloadInputTemplate(ds: Dataset) {
+  const columns = ds.inputTemplateColumns?.length ? ds.inputTemplateColumns : ds.inputAttributes;
+  if (!columns.length) {
+    toast.error("This dataset has no input columns defined.");
+    return;
+  }
+  try {
+    const { default: ExcelJS } = await import("exceljs");
+    const workbook = new ExcelJS.Workbook();
+    workbook.creator = "Freda";
+    workbook.created = new Date();
+
+    const sheet = workbook.addWorksheet("Template", { views: [{ state: "frozen", ySplit: 1 }] });
+    sheet.columns = columns.map((c) => ({ header: c.key, key: c.key, width: Math.max(16, c.key.length + 4) }));
+    const header = sheet.getRow(1);
+    header.font = { bold: true, color: { argb: "FFFFFFFF" } };
+    columns.forEach((c, i) => {
+      header.getCell(i + 1).fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: c.required ? "FF1F5E4A" : "FF64748B" },
+      };
+      header.getCell(i + 1).note = `${c.label}${c.required ? " (required)" : " (optional)"}`;
+    });
+
+    const info = workbook.addWorksheet("Instructions");
+    info.columns = [
+      { header: "Column", key: "column", width: 22 },
+      { header: "Label", key: "label", width: 26 },
+      { header: "Required", key: "required", width: 10 },
+      { header: "Type", key: "type", width: 10 },
+      { header: "Format / accepted values", key: "format", width: 40 },
+    ];
+    info.getRow(1).font = { bold: true };
+    columns.forEach((c) =>
+      info.addRow({
+        column: c.key,
+        label: c.label,
+        required: c.required ? "Yes" : "No",
+        type: c.type,
+        format: c.example ?? "",
+      }),
+    );
+    info.addRow({});
+    info.addRow({ column: "Fill one row per record on the Template sheet. Green headers are required; header names may vary — columns are auto-detected." });
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${ds.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")}-input-template.xlsx`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success(`Downloaded ${a.download}`);
+  } catch (err) {
+    console.error("Failed to build input template:", err);
+    toast.error("Could not generate the input template.");
+  }
+}
+
 /* ───────── Step 2: pick source + map fields ───────── */
 function MapStep(p: {
   ds: Dataset;
@@ -788,7 +853,12 @@ function MapStep(p: {
                       Upload your dataset to get started.
                     </p>
                   </div>
-                  {p.seedFile && <Badge tone="success">{p.seedRows.toLocaleString()} rows</Badge>}
+                  <div className="flex items-center gap-2">
+                    {p.seedFile && <Badge tone="success">{p.seedRows.toLocaleString()} rows</Badge>}
+                    <Button variant="outline" size="sm" onClick={() => void downloadInputTemplate(p.ds)}>
+                      <Download className="h-3.5 w-3.5" /> Download input template
+                    </Button>
+                  </div>
                 </div>
 
                 <div className="border border-dashed border-border rounded-md p-8 text-center">

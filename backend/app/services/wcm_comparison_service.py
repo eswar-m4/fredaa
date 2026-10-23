@@ -1103,13 +1103,16 @@ def compare_records(
     from app.api.demo_routes import get_record_key
 
     baseline_map = {}
+    # Keys/indexes are absolute (record_offset + position) so rows from different
+    # batches never share an id and recordIndex points at the right record when
+    # decisions or edits are saved.
     for idx, r in enumerate(baseline_records):
         if is_dataset:
-            key = f"idx_{idx}"
+            key = f"idx_{record_offset + idx}"
         else:
             key = get_record_key(source, r)
             if not key or key.strip() == "":
-                key = f"idx_{idx}"
+                key = f"idx_{record_offset + idx}"
         orig_key = key
         counter = 1
         while key in baseline_map:
@@ -1120,11 +1123,11 @@ def compare_records(
     new_map = {}
     for idx, r in enumerate(new_records):
         if is_dataset:
-            key = f"idx_{idx}"
+            key = f"idx_{record_offset + idx}"
         else:
             key = get_record_key(source, r)
             if not key or key.strip() == "":
-                key = f"idx_{idx}"
+                key = f"idx_{record_offset + idx}"
         orig_key = key
         counter = 1
         while key in new_map:
@@ -1243,7 +1246,7 @@ def compare_records(
                 "record": f"Record {record_offset + idx + 1}",
                 "attribute": attr_label,
                 "attributeKey": attr,
-                "recordIndex": idx,
+                "recordIndex": record_offset + idx,
                 "previous": prev,
                 "value": new_val,
                 "changeType": change_type,
@@ -1298,7 +1301,7 @@ def get_review_rows(job_id: str, sample_rate: float, sample_offset: int = 0, inc
             pass
 
     cache_signature_parts: List[str] = [
-        "review_logic_v7",
+        "review_logic_v8",
         f"refresh_count={refresh_count}",
         f"source={source or ''}",
         f"scope={scope or ''}",
