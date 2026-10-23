@@ -900,7 +900,7 @@ const server = createServer(async (req, res) => {
           return;
         }
         if (embedMode === 'customer') {
-          proxy(req, res, CUSTOMER_PORT, session.username, session.userType);
+          proxy(req, res, url.startsWith('/api/') ? BACKEND_PORT : CUSTOMER_PORT, session.username, session.userType);
           return;
         }
       }
@@ -913,9 +913,14 @@ const server = createServer(async (req, res) => {
 
     // Proxy to the right app
     let targetPort;
-    if (session.userType === 'customer') {
+    if (url.startsWith('/api/')) {
+      // Backend API for everyone — customer portal pages use the same market
+      // pipelines (solutions, agents, Ask Freda). The customer app itself only
+      // serves pages and /_serverFn calls.
+      targetPort = BACKEND_PORT;
+    } else if (session.userType === 'customer') {
       targetPort = CUSTOMER_PORT;
-    } else if (url.startsWith('/api/') || url.startsWith('/docs') || url.startsWith('/redoc')) {
+    } else if (url.startsWith('/docs') || url.startsWith('/redoc')) {
       targetPort = BACKEND_PORT;
     } else {
       targetPort = MARKET_PORT;

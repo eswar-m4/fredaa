@@ -164,6 +164,10 @@ class FredaCatalogService:
             },
         )
 
+    def reload(self) -> None:
+        """Rebuild the indexes after solutions_catalog.json is regenerated."""
+        self.__init__()
+
     @staticmethod
     def _load_solutions() -> List[Dict[str, Any]]:
         if not _SOLUTIONS_PATH.exists():

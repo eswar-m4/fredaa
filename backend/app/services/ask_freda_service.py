@@ -417,6 +417,110 @@ def _is_path_label(text: str) -> bool:
     return (text or "").strip().lower() in _PATH_ACTION_LABELS
 
 
+# ---------------------------------------------------------------------------
+# Customer workspace context
+# ---------------------------------------------------------------------------
+
+_WORKSPACE_QUESTION = re.compile(
+    r"\b(my|our|existing|current|active)\s+(projects?|data\s?sets?|workspace|jobs?|feeds?)\b"
+    r"|\bwhat\s+(projects|data)\s+do\s+(i|we)\s+have\b"
+    r"|\b(project|projects)\s+(status|list|summary)\b"
+    r"|\bstatus\s+of\b|\bhow\s+is\s+.+\s+(doing|performing)\b",
+    re.IGNORECASE,
+)
+_STOPWORDS = {
+    "the", "and", "for", "with", "data", "from", "that", "this", "need", "want", "get", "all",
+    "of", "in", "on", "to", "a", "an", "my", "our", "is", "are", "be", "list", "details", "info",
+}
+
+
+def _tokens(text: str) -> set:
+    return {t for t in re.findall(r"[a-z0-9]+", (text or "").lower()) if len(t) > 2 and t not in _STOPWORDS}
+
+
+def _project_line(p: Dict[str, Any]) -> str:
+    bits = []
+    records = p.get("records")
+    if isinstance(records, (int, float)):
+        bits.append(f"{int(records):,} records")
+    if p.get("datapoints"):
+        bits.append(f"{len(p['datapoints'])} datapoints")
+    if p.get("sources"):
+        bits.append(f"{len(p['sources'])} sources")
+    if p.get("frequency"):
+        bits.append(f"refreshed {str(p['frequency']).lower()}")
+    if p.get("reviewStatus"):
+        bits.append(f"review: {p['reviewStatus']}")
+    quality = [
+        f"{label} {p[key]}%"
+        for key, label in (("coverage", "coverage"), ("accuracy", "accuracy"), ("freshness", "freshness"))
+        if p.get(key) is not None
+    ]
+    if quality:
+        bits.append(", ".join(quality))
+    return f"• {p.get('name', 'Project')}" + (f" — {'; '.join(bits)}" if bits else "")
+
+
+def _workspace_answer(latest: str, context: Dict[str, Any], state: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """Answer questions about the caller's own projects from the workspace context."""
+    projects = [p for p in (context.get("projects") or []) if isinstance(p, dict) and p.get("name")]
+    if not projects or state:
+        return None
+    text = latest.lower()
+    named = [p for p in projects if str(p["name"]).lower() in text]
+    if not named and not _WORKSPACE_QUESTION.search(latest):
+        return None
+    workspace = context.get("workspace") or "Your workspace"
+    shown = named or projects
+    lines = []
+    for p in shown:
+        lines.append(_project_line(p))
+        if named and p.get("datapoints"):
+            dps = [str(d) for d in p["datapoints"]]
+            lines.append(f"    Datapoints: {', '.join(dps[:15])}{' …' if len(dps) > 15 else ''}")
+        if named and p.get("sources"):
+            srcs = [str(s) for s in p["sources"]]
+            lines.append(f"    Sources: {', '.join(srcs[:10])}{' …' if len(srcs) > 10 else ''}")
+    if named:
+        header = f"Here's what {workspace} has for {', '.join(str(p['name']) for p in named)}:"
+    else:
+        header = f"{workspace} has {len(projects)} project{'s' if len(projects) != 1 else ''}:"
+    return {
+        "message": header + "\n\n" + "\n".join(lines) + "\n\nAsk me to extend one of these, or describe a new requirement.",
+        "actions": [
+            {"label": "Open Dashboard & review", "route": "/", "action": None},
+            {"label": "Open Monitor", "route": "/monitoring", "action": None},
+        ],
+        "next_question": None,
+        "phase": "browse_catalog",
+        "matches": [],
+        "state": {},
+    }
+
+
+def _flag_existing_projects(result: Dict[str, Any], latest: str, context: Dict[str, Any]) -> Dict[str, Any]:
+    """Prepend a note when an existing workspace project already overlaps the request."""
+    projects = [p for p in (context.get("projects") or []) if isinstance(p, dict) and p.get("name")]
+    if not projects or not isinstance(result, dict):
+        return result
+    want = _tokens(latest)
+    if not want:
+        return result
+    hits = []
+    for p in projects:
+        name_tokens = _tokens(str(p.get("name", "")))
+        have = name_tokens | _tokens(" ".join(str(d) for d in (p.get("datapoints") or [])))
+        overlap = want & have
+        if len(overlap) >= 2 or (name_tokens & want):
+            hits.append((len(overlap), p))
+    if not hits:
+        return result
+    hits.sort(key=lambda h: -h[0])
+    names = ", ".join(f"**{p['name']}**" for _, p in hits[:3])
+    note = f"You already have {names} in your workspace — it may already cover part of this.\n\n"
+    return {**result, "message": note + str(result.get("message") or "")}
+
+
 def _latest_user_text(messages: List[Dict[str, Any]]) -> str:
     for m in reversed(messages):
         if m.get("role") == "user":
@@ -472,7 +576,7 @@ def _choice_labels(raw: Any) -> List[str]:
     return labels
 
 
-_IN_APP_PATHS = {"/any-site", "/site-specific", "/library", "/monitoring", "/discover"}
+_IN_APP_PATHS = {"/any-site", "/site-specific", "/library", "/monitoring", "/discover", "/tracker"}
 
 
 def _in_app_route(href: Any) -> Optional[str]:
@@ -569,7 +673,7 @@ def _adapt_genesis(payload: Dict[str, Any]) -> Dict[str, Any]:
                 if isinstance(option, dict):
                     actions.append(_option_action(option))
         elif kind == "job":
-            actions.append({"label": "View in Monitoring", "route": "/monitoring", "action": None})
+            actions.append({"label": "Open Request tracker", "route": "/tracker", "action": None})
         elif kind == "estimate":
             estimate = card.get("estimate") or {}
             if isinstance(estimate, dict):
@@ -632,23 +736,35 @@ class AskFredaService:
         api_key: Optional[str] = None,
         state: Optional[Dict[str, Any]] = None,
         action: Optional[str] = None,
+        context: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         """
         Prefer the Genesis Ask Freda engine (offline catalog match + semantic
         fallback) so Discover and dataset/agent playbooks stay on one origin.
         Fall back to the local catalog LLM if that engine is unreachable.
+
+        ``context`` (customer portal) describes the caller's workspace and its
+        existing projects: questions about those are answered from it, and a
+        new requirement an existing project already overlaps is flagged.
         """
         latest = _latest_user_text(messages)
         state = state if isinstance(state, dict) else {}
+        context = context if isinstance(context, dict) else {}
         action = _infer_engine_action(latest, action, state)
+
+        workspace = _workspace_answer(latest, context, state) if latest and not action else None
+        if workspace is not None:
+            return workspace
+
         if latest and detect_browse_intent(latest) and not state and not action:
             return self._browse_response()
 
-        genesis = await self._chat_via_genesis(messages, state, action)
-        if genesis is not None:
-            return genesis
-
-        return await self._chat_legacy(messages, api_key, latest)
+        result = await self._chat_via_genesis(messages, state, action)
+        if result is None:
+            result = await self._chat_legacy(messages, api_key, latest)
+        if latest and not state and not action:
+            result = _flag_existing_projects(result, latest, context)
+        return result
 
     async def _chat_via_genesis(
         self,

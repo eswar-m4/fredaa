@@ -1589,8 +1589,11 @@ async def run_scraper_background(job_id: str):
                 )
 
             is_contacts_dataset = "people" in source_lower or "contact" in source_lower
+            from app.services.page_extraction_service import PAGE_DATASETS, run_page_dataset
+            page_dataset_id = str(config_data.get("datasetId") or "")
+            is_page_dataset = page_dataset_id in PAGE_DATASETS
 
-            if not input_rows and not is_contacts_dataset:
+            if not input_rows and not is_contacts_dataset and not is_page_dataset:
                 # No input file was ever uploaded for this job at all — this
                 # is a genuine demo/preview run (no real data was provided),
                 # not a failure of real user input.
@@ -1613,16 +1616,38 @@ async def run_scraper_background(job_id: str):
             # People & Contacts — bypass the standard company-enrichment pipeline
             # and run the dedicated contact extractor on the real uploaded rows
             # only (never the demo rows above; it raises if there is no input).
-            if is_contacts_dataset:
+            # ESG Compliance / Regulatory Incident solutions read the pages named in
+            # the uploaded rows (real input only — no demo rows, raises otherwise).
+            if is_page_dataset or is_contacts_dataset:
                 started_at = datetime.utcnow()
-                records = await _run_contact_extractor(
-                    job_id, source, input_rows, BASE_DIR,
-                    selected_outputs=selected_outputs,
-                    region=config_data.get("detectedRegion"),
-                )
+                if is_page_dataset:
+                    labels = {
+                        str(f.get("key")): f for f in (config_data.get("outputFields") or [])
+                        if isinstance(f, dict) and f.get("key")
+                    }
+                    output_fields = [
+                        {
+                            "key": key,
+                            "label": str((labels.get(key) or {}).get("label") or key.replace("_", " ").capitalize()),
+                            "group": str((labels.get(key) or {}).get("group") or ""),
+                        }
+                        for key in selected_outputs
+                    ]
+                    if not output_fields:
+                        raise RuntimeError(f"Job {job_id}: no datapoints were selected.")
+                    records, matched_count = await run_page_dataset(page_dataset_id, input_rows, output_fields)
+                    matched = records[:matched_count] if matched_count == len(records) else [
+                        r for r in records if any(r.get(f["key"]) is not None for f in output_fields if f["key"] not in ("source_url", "last_verified", "case_url"))
+                    ]
+                else:
+                    records = await _run_contact_extractor(
+                        job_id, source, input_rows, BASE_DIR,
+                        selected_outputs=selected_outputs,
+                        region=config_data.get("detectedRegion"),
+                    )
+                    matched = [r for r in records if r.get("_match_status") != "not_found" and r.get("_match_status") != "no_domain"]
                 now_str = datetime.utcnow().isoformat() + "Z"
                 records_count = len(records)
-                matched = [r for r in records if r.get("_match_status") != "not_found" and r.get("_match_status") != "no_domain"]
                 freshness_val = round(100 * len(matched) / records_count) if records_count else 0
                 next_refresh_str = _calculate_next_refresh_str(frequency)
                 history_entry = {
@@ -3754,6 +3779,51 @@ async def submit_solution_request(request: Request, payload: SolutionRequestPayl
     return {"success": True, "job_id": job_id}
 
 
+@router.get("/my-requests")
+async def list_my_requests(request: Request):
+    """Requests raised through Ask Freda, for the Tracker page.
+
+    Users see their own requests; admins see everyone's. Status and the admin's
+    notes come from the admin request audit, which the admin console updates.
+    """
+    session = auth_service.get_session(request)
+    if not session:
+        return []
+    is_admin = session.get("role") == "admin"
+    query = "SELECT * FROM admin_request_audit WHERE source = 'Ask Freda'"
+    params: tuple = ()
+    if not is_admin:
+        query += " AND username = ?"
+        params = (session.get("username"),)
+    query += " ORDER BY created_at DESC"
+    with get_connection() as conn:
+        rows = conn.execute(query, params).fetchall()
+
+    out = []
+    for row in rows:
+        r = dict(row)
+        try:
+            raw = json.loads(r.get("raw_payload_json") or "{}")
+        except Exception:
+            raw = {}
+        out.append({
+            "id": r.get("job_id") or r.get("id"),
+            "title": raw.get("title") or r.get("dataset_name") or r.get("scope") or "Ask Freda request",
+            "request": raw.get("request"),
+            "status": r.get("request_status") or r.get("job_status") or "Solution Requested",
+            "admin_note": r.get("decision_reason") or r.get("status_reason"),
+            "attributes": raw.get("attributes") or [],
+            "sources": [s.get("name") if isinstance(s, dict) else s for s in (raw.get("sources") or [])],
+            "volume": raw.get("volume"),
+            "timeline": raw.get("timeline"),
+            "cadence": raw.get("cadence"),
+            "raised_by": r.get("display_name") or r.get("username"),
+            "created_at": r.get("created_at"),
+            "updated_at": r.get("updated_at"),
+        })
+    return out
+
+
 # ---------------------------------------------------------------------------
 # Ask Freda AI chat endpoint
 # ---------------------------------------------------------------------------
@@ -3767,6 +3837,8 @@ class AskFredaChatRequest(BaseModel):
     messages: List[AskFredaMessage]
     state: Optional[Dict[str, Any]] = None
     action: Optional[str] = None
+    # Customer portal: {"workspace": name, "projects": [{name, records, datapoints, sources, ...}]}
+    context: Optional[Dict[str, Any]] = None
 
 
 @router.post("/ask-freda/chat")
@@ -3779,6 +3851,7 @@ async def ask_freda_chat(payload: AskFredaChatRequest):
         messages,
         state=payload.state,
         action=payload.action,
+        context=payload.context,
     )
     # result is a dict: {message, actions, next_question, phase, matches, state}
     return result

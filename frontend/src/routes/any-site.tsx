@@ -270,6 +270,11 @@ function AnySite() {
       datasetId: ds.id,
       workflowId: ds.workflowId,
       selectedOutputs,
+      // Labels/groups for the selected datapoints, so page-grounded solutions
+      // (ESG, Regulatory Incident) can tell the model what each field means.
+      outputFields: ds.outputAttributes
+        .filter((a) => selectedOutputs.includes(a.key))
+        .map((a) => ({ key: a.key, label: a.label, group: a.group ?? "" })),
       pickedSources,
       excludedSources,
       seedRows,

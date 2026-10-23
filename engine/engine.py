@@ -1047,7 +1047,7 @@ def _handle_build_new(message: str, state: dict, action: str | None, catalog: di
         }
     )
     return {
-        "text": "Here is the requirement I collected. Review it and submit the request to create a ticket in Monitoring.",
+        "text": "Here is the requirement I collected. Review it and submit the request to create a ticket in the Request tracker.",
         "state": next_state,
         "cards": _public_cards(
             [
@@ -1147,7 +1147,7 @@ def handle_chat(message: str, incoming: dict | None, action: str | None, history
             "text": (
                 f"Your new data requirement has been submitted to the Freda platform. "
                 f"Ticket {job['id']} is marked {job.get('status') or 'Solution Requested'}. "
-                "Track it in Monitoring for review."
+                "Track it in the Request tracker."
             ),
             "state": state,
             "cards": [{"type": "job", "title": "Submitted to Freda", "job": job}],

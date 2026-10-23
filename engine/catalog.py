@@ -46,8 +46,18 @@ def _rows(ws) -> list[dict[str, str]]:
     return out
 
 
-@lru_cache(maxsize=1)
 def load_catalog() -> dict:
+    """Catalog from the workbook, re-read whenever the file changes (the backend
+    regenerates the solution sheets from the frontend on startup)."""
+    try:
+        mtime = CATALOG_PATH.stat().st_mtime
+    except OSError:
+        mtime = 0.0
+    return _load_catalog(mtime)
+
+
+@lru_cache(maxsize=1)
+def _load_catalog(_mtime: float) -> dict:
     wb = load_workbook(CATALOG_PATH, data_only=True, read_only=True)
     overview_ws = wb["Overview"]
     overview: list[dict[str, str]] = []

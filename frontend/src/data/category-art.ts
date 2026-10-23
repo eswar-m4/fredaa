@@ -122,6 +122,20 @@ export const CATEGORY_ART: Record<string, CategoryArt> = {
     chip: "bg-slate-100 text-slate-700",
     blurb: "Headlines, mentions and intent signals",
   },
+  Environmental: {
+    icon: "Leaf",
+    gradient: "from-emerald-500 via-green-600 to-teal-700",
+    accent: "text-emerald-700",
+    chip: "bg-emerald-50 text-emerald-700",
+    blurb: "Emissions, disclosures and sustainability targets",
+  },
+  Regulatory: {
+    icon: "Gavel",
+    gradient: "from-slate-600 via-blue-800 to-slate-900",
+    accent: "text-blue-800",
+    chip: "bg-blue-50 text-blue-800",
+    blurb: "Registries, notices and enforcement actions",
+  },
 };
 
 export const DEFAULT_ART: CategoryArt = {

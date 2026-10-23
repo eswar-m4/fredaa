@@ -12,6 +12,7 @@ import type {
 } from "./types";
 
 let cached: Catalog | null = null;
+let cachedMtime = 0;
 
 function cell(value: unknown): string {
   if (value == null) return "";
@@ -72,14 +73,17 @@ function facetSheet(workbook: XLSX.WorkBook, name: string): FacetCount[] {
     .filter((row) => row.name);
 }
 
-function parseCatalog(): Catalog {
+function catalogFilePath(): string {
   // When deployed, the data directory lives one level above ask-web/ (at C:\fredaa\data\).
   // Fall back to the sibling path so both dev and server deployments work.
   const candidates = [
     path.join(process.cwd(), "data", "Freda_Agents_and_Solutions_Catalog.xlsx"),
     path.join(process.cwd(), "..", "data", "Freda_Agents_and_Solutions_Catalog.xlsx"),
   ];
-  const filePath = candidates.find((p) => fs.existsSync(p)) ?? candidates[0];
+  return candidates.find((p) => fs.existsSync(p)) ?? candidates[0];
+}
+
+function parseCatalog(filePath: string): Catalog {
   const buffer = fs.readFileSync(filePath);
   const workbook = XLSX.read(buffer, { type: "buffer", cellDates: true });
 
@@ -183,8 +187,20 @@ function parseCatalog(): Catalog {
   };
 }
 
+// Re-read when the workbook changes — the backend regenerates its solution
+// sheets from the frontend definitions on startup.
 export function loadCatalog(): Catalog {
-  if (!cached) cached = parseCatalog();
+  const filePath = catalogFilePath();
+  let mtime = 0;
+  try {
+    mtime = fs.statSync(filePath).mtimeMs;
+  } catch {
+    // parseCatalog reports the missing file
+  }
+  if (!cached || mtime !== cachedMtime) {
+    cached = parseCatalog(filePath);
+    cachedMtime = mtime;
+  }
   return cached;
 }
 

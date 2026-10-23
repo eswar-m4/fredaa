@@ -176,8 +176,30 @@ async def startup_event():
         except Exception:
             logger.exception("Failed to schedule review cache warmup")
 
+    async def sync_ask_freda_catalog():
+        # Keep Ask Freda's solution catalog identical to the Playbooks solutions
+        # (frontend datasets.ts + vertical-datasets.ts). Writes only on change.
+        try:
+            import importlib.util
+            from pathlib import Path
+
+            script = Path(__file__).resolve().parents[2] / "scripts" / "sync_ask_freda_catalog.py"
+            if not script.exists():
+                return
+            spec = importlib.util.spec_from_file_location("sync_ask_freda_catalog", script)
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)  # type: ignore[union-attr]
+            result = await asyncio.to_thread(module.sync)
+            if result.get("changed"):
+                from app.services.freda_catalog_service import freda_catalog_service
+                freda_catalog_service.reload()
+            logger.info("Ask Freda catalog sync: %s", result)
+        except Exception:
+            logger.exception("Ask Freda catalog sync failed; existing catalog kept")
+
     asyncio.create_task(refresh_scheduler_loop())
     asyncio.create_task(warm_pending_review_caches())
+    asyncio.create_task(sync_ask_freda_catalog())
     
     logger.info("Application initialization complete")
 

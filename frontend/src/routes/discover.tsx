@@ -514,8 +514,8 @@ function FredaAi() {
         ...prev,
         {
           kind: "freda",
-          text: "Your requirement has been submitted. The admin team will review it — you can track progress in Monitoring once it's approved and assigned a job.",
-          actions: [{ label: "View in Monitoring", route: "/monitoring" }],
+          text: "Your requirement has been submitted. The admin team will review it — track its status in the Request tracker.",
+          actions: [{ label: "Open Request tracker", route: "/tracker" }],
         },
       ]);
     } catch {

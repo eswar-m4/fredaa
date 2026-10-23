@@ -2,10 +2,8 @@ import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { ReactNode, useState, useEffect } from "react";
 import {
   LayoutDashboard,
-  BarChart3,
   Activity,
-  CheckSquare,
-  Upload,
+  Ticket,
   Bell,
   HelpCircle,
   PanelLeft,
@@ -26,15 +24,7 @@ const WORKSPACE: NavGroup = {
     { to: "/", label: "Dashboard", icon: LayoutDashboard },
     { to: "/monitoring", label: "Monitoring", icon: Activity },
     { to: "/playbooks", label: "Playbooks", icon: BookOpen },
-  ],
-};
-
-const OPERATE: NavGroup = {
-  group: "OPERATE",
-  items: [
-    { to: "/review", label: "Review", icon: CheckSquare },
-    { to: "/dashboard", label: "Analytics", icon: BarChart3 },
-    { to: "/export", label: "Export & Sync", icon: Upload },
+    { to: "/tracker", label: "Tracker", icon: Ticket },
   ],
 };
 
@@ -185,7 +175,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
     }
   }
 
-  const groups: NavGroup[] = [WORKSPACE, OPERATE];
+  const groups: NavGroup[] = [WORKSPACE];
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-background text-foreground">

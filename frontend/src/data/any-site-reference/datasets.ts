@@ -48,7 +48,9 @@ export type Dataset = {
     | "Jobs"
     | "Financial"
     | "News & Media"
-    | "Competitive";
+    | "Competitive"
+    | "Environmental"
+    | "Regulatory";
 
   tagline: string;
   description: string;
@@ -1083,4 +1085,6 @@ export const DATASET_CATEGORIES: Dataset["category"][] = [
   "Hospitality",
   "Legal",
   "Insurance",
+  "Environmental",
+  "Regulatory",
 ];

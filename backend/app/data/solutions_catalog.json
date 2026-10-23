@@ -1506,6 +1506,101 @@
         "Captured At"
       ],
       "outputFieldCount": 19
+    },
+    {
+      "id": "ds-esg-compliance",
+      "name": "ESG Compliance Monitoring",
+      "category": "Environmental",
+      "tagline": "Sustainability reports, targets, disclosure frameworks",
+      "description": "Tracks what companies actually state on their own public sustainability pages — report year, net-zero targets, renewable energy commitments, emissions disclosures and referenced frameworks (GRI/SASB/TCFD/CDP) — not a third-party rating score, which no public page states.",
+      "refreshDefault": "Monthly",
+      "coverage": 91,
+      "accuracy": 94,
+      "countriesCovered": 40,
+      "rowsAvailable": "Bring your own company list",
+      "sources": [
+        {
+          "name": "Company sustainability / ESG page (official)",
+          "kind": "Company website"
+        },
+        {
+          "name": "SEC EDGAR (10-K ESG addenda)",
+          "kind": "Regulator"
+        },
+        {
+          "name": "CDP Climate disclosures",
+          "kind": "Third-party"
+        },
+        {
+          "name": "GRI Sustainability Disclosure Database",
+          "kind": "Third-party"
+        }
+      ],
+      "outputFieldLabels": [
+        "Company Name",
+        "Sector / Industry",
+        "Most Recent Sustainability Report Year",
+        "Disclosure Framework Referenced (GRI/SASB/TCFD/CDP)",
+        "Stated Net-Zero / Carbon-Neutral Target Year",
+        "Renewable Energy Commitment or Current Usage",
+        "Scope 1/2 Emissions Disclosure Summary",
+        "Board / Workforce Diversity Statement",
+        "Named Certifications (B Corp, ISO 14001, etc.)",
+        "One-Line Summary of the Page's Main Message",
+        "Source URL",
+        "Last Verified"
+      ],
+      "outputFieldCount": 12
+    },
+    {
+      "id": "ds-regulatory-incident-tracking",
+      "name": "Regulatory Incident & Spill Tracking",
+      "category": "Regulatory",
+      "tagline": "Spill reports, hazmat incidents, case status by registry",
+      "description": "Tracks real environmental incident/spill registries case by case — incident type, location, chemicals involved and status — pulled in bulk from the regulator's own portal per jurisdiction, the same way ERIS's own Connecticut DEEP HazConnect registry (15,700+ real incidents) is onboarded.",
+      "refreshDefault": "Weekly",
+      "coverage": 98,
+      "accuracy": 97,
+      "countriesCovered": 2,
+      "rowsAvailable": "Bring your own registry per jurisdiction",
+      "sources": [
+        {
+          "name": "Connecticut DEEP HazConnect",
+          "kind": "Regulator"
+        },
+        {
+          "name": "North Dakota HazConnect",
+          "kind": "Regulator"
+        },
+        {
+          "name": "US EPA Superfund Document Search",
+          "kind": "Regulator"
+        },
+        {
+          "name": "Ontario Environmental Registry",
+          "kind": "Regulator"
+        },
+        {
+          "name": "Illinois FOIA Hazmat Search",
+          "kind": "Regulator"
+        }
+      ],
+      "outputFieldLabels": [
+        "Incident ID",
+        "Jurisdiction",
+        "Incident Date",
+        "Incident Type",
+        "Incident Subtype",
+        "Incident Description",
+        "Source Type",
+        "Source Subtype",
+        "Street Address",
+        "City / Town",
+        "Chemicals Involved",
+        "Case Record URL",
+        "Last Verified"
+      ],
+      "outputFieldCount": 13
     }
   ]
 }

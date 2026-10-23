@@ -4,6 +4,7 @@ import { BookOpen, Activity, Database, CheckSquare, TrendingUp } from "lucide-re
 import { AppLayout } from "@/components/AppLayout";
 import { Badge, Button, Card, PageHeader } from "@/components/ui-bits";
 import { readJobsCache, writeJobsCache } from "@/lib/jobs-cache";
+import { ReviewWorkspace } from "@/components/ReviewWorkspace";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -217,7 +218,7 @@ function Dashboard() {
     <AppLayout>
       <PageHeader
         title="Dashboard"
-        subtitle="Freda · active jobs, data quality and review status across all running workflows"
+        subtitle="Freda · active jobs, data quality and review across agents and solutions"
         actions={
           <Link to="/playbooks">
             <Button variant="outline" size="sm">
@@ -267,66 +268,11 @@ function Dashboard() {
           />
         </div>
 
-        <Card className="p-0 overflow-x-auto">
-          <div className="px-4 pt-4 pb-2 flex items-center justify-between gap-3">
-            <div>
-              <div className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">Jobs</div>
-              <div className="text-[14px] font-semibold mt-0.5">All running workflows</div>
-            </div>
-            <Badge tone="neutral">{jobs.length} total</Badge>
-          </div>
-          <table className="w-full min-w-[860px] text-[13px] border-separate border-spacing-0">
-            <thead className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">
-              <tr>
-                <th className="text-left px-4 py-3 border-b border-t border-border/40">Project / Source</th>
-                <th className="text-left px-4 py-3 border-b border-t border-border/40">Mode</th>
-                <th className="text-right px-4 py-3 border-b border-t border-border/40">Records</th>
-                <th className="text-left px-4 py-3 border-b border-t border-border/40">Freshness</th>
-                <th className="text-left px-4 py-3 border-b border-t border-border/40">Status</th>
-                <th className="text-right px-4 py-3 border-b border-t border-border/40">Last refresh</th>
-                <th className="text-right px-4 py-3 pr-5 border-b border-t border-border/40">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sortedJobs.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="px-4 py-10 text-center text-muted-foreground">
-                    No jobs found. Jobs will appear here once workflows are running.
-                  </td>
-                </tr>
-              ) : (
-                sortedJobs.map((job) => (
-                  <tr key={job.id} className="border-b border-border/40 last:border-b-0 hover:bg-secondary/30 transition-colors">
-                    <td className="px-4 py-3">
-                      <div className="font-medium text-foreground truncate max-w-[200px]">{getJobLabel(job)}</div>
-                      {job.source && job.project && (
-                        <div className="text-[11px] text-muted-foreground mt-0.5 truncate max-w-[200px]">{getJobSource(job)}</div>
-                      )}
-                    </td>
-                    <td className="px-4 py-3 text-muted-foreground">{job.mode || "—"}</td>
-                    <td className="px-4 py-3 text-right font-mono">{formatRecords(job)}</td>
-                    <td className="px-4 py-3">
-                      <span className="text-[12px] text-muted-foreground">{formatFreshness(job)}</span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <Badge tone={statusTone(job.status)}>{job.status || "Unknown"}</Badge>
-                    </td>
-                    <td className="px-4 py-3 text-right text-muted-foreground">
-                      {formatRelativeDate(job.last_refresh || job.created_at)}
-                    </td>
-                    <td className="px-4 py-3 pr-5 text-right">
-                      <Link to="/review" search={{ jobId: job.id } as any}>
-                        <Button variant="outline" size="sm">
-                          Review
-                        </Button>
-                      </Link>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </Card>
+        <div>
+          <div className="text-[11px] uppercase tracking-wider text-muted-foreground font-semibold">Review</div>
+          <div className="text-[14px] font-semibold mt-0.5 mb-3">Review by agents and solutions</div>
+          <ReviewWorkspace />
+        </div>
       </div>
     </AppLayout>
   );

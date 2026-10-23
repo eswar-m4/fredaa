@@ -119,7 +119,7 @@ class AuthService:
     def get_session(self, request: Request) -> Optional[Dict[str, Any]]:
         token = request.cookies.get("freda_session")
         if not token:
-            return None
+            return self._gateway_customer_session(request)
         now = datetime.utcnow()
         with get_connection() as conn:
             row = conn.execute(
@@ -169,6 +169,32 @@ class AuthService:
             "username": username,
             "role": "admin",
             "user_id": f"admin-{username}",
+            "display_name": username,
+            "created_at": now,
+            "updated_at": now,
+            "expires_at": now + timedelta(hours=1),
+            "last_seen_at": now,
+        }
+
+    @staticmethod
+    def _gateway_customer_session(request: Request) -> Optional[Dict[str, Any]]:
+        """Customer-portal identity asserted by the freda-auth gateway.
+
+        Customer users never get a backend session cookie (gateway-sync only
+        provisions market users), but the customer portal calls the same
+        backend pipelines. The gateway overwrites X-Freda-* on every proxied
+        request and the backend only listens on 127.0.0.1, so these headers are
+        trusted exactly like the gateway admin headers above.
+        """
+        username = request.headers.get("x-freda-user", "").strip()
+        if not username or request.headers.get("x-freda-type", "").strip() != "customer":
+            return None
+        now = datetime.utcnow()
+        return {
+            "session_token": f"gw-customer-{username}",
+            "username": username,
+            "role": "user",
+            "user_id": f"customer-{username}",
             "display_name": username,
             "created_at": now,
             "updated_at": now,
