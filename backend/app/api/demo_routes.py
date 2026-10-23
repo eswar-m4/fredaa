@@ -2642,6 +2642,13 @@ async def run_scraper_background(job_id: str):
     except Exception as e:
         import traceback
         traceback.print_exc()
+        # Keep the reason so the portals can show why a run failed.
+        try:
+            os.makedirs(os.path.join(BASE_DIR, "datasets"), exist_ok=True)
+            with open(os.path.join(BASE_DIR, "datasets", f"{job_id}_error.txt"), "w", encoding="utf-8") as f_err:
+                f_err.write(f"{type(e).__name__}: {e}")
+        except Exception:
+            pass
         with get_connection() as conn:
             conn.execute(
                 "UPDATE scraper_jobs SET status = 'Failed', fresh = 0 WHERE id = ?",
@@ -3306,6 +3313,37 @@ async def edit_value(req: EditValueRequest):
 
 
 # Confidence report preview route has been removed.
+
+
+@router.get("/jobs/{job_id}/records")
+async def get_job_records(job_id: str):
+    """Status and latest run records of one job (used by the customer portal to
+    pull a backend dataset run into a workspace project)."""
+    with get_connection() as conn:
+        row = conn.execute("SELECT status, refresh_count, records FROM scraper_jobs WHERE id = ?", (job_id,)).fetchone()
+    if not row:
+        raise HTTPException(status_code=404, detail="Job not found")
+    status, refresh_count = row[0], row[1]
+    error = None
+    error_path = os.path.join(BASE_DIR, "datasets", f"{job_id}_error.txt")
+    if status == "Failed" and os.path.exists(error_path):
+        try:
+            with open(error_path, "r", encoding="utf-8") as f_err:
+                error = f_err.read().strip() or None
+        except Exception:
+            error = None
+    records: List[Dict[str, Any]] = []
+    if status not in ("Running", "Refreshing", "Pending Onboarding"):
+        run_num = _latest_run_number_for_job(job_id, refresh_count)
+        run_path = os.path.join(BASE_DIR, "datasets", f"{job_id}_run_{max(1, run_num)}.json")
+        if os.path.exists(run_path):
+            try:
+                with open(run_path, "r", encoding="utf-8") as f_run:
+                    loaded = json.load(f_run)
+                records = loaded if isinstance(loaded, list) else []
+            except Exception:
+                records = []
+    return {"job_id": job_id, "status": status, "error": error, "records": records}
 
 
 @router.get("/jobs/review_data")
