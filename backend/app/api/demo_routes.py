@@ -2860,18 +2860,29 @@ async def _run_contact_extractor(job_id: str, source: str, input_rows: list, bas
     the backend venv.
     """
     import importlib.util
+    import sys
     import tempfile
     import os
     from openpyxl import Workbook
+    from app.config import settings
 
-    ce_path = os.path.join(base_dir, "..", "contact_extractor.py")
+    ce_path = os.path.abspath(os.path.join(base_dir, "..", "contact_extractor.py"))
     if not os.path.exists(ce_path):
         logger.error("contact_extractor.py not found at %s", ce_path)
         return []
 
-    spec = importlib.util.spec_from_file_location("contact_extractor", ce_path)
-    ce = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(ce)  # type: ignore[union-attr]
+    ce = sys.modules.get("contact_extractor")
+    if ce is None:
+        spec = importlib.util.spec_from_file_location("contact_extractor", ce_path)
+        ce = importlib.util.module_from_spec(spec)
+        # Register before exec: its @dataclass classes (with `from __future__ import
+        # annotations`) look their module up in sys.modules and crash otherwise.
+        sys.modules["contact_extractor"] = ce
+        try:
+            spec.loader.exec_module(ce)  # type: ignore[union-attr]
+        except Exception:
+            sys.modules.pop("contact_extractor", None)
+            raise
 
     def _first_url(row: dict) -> str:
         for key in ("company_domain", "corp_site", "website", "url", "domain"):
@@ -2900,7 +2911,13 @@ async def _run_contact_extractor(job_id: str, source: str, input_rows: list, bas
     wb.save(tmp_in)
 
     try:
-        cfg = ce.ExtractionConfig(input_path=tmp_in, browser_provider="http")
+        # settings only puts .env keys into os.environ temporarily, so pass the key
+        # explicitly — otherwise the extractor can't find it and returns nothing.
+        cfg = ce.ExtractionConfig(
+            input_path=tmp_in,
+            browser_provider="http",
+            api_key=settings.OPENAI_API_KEY or None,
+        )
         report = await ce.run_async(cfg)
         return report.contacts
     except Exception as exc:
