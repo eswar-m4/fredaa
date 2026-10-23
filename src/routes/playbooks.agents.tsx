@@ -10,6 +10,7 @@ import { addTicket } from "@/lib/ticket-store";
 import { logActivity } from "@/lib/logger";
 import { ATTRIBUTES } from "@/data/attributes";
 import { cn } from "@/lib/utils";
+import { AgentsCatalog } from "@/components/AgentsCatalog";
 
 export const Route = createFileRoute("/playbooks/agents")({
   head: () => ({
@@ -51,6 +52,9 @@ function AgentsPage() {
   const [cadence, setCadence] = useState<Record<string, Cadence>>({});
   const [customRule, setCustomRule] = useState<Record<string, string>>({});
   const [confirmed, setConfirmed] = useState<{ id: string; type: string } | null>(null);
+  // Tab 1: this workspace's projects and their sources (unchanged). Tab 2: the
+  // full market catalog of agents & sources, launched on the shared backend.
+  const [tab, setTab] = useState<"projects" | "catalog">("projects");
 
   const currentCadence: Cadence = cadence[project.id] ?? project.frequency;
   const currentRule = customRule[project.id] ?? "Every 2 weeks · Tuesday 06:00 UTC";
@@ -160,6 +164,31 @@ function AgentsPage() {
         </DialogContent>
       </Dialog>
 
+      <div className="px-7 pb-3">
+        <div role="tablist" className="inline-flex rounded-md border border-border overflow-hidden">
+          {([
+            { key: "projects", label: `Your projects (${customer.projects.length})` },
+            { key: "catalog", label: "All agents & sources" },
+          ] as const).map((t) => (
+            <button
+              key={t.key}
+              role="tab"
+              aria-selected={tab === t.key}
+              onClick={() => setTab(t.key)}
+              className={cn(
+                "px-4 py-1.5 text-[12.5px] font-medium border-r border-border last:border-r-0",
+                tab === t.key ? "bg-primary text-primary-foreground" : "bg-card hover:bg-secondary",
+              )}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {tab === "catalog" ? (
+        <AgentsCatalog />
+      ) : (
       <div className="px-7 pb-8 space-y-4">
 
         <div className="grid lg:grid-cols-2 gap-4 items-stretch">
@@ -344,6 +373,7 @@ function AgentsPage() {
           </div>
         </Card>
       </div>
+      )}
     </AppLayout>
   );
 }

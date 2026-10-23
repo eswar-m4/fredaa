@@ -12,11 +12,14 @@ import {
   type LiveRefreshProfile,
   type RegistryLiveRefreshProfile,
   type DirectoryLiveRefreshProfile,
+  type BackendDatasetLiveRefreshProfile,
 } from "@/lib/live-refresh-profiles";
+import { DATASETS } from "@/data/datasets";
+import { reviewRecordsFor as backendReviewRecords, rowsFromRun, runBackendDatasetJob } from "@/lib/backend-datasets";
 import { xlsxRowsToReviewRecords, reviewRecordsFor, reviewStatusFor, type Project, type ProjectStatus, type ReviewRecord, type ChangeType } from "@/data/customers";
 import type { LiveReviewData } from "@/components/ReviewDialog";
 import { clearReviewProgress } from "@/lib/review-status";
-import { isCustomProjectId } from "@/lib/custom-projects";
+import { isCustomProjectId, updateBackendProfileRows } from "@/lib/custom-projects";
 import {
   saveLiveReview,
   saveLiveSnapshot,
@@ -129,6 +132,7 @@ export async function fetchLiveReview(project: Project): Promise<LiveReviewData>
 
   if (profile.kind === "registry") return fetchRegistryLiveReview(project, profile);
   if (profile.kind === "directory") return fetchDirectoryLiveReview(project, profile);
+  if (profile.kind === "backend") return fetchBackendLiveReview(project, profile);
 
   // The entity list (ids, names, URLs) always comes from the on-file rows; the
   // values each field is compared against come from the previous run if any.
@@ -411,6 +415,40 @@ async function fetchDirectoryLiveReview(project: Project, profile: DirectoryLive
   };
   saveLiveReview(project.id, live);
   if (outcome.rows.length > 0) saveLiveSnapshot(project.id, profile.kind, outcome.rows);
+  clearReviewProgress(project.id);
+  return live;
+}
+
+/** Backend-pipeline projects (Firmographic, People & Contacts): "Run"
+ *  relaunches the same FreDA backend job with the same uploaded input and
+ *  diffs the new run against the previous one. */
+async function fetchBackendLiveReview(project: Project, profile: BackendDatasetLiveRefreshProfile): Promise<LiveReviewData> {
+  const dataset = DATASETS.find((d) => d.id === profile.datasetId);
+  if (!dataset) throw new Error(`Solution ${profile.datasetName} is no longer in the catalog.`);
+  const run = await runBackendDatasetJob({
+    dataset,
+    inputRows: profile.inputRows,
+    filters: profile.launchFilters,
+    frequency: profile.frequency,
+    jobId: profile.backendJobId,
+  });
+  const rows = rowsFromRun(run.records, profile.extractableFields);
+  const baseline = baselineFor(project.id, profile.kind, profile.currentValueRows);
+  const records = backendReviewRecords(project.id, baseline.rows, rows, profile.nameField, profile.extractableFields, baseline.fromPreviousRun);
+  const live: LiveReviewData = {
+    records,
+    checkedAt: new Date().toISOString(),
+    aiConfigured: true,
+    reachableCount: rows.length,
+    totalCount: run.records.length,
+    fetchErrors: rows.length === 0 ? [{ entity: profile.datasetName, error: "The run returned no data for the uploaded rows." }] : [],
+    profileKind: profile.kind,
+  };
+  saveLiveReview(project.id, live);
+  if (rows.length > 0) {
+    saveLiveSnapshot(project.id, profile.kind, rows);
+    updateBackendProfileRows(project.id, rows, run.jobId);
+  }
   clearReviewProgress(project.id);
   return live;
 }

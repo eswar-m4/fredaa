@@ -43,7 +43,8 @@ import { Badge, Button, Card, Input, PageHeader, SectionTitle, Select, Steps } f
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useActiveCustomer, useMounted } from "@/lib/workspace";
 import { readIntakeFile, type IntakeResult } from "@/lib/ai-intake";
-import { launchSelfServiceProject, launchDirectoryProject, launchContactsProject } from "@/lib/custom-projects";
+import { launchSelfServiceProject, launchDirectoryProject, launchBackendDatasetProject } from "@/lib/custom-projects";
+import { isBackendDataset, parseUploadViaBackend, rowsFromUrls } from "@/lib/backend-datasets";
 import { logActivity } from "@/lib/logger";
 import { estimate, fmt, type Project } from "@/data/customers";
 import { DATASETS, DATASET_CATEGORIES, type Dataset } from "@/data/datasets";
@@ -280,6 +281,13 @@ function DatasetSetup({ item, onBack }: { item: SetupItem; onBack: () => void })
   const [launchError, setLaunchError] = useState<string | null>(null);
   const [launchFetchErrors, setLaunchFetchErrors] = useState<{ entity: string; error: string }[]>([]);
   const fileRef = useRef<HTMLInputElement>(null);
+  // Firmographic Data / People & Contacts run on the shared backend pipeline
+  // (same as the market portal): the upload is parsed by the backend (CSV or
+  // Excel) and its rows are the job input.
+  const backend = isBackendDataset(item.id);
+  const [uploadRows, setUploadRows] = useState<Record<string, string>[]>([]);
+  const [uploadName, setUploadName] = useState<string | null>(null);
+  const [runStatus, setRunStatus] = useState<string | null>(null);
 
   const entityUrlCount = extraUrls.filter((u) => u.trim()).length;
   const sourceCount = wired.length + entityUrlCount;
@@ -297,6 +305,19 @@ function DatasetSetup({ item, onBack }: { item: SetupItem; onBack: () => void })
 
   async function readFile(file: File) {
     setReadError(null);
+    if (backend) {
+      try {
+        const parsed = await parseUploadViaBackend(file);
+        if (!parsed.records.length) throw new Error("The file has no data rows.");
+        setUploadRows(parsed.records);
+        setUploadName(file.name);
+      } catch (err) {
+        setUploadRows([]);
+        setUploadName(null);
+        setReadError(`Couldn't read "${file.name}": ${err instanceof Error ? err.message : String(err)}`);
+      }
+      return;
+    }
     try {
       const text = await file.text();
       const r = readIntakeFile(file.name, text);
@@ -316,19 +337,23 @@ function DatasetSetup({ item, onBack }: { item: SetupItem; onBack: () => void })
     logActivity("workflow_launched", `Launched dataset: ${item.name} · ${attrs.length} attributes · ${cadence} schedule`, "/playbooks/solutions");
     const urls = extraUrls.filter((u) => u.trim());
 
-    // People & Contacts — run the contact extractor now so real contacts land
-    // in the workspace immediately (same pattern as directory mode).
-    if (dataset.id === "ds-contacts") {
+    // Firmographic / People & Contacts — run the same backend By Dataset job as
+    // the market portal, on the uploaded rows (or the typed URLs) only.
+    if (backend) {
       setLaunching(true);
       setLaunchError(null);
+      setRunStatus("Launching");
       try {
-        const { project, fetchErrors } = await launchContactsProject({
+        const inputRows = uploadRows.length ? uploadRows : rowsFromUrls(dataset.id, urls);
+        const { project, fetchErrors } = await launchBackendDatasetProject({
           customerId: customer.id,
           projectName: name,
           dataset,
-          entityUrls: urls,
+          inputRows,
+          seedFile: uploadName,
           selectedAttributeKeys: attrs,
           cadence,
+          onStatus: setRunStatus,
         });
         setLaunchedProject(project);
         setLaunchFetchErrors(fetchErrors);
@@ -337,6 +362,7 @@ function DatasetSetup({ item, onBack }: { item: SetupItem; onBack: () => void })
         setLaunchError(err instanceof Error ? err.message : String(err));
       } finally {
         setLaunching(false);
+        setRunStatus(null);
       }
       return;
     }
@@ -454,12 +480,23 @@ function DatasetSetup({ item, onBack }: { item: SetupItem; onBack: () => void })
                 <div onClick={() => fileRef.current?.click()} className="rounded-lg border border-dashed border-primary/40 bg-primary/5 p-6 text-center cursor-pointer hover:bg-primary/10 transition">
                   <Upload className="h-6 w-6 mx-auto text-primary" />
                   <div className="text-[13px] font-medium mt-2">Upload your source / entity list</div>
-                  <div className="text-[11.5px] text-muted-foreground">CSV, TSV or TXT — FreDA AI reads the file, extracts source URLs and datapoint columns</div>
-                  <input ref={fileRef} type="file" className="hidden" accept=".csv,.tsv,.txt" onChange={(e) => { const f = e.target.files?.[0]; if (f) void readFile(f); }} />
+                  <div className="text-[11.5px] text-muted-foreground">
+                    {backend
+                      ? "CSV or Excel — one row per company (Firmographic) or per company/person (People & Contacts), with a domain or website column"
+                      : "CSV, TSV or TXT — FreDA AI reads the file, extracts source URLs and datapoint columns"}
+                  </div>
+                  <input ref={fileRef} type="file" className="hidden" accept={backend ? ".csv,.xlsx,.xls" : ".csv,.tsv,.txt"} onChange={(e) => { const f = e.target.files?.[0]; if (f) void readFile(f); }} />
                 </div>
                 {readError && (
                   <div className="rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2.5 text-[11.5px] text-destructive">
                     {readError}
+                  </div>
+                )}
+                {backend && uploadName && (
+                  <div className="rounded-lg border border-info/30 bg-info-bg px-3 py-2.5 text-[11.5px] text-info">
+                    <div className="font-medium inline-flex items-center gap-1.5">
+                      <FileSpreadsheet className="h-3.5 w-3.5" /> {uploadName} — {fmt(uploadRows.length)} rows ready for the FreDA pipeline
+                    </div>
                   </div>
                 )}
                 {intake && (
@@ -644,8 +681,10 @@ function DatasetSetup({ item, onBack }: { item: SetupItem; onBack: () => void })
                 {launching ? (
                   <div className="rounded-lg border border-border bg-secondary/30 p-4 text-[12.5px] text-muted-foreground flex items-center gap-2.5">
                     <RefreshCw className="h-4 w-4 animate-spin shrink-0" />
-                    Extracting real data from {entityUrlCount} directory {entityUrlCount === 1 ? "page" : "pages"} — pulling out every company/person each
-                    one names can take a minute or two for a large directory. Don&apos;t close this.
+                    {backend
+                      ? `Running on the FreDA pipeline (${runStatus ?? "Launching"}) — ${fmt(uploadRows.length || entityUrlCount)} input rows. Large lists can take several minutes. Don't close this.`
+                      : <>Extracting real data from {entityUrlCount} directory {entityUrlCount === 1 ? "page" : "pages"} — pulling out every company/person each
+                    one names can take a minute or two for a large directory. Don&apos;t close this.</>}
                   </div>
                 ) : launchedProject ? (
                   <div className="rounded-lg border border-success/40 bg-success-bg p-4 text-[12.5px] text-success space-y-1">
@@ -653,7 +692,11 @@ function DatasetSetup({ item, onBack }: { item: SetupItem; onBack: () => void })
                       <CheckCircle2 className="h-4 w-4" /> {launchedProject.name} is live in your workspace
                     </div>
                     <div>
-                      {directoryMode
+                      {backend
+                        ? launchedProject.records > 0
+                          ? `The FreDA pipeline returned ${fmt(launchedProject.records)} ${launchedProject.records === 1 ? "record" : "records"} — already in Review, ready to approve.`
+                          : "The run finished but returned no data for these rows — check the domains/websites in your file."
+                        : directoryMode
                         ? launchedProject.records > 0
                           ? `Found ${fmt(launchedProject.records)} real ${launchedProject.records === 1 ? "entry" : "entries"} across your directory pages — already in Review, ready to approve.`
                           : "No entries were found on those pages — double-check the URLs actually list companies/people, or that they're reachable."
@@ -682,7 +725,8 @@ function DatasetSetup({ item, onBack }: { item: SetupItem; onBack: () => void })
                     <Summary label="Datapoints" value={`${attrs.length} attributes`} />
                     <Summary label="Schedule" value={scheduleLabel} />
                     {intake && <Summary label="Uploaded file" value={intake.fileName} />}
-                    {entityUrlCount === 0 && (
+                    {backend && uploadName && <Summary label="Uploaded file" value={`${uploadName} · ${fmt(uploadRows.length)} rows`} />}
+                    {entityUrlCount === 0 && !(backend && uploadRows.length > 0) && (
                       <div className="rounded-lg border border-warning/40 bg-warning-bg px-3 py-2.5 text-[11.5px] text-warning">
                         Add at least one {directoryMode ? "directory" : "entity"} URL (Upload dataset, or type one in on the Wired sources step) — that's
                         what "Run" actually fetches. Without one, there's nothing to launch.
@@ -693,7 +737,7 @@ function DatasetSetup({ item, onBack }: { item: SetupItem; onBack: () => void })
                         Launch failed: {launchError}
                       </div>
                     )}
-                    <Button className="w-full mt-2" onClick={() => void launch()} disabled={!name.trim() || attrs.length === 0 || entityUrlCount === 0}>
+                    <Button className="w-full mt-2" onClick={() => void launch()} disabled={!name.trim() || attrs.length === 0 || (entityUrlCount === 0 && !(backend && uploadRows.length > 0))}>
                       <Rocket className="h-4 w-4" /> Launch now
                     </Button>
                   </div>

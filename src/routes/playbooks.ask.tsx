@@ -2,8 +2,11 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight, Activity, FolderPlus, LayoutDashboard, Bot } from "lucide-react";
 import { AppLayout, WorkspaceLoadingFallback } from "@/components/AppLayout";
 import { Button, Card, PageHeader } from "@/components/ui-bits";
-import { AskFredaPanel } from "@/components/AskFredaPanel";
+import { useMemo } from "react";
+import { AskFredaChat, type AskFredaWorkspaceContext } from "@/components/AskFredaChat";
 import { useActiveCustomer, useMounted } from "@/lib/workspace";
+import { reviewStatusFor } from "@/data/customers";
+import { addTicket } from "@/lib/ticket-store";
 
 export const Route = createFileRoute("/playbooks/ask")({
   head: () => ({
@@ -29,6 +32,44 @@ const NAV = [
 function AskPage() {
   const mounted = useMounted();
   const customer = useActiveCustomer();
+
+  // What Freda knows about this workspace: every project with its real
+  // attributes, so questions about existing projects are answered from them.
+  const context = useMemo<AskFredaWorkspaceContext>(
+    () => ({
+      workspace: customer.name,
+      industry: customer.industry,
+      projects: customer.projects.map((p) => ({
+        name: p.name,
+        records: p.records,
+        datapoints: p.datapoints,
+        sources: p.sources.map((s) => s.label),
+        frequency: p.frequency,
+        reviewStatus: reviewStatusFor(p),
+        coverage: p.coverage,
+        accuracy: p.accuracy,
+        freshness: p.freshness,
+        industry: customer.industry,
+      })),
+    }),
+    [customer],
+  );
+
+  function raiseTicket(title: string, detail: string) {
+    addTicket({
+      workspaceId: customer.id,
+      workspaceName: customer.name,
+      project: title,
+      type: "New project",
+      detail: title,
+      raisedBy: `${customer.shortName.toLowerCase()} workspace user (Ask FreDA)`,
+      estimateDays: 7,
+      sources: [],
+      datapoints: [],
+      industry: customer.industry,
+    });
+    void detail;
+  }
 
   if (!mounted) return <WorkspaceLoadingFallback />;
 
@@ -68,7 +109,7 @@ function AskPage() {
           })}
         </div>
 
-        <AskFredaPanel />
+        <AskFredaChat context={context} onSubmitted={raiseTicket} />
       </div>
     </AppLayout>
   );

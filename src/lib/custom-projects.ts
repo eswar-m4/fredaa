@@ -14,15 +14,16 @@
 // self-provisioned catalog-dataset case.
 import { useSyncExternalStore } from "react";
 import type { Project, SourceRef, ReviewRecord } from "@/data/customers";
-import type { WebpageLiveRefreshProfile, DirectoryLiveRefreshProfile } from "@/lib/live-refresh-types";
+import type { WebpageLiveRefreshProfile, DirectoryLiveRefreshProfile, BackendDatasetLiveRefreshProfile } from "@/lib/live-refresh-types";
 import type { Dataset } from "@/data/datasets";
 import { runDirectoryExtraction } from "@/lib/api/directory-extract.functions";
-import { runContactExtraction } from "@/lib/api/contact-extract.functions";
 import { diffRegistrySnapshot } from "@/lib/api/registry-refresh.core";
 import { saveLiveReview, saveLiveSnapshot } from "@/lib/live-review-store";
 import type { LiveReviewData } from "@/components/ReviewDialog";
+import { buildLaunchFilters, nameFieldFor, reviewRecordsFor, rowsFromRun, runBackendDatasetJob } from "@/lib/backend-datasets";
 
-export type CustomProjectEntry = { project: Project; profile: WebpageLiveRefreshProfile | DirectoryLiveRefreshProfile };
+type CustomProfile = WebpageLiveRefreshProfile | DirectoryLiveRefreshProfile | BackendDatasetLiveRefreshProfile;
+export type CustomProjectEntry = { project: Project; profile: CustomProfile };
 
 const KEY = "freda_custom_projects_v1";
 const listeners = new Set<() => void>();
@@ -404,7 +405,7 @@ export async function launchDirectoryProject(params: {
 /** Looked up by monitoring-live-review.ts / live-refresh-profiles.ts when a
  *  project id isn't one of the hand-built static profiles — the dynamic
  *  counterpart to LIVE_REFRESH_PROFILES. */
-export function getCustomLiveRefreshProfile(projectId: string): WebpageLiveRefreshProfile | DirectoryLiveRefreshProfile | null {
+export function getCustomLiveRefreshProfile(projectId: string): CustomProfile | null {
   const all = readAll();
   for (const entries of Object.values(all)) {
     const hit = entries.find((e) => e.project.id === projectId);
@@ -426,106 +427,122 @@ export function removeCustomProject(customerId: string, projectId: string) {
   persist({ ...all, [customerId]: next });
 }
 
-/** Provisions a People & Contacts project and immediately runs the
- *  contact extractor Python script to populate the first batch of rows.
- *  The project lands in Review pending with real contacts (or empty rows
- *  if extraction fails), same as launchDirectoryProject does for directories. */
-export async function launchContactsProject(params: {
+/** Provisions a project whose data comes from the shared FreDA backend
+ *  pipeline — the same By Dataset job the market portal runs (Firmographic
+ *  Data, People & Contacts). Runs the job now and lands the project with its
+ *  real first-run rows in Review (every value Added, since it's a new data
+ *  run). Only the customer's uploaded rows are used; a failed run throws its
+ *  real reason. Monitor's "Run" relaunches the same backend job. */
+export async function launchBackendDatasetProject(params: {
   customerId: string;
   projectName: string;
   dataset: Dataset;
-  entityUrls: string[];
+  inputRows: Record<string, string>[];
+  seedFile: string | null;
   selectedAttributeKeys: string[];
   cadence: string;
+  onStatus?: (status: string) => void;
 }): Promise<{ project: Project; fetchErrors: { entity: string; error: string }[] }> {
-  const { customerId, projectName, dataset, entityUrls, selectedAttributeKeys, cadence } = params;
+  const { customerId, projectName, dataset, inputRows, seedFile, selectedAttributeKeys, cadence, onStatus } = params;
   const id = nextCustomProjectId(customerId);
-  const urls = [...new Set(entityUrls.map((u) => u.trim()).filter(Boolean))];
+  const attrsByKey = new Map(dataset.outputAttributes.map((a) => [a.key, a]));
+  const fields = selectedAttributeKeys.filter((k) => attrsByKey.has(k));
+  if (!fields.length) throw new Error("Select at least one datapoint.");
+  const fieldLabels = Object.fromEntries(fields.map((f) => [f, attrsByKey.get(f)!.label]));
+  const frequency = cadence === "Custom" ? "Weekly" : cadence;
+  const filters = buildLaunchFilters(dataset, fields, frequency, seedFile, inputRows.length);
 
-  const pairs: [string, string][] = urls.map((u) => [u, nameFromUrl(u)]);
-  if (!pairs.length) {
-    pairs.push(["https://acme.com", "Acme Corp"], ["https://bolt.new", "Bolt"], ["https://vercel.com", "Vercel"]);
-  }
+  const run = await runBackendDatasetJob({ dataset, inputRows, filters, frequency, onStatus });
+  const rows = rowsFromRun(run.records, fields);
+  const nameField = nameFieldFor(dataset.id, fields);
 
-  let contacts: Record<string, string>[] = [];
-  const fetchErrors: { entity: string; error: string }[] = [];
-  try {
-    const result = await runContactExtraction({ data: { pairs } });
-    contacts = result.contacts;
-  } catch (err) {
-    fetchErrors.push({ entity: "contact extractor", error: err instanceof Error ? err.message : String(err) });
-  }
+  const records = reviewRecordsFor(id, [], rows, nameField, fields, false);
+  const live: LiveReviewData = {
+    records,
+    checkedAt: new Date().toISOString(),
+    aiConfigured: true,
+    reachableCount: rows.length,
+    totalCount: run.records.length,
+    fetchErrors: [],
+    profileKind: "backend",
+  };
+  saveLiveReview(id, live);
+  if (rows.length > 0) saveLiveSnapshot(id, "backend", rows);
 
-  const { fields, promptConfig } = promptConfigFromDataset(dataset, selectedAttributeKeys);
-  const columns = fields.length > 0 ? fields : ["name", "title", "email", "phone", "linkedin", "company"];
-
-  const sampleRows: Record<string, string>[] = contacts.length
-    ? contacts.map((c) => ({ ...c } as Record<string, string>))
-    : urls.map((url) => {
-        const row: Record<string, string> = { company: nameFromUrl(url), source_url: url };
-        for (const f of columns) if (!(f in row)) row[f] = "";
-        return row;
-      });
-
-  const profile: WebpageLiveRefreshProfile = {
-    kind: "webpage",
+  const profile: BackendDatasetLiveRefreshProfile = {
+    kind: "backend",
     projectId: id,
-    idField: "source_url",
-    nameField: "name",
-    urlField: "source_url",
-    extractableFields: columns,
-    currentValueRows: sampleRows,
-    promptConfig,
-    outputFormat: "flat",
+    datasetId: dataset.id,
+    datasetName: dataset.name,
+    backendJobId: run.jobId,
+    keyField: "__key",
+    nameField,
+    extractableFields: fields,
+    fieldLabels,
+    currentValueRows: rows,
+    inputRows,
+    launchFilters: filters,
+    frequency,
     outputSheetName: `${dataset.name} Output`,
-    usesSecEdgarOverlay: false,
   };
 
-  const sources: SourceRef[] = urls.length
-    ? urls.map((url, i) => ({
-        id: `${id}-src-${i}`,
-        label: nameFromUrl(url),
-        url,
-        status: "Live" as const,
-        records: contacts.filter((c) => c.input_url === url || c.source_url?.startsWith(url)).length || 1,
-        addedOn: new Date().toLocaleDateString("en-US", { month: "short", year: "numeric" }),
-      }))
-    : dataset.sources.slice(0, 5).map((s, i) => ({
-        id: `${id}-src-${i}`,
-        label: s.name,
-        url: s.url.startsWith("http") ? s.url : `https://${s.url}`,
-        status: "Live" as const,
-        records: 0,
-        addedOn: new Date().toLocaleDateString("en-US", { month: "short", year: "numeric" }),
-      }));
+  const coverage = rows.length ? Math.round((rows.reduce((n, r) => n + fields.filter((f) => r[f]).length, 0) / (rows.length * fields.length)) * 100) : 0;
+  const hosts = [...new Set(rows.map((r) => r.source_url).filter(Boolean).map((u) => nameFromUrl(u!)))];
+  const sources: SourceRef[] = (hosts.length ? hosts : dataset.sources.map((s) => s.name)).slice(0, 10).map((label, i) => ({
+    id: `${id}-src-${i}`,
+    label,
+    url: label.includes(".") ? `https://${label}` : "",
+    status: "Live" as const,
+    records: hosts.length ? rows.filter((r) => r.source_url && nameFromUrl(r.source_url) === label).length : 0,
+    addedOn: new Date().toLocaleDateString("en-US", { month: "short", year: "numeric" }),
+  }));
 
   const project: Project = {
     id,
     customerId,
     name: projectName,
     source: dataset.tagline,
-    websiteUrl: urls[0] ?? dataset.sources[0]?.url ?? "",
-    datapoints: columns,
+    websiteUrl: rows[0]?.source_url ?? "",
+    datapoints: fields.map((f) => fieldLabels[f] ?? f),
     sources,
-    records: sampleRows.length,
-    admv: { added: sampleRows.length, deleted: 0, modified: 0, verified: 0 },
-    freshness: sampleRows.length > 0 ? 92 : 0,
-    accuracy: sampleRows.length > 0 ? 88 : 0,
-    coverage: sampleRows.length > 0 ? 85 : 0,
+    records: rows.length,
+    admv: { added: records.length, deleted: 0, modified: 0, verified: 0 },
+    freshness: rows.length > 0 ? 100 : 0,
+    accuracy: 0,
+    coverage,
     frequency: FREQ_MAP[cadence] ?? "Weekly",
     lastRefreshHrs: 0,
     nextRefreshHrs: 0,
     status: "Review pending",
-    pendingReview: sampleRows.length,
+    pendingReview: records.length,
     history: [],
-    sampleRows,
-    columns,
+    sampleRows: rows,
+    columns: fields,
   };
 
   const all = readAll();
   const existing = all[customerId] ?? [];
   persist({ ...all, [customerId]: [...existing, { project, profile }] });
+  const fetchErrors = rows.length === 0 ? [{ entity: dataset.name, error: "The run finished but returned no data for the uploaded rows." }] : [];
   return { project, fetchErrors };
+}
+
+/** Updates a backend project's stored profile after a Monitor "Run". */
+export function updateBackendProfileRows(projectId: string, rows: Record<string, string>[], jobId: string) {
+  const all = readAll();
+  let changed = false;
+  const next: Record<string, CustomProjectEntry[]> = {};
+  for (const [cid, entries] of Object.entries(all)) {
+    next[cid] = entries.map((e) => {
+      if (e.project.id !== projectId || e.profile.kind !== "backend") return e;
+      changed = true;
+      return {
+        project: { ...e.project, records: rows.length, sampleRows: rows },
+        profile: { ...e.profile, currentValueRows: rows, backendJobId: jobId },
+      };
+    });
+  }
+  if (changed) persist(next);
 }
 
 /** True for a project id that was self-provisioned via launchSelfServiceProject

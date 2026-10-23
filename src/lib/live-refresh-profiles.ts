@@ -15,6 +15,7 @@ export type {
   WebpageLiveRefreshProfile,
   RegistryLiveRefreshProfile,
   DirectoryLiveRefreshProfile,
+  BackendDatasetLiveRefreshProfile,
   LiveRefreshProfile,
 } from "@/lib/live-refresh-types";
 import type { LiveRefreshProfile, RegistryLiveRefreshProfile, WebpageLiveRefreshProfile } from "@/lib/live-refresh-types";

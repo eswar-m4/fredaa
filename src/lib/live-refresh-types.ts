@@ -101,4 +101,30 @@ export type DirectoryLiveRefreshProfile = {
   entityLabel: string;
 };
 
-export type LiveRefreshProfile = WebpageLiveRefreshProfile | RegistryLiveRefreshProfile | DirectoryLiveRefreshProfile;
+/** A solution run on the shared FreDA backend pipeline (the same By Dataset
+ *  job the market portal launches) — used for Firmographic Data and People &
+ *  Contacts. "Run" relaunches that backend job with the same uploaded input
+ *  and diffs the new run against the previous one by keyField. */
+export type BackendDatasetLiveRefreshProfile = {
+  kind: "backend";
+  projectId: string;
+  datasetId: string;
+  datasetName: string;
+  backendJobId: string;
+  keyField: string;
+  nameField: string;
+  extractableFields: string[];
+  fieldLabels: Record<string, string>;
+  currentValueRows: Record<string, string>[];
+  /** The uploaded input rows, re-sent on every run. */
+  inputRows: Record<string, string>[];
+  launchFilters: string;
+  frequency: string;
+  outputSheetName: string;
+};
+
+export type LiveRefreshProfile =
+  | WebpageLiveRefreshProfile
+  | RegistryLiveRefreshProfile
+  | DirectoryLiveRefreshProfile
+  | BackendDatasetLiveRefreshProfile;
