@@ -2877,10 +2877,9 @@ async def _run_contact_extractor(
     failing raises instead of returning placeholder data. Records are keyed by
     the dataset's output fields so the Review grid can show them.
 
-    Uses browser_provider='http' (plain requests, no Playwright) so it works
-    inside the backend venv without needing Chromium installed.  Upgrade to
-    'playwright' on the server once `playwright install chromium` is run inside
-    the backend venv.
+    Crawls with Playwright Chromium (needs `python -m playwright install chromium`
+    in the backend venv); fails if Chromium can't start rather than degrading to
+    plain HTTP fetches, which miss JavaScript-rendered contacts.
     """
     import importlib.util
     import shutil
@@ -2963,17 +2962,49 @@ async def _run_contact_extractor(
         ws.append([url, company])
     wb.save(tmp_in)
 
+    # Real-browser crawl (Playwright Chromium). Many sites only render emails,
+    # titles and team listings with JavaScript, so plain HTTP fetches miss most
+    # contacts. The extractor silently falls back to plain HTTP when Chromium
+    # can't start, so check it launches first and fail loudly instead.
+    async def _crawl() -> Any:
+        try:
+            from playwright.async_api import async_playwright
+        except ImportError as exc:
+            raise RuntimeError(
+                "Playwright is not installed in the backend venv. Run: "
+                "pip install -r requirements.txt && python -m playwright install chromium"
+            ) from exc
+        try:
+            async with async_playwright() as pw:
+                browser = await pw.chromium.launch(headless=True)
+                await browser.close()
+        except Exception as exc:
+            raise RuntimeError(
+                f"Playwright Chromium could not start ({exc}). Run: python -m playwright install chromium"
+            ) from exc
+        return await ce.run_async(cfg)
+
+    def _crawl_in_thread() -> Any:
+        # Own event loop in a worker thread: keeps the API responsive during a
+        # long crawl, and Playwright needs a Proactor loop on Windows.
+        loop = asyncio.ProactorEventLoop() if sys.platform == "win32" else asyncio.new_event_loop()
+        try:
+            asyncio.set_event_loop(loop)
+            return loop.run_until_complete(_crawl())
+        finally:
+            loop.close()
+
     try:
         # settings only puts .env keys into os.environ temporarily, so pass the key
         # explicitly — otherwise the extractor can't find it.
         cfg = ce.ExtractionConfig(
             input_path=tmp_in,
             output_path=os.path.join(tmp_dir, "output.xlsx"),
-            browser_provider="http",
+            browser_provider="playwright",
             api_key=settings.OPENAI_API_KEY,
             phone_region=phone_region,
         )
-        report = await ce.run_async(cfg)
+        report = await asyncio.to_thread(_crawl_in_thread)
     finally:
         shutil.rmtree(tmp_dir, ignore_errors=True)
 
