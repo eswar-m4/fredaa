@@ -50,7 +50,9 @@ module.exports = {
     // ── Ask Freda Next.js app ────────────────────────────────────────────────
     {
       name: 'freda-ask-web',
-      script: './node_modules/.bin/next',
+      // Next's JS entry, not node_modules/.bin/next (a shell shim on Windows
+      // that PM2 can't run with the node interpreter). Build first: npm run build.
+      script: './node_modules/next/dist/bin/next',
       args: 'start --hostname 0.0.0.0 --port 43147',
       cwd: './ask-web',
       interpreter: 'node',
@@ -62,6 +64,24 @@ module.exports = {
         NODE_ENV: 'production',
         PORT: '43147',
       },
+    },
+
+    // ── Ask Freda engine (FastAPI) ───────────────────────────────────────────
+    // The backend's Ask Freda chat calls this on 127.0.0.1:43148
+    // (ASK_FREDA_ENGINE_URL). app.py only defines the app, so it must run
+    // under uvicorn — `python app.py` exits immediately and crash-loops.
+    // Create its venv with: python -m venv venv && venv\Scripts\pip install -r requirements.txt
+    // (inside ./engine). OPENAI_API_KEY goes in engine/.env.
+    {
+      name: 'freda-engine',
+      script: './venv/Scripts/pythonw.exe',
+      args: '-m uvicorn app:app --host 127.0.0.1 --port 43148 --workers 1',
+      cwd: './engine',
+      interpreter: 'none',
+      watch: false,
+      autorestart: true,
+      max_restarts: 10,
+      restart_delay: 5000,
     },
   ],
 };
