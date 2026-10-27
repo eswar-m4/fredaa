@@ -43,14 +43,15 @@ import { Badge, Button, Card, Input, PageHeader, SectionTitle, Select, Steps } f
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useActiveCustomer, useMounted } from "@/lib/workspace";
 import { readIntakeFile, type IntakeResult } from "@/lib/ai-intake";
-import { launchSelfServiceProject, launchDirectoryProject, launchBackendDatasetProject } from "@/lib/custom-projects";
-import { isBackendDataset, parseUploadViaBackend, rowsFromUrls } from "@/lib/backend-datasets";
+import { launchSelfServiceProject, launchDirectoryProject, addBackendProject } from "@/lib/custom-projects";
+import { buildSolutionJob, isBackendDataset, launchBackendJobs, parseUploadViaBackend, rowsFromUrls } from "@/lib/backend-datasets";
 import { logActivity } from "@/lib/logger";
 import { estimate, fmt, type Project } from "@/data/customers";
 import { DATASETS, DATASET_CATEGORIES, type Dataset } from "@/data/datasets";
 import { categoryArt } from "@/data/category-art";
 import { industryFit } from "@/lib/industry-datasets";
 import { cn } from "@/lib/utils";
+import { SolutionsCatalog } from "@/components/SolutionsCatalog";
 
 export const Route = createFileRoute("/playbooks/solutions")({
   head: () => ({
@@ -123,6 +124,9 @@ function SolutionsPage() {
   const [cat, setCat] = useState<string>("All");
   const [scope, setScope] = useState<"fit" | "all">("fit");
   const [active, setActive] = useState<SetupItem | null>(null);
+  // Tab 1: this customer's solutions (unchanged). Tab 2: all 21 solutions,
+  // set up and launched exactly as in the market portal.
+  const [tab, setTab] = useState<"customer" | "all">("customer");
 
   const pool = scope === "fit" ? relevant : datasets;
   const cats = DATASET_CATEGORIES as string[];
@@ -138,10 +142,47 @@ function SolutionsPage() {
 
   if (!mounted) return <WorkspaceLoadingFallback />;
 
+  const tabBar = (
+    <div className="px-7 pt-5">
+      <div role="tablist" className="inline-flex rounded-md border border-border overflow-hidden">
+        {([
+          { key: "customer", label: `${customer.shortName} solutions (${relevant.length})` },
+          { key: "all", label: `All solutions (${datasets.length})` },
+        ] as const).map((t) => (
+          <button
+            key={t.key}
+            role="tab"
+            aria-selected={tab === t.key}
+            onClick={() => {
+              setTab(t.key);
+              setActive(null);
+            }}
+            className={cn(
+              "px-4 py-1.5 text-[12.5px] font-medium border-r border-border last:border-r-0",
+              tab === t.key ? "bg-primary text-primary-foreground" : "bg-card hover:bg-secondary",
+            )}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+
+  if (tab === "all") {
+    return (
+      <AppLayout>
+        {tabBar}
+        <SolutionsCatalog />
+      </AppLayout>
+    );
+  }
+
   if (active) return <DatasetSetup item={active} onBack={() => setActive(null)} />;
 
   return (
     <AppLayout>
+      {tabBar}
       <PageHeader
         title={cat !== "All" ? `${cat} Data Set Up` : "Solutions — Dataset Setup"}
         subtitle="Pick a dataset, choose your sources or upload your own data, then select your datapoints. A workflow runs behind the scenes."
@@ -345,18 +386,27 @@ function DatasetSetup({ item, onBack }: { item: SetupItem; onBack: () => void })
       setRunStatus("Launching");
       try {
         const inputRows = uploadRows.length ? uploadRows : rowsFromUrls(dataset.id, urls);
-        const { project, fetchErrors } = await launchBackendDatasetProject({
+        if (!inputRows.length) throw new Error("Upload a file or add at least one URL first.");
+        const fields = attrs.filter((k) => dataset.outputAttributes.some((a) => a.key === k));
+        const frequency = cadence === "Custom" ? "Weekly" : cadence;
+        const job = buildSolutionJob({ dataset, inputRows, selectedOutputs: fields, frequency, seedFile: uploadName });
+        await launchBackendJobs([job]);
+        // The run continues in the background; the project fills in when it's done.
+        const project = addBackendProject({
           customerId: customer.id,
           projectName: name,
-          dataset,
-          inputRows,
-          seedFile: uploadName,
-          selectedAttributeKeys: attrs,
+          origin: "solution",
+          datasetId: dataset.id,
+          datasetName: dataset.name,
+          launchJob: job,
+          fields,
+          fieldLabels: Object.fromEntries(dataset.outputAttributes.filter((a) => fields.includes(a.key)).map((a) => [a.key, a.label])),
           cadence,
-          onStatus: setRunStatus,
+          sourceLabel: uploadName ?? `${inputRows.length} input rows`,
+          tagline: dataset.tagline,
         });
         setLaunchedProject(project);
-        setLaunchFetchErrors(fetchErrors);
+        setLaunchFetchErrors([]);
         setStep(WIZARD_STEPS.length - 1);
       } catch (err) {
         setLaunchError(err instanceof Error ? err.message : String(err));
@@ -695,7 +745,7 @@ function DatasetSetup({ item, onBack }: { item: SetupItem; onBack: () => void })
                       {backend
                         ? launchedProject.records > 0
                           ? `The FreDA pipeline returned ${fmt(launchedProject.records)} ${launchedProject.records === 1 ? "record" : "records"} — already in Review, ready to approve.`
-                          : "The run finished but returned no data for these rows — check the domains/websites in your file."
+                          : "Running on the FreDA pipeline now — it shows as Syncing in Monitor and lands in Review when the run finishes (large lists can take several minutes). You can leave this page."
                         : directoryMode
                         ? launchedProject.records > 0
                           ? `Found ${fmt(launchedProject.records)} real ${launchedProject.records === 1 ? "entry" : "entries"} across your directory pages — already in Review, ready to approve.`

@@ -101,26 +101,32 @@ export type DirectoryLiveRefreshProfile = {
   entityLabel: string;
 };
 
-/** A solution run on the shared FreDA backend pipeline (the same By Dataset
- *  job the market portal launches) — used for Firmographic Data and People &
- *  Contacts. "Run" relaunches that backend job with the same uploaded input
- *  and diffs the new run against the previous one by keyField. */
+/** A project whose data comes from a job on the shared FreDA backend — the
+ *  same jobs the market portal launches: a Solutions (By Dataset) run such as
+ *  Firmographic Data / People & Contacts, or an Agent run such as BSE or
+ *  National Grid. The job runs in the background; lib/backend-projects.ts
+ *  polls it and fills the project when it finishes. "Run" relaunches the
+ *  same job payload and diffs against the previous run by keyField. */
 export type BackendDatasetLiveRefreshProfile = {
   kind: "backend";
   projectId: string;
-  datasetId: string;
+  origin: "solution" | "agent";
+  /** Catalog solution id (solution runs only). */
+  datasetId?: string;
   datasetName: string;
   backendJobId: string;
+  /** The exact job sent to /api/v1/demo/jobs/launch (incl. input_data), re-sent on Run. */
+  launchJob: Record<string, unknown>;
   keyField: string;
   nameField: string;
+  /** Empty for agent runs until the first run returns (fields come from the data). */
   extractableFields: string[];
   fieldLabels: Record<string, string>;
   currentValueRows: Record<string, string>[];
-  /** The uploaded input rows, re-sent on every run. */
-  inputRows: Record<string, string>[];
-  launchFilters: string;
-  frequency: string;
   outputSheetName: string;
+  /** True while a backend run is in flight and not yet pulled into the project. */
+  pending?: boolean;
+  lastError?: string | null;
 };
 
 export type LiveRefreshProfile =

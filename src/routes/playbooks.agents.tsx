@@ -167,7 +167,7 @@ function AgentsPage() {
       <div className="px-7 pb-3">
         <div role="tablist" className="inline-flex rounded-md border border-border overflow-hidden">
           {([
-            { key: "projects", label: `Your projects (${customer.projects.length})` },
+            { key: "projects", label: `${customer.shortName} agents (${agents.length})` },
             { key: "catalog", label: "All agents & sources" },
           ] as const).map((t) => (
             <button

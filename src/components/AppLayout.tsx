@@ -18,6 +18,7 @@ import { fetchSession, logoutRequest, type SessionInfo } from "@/lib/auth";
 import { useTickets } from "@/lib/ticket-store";
 import { CUSTOMERS } from "@/data/customers";
 import { setActiveCustomer, useActiveCustomer } from "@/lib/workspace";
+import { useBackendProjectSync } from "@/lib/backend-project-sync";
 import fredaLogo from "@/assets/freda-mobius-bold.png";
 
 type NavItem = { to: string; label: string; icon: typeof Activity; hash?: string };
@@ -49,6 +50,8 @@ export function AppLayout({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const hash = useRouterState({ select: (s) => s.location.hash });
   const customer = useActiveCustomer();
+  // Pull finished backend runs (Solutions / Agents) into the workspace.
+  useBackendProjectSync();
 
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);

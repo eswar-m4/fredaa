@@ -30,7 +30,7 @@ export type AskFredaWorkspaceContext = {
     name: string;
     records?: number;
     datapoints?: string[];
-    sources?: string[];
+    sources?: { label: string; url?: string; records?: number }[];
     frequency?: string;
     reviewStatus?: string;
     coverage?: number;

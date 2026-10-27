@@ -14,12 +14,11 @@ import {
   type DirectoryLiveRefreshProfile,
   type BackendDatasetLiveRefreshProfile,
 } from "@/lib/live-refresh-profiles";
-import { DATASETS } from "@/data/datasets";
-import { reviewRecordsFor as backendReviewRecords, rowsFromRun, runBackendDatasetJob } from "@/lib/backend-datasets";
+import { launchBackendJobs, waitForBackendJob } from "@/lib/backend-datasets";
 import { xlsxRowsToReviewRecords, reviewRecordsFor, reviewStatusFor, type Project, type ProjectStatus, type ReviewRecord, type ChangeType } from "@/data/customers";
 import type { LiveReviewData } from "@/components/ReviewDialog";
 import { clearReviewProgress } from "@/lib/review-status";
-import { isCustomProjectId, updateBackendProfileRows } from "@/lib/custom-projects";
+import { applyBackendRun, isCustomProjectId, markBackendRunStarted } from "@/lib/custom-projects";
 import {
   saveLiveReview,
   saveLiveSnapshot,
@@ -76,6 +75,11 @@ export function isLiveCheckable(p: Project): boolean {
  *    - otherwise → "Review pending" (covers both "not started" and "partial") */
 export function monitorStatusFor(p: Project, isRunning = false): ProjectStatus {
   if (isRunning) return "Syncing";
+  const profile = getLiveRefreshProfile(p.id);
+  if (profile?.kind === "backend") {
+    if (profile.pending) return "Syncing";
+    if (profile.lastError) return "Needs attention";
+  }
   const live = loadLiveReview(p.id);
   if (live && live.fetchErrors.length > 0) return "Needs attention";
   return reviewStatusFor(p) === "Completed" ? "In sync" : "Review pending";
@@ -419,36 +423,21 @@ async function fetchDirectoryLiveReview(project: Project, profile: DirectoryLive
   return live;
 }
 
-/** Backend-pipeline projects (Firmographic, People & Contacts): "Run"
- *  relaunches the same FreDA backend job with the same uploaded input and
- *  diffs the new run against the previous one. */
+/** Backend projects (Solutions or Agent runs on the shared FreDA backend):
+ *  "Run" relaunches the same backend job and pulls the new run in, diffed
+ *  against the previous one. */
 async function fetchBackendLiveReview(project: Project, profile: BackendDatasetLiveRefreshProfile): Promise<LiveReviewData> {
-  const dataset = DATASETS.find((d) => d.id === profile.datasetId);
-  if (!dataset) throw new Error(`Solution ${profile.datasetName} is no longer in the catalog.`);
-  const run = await runBackendDatasetJob({
-    dataset,
-    inputRows: profile.inputRows,
-    filters: profile.launchFilters,
-    frequency: profile.frequency,
-    jobId: profile.backendJobId,
-  });
-  const rows = rowsFromRun(run.records, profile.extractableFields);
-  const baseline = baselineFor(project.id, profile.kind, profile.currentValueRows);
-  const records = backendReviewRecords(project.id, baseline.rows, rows, profile.nameField, profile.extractableFields, baseline.fromPreviousRun);
-  const live: LiveReviewData = {
-    records,
-    checkedAt: new Date().toISOString(),
-    aiConfigured: true,
-    reachableCount: rows.length,
-    totalCount: run.records.length,
-    fetchErrors: rows.length === 0 ? [{ entity: profile.datasetName, error: "The run returned no data for the uploaded rows." }] : [],
-    profileKind: profile.kind,
-  };
-  saveLiveReview(project.id, live);
-  if (rows.length > 0) {
-    saveLiveSnapshot(project.id, profile.kind, rows);
-    updateBackendProfileRows(project.id, rows, run.jobId);
+  markBackendRunStarted(project.id);
+  await launchBackendJobs([{ ...profile.launchJob, id: profile.backendJobId }]);
+  let state;
+  try {
+    state = await waitForBackendJob(profile.backendJobId);
+  } catch (err) {
+    applyBackendRun(project.id, { status: "Failed", error: err instanceof Error ? err.message : String(err), records: [], done: true });
+    throw err;
   }
+  const live = applyBackendRun(project.id, state);
+  if (!live) throw new Error(state.error ?? "The backend run failed.");
   clearReviewProgress(project.id);
   return live;
 }
@@ -556,6 +545,7 @@ export function recordsForDownload(project: Project): ReviewRecord[] {
   if (project.sampleRows && project.sampleRows.length > 0) {
     return xlsxRowsToReviewRecords(project);
   }
+  if (isCustomProjectId(project.id)) return [];
   return reviewRecordsFor(project, Math.min(POOL, Math.max(1200, project.pendingReview)));
 }
 

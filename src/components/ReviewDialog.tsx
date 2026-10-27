@@ -6,6 +6,7 @@ import { AlertTriangle, Check, X, ChevronLeft, ChevronRight, RotateCcw, Layers, 
 import { downloadCsv } from "@/lib/download";
 import { reviewRecordsFor, xlsxRowsToReviewRecords, fmt, hrsAgo, type Project, type ReviewRecord, type ChangeType } from "@/data/customers";
 import { isLiveCheckable, baselineReviewRecords } from "@/lib/monitoring-live-review";
+import { isCustomProjectId } from "@/lib/custom-projects";
 import { recordReviewSubmission } from "@/lib/review-status";
 
 type Decision = "approved" | "rejected";
@@ -68,6 +69,9 @@ export function ReviewDialog({
     if (project.sampleRows && project.sampleRows.length > 0) {
       return xlsxRowsToReviewRecords(project);
     }
+    // Self-provisioned projects only ever show their real runs — never the
+    // generated sample pool (e.g. a backend run that hasn't finished yet).
+    if (isCustomProjectId(project.id)) return [];
     return reviewRecordsFor(project, Math.min(POOL, Math.max(1200, project.pendingReview)));
   }, [project?.id, live]);
   const noLiveRunYet = !live && !!project && isLiveCheckable(project) && all.length === 0;

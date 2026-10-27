@@ -20,7 +20,7 @@ import { runDirectoryExtraction } from "@/lib/api/directory-extract.functions";
 import { diffRegistrySnapshot } from "@/lib/api/registry-refresh.core";
 import { saveLiveReview, saveLiveSnapshot } from "@/lib/live-review-store";
 import type { LiveReviewData } from "@/components/ReviewDialog";
-import { buildLaunchFilters, nameFieldFor, reviewRecordsFor, rowsFromRun, runBackendDatasetJob } from "@/lib/backend-datasets";
+import { deriveFields, humanize, nameFieldFor, reviewRecordsFor, rowsFromRun, type BackendJobState } from "@/lib/backend-datasets";
 
 type CustomProfile = WebpageLiveRefreshProfile | DirectoryLiveRefreshProfile | BackendDatasetLiveRefreshProfile;
 export type CustomProjectEntry = { project: Project; profile: CustomProfile };
@@ -427,122 +427,175 @@ export function removeCustomProject(customerId: string, projectId: string) {
   persist({ ...all, [customerId]: next });
 }
 
-/** Provisions a project whose data comes from the shared FreDA backend
- *  pipeline — the same By Dataset job the market portal runs (Firmographic
- *  Data, People & Contacts). Runs the job now and lands the project with its
- *  real first-run rows in Review (every value Added, since it's a new data
- *  run). Only the customer's uploaded rows are used; a failed run throws its
- *  real reason. Monitor's "Run" relaunches the same backend job. */
-export async function launchBackendDatasetProject(params: {
+/** Adds a project backed by a job already launched on the shared FreDA
+ *  backend (a Solutions run or an Agent run, same jobs as the market portal).
+ *  It shows up in Dashboard / Monitor straight away as Syncing; the
+ *  background sync (useBackendProjectSync) fills it with the real run when
+ *  the job finishes, or marks it Needs attention with the backend's reason. */
+export function addBackendProject(params: {
   customerId: string;
   projectName: string;
-  dataset: Dataset;
-  inputRows: Record<string, string>[];
-  seedFile: string | null;
-  selectedAttributeKeys: string[];
+  origin: "solution" | "agent";
+  datasetId?: string;
+  datasetName: string;
+  launchJob: Record<string, unknown>;
+  fields: string[];
+  fieldLabels?: Record<string, string>;
   cadence: string;
-  onStatus?: (status: string) => void;
-}): Promise<{ project: Project; fetchErrors: { entity: string; error: string }[] }> {
-  const { customerId, projectName, dataset, inputRows, seedFile, selectedAttributeKeys, cadence, onStatus } = params;
+  sourceLabel: string;
+  sourceUrl?: string;
+  tagline?: string;
+}): Project {
+  const { customerId, projectName, origin, datasetId, datasetName, launchJob, fields, cadence, sourceLabel, sourceUrl = "", tagline } = params;
   const id = nextCustomProjectId(customerId);
-  const attrsByKey = new Map(dataset.outputAttributes.map((a) => [a.key, a]));
-  const fields = selectedAttributeKeys.filter((k) => attrsByKey.has(k));
-  if (!fields.length) throw new Error("Select at least one datapoint.");
-  const fieldLabels = Object.fromEntries(fields.map((f) => [f, attrsByKey.get(f)!.label]));
-  const frequency = cadence === "Custom" ? "Weekly" : cadence;
-  const filters = buildLaunchFilters(dataset, fields, frequency, seedFile, inputRows.length);
-
-  const run = await runBackendDatasetJob({ dataset, inputRows, filters, frequency, onStatus });
-  const rows = rowsFromRun(run.records, fields);
-  const nameField = nameFieldFor(dataset.id, fields);
-
-  const records = reviewRecordsFor(id, [], rows, nameField, fields, false);
-  const live: LiveReviewData = {
-    records,
-    checkedAt: new Date().toISOString(),
-    aiConfigured: true,
-    reachableCount: rows.length,
-    totalCount: run.records.length,
-    fetchErrors: [],
-    profileKind: "backend",
-  };
-  saveLiveReview(id, live);
-  if (rows.length > 0) saveLiveSnapshot(id, "backend", rows);
-
+  const fieldLabels = params.fieldLabels ?? Object.fromEntries(fields.map((f) => [f, humanize(f)]));
   const profile: BackendDatasetLiveRefreshProfile = {
     kind: "backend",
     projectId: id,
-    datasetId: dataset.id,
-    datasetName: dataset.name,
-    backendJobId: run.jobId,
+    origin,
+    datasetId,
+    datasetName,
+    backendJobId: String(launchJob.id),
+    launchJob,
     keyField: "__key",
-    nameField,
+    nameField: nameFieldFor(fields, datasetId),
     extractableFields: fields,
     fieldLabels,
-    currentValueRows: rows,
-    inputRows,
-    launchFilters: filters,
-    frequency,
-    outputSheetName: `${dataset.name} Output`,
+    currentValueRows: [],
+    outputSheetName: `${datasetName} Output`,
+    pending: true,
+    lastError: null,
   };
-
-  const coverage = rows.length ? Math.round((rows.reduce((n, r) => n + fields.filter((f) => r[f]).length, 0) / (rows.length * fields.length)) * 100) : 0;
-  const hosts = [...new Set(rows.map((r) => r.source_url).filter(Boolean).map((u) => nameFromUrl(u!)))];
-  const sources: SourceRef[] = (hosts.length ? hosts : dataset.sources.map((s) => s.name)).slice(0, 10).map((label, i) => ({
-    id: `${id}-src-${i}`,
-    label,
-    url: label.includes(".") ? `https://${label}` : "",
-    status: "Live" as const,
-    records: hosts.length ? rows.filter((r) => r.source_url && nameFromUrl(r.source_url) === label).length : 0,
-    addedOn: new Date().toLocaleDateString("en-US", { month: "short", year: "numeric" }),
-  }));
-
   const project: Project = {
     id,
     customerId,
     name: projectName,
-    source: dataset.tagline,
-    websiteUrl: rows[0]?.source_url ?? "",
+    source: tagline ?? datasetName,
+    websiteUrl: sourceUrl,
     datapoints: fields.map((f) => fieldLabels[f] ?? f),
-    sources,
-    records: rows.length,
-    admv: { added: records.length, deleted: 0, modified: 0, verified: 0 },
-    freshness: rows.length > 0 ? 100 : 0,
+    sources: [
+      {
+        id: `${id}-src-0`,
+        label: sourceLabel,
+        url: sourceUrl,
+        status: "Live",
+        records: 0,
+        addedOn: new Date().toLocaleDateString("en-US", { month: "short", year: "numeric" }),
+      },
+    ],
+    records: 0,
+    admv: { added: 0, deleted: 0, modified: 0, verified: 0 },
+    freshness: 0,
     accuracy: 0,
-    coverage,
+    coverage: 0,
     frequency: FREQ_MAP[cadence] ?? "Weekly",
     lastRefreshHrs: 0,
     nextRefreshHrs: 0,
-    status: "Review pending",
-    pendingReview: records.length,
+    status: "Syncing",
+    pendingReview: 0,
     history: [],
-    sampleRows: rows,
+    sampleRows: [],
     columns: fields,
   };
-
   const all = readAll();
-  const existing = all[customerId] ?? [];
-  persist({ ...all, [customerId]: [...existing, { project, profile }] });
-  const fetchErrors = rows.length === 0 ? [{ entity: dataset.name, error: "The run finished but returned no data for the uploaded rows." }] : [];
-  return { project, fetchErrors };
+  persist({ ...all, [customerId]: [...(all[customerId] ?? []), { project, profile }] });
+  return project;
 }
 
-/** Updates a backend project's stored profile after a Monitor "Run". */
-export function updateBackendProfileRows(projectId: string, rows: Record<string, string>[], jobId: string) {
+/** Backend projects with a run still in flight (for the background sync). */
+export function pendingBackendProjects(): { project: Project; profile: BackendDatasetLiveRefreshProfile }[] {
+  const out: { project: Project; profile: BackendDatasetLiveRefreshProfile }[] = [];
+  for (const entries of Object.values(readAll())) {
+    for (const e of entries) {
+      if (e.profile.kind === "backend" && e.profile.pending) out.push({ project: e.project, profile: e.profile });
+    }
+  }
+  return out;
+}
+
+function updateEntry(projectId: string, fn: (e: CustomProjectEntry) => CustomProjectEntry) {
   const all = readAll();
   let changed = false;
   const next: Record<string, CustomProjectEntry[]> = {};
   for (const [cid, entries] of Object.entries(all)) {
     next[cid] = entries.map((e) => {
-      if (e.project.id !== projectId || e.profile.kind !== "backend") return e;
+      if (e.project.id !== projectId) return e;
       changed = true;
-      return {
-        project: { ...e.project, records: rows.length, sampleRows: rows },
-        profile: { ...e.profile, currentValueRows: rows, backendJobId: jobId },
-      };
+      return fn(e);
     });
   }
   if (changed) persist(next);
+}
+
+/** Marks a backend project's run as started again (Monitor "Run"). */
+export function markBackendRunStarted(projectId: string) {
+  updateEntry(projectId, (e) =>
+    e.profile.kind !== "backend" ? e : { project: { ...e.project, status: "Syncing" }, profile: { ...e.profile, pending: true, lastError: null } },
+  );
+}
+
+/** Pulls a finished backend run into its project: rows, Review records
+ *  (diffed against the previous run), counts and status. Returns the live
+ *  review it saved, or null if the run failed. */
+export function applyBackendRun(projectId: string, state: BackendJobState): LiveReviewData | null {
+  const entry = Object.values(readAll()).flat().find((e) => e.project.id === projectId);
+  if (!entry || entry.profile.kind !== "backend") return null;
+  const profile = entry.profile;
+
+  if (state.status === "Failed") {
+    updateEntry(projectId, (e) => ({
+      project: { ...e.project, status: "Needs attention" },
+      profile: { ...(e.profile as BackendDatasetLiveRefreshProfile), pending: false, lastError: state.error ?? "The backend run failed." },
+    }));
+    return null;
+  }
+
+  const fields = profile.extractableFields.length ? profile.extractableFields : deriveFields(state.records);
+  const fieldLabels = { ...Object.fromEntries(fields.map((f) => [f, humanize(f)])), ...profile.fieldLabels };
+  const nameField = profile.extractableFields.length ? profile.nameField : nameFieldFor(fields, profile.datasetId);
+  const rows = rowsFromRun(state.records, fields);
+  const previous = profile.currentValueRows;
+  const records: ReviewRecord[] = reviewRecordsFor(projectId, previous, rows, nameField, fields, previous.length > 0, profile.datasetName);
+  const live: LiveReviewData = {
+    records,
+    checkedAt: new Date().toISOString(),
+    aiConfigured: true,
+    reachableCount: rows.length,
+    totalCount: state.records.length,
+    fetchErrors: rows.length === 0 ? [{ entity: profile.datasetName, error: "The run finished but returned no data for this input." }] : [],
+    profileKind: "backend",
+  };
+  saveLiveReview(projectId, live);
+  if (rows.length > 0) saveLiveSnapshot(projectId, "backend", rows);
+
+  const count = (t: string) => records.filter((r) => r.changeType === t).length;
+  const filledCells = rows.reduce((n, r) => n + fields.filter((f) => r[f]).length, 0);
+  updateEntry(projectId, (e) => ({
+    project: {
+      ...e.project,
+      records: rows.length,
+      sampleRows: rows,
+      columns: fields,
+      datapoints: fields.map((f) => fieldLabels[f] ?? f),
+      admv: { added: count("Added"), deleted: count("Deleted"), modified: count("Modified"), verified: count("Verified") },
+      coverage: rows.length && fields.length ? Math.round((filledCells / (rows.length * fields.length)) * 100) : 0,
+      freshness: rows.length ? 100 : 0,
+      lastRefreshHrs: 0,
+      status: rows.length ? "Review pending" : "Needs attention",
+      pendingReview: records.length,
+      sources: e.project.sources.map((s, i) => (i === 0 ? { ...s, records: rows.length } : s)),
+    },
+    profile: {
+      ...(e.profile as BackendDatasetLiveRefreshProfile),
+      extractableFields: fields,
+      fieldLabels,
+      nameField,
+      currentValueRows: rows,
+      pending: false,
+      lastError: rows.length ? null : "The run finished but returned no data for this input.",
+    },
+  }));
+  return live;
 }
 
 /** True for a project id that was self-provisioned via launchSelfServiceProject

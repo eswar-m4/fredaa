@@ -1,8 +1,8 @@
-// Solutions that run on the shared FreDA backend pipeline — the same
-// "By Dataset" job the market portal launches (/api/v1/demo/jobs/launch), so
-// Firmographic Data and People & Contacts behave identically in both portals.
-// Only the customer's uploaded rows are used: no demo or placeholder input,
-// and a failed backend run surfaces its real reason instead of empty rows.
+// Jobs on the shared FreDA backend — the same jobs the market portal runs.
+// Solutions (By Dataset) such as Firmographic Data / People & Contacts and
+// Agents (Site-Specific) such as BSE or National Grid. Only the customer's
+// own input is sent: no demo or placeholder rows, and a failed run surfaces
+// the backend's real reason instead of empty data.
 import { apiFetch } from "@/lib/api";
 import type { Dataset } from "@/data/datasets";
 import type { ReviewRecord } from "@/data/customers";
@@ -40,83 +40,109 @@ export function rowsFromUrls(datasetId: string, urls: string[]): Record<string, 
   return urls.map((u) => u.trim()).filter(Boolean).map((u) => ({ [column]: u }));
 }
 
-export function buildLaunchFilters(dataset: Dataset, selectedOutputs: string[], frequency: string, seedFile: string | null, seedRows: number) {
-  return JSON.stringify({
+/** The By Dataset job the market portal's Solutions page sends for a dataset. */
+export function buildSolutionJob(params: {
+  dataset: Dataset;
+  inputRows: Record<string, string>[];
+  selectedOutputs: string[];
+  frequency: string;
+  seedFile: string | null;
+  pickedSources?: string[];
+  excludedSources?: string[];
+  delivery?: string;
+  format?: string;
+  detectedRegion?: string;
+}): Record<string, unknown> {
+  const { dataset, inputRows, selectedOutputs, frequency, seedFile } = params;
+  const filters = JSON.stringify({
     datasetId: dataset.id,
     workflowId: dataset.workflowId,
     selectedOutputs,
     outputFields: dataset.outputAttributes
       .filter((a) => selectedOutputs.includes(a.key))
       .map((a) => ({ key: a.key, label: a.label, group: a.group ?? "" })),
-    pickedSources: dataset.sources.map((s) => s.name),
-    excludedSources: [],
-    seedRows,
-    seedFile,
+    pickedSources: params.pickedSources ?? dataset.sources.map((s) => s.name),
+    excludedSources: params.excludedSources ?? [],
+    seedRows: inputRows.length,
     frequency,
+    delivery: params.delivery ?? "Portal",
+    format: params.format ?? "JSON",
     sourceMode: "upload",
+    detectedRegion: params.detectedRegion,
+    seedFile,
     portal: "customer",
   });
-}
-
-export type BackendRunResult = { jobId: string; records: Record<string, unknown>[] };
-
-const POLL_MS = 5000;
-const MAX_WAIT_MS = 30 * 60 * 1000;
-
-/** Launches (or relaunches, when jobId is given) a backend By Dataset job and
- *  waits for it to finish. Throws with the backend's reason if it fails. */
-export async function runBackendDatasetJob(params: {
-  dataset: Dataset;
-  inputRows: Record<string, string>[];
-  filters: string;
-  frequency: string;
-  jobId?: string;
-  onStatus?: (status: string) => void;
-}): Promise<BackendRunResult> {
-  const { dataset, inputRows, filters, frequency, onStatus } = params;
-  if (!inputRows.length) throw new Error(`${dataset.name} needs uploaded input rows — upload a file or enter URLs.`);
-  const jobId = params.jobId ?? `J-${Date.now()}`;
-  const job = {
-    id: jobId,
+  return {
+    id: `J-${Date.now()}`,
     source: dataset.name,
     dataset_name: dataset.name,
+    seed_file: seedFile,
     scope: "By Dataset",
     filters,
     frequency,
-    delivery: "Portal",
-    output_format: "JSON",
+    delivery: params.delivery ?? "Portal",
+    output_format: params.format ?? "JSON",
     isCustomSource: false,
     mode: "By Dataset",
     status: "Running",
     created_at: new Date().toISOString(),
     input_data: inputRows,
   };
-  const launch = await apiFetch("/api/v1/demo/jobs/launch", {
+}
+
+/** Starts (or reruns, same id) backend jobs. Throws with the backend's reason. */
+export async function launchBackendJobs(jobs: Record<string, unknown>[]): Promise<void> {
+  const res = await apiFetch("/api/v1/demo/jobs/launch", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ jobs: [job] }),
+    body: JSON.stringify({ jobs: jobs.map((j) => ({ ...j, status: j.status ?? "Running", created_at: new Date().toISOString() })) }),
     timeoutMs: 60000,
   });
-  if (!launch.ok) {
-    const detail = await launch.json().catch(() => null);
-    throw new Error(detail?.detail ? JSON.stringify(detail.detail) : `Backend rejected the launch (${launch.status})`);
+  if (!res.ok) {
+    const detail = await res.json().catch(() => null);
+    const reason = detail?.detail ? (typeof detail.detail === "string" ? detail.detail : JSON.stringify(detail.detail)) : `HTTP ${res.status}`;
+    throw new Error(`The FreDA backend rejected the launch: ${reason}`);
   }
+}
 
+export type BackendJobState = { status: string; error: string | null; records: Record<string, unknown>[]; done: boolean };
+
+const RUNNING = new Set(["Running", "Refreshing"]);
+
+/** One status check of a backend job. */
+export async function checkBackendJob(jobId: string): Promise<BackendJobState> {
+  const res = await apiFetch(`/api/v1/demo/jobs/${encodeURIComponent(jobId)}/records`, { timeoutMs: 30000 });
+  if (!res.ok) throw new Error(`Could not read backend job ${jobId} (HTTP ${res.status})`);
+  const data = await res.json();
+  const status = String(data.status ?? "");
+  return {
+    status,
+    error: data.error ? String(data.error) : null,
+    records: Array.isArray(data.records) ? data.records : [],
+    done: !RUNNING.has(status),
+  };
+}
+
+/** Jobs a page is actively waiting on — the background sync leaves these
+ *  alone so a finished run is never applied twice. */
+export const awaitedJobs = new Set<string>();
+
+/** Waits for a backend job (used by Monitor "Run"). */
+export async function waitForBackendJob(jobId: string, maxWaitMs = 30 * 60 * 1000): Promise<BackendJobState> {
   const started = Date.now();
-  for (;;) {
-    await new Promise((r) => setTimeout(r, POLL_MS));
-    const res = await apiFetch(`/api/v1/demo/jobs/${encodeURIComponent(jobId)}/records`, { timeoutMs: 30000 });
-    if (!res.ok) throw new Error(`Could not read the backend run (${res.status})`);
-    const data = await res.json();
-    const status = String(data.status ?? "");
-    onStatus?.(status);
-    if (status === "Failed") throw new Error(data.error ? String(data.error) : "The backend run failed.");
-    if (status !== "Running" && status !== "Refreshing") {
-      return { jobId, records: Array.isArray(data.records) ? data.records : [] };
+  awaitedJobs.add(jobId);
+  try {
+    for (;;) {
+      await new Promise((r) => setTimeout(r, 5000));
+      const state = await checkBackendJob(jobId);
+      if (state.done) {
+        if (state.status === "Failed") throw new Error(state.error ?? "The backend run failed.");
+        return state;
+      }
+      if (Date.now() - started > maxWaitMs) throw new Error("The backend run is still going after 30 minutes — check Monitor again later.");
     }
-    if (Date.now() - started > MAX_WAIT_MS) {
-      throw new Error("The backend run is taking longer than 30 minutes — it keeps running; check Monitor later.");
-    }
+  } finally {
+    awaitedJobs.delete(jobId);
   }
 }
 
@@ -127,21 +153,58 @@ function str(v: unknown): string {
   return String(v).trim();
 }
 
-/** Backend run records -> flat string rows over the tracked fields, keyed so
- *  runs can be diffed (one stable key per row). Rows the run couldn't match
- *  (no data at all) are dropped rather than shown as blank records. */
+const SKIP_KEYS = /^(_|id$|run_id$|timestamp$|scraped_at$|created_at$)/;
+
+/** Field keys for an agent run, from the data itself (first-seen order). */
+export function deriveFields(records: Record<string, unknown>[]): string[] {
+  const seen: string[] = [];
+  for (const rec of records.slice(0, 200)) {
+    for (const k of Object.keys(rec ?? {})) {
+      if (!SKIP_KEYS.test(k) && !seen.includes(k)) seen.push(k);
+    }
+  }
+  return seen.slice(0, 60);
+}
+
+/** Backend run records -> flat string rows over the tracked fields, each with
+ *  a stable __key so runs can be diffed. Rows with no data are dropped. */
 export function rowsFromRun(records: Record<string, unknown>[], fields: string[]): Record<string, string>[] {
   const rows: Record<string, string>[] = [];
+  const used = new Map<string, number>();
   records.forEach((rec, i) => {
     const row: Record<string, string> = {};
     for (const f of fields) row[f] = str(rec[f]);
     const sourceUrl = str(rec["_source_url"] ?? rec["source_url"]);
     if (sourceUrl) row.source_url = sourceUrl;
     if (!fields.some((f) => row[f])) return;
-    row.__key = keyFor(row, i);
+    let key = keyFor(row, fields, i);
+    const n = used.get(key) ?? 0;
+    used.set(key, n + 1);
+    if (n) key = `${key}#${n}`;
+    row.__key = key;
     rows.push(row);
   });
   return rows;
+}
+
+function keyFor(row: Record<string, string>, fields: string[], i: number): string {
+  const preferred =
+    row.email || row.linkedin_url || [row.full_name, row.company_domain || row.company_name].filter(Boolean).join("|") ||
+    row.website || row.domain || row.legal_name || row.company_name || row.cin || row.isin || row.ticker;
+  const fallback = fields.slice(0, 2).map((f) => row[f]).filter(Boolean).join("|");
+  return (preferred || fallback || `row-${i}`).toLowerCase();
+}
+
+export function nameFieldFor(fields: string[], datasetId?: string): string {
+  const prefs =
+    datasetId === "ds-contacts"
+      ? ["full_name", "email", "company_name"]
+      : ["legal_name", "company_name", "name", "full_name", "title", "company", "website", "domain"];
+  return prefs.find((f) => fields.includes(f)) ?? fields.find((f) => /name|title|company/i.test(f)) ?? fields[0] ?? "__key";
+}
+
+export function humanize(field: string): string {
+  return field.replace(/[_-]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 function hostOf(url: string | undefined): string {
@@ -153,18 +216,6 @@ function hostOf(url: string | undefined): string {
   }
 }
 
-function keyFor(row: Record<string, string>, i: number): string {
-  const ident =
-    row.email || row.linkedin_url || [row.full_name, row.company_domain || row.company_name].filter(Boolean).join("|") ||
-    row.website || row.domain || row.legal_name || row.company_name;
-  return (ident || `row-${i}`).toLowerCase();
-}
-
-export function nameFieldFor(datasetId: string, fields: string[]): string {
-  const prefs = datasetId === "ds-contacts" ? ["full_name", "email", "company_name"] : ["legal_name", "company_name", "website", "domain"];
-  return prefs.find((f) => fields.includes(f)) ?? fields[0] ?? "__key";
-}
-
 /** Review records for a run, diffed against the previous run's rows (empty on
  *  the first run, so every value is Added with no old value). */
 export function reviewRecordsFor(
@@ -174,6 +225,7 @@ export function reviewRecordsFor(
   nameField: string,
   fields: string[],
   includeRemoved: boolean,
+  fallbackSource = "",
 ): ReviewRecord[] {
   const diffed = diffRegistrySnapshot(previousRows, rows, "__key", nameField, fields, includeRemoved);
   const records: ReviewRecord[] = [];
@@ -188,7 +240,7 @@ export function reviewRecordsFor(
         newValue: d.newValue || "—",
         changeType: d.changeType,
         confidence: 90,
-        source: hostOf(rec.row.source_url) || rec.name,
+        source: hostOf(rec.row.source_url) || fallbackSource || rec.name,
         sourceUrl: rec.row.source_url ?? "",
         detectedHrs: 0,
       });

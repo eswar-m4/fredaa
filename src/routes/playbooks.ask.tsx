@@ -43,7 +43,7 @@ function AskPage() {
         name: p.name,
         records: p.records,
         datapoints: p.datapoints,
-        sources: p.sources.map((s) => s.label),
+        sources: p.sources.map((s) => ({ label: s.label, url: s.url, records: s.records })),
         frequency: p.frequency,
         reviewStatus: reviewStatusFor(p),
         coverage: p.coverage,

@@ -4,6 +4,9 @@ import { Badge, Button, Card, Input, PageHeader, Select, SectionTitle, Steps } f
 import { readJobsCache, writeJobsCache } from "@/lib/jobs-cache";
 import bots from "@/data/bots.json";
 import { hasAskFredaConversation } from "@/lib/ask-freda-session";
+import { useActiveCustomer } from "@/lib/workspace";
+import { addBackendProject } from "@/lib/custom-projects";
+import { addTicket } from "@/lib/ticket-store";
 import {
   ArrowLeft,
   Search,
@@ -1289,6 +1292,9 @@ function ScopeScheduleStep({
 
 function ReviewStep({ sel, onBack }: { sel: Selection; onBack: () => void }) {
   const navigate = useNavigate();
+  const customer = useActiveCustomer();
+  const [launching, setLaunching] = useState(false);
+  const [launchFailed, setLaunchFailed] = useState(false);
   const total = sel.items.length + (sel.newSite ? 1 : 0);
 
   const formatReviewCriteria = (criteria: string, botName: string) => {
@@ -1420,6 +1426,40 @@ function ReviewStep({ sel, onBack }: { sel: Selection; onBack: () => void }) {
         return false;
       }
 
+      // Each running agent job becomes a workspace project (Dashboard,
+      // Monitor, Review); the background sync fills it when the run is done.
+      // New sites awaiting onboarding go to the Request tracker instead.
+      sel.items.forEach((item, index) => {
+        const job = newJobs[index];
+        if (!job || job.status !== "Running") return;
+        addBackendProject({
+          customerId: customer.id,
+          projectName: `${item.bot.name} — ${customer.shortName}`,
+          origin: "agent",
+          datasetName: item.bot.name,
+          launchJob: job,
+          fields: [],
+          cadence: item.frequency,
+          sourceLabel: item.bot.name,
+          sourceUrl: item.bot.url,
+          tagline: `${item.bot.category || item.bot.type} agent · ${item.bot.country}`,
+        });
+      });
+      for (const job of newJobs.filter((j: any) => j.status === "Pending Onboarding")) {
+        addTicket({
+          workspaceId: customer.id,
+          workspaceName: customer.name,
+          project: String(job.source),
+          type: "Add source",
+          detail: `${job.isCustomSource ? "Onboard new site" : "Custom scrape"}: ${job.source}`,
+          raisedBy: `${customer.shortName.toLowerCase()} workspace user`,
+          estimateDays: 5,
+          sources: [String(job.source)],
+          datapoints: [],
+          frequency: String(job.frequency || ""),
+        });
+      }
+
       return true;
     } catch (err) {
       console.error("Failed to launch jobs:", err);
@@ -1502,15 +1542,25 @@ function ReviewStep({ sel, onBack }: { sel: Selection; onBack: () => void }) {
           </tbody>
         </table>
       </div>
+      {launchFailed && (
+        <div className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-[12px] text-destructive">
+          The FreDA backend didn&apos;t accept this launch. Please try again in a moment.
+        </div>
+      )}
       <div className="flex justify-between pt-2">
-        <Button variant="outline" onClick={onBack}>Back</Button>
+        <Button variant="outline" onClick={onBack} disabled={launching}>Back</Button>
         <Button
-          onClick={() => {
-            void handleLaunch();
-            navigate({ to: "/monitoring" });
+          disabled={launching}
+          onClick={async () => {
+            setLaunching(true);
+            setLaunchFailed(false);
+            const ok = await handleLaunch();
+            setLaunching(false);
+            if (ok) navigate({ to: "/monitoring" });
+            else setLaunchFailed(true);
           }}
         >
-          Launch & open Jobs <ArrowRight className="h-4 w-4" />
+          {launching ? "Launching…" : "Launch & open Monitor"} <ArrowRight className="h-4 w-4" />
         </Button>
       </div>
     </Card>
