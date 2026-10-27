@@ -77,6 +77,9 @@ def create_job(payload: dict) -> dict:
             "volume": estimate.get("volume") or extras_volume(req),
             "timeline": estimate.get("timeline"),
             "cadence": req.get("frequency") or req.get("recurring") or estimate.get("refresh"),
+            # Who asked — forwarded by the backend with each chat turn, so the
+            # request lands in that user's Request tracker.
+            "requested_by": payload.get("requester"),
         }
     )
     now = datetime.now(timezone.utc)

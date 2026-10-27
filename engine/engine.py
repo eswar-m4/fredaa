@@ -5,6 +5,7 @@ import re
 from urllib.parse import urlencode
 
 from catalog import load_catalog
+from workspace import PROJECT_AGENT_PREFIX, PROJECT_PREFIX, with_workspace
 from extract_req import classify_intent, extract_requirement, scope_summary
 from jobs import create_job, list_jobs
 from llm import complete_json, compose_scope_question, llm_config
@@ -59,12 +60,16 @@ CATALOG_QUESTION = re.compile(
 )
 
 def _dataset_setup_href(solution_id: str | None = None) -> str:
+    if solution_id and solution_id.startswith(PROJECT_PREFIX):
+        return "/monitoring"  # an existing customer project lives in Monitor
     if solution_id:
         return f"{USE_CAPABILITY_PATH}?{urlencode({'dataset': solution_id})}"
     return USE_CAPABILITY_PATH
 
 
 def _agent_href(agent_id: str | None = None) -> str:
+    if agent_id and agent_id.startswith(PROJECT_AGENT_PREFIX):
+        return "/playbooks/agents"  # customer portal Agents page
     if agent_id:
         return f"{USE_AGENT_PATH}?{urlencode({'agent': agent_id})}"
     return USE_AGENT_PATH
@@ -345,19 +350,32 @@ def _metadata_cards(message: str, catalog: dict) -> list[dict]:
 
 def _metadata_text(message: str, catalog: dict) -> str:
     q = (message or "").lower()
+    # Customer portal: the workspace's projects/agents are listed on top of
+    # the packaged catalog, never counted as packaged solutions.
+    packaged = [s for s in catalog["solutions"] if not s.get("workspaceProject")]
+    projects = [s for s in catalog["solutions"] if s.get("workspaceProject")]
+    agents = [a for a in catalog["agents"] if not a.get("workspaceProject")]
+    project_agents = [a for a in catalog["agents"] if a.get("workspaceProject")]
+    categories = len({s["category"] for s in packaged})
+    extra = ""
+    if projects:
+        extra = (
+            f"\n\nYour workspace also has {len(projects)} existing project{'s' if len(projects) != 1 else ''} "
+            f"({', '.join(s['name'] for s in projects)}) with {len(project_agents)} source agent"
+            f"{'s' if len(project_agents) != 1 else ''}."
+        )
     if "sheet" in q:
         return (
             f"The catalog workbook has Overview plus Agents, Solutions, Sources, and facet sheets. "
-            f"There are {len(catalog['agents'])} Agents, {len(catalog['solutions'])} Solutions, "
+            f"There are {len(agents)} Agents, {len(packaged)} Solutions, "
             f"and {len(catalog['sources'])} source rows."
-        )
-    if "solution" in q or "catalogue" in q:
+        ) + extra
+    if "solution" in q or "catalogue" in q or "project" in q:
         return (
-            f"There are {len(catalog['solutions'])} packaged Solutions across "
-            f"{len(catalog['solutionsByCategory'])} categories."
-        )
+            f"There are {len(packaged)} packaged Solutions across {categories} categories."
+        ) + extra
     if "agent" in q:
-        return f"The Agent catalog currently has {len(catalog['agents'])} extraction agents."
+        return f"The Agent catalog currently has {len(agents)} extraction agents." + extra
     bits = [f"{row['label']}: {row['value']}" for row in catalog["overview"][:8]]
     return "Catalog overview:\n" + "\n".join(bits)
 
@@ -1066,8 +1084,15 @@ def _handle_build_new(message: str, state: dict, action: str | None, catalog: di
         }
 
 
-def handle_chat(message: str, incoming: dict | None, action: str | None, history: list[dict] | None) -> dict:
-    catalog = load_catalog()
+def handle_chat(
+    message: str,
+    incoming: dict | None,
+    action: str | None,
+    history: list[dict] | None,
+    context: dict | None = None,
+) -> dict:
+    # Customer portal: the workspace's own projects/agents join the catalog.
+    catalog = with_workspace(load_catalog(), context)
     agents_by_id, solutions_by_id = _catalog_index(catalog)
     state = {**INITIAL_STATE, **(incoming or {})}
     state["requirement"] = _merge_requirement(state.get("requirement"), None)
@@ -1123,9 +1148,13 @@ def handle_chat(message: str, incoming: dict | None, action: str | None, history
                     "family": state.get("family") or "generic",
                     "estimate": estimate,
                     "answers": state.get("answersLog") or [],
+                    "requester": state.get("requester"),
                 }
             )
-        except Exception:
+        except Exception as exc:
+            import logging
+
+            logging.getLogger("ask_freda_engine").exception("Submitting the requirement failed: %s", exc)
             return {
                 "text": (
                     "I couldn't submit that requirement to the Freda platform. "

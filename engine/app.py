@@ -21,6 +21,8 @@ class ChatIn(BaseModel):
     state: dict | None = None
     action: str | None = None
     history: list[dict] = Field(default_factory=list)
+    # Customer portal workspace: {"workspace", "industry", "projects": [...]}
+    context: dict | None = None
 
 
 class NewSourceIn(BaseModel):
@@ -47,7 +49,7 @@ def get_catalog():
 @app.post("/chat")
 def post_chat(body: ChatIn):
     try:
-        return handle_chat(body.message, body.state, body.action, body.history)
+        return handle_chat(body.message, body.state, body.action, body.history, body.context)
     except RuntimeError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
     except Exception as exc:  # noqa: BLE001

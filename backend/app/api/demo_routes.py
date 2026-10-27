@@ -3753,6 +3753,10 @@ class SolutionRequestPayload(BaseModel):
     volume: Optional[str] = None
     timeline: Optional[str] = None
     cadence: Optional[str] = None
+    # Set by the Ask Freda engine, which calls this server-to-server with no
+    # session: the user the backend forwarded with the chat turn. Ignored
+    # whenever the caller has a session of its own.
+    requested_by: Optional[Dict[str, Any]] = None
 
 
 @router.post("/solution-request")
@@ -3760,6 +3764,13 @@ async def submit_solution_request(request: Request, payload: SolutionRequestPayl
     """Record an Ask Freda solution request in the admin console."""
     from app.services.admin_request_audit_service import admin_request_audit_service
     session = auth_service.get_session(request)
+    if not session and isinstance(payload.requested_by, dict) and payload.requested_by.get("username"):
+        session = {
+            "username": str(payload.requested_by.get("username")),
+            "display_name": str(payload.requested_by.get("display_name") or payload.requested_by.get("username")),
+            "user_id": str(payload.requested_by.get("user_id") or payload.requested_by.get("username")),
+            "role": str(payload.requested_by.get("role") or "user"),
+        }
     owner_username = (session or {}).get("username") or "user"
     display_name = (session or {}).get("display_name") or owner_username
     user_id = (session or {}).get("user_id") or owner_username
@@ -3880,14 +3891,24 @@ class AskFredaChatRequest(BaseModel):
 
 
 @router.post("/ask-freda/chat")
-async def ask_freda_chat(payload: AskFredaChatRequest):
+async def ask_freda_chat(request: Request, payload: AskFredaChatRequest):
     """Send conversation history to Ask Freda AI and return structured response."""
     from app.services.ask_freda_service import ask_freda_service
 
     messages = [{"role": m.role, "content": m.content} for m in payload.messages]
+    session = auth_service.get_session(request) or auth_service._gateway_admin_session(request)
+    requester = {
+        "username": session.get("username"),
+        "display_name": session.get("display_name"),
+        "user_id": session.get("user_id"),
+        "role": session.get("role"),
+    } if session else None
+    state = dict(payload.state or {})
+    if requester:
+        state["requester"] = requester
     result = await ask_freda_service.chat(
         messages,
-        state=payload.state,
+        state=state,
         action=payload.action,
         context=payload.context,
     )

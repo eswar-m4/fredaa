@@ -461,66 +461,6 @@ def _project_line(p: Dict[str, Any]) -> str:
     return f"• {p.get('name', 'Project')}" + (f" — {'; '.join(bits)}" if bits else "")
 
 
-def _workspace_answer(latest: str, context: Dict[str, Any], state: Dict[str, Any]) -> Optional[Dict[str, Any]]:
-    """Answer questions about the caller's own projects from the workspace context."""
-    projects = [p for p in (context.get("projects") or []) if isinstance(p, dict) and p.get("name")]
-    if not projects or state:
-        return None
-    text = latest.lower()
-    named = [p for p in projects if str(p["name"]).lower() in text]
-    if not named and not _WORKSPACE_QUESTION.search(latest):
-        return None
-    workspace = context.get("workspace") or "Your workspace"
-    shown = named or projects
-    lines = []
-    for p in shown:
-        lines.append(_project_line(p))
-        if named and p.get("datapoints"):
-            dps = [str(d) for d in p["datapoints"]]
-            lines.append(f"    Datapoints: {', '.join(dps[:15])}{' …' if len(dps) > 15 else ''}")
-        if named and p.get("sources"):
-            srcs = [str(s) for s in p["sources"]]
-            lines.append(f"    Sources: {', '.join(srcs[:10])}{' …' if len(srcs) > 10 else ''}")
-    if named:
-        header = f"Here's what {workspace} has for {', '.join(str(p['name']) for p in named)}:"
-    else:
-        header = f"{workspace} has {len(projects)} project{'s' if len(projects) != 1 else ''}:"
-    return {
-        "message": header + "\n\n" + "\n".join(lines) + "\n\nAsk me to extend one of these, or describe a new requirement.",
-        "actions": [
-            {"label": "Open Dashboard & review", "route": "/", "action": None},
-            {"label": "Open Monitor", "route": "/monitoring", "action": None},
-        ],
-        "next_question": None,
-        "phase": "browse_catalog",
-        "matches": [],
-        "state": {},
-    }
-
-
-def _flag_existing_projects(result: Dict[str, Any], latest: str, context: Dict[str, Any]) -> Dict[str, Any]:
-    """Prepend a note when an existing workspace project already overlaps the request."""
-    projects = [p for p in (context.get("projects") or []) if isinstance(p, dict) and p.get("name")]
-    if not projects or not isinstance(result, dict):
-        return result
-    want = _tokens(latest)
-    if not want:
-        return result
-    hits = []
-    for p in projects:
-        name_tokens = _tokens(str(p.get("name", "")))
-        have = name_tokens | _tokens(" ".join(str(d) for d in (p.get("datapoints") or [])))
-        overlap = want & have
-        if len(overlap) >= 2 or (name_tokens & want):
-            hits.append((len(overlap), p))
-    if not hits:
-        return result
-    hits.sort(key=lambda h: -h[0])
-    names = ", ".join(f"**{p['name']}**" for _, p in hits[:3])
-    note = f"You already have {names} in your workspace — it may already cover part of this.\n\n"
-    return {**result, "message": note + str(result.get("message") or "")}
-
-
 def _latest_user_text(messages: List[Dict[str, Any]]) -> str:
     for m in reversed(messages):
         if m.get("role") == "user":
@@ -750,20 +690,21 @@ class AskFredaService:
         latest = _latest_user_text(messages)
         state = state if isinstance(state, dict) else {}
         context = context if isinstance(context, dict) else {}
-        action = _infer_engine_action(latest, action, state)
+        # "requester" rides along on every turn (see the chat endpoint); it
+        # isn't conversation state, so a new chat still counts as fresh.
+        convo = {k: v for k, v in state.items() if k != "requester"}
+        action = _infer_engine_action(latest, action, convo)
 
-        workspace = _workspace_answer(latest, context, state) if latest and not action else None
-        if workspace is not None:
-            return workspace
+        # Same flow as the market portal. A customer workspace only extends what
+        # Freda searches: the engine adds its projects/agents to the catalog
+        # (match, use existing, expand, new scope), and the browse listing
+        # appends them.
+        if latest and detect_browse_intent(latest) and not convo and not action:
+            return self._browse_response(context)
 
-        if latest and detect_browse_intent(latest) and not state and not action:
-            return self._browse_response()
-
-        result = await self._chat_via_genesis(messages, state, action)
+        result = await self._chat_via_genesis(messages, state, action, context)
         if result is None:
             result = await self._chat_legacy(messages, api_key, latest)
-        if latest and not state and not action:
-            result = _flag_existing_projects(result, latest, context)
         return result
 
     async def _chat_via_genesis(
@@ -771,6 +712,7 @@ class AskFredaService:
         messages: List[Dict[str, Any]],
         state: Optional[Dict[str, Any]],
         action: Optional[str],
+        context: Optional[Dict[str, Any]] = None,
     ) -> Optional[Dict[str, Any]]:
         engine_url = str(getattr(settings, "ASK_FREDA_ENGINE_URL", "") or os.environ.get("ASK_FREDA_ENGINE_URL") or "http://127.0.0.1:43148").rstrip("/")
         if not engine_url:
@@ -796,6 +738,9 @@ class AskFredaService:
                         "state": state or {},
                         "action": action,
                         "history": history,
+                        # Customer portal workspace — the engine adds its
+                        # projects/agents to the catalog for this turn.
+                        "context": context or None,
                     },
                 )
             if not response.is_success:
@@ -895,12 +840,19 @@ class AskFredaService:
             }
 
     @staticmethod
-    def _browse_response() -> Dict[str, Any]:
+    def _browse_response(context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         catalog = freda_catalog_service.browse_catalog()
         by_cat = catalog["solutions_by_category"]
         lines = [f"Freda's catalog has {catalog['solution_count']} solutions and {catalog['agent_count']} onboarded agents. Solutions by category:"]
         for cat, names in sorted(by_cat.items()):
             lines.append(f"• {cat}: {', '.join(names)}")
+        # Customer portal: the workspace's own projects after the catalog.
+        projects = [p for p in ((context or {}).get("projects") or []) if isinstance(p, dict) and p.get("name")]
+        workspace = (context or {}).get("workspace") or "Your workspace"
+        if projects:
+            lines.append("")
+            lines.append(f"{workspace} also has {len(projects)} existing project{'s' if len(projects) != 1 else ''}:")
+            lines.extend(_project_line(p) for p in projects)
         message = "\n".join(lines)
 
         matches = [
@@ -917,6 +869,20 @@ class AskFredaService:
                 "score": None,
             }
             for s in freda_catalog_service._solutions
+        ] + [
+            {
+                "type": "solution",
+                "id": "proj-" + re.sub(r"[^a-z0-9]+", "-", str(p["name"]).lower()).strip("-"),
+                "name": p["name"],
+                "category": f"{workspace} projects",
+                "description": f"Existing project · {len(p.get('datapoints') or [])} datapoints · {len(p.get('sources') or [])} sources",
+                "coverage": p.get("coverage"),
+                "refresh": p.get("frequency"),
+                "sources": [str(x.get("label") if isinstance(x, dict) else x) for x in (p.get("sources") or [])[:5]],
+                "route": "/monitoring",
+                "score": None,
+            }
+            for p in projects
         ]
 
         return {

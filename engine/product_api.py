@@ -4,7 +4,8 @@ import os
 
 import httpx
 
-DEFAULT_PRODUCT_API = "http://127.0.0.1:8080"
+# The FreDA backend (fredaa-backend in ecosystem.config.cjs listens on 8131).
+DEFAULT_PRODUCT_API = "http://127.0.0.1:8131"
 
 
 def product_api_base() -> str:
